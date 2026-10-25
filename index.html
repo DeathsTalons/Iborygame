@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ibory</title>
+<meta name="description" content="Ibory is a slow, punishing, real-time medieval strategy game. Build cities, raise heroes from history, farm the valleys and siege historic cities, alone or with an alliance.">
+<meta name="theme-color" content="#252a27">
+<link rel="icon" href="img/icon-192.png">
+<meta property="og:title" content="Ibory">
+<meta property="og:description" content="A slow, punishing, real-time medieval strategy game. Free, no ads, nothing to buy that makes you stronger.">
+<meta property="og:image" content="https://iborygame.com/img/icon-512.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<style>
+/* hero: the game's own map, full bleed, with the title held on its left */
+.hero{position:relative;min-height:min(84vh,720px);display:flex;align-items:center;overflow:hidden;border-bottom:1px solid var(--rule)}
+.hero .ground{position:absolute;inset:0;background:url(img/map.webp) center/cover no-repeat;image-rendering:pixelated;transform:scale(1.04)}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(28,32,30,.96) 0%,rgba(28,32,30,.86) 38%,rgba(28,32,30,.35) 72%,rgba(28,32,30,.15) 100%),linear-gradient(0deg,rgba(28,32,30,.9) 0%,rgba(28,32,30,0) 40%)}
+.hero .in{position:relative;z-index:1;max-width:1120px;width:100%;margin:0 auto;padding:56px 24px 64px}
+.hero h1{font:700 clamp(2.3rem,5.2vw,3.9rem)/1.08 var(--display);margin:0;max-width:13ch;letter-spacing:.01em}
+.hero p.lede{font-size:1.2rem;max-width:34ch;color:var(--ink);margin:20px 0 28px}
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+
+/* the build queue: Ibory's real-time clock, ticking */
+.queue{margin-top:40px;display:inline-grid;grid-template-columns:auto auto;align-items:center;gap:4px 18px;background:rgba(28,32,30,.88);border:1px solid #4a534d;border-radius:10px;padding:14px 18px}
+.queue .what{font-size:.98rem;color:var(--dim)}
+.queue .left{font:700 1.5rem var(--display);font-variant-numeric:tabular-nums;color:var(--gold-hi);grid-row:span 2;text-align:right;min-width:9.5ch}
+.queue .why{font-size:.92rem;color:var(--dim)}
+.queue .why b{color:var(--ink);font-weight:500}
+
+/* how it plays */
+.plays{max-width:1120px;margin:0 auto;padding:72px 24px 24px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:48px;align-items:start}
+.plays h2,.heroes h2{font:700 clamp(1.7rem,3.5vw,2.3rem)/1.15 var(--display);margin:0 0 14px}
+.plays h3{font:700 1.15rem var(--display);color:var(--gold-hi);margin:28px 0 4px}
+.plays p{margin:0;max-width:52ch;color:#d9ddd6}
+.strip{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 4px 14px;margin:0 -4px}
+.strip figure{flex:0 0 min(62%,250px);margin:0;scroll-snap-align:start}
+.strip img{width:100%;border-radius:14px;border:1px solid #4a534d;background:var(--slate-deep)}
+.strip figcaption{font-size:.92rem;color:var(--dim);margin-top:8px}
+
+/* heroes from history */
+.heroes{max-width:1120px;margin:0 auto;padding:56px 24px 24px}
+.heroes p{max-width:60ch;color:#d9ddd6;margin:0 0 22px}
+.faces{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:10px;list-style:none;padding:0;margin:0}
+.faces li{font-size:.85rem;color:var(--dim);line-height:1.25}
+.faces img{width:100%;aspect-ratio:1;border-radius:8px;border:2px solid #6b5a2c;margin-bottom:6px}
+
+/* closing */
+.last{max-width:1120px;margin:0 auto;padding:56px 24px 8px}
+.last p{max-width:56ch;color:#d9ddd6}
+
+@media (max-width:860px){
+  .plays{grid-template-columns:minmax(0,1fr);gap:28px;padding-top:56px}
+  .faces{grid-template-columns:repeat(5,minmax(0,1fr))}
+}
+@media (max-width:560px){
+  .hero{min-height:88vh}
+  .hero::after{background:linear-gradient(0deg,rgba(28,32,30,.97) 0%,rgba(28,32,30,.9) 46%,rgba(28,32,30,.45) 100%)}
+  .hero{align-items:flex-end}
+  .hero .in{padding:40px 16px 40px}
+  .hero p.lede{font-size:1.1rem}
+  .queue{display:grid;margin-top:28px}
+  .queue .left{font-size:1.3rem}
+  .plays,.heroes,.last{padding-left:16px;padding-right:16px}
+  .faces{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .faces li:nth-child(n+9){display:none}
+}
+@media (prefers-reduced-motion:no-preference){
+  .hero .ground{animation:drift 60s ease-in-out infinite alternate}
+  @keyframes drift{from{transform:scale(1.04) translate(0,0)}to{transform:scale(1.1) translate(-2%,-1.5%)}}
+}
+</style>
+</head>
+<body>
+<header class="bar">
+  <a class="brand" href="/"><img src="img/icon-192.png" alt="">Ibory</a>
+  <nav aria-label="Main">
+    <a href="/play/">Play</a>
+    <a href="https://discord.gg/H8gErENmWe" rel="noopener">Discord</a>
+    <a class="wide" href="/account.html">Account</a>
+  </nav>
+</header>
+
+<main>
+<section class="hero">
+  <div class="ground" role="img" aria-label="Ibory's world map: valleys, NPC cities and a historic city in North March"></div>
+  <div class="in">
+    <h1>The king is gone. The kingdom is yours to hold.</h1>
+    <p class="lede">A slow, real-time medieval strategy game. Free to play, no ads, and nothing to buy that makes you stronger.</p>
+    <div class="cta">
+      <a class="btn main" href="/play/">Play in your browser</a>
+      <a class="btn quiet" href="https://discord.gg/H8gErENmWe" rel="noopener">Join the Discord</a>
+    </div>
+    <div class="queue" aria-live="off">
+      <span class="what">Town Hall to level 10</span>
+      <span class="left" id="left">3d 22h 14m</span>
+      <span class="why">Real time. Close the game and the builders <b>keep working</b>.</span>
+    </div>
+  </div>
+</section>
+
+<section class="plays">
+  <div>
+    <h2>How it plays</h2>
+    <h3>Build for the long haul</h3>
+    <p>Grow one town into a kingdom of cities. Buildings and research take hours, then days, and every city keeps its own tech tree. There's no speed button.</p>
+    <h3>Fight by the numbers</h3>
+    <p>Every battle runs on one engine with the same rules for you, NPC cities and other players. Troop types, fortifications, research and hero stats all count, and the War Wizard replays any fight round by round. Test plans in the battle simulator and the War College puzzles.</p>
+    <h3>Alone, or with an alliance</h3>
+    <p>Play single player for as long as you like. Make a free account for cloud saves, high scores, world chat, alliance rallies and reinforcements, opt-in invasions and PvP battlefields.</p>
+  </div>
+  <div class="strip" tabindex="0" aria-label="Screens from the game">
+    <figure><img src="img/screen-city.webp" width="540" height="1169" alt="The city screen: resources, builders and the town's building plots" loading="lazy"><figcaption>Your town and its builders</figcaption></figure>
+    <figure><img src="img/screen-map.webp" width="540" height="1169" alt="The world map, with valley and NPC city levels on each tile" loading="lazy"><figcaption>The map of North March</figcaption></figure>
+    <figure><img src="img/screen-college.webp" width="540" height="1169" alt="The War College list of battle puzzles" loading="lazy"><figcaption>War College puzzles</figcaption></figure>
+    <figure><img src="img/screen-war.webp" width="540" height="1169" alt="The battle simulator with troop counts for both sides" loading="lazy"><figcaption>The battle simulator</figcaption></figure>
+  </div>
+</section>
+
+<section class="heroes">
+  <h2>Heroes from history</h2>
+  <p>Spin the wheel for heroes to lead your marches, run your cities and man your walls. The greatest are held in the historic cities on the map: break a city's loyalty and its hero joins you.</p>
+  <ul class="faces">
+    <li><img src="img/hero-joan-of-arc.webp" alt="" loading="lazy">Joan of Arc</li>
+    <li><img src="img/hero-genghis-khan.webp" alt="" loading="lazy">Genghis Khan</li>
+    <li><img src="img/hero-saladin.webp" alt="" loading="lazy">Saladin</li>
+    <li><img src="img/hero-boudica.webp" alt="" loading="lazy">Boudica</li>
+    <li><img src="img/hero-charlemagne.webp" alt="" loading="lazy">Charlemagne</li>
+    <li><img src="img/hero-leonidas.webp" alt="" loading="lazy">Leonidas</li>
+    <li><img src="img/hero-tomyris.webp" alt="" loading="lazy">Tomyris</li>
+    <li><img src="img/hero-sun-tzu.webp" alt="" loading="lazy">Sun Tzu</li>
+    <li><img src="img/hero-julius-caesar.webp" alt="" loading="lazy">Julius Caesar</li>
+    <li><img src="img/hero-cleopatra.webp" alt="" loading="lazy">Cleopatra</li>
+  </ul>
+</section>
+
+<section class="last">
+  <h2 style="font:700 clamp(1.7rem,3.5vw,2.3rem)/1.15 var(--display);margin:0 0 12px">Meant to take a long time</h2>
+  <p>Medals drop from under 1% of victories. Gear is crafted from very rare materials, and a legendary hero is a real milestone. If that sounds good, you'll fit right in.</p>
+  <div class="cta" style="margin-top:22px"><a class="btn main" href="/play/">Play in your browser</a></div>
+</section>
+</main>
+
+<footer class="foot"><div>
+  <a href="/play/">Play</a>
+  <a href="https://discord.gg/H8gErENmWe" rel="noopener">Discord</a>
+  <a href="/account.html">Your account</a>
+  <a href="/privacy.html">Privacy policy</a>
+  <span>© 2026 Ibory. Hero portraits are public-domain artworks.</span>
+</div></footer>
+
+<script>
+// the build queue counts down in real time, like the game's own timers
+(function(){
+  var el=document.getElementById("left"); if (!el) return;
+  var end=Date.now()+((3*24+22)*3600+14*60+6)*1000;
+  function pad(n){ return (n<10?"0":"")+n; }
+  function tick(){ var s=Math.max(0,Math.floor((end-Date.now())/1000)), d=Math.floor(s/86400), h=Math.floor(s%86400/3600), m=Math.floor(s%3600/60);
+    el.textContent=d+"d "+h+"h "+pad(m)+"m "+pad(s%60)+"s"; }
+  tick(); setInterval(tick,1000);
+})();
+</script>
+</body>
+</html>
