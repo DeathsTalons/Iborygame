@@ -189,6 +189,21 @@ details.rep summary{list-style-position:outside;line-height:1.35}
 .farmadd{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:10px}
 .farmgrid{display:grid;grid-template-columns:repeat(5,auto);gap:6px}
 @media (min-width:520px){ .farmgrid{grid-template-columns:repeat(10,auto)} }
+.altiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.altile{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px 9px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);cursor:pointer;font:inherit;color:inherit;text-align:center;min-width:0}
+.altile img{width:58px;height:58px;margin-bottom:2px}
+.altile .nm{font:700 .78rem/1.15 var(--display);overflow-wrap:anywhere}
+.altile .lv{font-size:.8rem;color:var(--muted)}
+.altile .st{font-size:.74rem;line-height:1.2}
+.altile.ready{border-color:var(--brass)}.altile.ready .st{color:var(--brass)}
+.altile.run{border-color:var(--grass);box-shadow:inset 0 0 0 1px var(--grass)}
+.altile.lock{opacity:.7}
+.altile .tbar,.alnow .tbar{display:block;width:80%;height:5px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:3px}.altile .tbar i{display:block;height:100%;background:var(--grass)}
+.alnow{display:flex;gap:12px;align-items:flex-start}.alnow img{width:56px;height:56px;flex:none}
+.alhead{display:flex;gap:12px;align-items:center}.alhead img{width:72px;height:72px;flex:none}
+.alfx{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+.alcost{display:grid;grid-template-columns:auto auto 1fr;gap:4px 12px;align-items:baseline}.alcost b{text-align:right;font-variant-numeric:tabular-nums}
+.albk{margin:0 0 6px}
 .chipbtn{min-width:34px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;font:700 .9rem var(--display)}
 .chipbtn.on{border-color:var(--brass);color:var(--brass);background:var(--brass-soft)}
 .chipbtn:disabled{opacity:.4;cursor:not-allowed}
@@ -838,7 +853,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script>
 (function(){
 "use strict";
-var APP_VERSION = "0.2.2";
+var APP_VERSION = "0.2.3";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -4739,7 +4754,7 @@ function alUnread(){ var al=alMine(); if (!al) return 0; var seen=S.alSeen||0, n
 function alSync(){
   if (!alOn() || ALS.busy) return; ALS.busy=true; ALS.last=Date.now();
   var sendJobs=!!alMine(), jobs=sendJobs?alMyJobs():null; if (jobs) ALS.jobSig=jobs.map(function(j){ return j.ref; }).join("|");
-  var sb={since:ALS.top}, firstChat=!ALS.top; if (alMine()){ sb.thr=wtThreats(); sb.hc=rfCities(); if (S.alRfLoss&&S.alRfLoss.length) sb.rl=S.alRfLoss.slice(0,50); } if (jobs){ sb.proj=jobs.map(function(j){ return {ref:j.ref, kind:j.kind, label:j.label, end:j.end}; }); S.alGive=S.alGive||{r:0,c:0}; sb.give={r:Math.floor(S.alGive.r), c:Math.floor(S.alGive.c)}; } if (!ALS.cat) sb.cat=1;
+  var sb={since:ALS.top}, firstChat=!ALS.top; if (alMine()){ sb.thr=wtThreats(); sb.hc=rfCities(); if (S.alRfLoss&&S.alRfLoss.length) sb.rl=S.alRfLoss.slice(0,50); } if (jobs){ sb.proj=jobs.map(function(j){ return {ref:j.ref, kind:j.kind, label:j.label, end:j.end}; }); S.alGive=S.alGive||{r:0,c:0}; var myR=alMyRates(); sb.give={r:Math.floor(S.alGive.r), c:Math.floor(S.alGive.c), rr:Math.round(myR.r), cr:Math.round(myR.c)}; } if (!ALS.cat) sb.cat=1;
   var arf=rxFromOf(ALS.chat); sb.rxFrom=arf;
   alPost("/al/sync",sb).then(function(d){ ALS.busy=false; if (d && !d.error) rxTake("a", d.rx, arf);
     if (d.error){ ALS.err=d.error; alRender(); return; }
@@ -4860,19 +4875,20 @@ function viewAllianceList(mineId){
   return h;
 }
 // alliance pages in four groups: underlined group tabs, then the group's pages as chips (only when it has more than one)
-var AL_GROUPS=[["battle","Battle",["rally","arena","reinf","war"]],["map","Map",["map"]],["build","Build",["projects","city","univ","trade"]],["people","People",["members","apps","ranks","about","list"]]]; // 0.1.237: the Chat page is gone (alliance chat lives in the chat dock); Battle › Rallies opens first
+var AL_GROUPS=[["battle","Battle",["rally","arena","reinf","war"]],["map","Map",["map"]],["build","Build",["city","projects","bank","lend","bldg"]],["people","People",["members","apps","ranks","about","list"]]]; // 0.1.237: the Chat page is gone (alliance chat lives in the chat dock); Battle › Rallies opens first
 function alGroupOf(sub){ for (var i=0;i<AL_GROUPS.length;i++) if (AL_GROUPS[i][2].indexOf(sub)>=0) return AL_GROUPS[i]; return AL_GROUPS[0]; }
 function alNavHtml(tabs, sub, dot){ var have={}; tabs.forEach(function(t){ have[t[0]]=t[1]; }); var cur=alGroupOf(sub); ALS.lastIn=ALS.lastIn||{}; ALS.lastIn[cur[0]]=sub;
   var h='<nav class="altabs" role="tablist">'+AL_GROUPS.map(function(gp){ var first=(ALS.lastIn[gp[0]]&&have[ALS.lastIn[gp[0]]])?ALS.lastIn[gp[0]]:gp[2].filter(function(k){ return have[k]; })[0];
     return '<button role="tab" aria-selected="'+(gp===cur)+'" data-act="al-sub" data-v="'+first+'">'+gp[1]+(dot[gp[0]]?' <span class="aldot">\u2022</span>':'')+'</button>'; }).join("")+'</nav>';
   var pages=cur[2].filter(function(k){ return have[k]; });
-  if (pages.length>1) h+='<div class="alsubs">'+pages.map(function(k){ return '<button class="chipbtn'+(sub===k?' on':'')+'" data-act="al-sub" data-v="'+k+'">'+have[k]+'</button>'; }).join("")+'</div>';
+  if (pages.length>1) h+='<div class="alsubs">'+pages.map(function(k){ return '<button class="chipbtn'+(sub===k||(sub==="bldg"&&k==="city")?' on':'')+'" data-act="al-sub" data-v="'+k+'">'+have[k]+'</button>'; }).join("")+'</div>';
   return h; }
 function viewMyAlliance(al){
   var my=al.my, rk=al.ranks, sub=ALS.sub, apps=al.apps||[];
   if (sub==="apps" && !my.can.accept) sub="rally"; if (sub==="ranks" && my.rank!==0) sub="rally"; if (sub==="chat") sub=ALS.sub="rally";
+  if (sub==="univ"||sub==="trade"){ ALS.bk=sub; sub=ALS.sub="bldg"; } // 0.2.3: the University and Trading Post are building pages now
   var hp=ALS.d.help||{projects:[],canHelp:0};
-  var tabs=[["projects","Projects"+(hp.canHelp?" ("+hp.canHelp+")":"")],["city","Alliance City"],["univ","University"+(al.econ&&al.econ.rs&&al.econ.rs.length?" \u2022":"")],["arena","Arena"+(arCur()?" \u2022":"")],["rally","Rallies"+(ryLive().length?" \u2022":"")],["reinf","Reinforce"+((al.reinf&&al.reinf.here&&al.reinf.here.length)?" ("+al.reinf.here.length+")":"")],["trade","Trade"+((al.trade&&al.trade.in&&al.trade.in.length)?" ("+al.trade.in.length+")":"")],["war",!AW_ON?"War (coming soon)":"War"+((AWS.d&&AWS.d.war&&AWS.d.war.status!=="settled"&&AWS.d.war.status!=="over")?" \u2022":AWS.d&&AWS.d.round?" (sign-ups)":"")],["map","Map"],["members","Members ("+al.members.length+")"],["list","All alliances"]]; if (my.can.accept) tabs.push(["apps","Applications"+(apps.length?" ("+apps.length+")":"")]); if (my.rank===0) tabs.push(["ranks","Ranks"]); tabs.push(["about","About"]);
+  var tabs=[["projects","Projects"+(hp.canHelp?" ("+hp.canHelp+")":"")],["city","City"+(al.econ&&al.econ.bd?" \u2022":"")],["bank","Bank"],["lend","Lending"],["arena","Arena"+(arCur()?" \u2022":"")],["rally","Rallies"+(ryLive().length?" \u2022":"")],["reinf","Reinforce"+((al.reinf&&al.reinf.here&&al.reinf.here.length)?" ("+al.reinf.here.length+")":"")],["war",!AW_ON?"War (coming soon)":"War"+((AWS.d&&AWS.d.war&&AWS.d.war.status!=="settled"&&AWS.d.war.status!=="over")?" \u2022":AWS.d&&AWS.d.round?" (sign-ups)":"")],["map","Map"],["members","Members ("+al.members.length+")"],["list","All alliances"]]; if (my.can.accept) tabs.push(["apps","Applications"+(apps.length?" ("+apps.length+")":"")]); if (my.rank===0) tabs.push(["ranks","Ranks"]); tabs.push(["about","About"]);
   var h='<div class="section"><div class="shead"><h3>'+esc(al.name)+' <span class="dur">['+esc(al.tag)+']</span></h3><span class="dur">'+al.members.length+' / '+al.cap+' members</span></div>'+
     '<p class="dur" style="margin:0">You are <b>'+esc(rk[my.rank].n)+'</b>. Your honor: '+fmt(ALS.d.honor||0)+'.'+(ALS.err?' <span class="why">'+esc(ALS.err)+'</span>':'')+'</p>'+
     '</div>'+alNavHtml(tabs, sub, {build:!!(hp.canHelp||(al.trade&&al.trade.in&&al.trade.in.length)), battle:!!(arCur()||ryLive().length||(al.reinf&&al.reinf.here&&al.reinf.here.length)||(AW_ON&&AWS.d&&AWS.d.war&&AWS.d.war.status!=="settled"&&AWS.d.war.status!=="over")), people:!!apps.length});
@@ -4882,9 +4898,13 @@ function viewMyAlliance(al){
       '<p class="hint">Every build and research a member starts shows up here. Each member can help each one once, and every help takes '+Math.round((hp.helpSec||60)/60)+' minute'+((hp.helpSec||60)>=120?'s':'')+' off. The Help button next to Settings helps them all with one tap.</p>'+
       (hp.projects.length?hp.projects.map(function(p){ return '<div class="bq"><span><b>'+esc(p.owner)+'</b>: '+esc(p.label)+'<br><span class="dur">'+(p.end>Date.now()?fmtT(p.end-Date.now())+' left':'finishing')+' \u00b7 helped '+p.helps+' of '+others+'</span></span><span class="dur">'+(p.mine?'yours':p.helped?'\u2713 helped':'')+'</span></div>'; }).join(""):'<p class="hint">No projects running.</p>')+'</div>';
   } else if (sub==="city"){
-    h+=alCityHtml(al);
-  } else if (sub==="univ"){
-    h+=alUnivHtml(al);
+    h+=alHubHtml(al);
+  } else if (sub==="bldg"){
+    h+=alBldgPage(al, ALS.bk||"city");
+  } else if (sub==="bank"){
+    h+=alBankHtml(al);
+  } else if (sub==="lend"){
+    h+=alLendHtml(al);
   } else if (sub==="list"){
     h+=viewAllianceList(al.id);
   } else if (sub==="arena"){
@@ -4895,8 +4915,6 @@ function viewMyAlliance(al){
     h+=alReinfHtml(al);
   } else if (sub==="war"){
     h+=AW_ON?awHtml(al):'<div class="section"><h3>Alliance War</h3><p class="hint">Coming soon: alliance against alliance, with attackers, defenders and goalkeepers, a wall to break, and rewards for the whole alliance.</p><div class="btnrow"><button class="btn" disabled>Coming soon</button></div></div>';
-  } else if (sub==="trade"){
-    h+=alTradeHtml(al);
   } else if (sub==="map"){
     h+=alMapHtml(al);
   } else if (sub==="members"){
@@ -5154,7 +5172,9 @@ function alUnivHtml(al){
   var my=al.my, ul=E.lv.univ||0, tree=ALS.uTree||C0.trees[0][0], h='';
   h+='<div class="section"><div class="shead"><h3>University</h3><span class="dur">'+(ul?'level '+ul+' of 10':'not built')+'</span></div>'+
     '<div class="rgrid"><span>Research pool <b>'+fmt(E.rp)+'</b></span><span>Running <b>'+E.rs.length+' / '+E.slots+'</b></span></div>';
-  E.rs.forEach(function(r){ var T=C0.techs.filter(function(t){ return t.k===r.k; })[0]||{n:r.k}; h+='<div class="bq"><span><b>'+esc(T.n)+' level '+r.to+'</b><br>'+alBar(r.got,r.need)+'</span></div>'; });
+  var uF=(E.flow&&E.flow.r)||0, uCum=0; if (E.rs.length) h+='<p class="dur" style="margin:4px 0 0">'+(uF?fmt(uF)+' research points an hour from lent Academies (they go to the first research, then the next).':'<span class="why">No Academies are lent, so research isn\u2019t moving. Lend one on Build \u203a Lending.</span>')+'</p>';
+  E.rs.forEach(function(r){ var T=C0.techs.filter(function(t){ return t.k===r.k; })[0]||{n:r.k}; uCum+=Math.max(0,r.need-r.got); var eta=alEta(uCum,uF);
+    h+='<div class="bq"><span><b>'+esc(T.n)+' level '+r.to+'</b><br>'+alBar(r.got,r.need)+(eta?'<br><span class="dur">Done in '+eta+'</span>':'')+'</span></div>'; });
   if (!ul) h+='<p class="why">Build the University in the Alliance City to start researching.</p>';
   else h+='<p class="hint" style="margin:6px 0 0">Members lend their Academies (Alliance City page) to make research points. University level N opens tier N, and a tier opens once every research above it is finished.</p>';
   h+='</div>';
@@ -5187,42 +5207,109 @@ function alUnivHtml(al){
     h+='</div>'; }
   return h;
 }
-function alCityHtml(al){
-  var E=al.econ, C0=ALS.cat; if (!E || !C0) return '<div class="section"><p class="hint">Loading the Alliance City\u2026</p></div>';
-  var my=al.my, h='', univ=C0.bldg[0], ul=E.lv.univ||0, cl=E.lv.city||1;
-  // construction
-  h+='<div class="section"><div class="shead"><h3>Alliance City</h3><span class="dur">level '+cl+' of '+C0.city.max+'</span></div>'+
-    '<p class="hint">Members donate resources to the bank and lend their builders and Academies. Construction points build and upgrade alliance buildings; research points go into the University\u2019s research. Points wait in the pool until something is running.</p>';
-  if (E.bd){ var bn=E.bd.k==="city"?"Alliance City":(C0.bldg.filter(function(b){ return b.k===E.bd.k; })[0]||{}).n; h+='<div class="bq"><span><b>Building:</b> '+esc(bn)+' level '+E.bd.to+'<br>'+alBar(E.bd.got,E.bd.need)+'</span></div>'; }
-  else if (my.can.bank){
-    var opts=[];
-    if (cl<C0.city.max) opts.push(['city','Upgrade the Alliance City to level '+(cl+1), C0.city.need[cl]]);
-    C0.bldg.forEach(function(B){ var bl=E.lv[B.k]||0; if (bl<B.max) opts.push([B.k,(bl?'Upgrade the '+B.n+' to level ':'Build the '+B.n+' (level ')+(bl+1)+(bl?'':')'), B.need[bl], bl+1>cl, B.d]); });
-    h+=opts.map(function(o){ return '<div class="bq"><span>'+o[1]+(o[4]?'<br><span class="hint">'+esc(o[4])+'</span>':'')+'<br><span class="dur">'+fmt(o[2])+' construction points, '+alCostTxt(o[2])+'</span>'+(o[3]?'<br><span class="why">Needs Alliance City level '+(cl+1)+'</span>':'')+'</span><div class="mbtns"><button class="link strong" data-act="al-start" data-kind="build" data-key="'+o[0]+'"'+(o[3]?' disabled':'')+'>Start</button></div></div>'; }).join("");
-  } else h+='<p class="dur">Nothing is being built. Members with the bank permission start construction.</p>';
-  h+='<div class="rgrid" style="margin-top:6px">'+C0.bldg.map(function(B){ return '<span>'+esc(B.n)+' <b>level '+(E.lv[B.k]||0)+'</b></span>'; }).join("")+'<span>Research slots <b>'+E.slots+'</b></span><span>Construction pool <b>'+fmt(E.cp)+'</b></span><span>Research pool <b>'+fmt(E.rp)+'</b></span><span>Help <b>'+Math.round(E.help)+' s</b></span><span>Member cap <b>'+E.cap+'</b></span></div></div>';
-  // bank and donations
-  h+='<div class="section"><div class="shead"><h3>Bank</h3></div><div class="rgrid">'+RES.map(function(k){ return '<span>'+RNAME[k]+' <b>'+fmt(Math.floor(E.bank[k]||0))+'</b></span>'; }).join("")+'</div>'+
-    '<div class="h3" style="margin-top:8px">Donate from '+esc(S.name)+'</div><div class="tscroll"><table class="gt" style="min-width:0"><tbody>'+RES.map(function(k){ return '<tr><td>'+RNAME[k]+' <span class="dur">('+fmt(Math.floor(S.res[k]))+')</span></td><td><input type="number" min="0" data-aldon="'+k+'" value="'+(ALD[k]||"")+'" placeholder="0" style="width:110px"></td></tr>'; }).join("")+'</tbody></table></div>'+
-    '<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="al-donate">Donate</button></div><p class="hint">Every 1,000 resources donated is 1 contribution point.</p></div>';
-  h+=alBoxHtml(E.box||0);
-  // lending
-  h+='<div class="section"><div class="shead"><h3>Your cities</h3></div><p class="hint">An Academy working for the alliance makes research points (Academy level \u00d7 100 an hour, faster with Scholarship and your researcher), and can\u2019t research for its city meanwhile. Each builder lent makes construction points (Town Hall level \u00d7 100 an hour, faster with Construction and your mayor) and can\u2019t build at home. Every 100 points is 1 contribution point.</p>';
+/* ---------- the Alliance City hub and a page for every building (0.2.3) ----------
+   Build › City is a hub: what's being built (bar, points an hour, time left) and a tile for the city and each building.
+   A tile opens that building's page (ALS.sub "bldg", ALS.bk the key): level, what it does now and next, the upgrade's cost against the bank, Start,
+   then the building's own tools (the research tree, your box, the monuments...). Build › Bank and Build › Lending are their own pages. */
+var AL_BK_ORDER=["city","univ","wh","trade","arena","watch","memorial","arsenal","sanctuary"];
+function alBldgDef(k){ var C0=ALS.cat; if (!C0) return null;
+  if (k==="city") return {k:"city", n:"Alliance City", max:C0.city.max, need:C0.city.need, d:"The heart of the alliance. Every building is limited to the city’s level, so the city goes up first."};
+  return C0.bldg.filter(function(b){ return b.k===k; })[0]||null; }
+function alBldgLv(E,k){ return k==="city" ? (E.lv.city||1) : (E.lv[k]||0); }
+function alBldgName(k){ var d=alBldgDef(k); return d?d.n:k; }
+// what a building does at level L (L=0: not built)
+function alBldgFx(k, L, E){ if (L<=0) return "";
+  if (k==="city") return "Buildings can go up to level "+L;
+  if (k==="univ") return "Opens research tier "+L+", +"+(3*L)+"% research points";
+  if (k==="wh"){ var vault=(E&&E.fx&&E.fx.vault)||0; return "Each member can store "+fmt(Math.round(100e6*Math.pow(2,L-1)*(1+vault)))+" resources a day in their box"; }
+  if (k==="trade"){ var fee=Math.max(0.02, 0.10-(L-1)*(0.08/9)); return Math.round(fee*1000)/10+"% fee, "+fmt(Math.round(100e6*Math.pow(2,L-1)))+" a day each way per member"; }
+  if (k==="arena") return "Monsters up to level "+L;
+  if (k==="watch") return L>=8?"Full troop breakdown of attacks on members":L>=5?"Attacker and a rough troop count":L>=3?"Who is attacked, when, and by whom":"Who is attacked and when";
+  if (k==="memorial") return "Monuments can rise to level "+L;
+  if (k==="sanctuary") return "Halo of Fortune: +"+L+"% star upgrade success while lit";
+  if (k==="arsenal") return "The Warden’s gear at Arsenal level "+L;
+  return ""; }
+function alBldgState(E, k){ var d=alBldgDef(k), lv=alBldgLv(E,k), cl=E.lv.city||1;
+  if (E.bd && E.bd.k===k) return {s:"run", t:"Building level "+E.bd.to};
+  if (lv>=d.max) return {s:"max", t:"Top level"};
+  if (k!=="city" && lv+1>cl) return {s:"lock", t:"Needs City "+(lv+1)};
+  return {s:"ready", t:lv?"Can go to "+(lv+1):"Can be built"}; }
+function alBkImg(k, px){ var u=alSprUrl(k); return u?'<img src="'+u+'" width="'+px+'" height="'+px+'" alt="" style="image-rendering:pixelated">':''; }
+// time left for "remaining" points at "perH" an hour
+function alEta(rem, perH){ if (rem<=0) return "any moment"; if (!perH) return ""; return "about "+fmtT(rem/perH*3600e3); }
+// the construction card: what's being built, how fast, how long
+function alConstructionHtml(E, my){ var F=E.flow||{c:0,r:0,who:[]}, h='<div class="section albuild"><div class="shead"><h3>Construction</h3><span class="dur">'+fmt(F.c)+' points an hour</span></div>';
+  if (E.bd){ var B=E.bd, rem=Math.max(0,B.need-B.got), eta=alEta(rem, F.c);
+    h+='<div class="alnow">'+alBkImg(B.k,56)+'<div style="min-width:0;flex:1"><b>'+esc(alBldgName(B.k))+' to level '+B.to+'</b>'+alBar(B.got,B.need)+
+      '<div class="dur" style="margin-top:2px">'+(F.c?(eta?'Done in '+eta+' at the current rate':''):'<span class="why">No builders are lent, so nothing is coming in.</span>')+'</div>'+
+      '<div class="dur">Started'+(B.by?' by '+esc(B.by):'')+' '+alAgo(B.at).replace(/^online$/,"just now")+'</div></div></div>';
+    if (!F.c) h+='<p class="hint" style="margin:6px 0 0">Construction points come from builders members lend on the <b>Lending</b> page. They arrive whenever each member opens the game.</p>'; }
+  else { h+='<p style="margin:0">Nothing is being built.</p>';
+    h+='<p class="dur" style="margin:2px 0 0">'+(E.cp?fmt(E.cp)+' construction points are waiting in the pool for the next build.':'The pool is empty.')+' '+(my.can.bank?'Tap a building below to start an upgrade.':'Members with the bank permission start construction.')+'</p>'; }
+  if (F.who.length) h+='<details class="det" data-det="alflow"'+(DET.alflow?' open':'')+'><summary class="dur">Who is lending ('+F.who.length+')</summary>'+F.who.map(function(w){ return '<div class="bq"><span>'+esc(w.n)+'</span><span class="dur">'+(w.c?fmt(w.c)+' construction':'')+(w.c&&w.r?' · ':'')+(w.r?fmt(w.r)+' research':'')+' an hour</span></div>'; }).join("")+'</details>';
+  return h+'</div>'; }
+function alHubHtml(al){ var E=al.econ, C0=ALS.cat; if (!E || !C0) return '<div class="section"><p class="hint">Loading the Alliance City…</p></div>';
+  var my=al.my, h=alConstructionHtml(E, my);
+  h+='<div class="section"><div class="shead"><h3>Buildings</h3><span class="dur">City level '+(E.lv.city||1)+' of '+C0.city.max+'</span></div><div class="altiles">'+AL_BK_ORDER.map(function(k){ if (!alBldgDef(k)) return ''; var st=alBldgState(E,k), lv=alBldgLv(E,k);
+      var extra=''; if (k==="univ" && E.rs.length) extra='<span class="st okc">'+E.rs.length+' researching</span>'; if (k==="trade" && al.trade && al.trade.in && al.trade.in.length) extra='<span class="st okc">'+al.trade.in.length+' arriving</span>';
+      return '<button class="altile '+st.s+'" data-act="al-bk" data-v="'+k+'">'+alBkImg(k,60)+'<span class="nm">'+esc(alBldgName(k))+'</span><span class="lv">'+(lv?'Level '+lv:'Not built')+'</span>'+
+        (st.s==="run"?'<span class="tbar"><i style="width:'+alPct(E.bd.got,E.bd.need)+'%"></i></span>':'<span class="st'+(st.s==="lock"?' dur':'')+'">'+st.t+'</span>')+extra+'</button>'; }).join("")+'</div></div>';
+  h+='<div class="section"><div class="shead"><h3>Recently finished</h3></div>'+(E.log.length?E.log.map(function(l){ return '<p class="dur" style="margin:2px 0">'+alTime(l.at)+' · '+esc(l.t)+'</p>'; }).join(""):'<p class="hint">Nothing finished yet.</p>')+'</div>';
+  return h; }
+// a building's upgrade card: cost line by line against the bank, and Start (or why not)
+function alUpgradeHtml(E, my, k){ var C0=ALS.cat, d=alBldgDef(k), lv=alBldgLv(E,k), cl=E.lv.city||1, st=alBldgState(E,k), x=C0.resX||{food:2,lumber:2,stone:2,iron:2,gold:0.5};
+  if (st.s==="run") return alConstructionHtml(E, my);
+  if (st.s==="max") return '<div class="section"><p class="okc" style="margin:0">'+esc(d.n)+' is at its top level.</p></div>';
+  var need=d.need[lv], short=[], h='<div class="section"><div class="shead"><h3>'+(lv?'Upgrade to level '+(lv+1):'Build it (level 1)')+'</h3></div>';
+  h+='<div class="alcost"><span>Construction points</span><b>'+fmt(need)+'</b><span class="dur">'+(E.cp?fmt(E.cp)+' in the pool':'from lent builders')+'</span>';
+  RES.forEach(function(r){ var c=Math.round(need*x[r]), have=Math.floor((E.bank&&E.bank[r])||0), ok=have>=c; if (!ok) short.push(fmt(c-have)+' '+RNAME[r].toLowerCase());
+    h+='<span>'+RNAME[r]+'</span><b>'+fmt(c)+'</b><span class="'+(ok?'okc':'why')+'">'+(ok?'✓ in the bank':'bank has '+fmt(have))+'</span>'; });
+  h+='</div>';
+  var F=E.flow||{c:0}; if (F.c) h+='<p class="dur" style="margin:6px 0 0">At '+fmt(F.c)+' construction points an hour, about '+fmtT(Math.max(0,need-(E.cp||0))/F.c*3600e3)+' once started.</p>';
+  var why = st.s==="lock" ? 'Needs the Alliance City at level '+(lv+1)+' first.' : E.bd ? alBldgName(E.bd.k)+' is being built. One build at a time.' : !my.can.bank ? 'Your rank can’t spend the alliance bank.' : short.length ? 'The bank is short: '+short.join(", ")+'. Donate on the Bank page.' : '';
+  h+='<div class="trainrow" style="margin-top:8px"><button class="btn small" data-act="al-start" data-kind="build" data-key="'+k+'"'+(why?' disabled':'')+'>'+(lv?'Upgrade to level '+(lv+1):'Build it')+'</button></div>'+(why?'<p class="why" style="margin:4px 0 0">'+why+'</p>':'');
+  return h+'</div>'; }
+function alBldgPage(al, k){ var E=al.econ, C0=ALS.cat; if (!E || !C0) return '<div class="section"><p class="hint">Loading…</p></div>';
+  var d=alBldgDef(k); if (!d) return '<div class="section"><p class="hint">No such building.</p></div>';
+  var my=al.my, lv=alBldgLv(E,k), now=alBldgFx(k,lv,E), nx=lv<d.max?alBldgFx(k,lv+1,E):"";
+  var h='<div class="albk"><button class="link" data-act="al-sub" data-v="city">‹ Alliance City</button></div>';
+  h+='<div class="section"><div class="alhead">'+alBkImg(k,72)+'<div style="min-width:0"><h3 style="margin:0">'+esc(d.n)+'</h3><span class="dur">'+(lv?'Level '+lv+' of '+d.max:'Not built yet')+'</span></div></div>'+
+    '<p style="margin:8px 0 0">'+esc(d.d)+'</p>'+
+    ((now||nx)?'<div class="alfx">'+(now?'<span class="dur">Now</span><span>'+esc(now)+'</span>':'')+(nx?'<span class="dur">Level '+(lv+1)+'</span><span>'+esc(nx)+'</span>':'')+'</div>':'')+'</div>';
+  h+=alUpgradeHtml(E, my, k);
+  if (k==="city") h+='<div class="section"><div class="shead"><h3>Buildings in the city</h3></div>'+AL_BK_ORDER.filter(function(x){ return x!=="city" && alBldgDef(x); }).map(function(x){ var L=alBldgLv(E,x), D=alBldgDef(x);
+      return '<button class="bq" style="width:100%;text-align:left" data-act="al-bk" data-v="'+x+'"><span>'+esc(D.n)+'</span><span class="dur">'+(L?'level '+L:'not built')+(L>=(E.lv.city||1)&&L<D.max?' · at the city’s level':'')+'</span></button>'; }).join("")+'</div>';
+  else if (k==="univ") h+=alUnivHtml(al);
+  else if (k==="wh") h+=alBoxHtml(E.box||0);
+  else if (k==="trade") h+=alTradeHtml(al);
+  else if (k==="memorial") h+=memHtml(E, C0, my);
+  else if (k==="arsenal") h+=arsHtml(E, my);
+  else if (k==="sanctuary") h+=sancHtml(E, my);
+  else if (k==="arena") h+='<div class="section"><div class="shead"><h3>Monster fights</h3></div><p class="hint" style="margin:0 0 6px">Summon and fight Arena monsters from Battle › Arena.</p><div class="btnrow"><button class="btn small" data-act="al-sub" data-v="arena">Open the Arena</button></div></div>';
+  else if (k==="watch") h+='<div class="section"><div class="shead"><h3>Alerts</h3></div><p class="hint" style="margin:0">Warnings appear as the alarm chip at the top of the game. Level 1 shows who is attacked and when; level 3 adds the attacker; level 5 a rough troop count; level 8 the full breakdown. You can mute single alerts or whole kinds from the chip.</p></div>';
+  return h; }
+// Build › Bank: what the alliance has, donating, contributions
+function alBankHtml(al){ var E=al.econ; if (!E) return '<div class="section"><p class="hint">Loading the bank…</p></div>';
+  var h='<div class="section"><div class="shead"><h3>Bank</h3></div><div class="rgrid">'+RES.map(function(k){ return '<span>'+RNAME[k]+' <b>'+fmt(Math.floor(E.bank[k]||0))+'</b></span>'; }).join("")+'</div>'+
+    '<div class="rgrid" style="margin-top:6px"><span>Construction pool <b>'+fmt(E.cp)+'</b></span><span>Research pool <b>'+fmt(E.rp)+'</b></span></div></div>';
+  h+='<div class="section"><div class="shead"><h3>Donate from '+esc(S.name)+'</h3></div><div class="tscroll"><table class="gt" style="min-width:0"><tbody>'+RES.map(function(k){ return '<tr><td>'+RNAME[k]+' <span class="dur">('+fmt(Math.floor(S.res[k]))+')</span></td><td><input type="number" min="0" data-aldon="'+k+'" value="'+(ALD[k]||"")+'" placeholder="0" style="width:110px"></td></tr>'; }).join("")+'</tbody></table></div>'+
+    '<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="al-donate">Donate</button></div><p class="hint">Upgrades take resources from the bank when they start. Every 1,000 resources donated is 1 contribution point.</p></div>';
+  h+='<div class="section"><div class="shead"><h3>Contributions</h3></div>'+(E.contrib.length?E.contrib.map(function(c,i){ return '<div class="bq"><span>#'+(i+1)+' <b>'+esc(c.name)+'</b></span><span>'+fmt(c.score)+'</span></div>'; }).join(""):'<p class="hint">Nobody has contributed yet.</p>')+'</div>';
+  return h; }
+// Build › Lending: your cities' Academies and builders
+function alLendHtml(al){ var E=al.econ; if (!E) return '<div class="section"><p class="hint">Loading…</p></div>'; var F=E.flow||{c:0,r:0,who:[]};
+  var h='<div class="section"><div class="shead"><h3>The alliance’s rate</h3></div><div class="rgrid"><span>Construction <b>'+fmt(F.c)+'/h</b></span><span>Research <b>'+fmt(F.r)+'/h</b></span><span>Lending <b>'+F.who.length+' member'+(F.who.length===1?'':'s')+'</b></span></div></div>';
+  h+='<div class="section"><div class="shead"><h3>Your cities</h3></div><p class="hint">An Academy working for the alliance makes research points (Academy level × 100 an hour, faster with Scholarship and your researcher), and can’t research for its city meanwhile. Each builder lent makes construction points (Town Hall level × 100 an hour, faster with Construction and your mayor) and can’t build at home. Every 100 points is 1 contribution point.</p>';
   S.cities.forEach(function(c,ci){ withCity(ci,function(){ var rt=alRates(), acadBusy=!!S.research && !S.alAcad, maxB=BUILDERS-S.builds.length+(S.alBld||0);
     var r1={r:academyLv()*100*(1+0.1*(S.tech.scholarship||0))*(1+hs(bestFor("int"),"int")/200)*bResearch(), c:S.th*100*(1+0.1*(S.tech.construction||0))*(1+hs(bestFor("pol"),"pol")/200)*bBuild()};
-    h+='<div class="acity"><h4><span>'+esc(c.name)+'</span><span class="dur">Academy '+academyLv()+' \u00b7 Town Hall '+S.th+'</span></h4>'+
+    h+='<div class="acity"><h4><span>'+esc(c.name)+'</span><span class="dur">Academy '+academyLv()+' · Town Hall '+S.th+'</span></h4>'+
       '<div class="btnrow" style="align-items:center">'+(academyLv()?'<button class="btn small'+(S.alAcad?'':' ghost')+'" data-act="al-lendacad" data-ci="'+ci+'"'+(acadBusy?' disabled':'')+'>'+(S.alAcad?'Academy: working for the alliance':'Lend the Academy')+'</button>':'<span class="dur">No Academy</span>')+
       '<span class="dur">'+fmt(Math.round(r1.r))+' research pts/h</span></div>'+(acadBusy?'<p class="why" style="margin:2px 0">Researching for the city right now.</p>':'')+
       '<div class="btnrow" style="align-items:center;margin-top:4px"><span class="dur">Builders lent:</span>'+[0,1,2].map(function(n){ return '<button class="chipbtn'+((S.alBld||0)===n?' on':'')+'" data-act="al-lendbld" data-ci="'+ci+'" data-n="'+n+'"'+(n>maxB?' disabled':'')+'>'+n+'</button>'; }).join("")+'<span class="dur">'+fmt(Math.round(r1.c))+' construction pts/h each</span></div>'+
       ((S.alAcad||S.alBld)?'<p class="dur" style="margin:4px 0 0">Making '+fmt(Math.round(rt.r))+' research and '+fmt(Math.round(rt.c))+' construction points an hour.</p>':'')+'</div>'; }); });
-  h+='</div>';
-  h+='<div class="section"><div class="shead"><h3>University research</h3><span class="dur">'+E.rs.length+' / '+E.slots+' running</span></div><p class="hint" style="margin:0">The research tree has its own page now.</p><div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="al-sub" data-v="univ">Open the University</button></div></div>';
-  h+=memHtml(E, C0, my)+arsHtml(E, my)+sancHtml(E, my);
-  // contributions and news
-  h+='<div class="section"><div class="shead"><h3>Contributions</h3></div>'+(E.contrib.length?E.contrib.map(function(c,i){ return '<div class="bq"><span>#'+(i+1)+' <b>'+esc(c.name)+'</b></span><span>'+fmt(c.score)+'</span></div>'; }).join(""):'<p class="hint">Nobody has contributed yet.</p>')+
-    (E.log.length?'<div class="h3" style="margin-top:8px">Finished</div>'+E.log.map(function(l){ return '<p class="dur" style="margin:2px 0">'+alTime(l.at)+' '+esc(l.t)+'</p>'; }).join(""):'')+'</div>';
-  return h;
-}
+  return h+'</div>'; }
+// what this player is lending right now, all cities (sent with each sync so the alliance can show its rate)
+function alMyRates(){ var t={r:0,c:0}; for (var i=0;i<S.cities.length;i++) withCity(i,function(){ if (S.alAcad||S.alBld){ var r=alRates(); t.r+=r.r; t.c+=r.c; } }); return t; }
 /* the Alliance Warehouse: a private box kept in your own save, safe from plunder. The alliance's Warehouse level sets how much can go in per day (midnight UTC). */
 var ALB={food:"",lumber:"",stone:"",iron:"",gold:""};
 function alDayNo(){ return Math.floor(Date.now()/864e5); }
@@ -6072,9 +6159,9 @@ setInterval(alMvTick, 1000);
 // the alliance map's popup (0.1.135): what you tapped, with its buttons, right on the map
 function alPopHtml(al, M, sel, me, rk){ var st=alMapAt(M,sel.x,sel.y), my=al.my||{can:{}}, P=46, top, h='', b=[], title='', info='';
   var d=me?alDist(me, st&&st.city?alCityMid(M):sel):0;
-  if (st && st.b){ var bn=((ALS.cat&&ALS.cat.bldg.filter(function(z){ return z.k===st.b.k; })[0])||{n:st.b.k}).n, tabv=st.b.k==="arena"?"arena":st.b.k==="trade"?"trade":st.b.k==="univ"?"univ":"city";
+  if (st && st.b){ var bn=((ALS.cat&&ALS.cat.bldg.filter(function(z){ return z.k===st.b.k; })[0])||{n:st.b.k}).n, tabv=st.b.k;
     title=esc(bn); info='Level '+((al.econ&&al.econ.lv[st.b.k])||0)+(me?' \u00b7 '+d+' squares from you':'');
-    b.push('<button class="btn" data-act="al-sub" data-v="'+tabv+'">Open</button>'); if (my.can.map) b.push('<button class="btn ghost" data-act="al-move" data-what="b" data-who="'+esc(st.b.k)+'">Move</button>'); }
+    b.push('<button class="btn" data-act="al-bk" data-v="'+tabv+'">Open</button>'); if (my.can.map) b.push('<button class="btn ghost" data-act="al-move" data-what="b" data-who="'+esc(st.b.k)+'">Move</button>'); }
   else if (st && st.city){ title='Alliance City'; info='Level '+((al.econ&&al.econ.lv.city)||1)+(me?' \u00b7 '+d+' squares from you':'');
     b.push('<button class="btn" data-act="al-sub" data-v="city">Open</button>'); if (my.can.map) b.push('<button class="btn ghost" data-act="al-move" data-what="city">Move</button>'); }
   else if (st && st.k){ var nm=st.k.name, mm=rk[nm]||{}, mine=isMe(nm), pf=mine?S.me:PROF[String(nm).toLowerCase()];
@@ -12561,7 +12648,8 @@ document.addEventListener("click",function(e){
   if (act.indexOf("aw-")===0 && AW_ON && awAct(act,a)) return;
   if (act.indexOf("al-")===0){
     if (act==="al-cloud"){ DET.cloud=true; goPage("settings"); return; }
-    if (act==="al-sub"){ if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); ALS.sub=a.dataset.v; ALS.armed=null; lastView=""; renderView(true); ALS.last=0; alSync(); if (ALS.sub==="list") alList(); return; }
+    if (act==="al-bk"){ if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); ALS.bk=a.dataset.v; ALS.sub="bldg"; ALS.armed=null; if (tab!=="guild") tab="guild"; lastView=""; renderView(true); window.scrollTo({top:0}); ALS.last=0; alSync(); return; }
+  if (act==="al-sub"){ if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); ALS.sub=a.dataset.v; ALS.armed=null; lastView=""; renderView(true); ALS.last=0; alSync(); if (ALS.sub==="list") alList(); return; }
     if (act==="al-sort"){ ALS.sort=a.dataset.v; lastView=""; renderView(true); return; }
     if (act==="al-view"){ alViewOpen(a.dataset.aid); return; }
     if (act==="al-box-in"){ alBoxMove(1); return; }
