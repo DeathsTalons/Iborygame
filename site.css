@@ -10,7 +10,7 @@ body{margin:0;background:var(--slate);color:var(--ink);font:18px/1.6 var(--body)
 a{color:var(--gold-hi);text-underline-offset:3px}
 a:hover{color:#f0c96a}
 :focus-visible{outline:3px solid var(--gold-hi);outline-offset:3px;border-radius:4px}
-img{max-width:100%;display:block}
+img{max-width:100%;height:auto;display:block}
 
 /* top bar */
 .bar{display:flex;align-items:center;gap:20px;padding:14px 24px;max-width:1120px;margin:0 auto}
