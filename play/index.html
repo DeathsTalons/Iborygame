@@ -108,14 +108,18 @@ header{flex-wrap:wrap}
 .chiprow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 @media (max-width:420px){ .chiprow{gap:5px} .chiprow .speedchip{padding:6px 9px;gap:5px;font-size:.9rem} .chiprow .speedchip.iconchip{padding:6px 7px} }
 
-.ledger{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.ledger{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:8;margin:-12px -14px 6px;padding:3px 6px 2px;box-shadow:0 1px 6px rgba(0,0,0,.18)}
+.ledger .res{background:none;padding:0 2px;display:flex;flex-direction:column;align-items:center;gap:0;min-width:0;line-height:1.1}
+.ledger .rtop{display:flex;align-items:center;gap:3px;min-width:0;max-width:100%}
+.ledger .res .ico{width:13px;height:13px;flex:none}
+.ledger .res b{font-size:.8rem;font-weight:700;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.ledger .res small{font-size:.62rem;line-height:1.1;white-space:nowrap;font-variant-numeric:tabular-nums}
 .res{background:var(--panel);padding:8px 6px 7px;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0}
 .res .ico{width:20px;height:20px;color:var(--brass)}
 .res b{font-size:1.02rem;font-weight:700;line-height:1.2}
 .res small{font-size:.76rem;color:var(--muted)}
 .res small.neg{color:var(--red)}
-.popline{display:flex;justify-content:space-between;gap:10px;font-size:.92rem;color:var(--muted);padding:8px 4px 0;flex-wrap:wrap}
-.popline b{color:var(--ink);font-weight:500}
+.ledger .res.pop .ico{color:var(--muted)}.ledger .res.pop small{color:var(--muted)}
 
 .queue{margin:0 0 12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
 .queue[open]{display:grid;gap:8px}
@@ -189,6 +193,52 @@ details.rep summary{list-style-position:outside;line-height:1.35}
 .farmadd{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:10px}
 .farmgrid{display:grid;grid-template-columns:repeat(5,auto);gap:6px}
 @media (min-width:520px){ .farmgrid{grid-template-columns:repeat(10,auto)} }
+.brtiles .altile .bico{width:30px;height:30px;color:var(--brass);display:block}.brtiles .altile .bico svg{width:100%;height:100%}
+.brtiles .altile.idle{border-style:dashed}
+.bico.big{width:48px;height:48px;color:var(--brass);flex:none;display:block}.bico.big svg{width:100%;height:100%}
+.wcbar{display:block;height:5px;border-radius:3px;background:var(--line);overflow:hidden;margin:4px 0 2px}.wcbar i{display:block;height:100%;background:var(--brass)}
+.wctile .n small{font-size:.72rem;color:var(--muted);font-weight:500}.wctile.done{border-color:var(--brass)}.wctile.done .wcbar i{background:var(--grass)}
+.wcgh{display:flex;align-items:center;gap:7px}.wcgh svg{width:20px;height:20px;color:var(--brass);flex:none}
+.wcabout{margin-top:6px}.wcabout summary{cursor:pointer;color:var(--muted);font-size:.86rem}.wcabout .hint{margin:6px 0 0}
+.wcnext{display:flex;flex-direction:column;gap:2px;width:100%;margin-top:10px;padding:10px 12px;border:1px solid var(--brass);border-radius:10px;background:var(--panel2);font:inherit;color:inherit;text-align:left;cursor:pointer}
+.wcnext b{font:700 .95rem var(--display)}.wcnext .gst{color:var(--brass);font-family:inherit;margin-left:4px}
+.wcnav{display:flex;justify-content:space-between;gap:10px;margin:4px 2px 12px}
+.kgtoday{display:flex;flex-direction:column;gap:3px;margin-top:8px;font-size:.84rem}.kgt{color:var(--ink)}.kgt b{color:var(--brass);font-weight:600;margin-left:4px}.kgt.done{color:var(--muted)}.kgt.done b{color:var(--grass)}
+.kgrep{margin:4px 0 0}.kgtile.lock{opacity:.62}.kgtile .n small{font-size:.72rem;color:var(--muted);font-weight:500}
+.fmstats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:4px 0 2px;text-align:center}.fmstats div{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 2px}.fmstats b{display:block;font:700 1.05rem var(--display)}.fmstats span{font-size:.74rem;color:var(--muted)}
+.fmtile.run{border-color:var(--grass);box-shadow:inset 0 0 0 1px var(--grass)}.fmtile.idle{opacity:.62}.fmtile .ln b{font-weight:700}
+.reptiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.reptile{display:flex;flex-direction:column;gap:3px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);cursor:pointer;font:inherit;color:inherit;text-align:left;min-width:0}
+.reptile .rtop{display:flex;align-items:center;gap:8px;min-width:0}.reptile svg{width:22px;height:22px;color:var(--brass);flex:none}
+.reptile .nm{font:700 .84rem/1.15 var(--display);min-width:0;overflow-wrap:break-word;hyphens:none}.reptile .n{margin-left:auto;font:700 .95rem var(--display);color:var(--brass);padding-left:4px}
+.reptile .ln{font-size:.8rem;color:var(--muted);line-height:1.3;overflow-wrap:anywhere}
+.reptile.alert{border-color:var(--red);box-shadow:inset 0 0 0 1px var(--red)}.reptile.alert .n{color:var(--red)}
+.rnew{display:inline-block;font-size:.7rem;font-weight:700;color:#1d201e;background:var(--red);border-radius:9px;padding:0 6px}
+.medal{color:var(--brass);font-weight:700}
+.repday{font:700 .76rem var(--display);color:var(--muted);letter-spacing:.06em;margin:14px 0 2px}
+.reprow2{display:flex;gap:8px;align-items:flex-start;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:8px 2px;color:var(--ink);font:inherit;font-size:.92rem;line-height:1.35;cursor:pointer}
+.reprow2:hover{background:var(--panel2)}.reprow2 .rt{color:var(--muted);font-size:.8rem;min-width:52px;padding-top:2px;white-space:nowrap}.reprow2 .rb{flex:1;min-width:0;overflow-wrap:anywhere}.reprow2 .rx{display:block;color:var(--muted);font-size:.8rem}
+.reprow2.sub{font-size:.86rem;padding:6px 2px}
+.rdot{width:7px;height:7px;border-radius:50%;background:var(--red);margin-top:7px;flex:none}.rdot0{width:7px;flex:none}
+.farmrun{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin:6px 0}
+.farmrun .frh{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.farmrun .frh b{font:700 .88rem var(--display);min-width:0;overflow-wrap:anywhere}.farmrun .frh .dur{white-space:nowrap}
+.frbar{display:flex;height:5px;border-radius:3px;overflow:hidden;margin:6px 0 4px;background:var(--line)}.frbar i{display:block;background:var(--grass)}.frbar u{display:block;background:var(--red)}
+.frloot{display:flex;gap:4px 10px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}.frloot b{color:var(--ink)}
+.rmed{color:var(--brass);font-weight:700}
+.frtog{margin-top:4px;font-size:.84rem}
+.frsub{margin:6px 0 0 6px;border-left:2px solid var(--line);padding-left:6px}
+nav.tabs button.hasnew{position:relative}nav.tabs button.hasnew::after{content:"";position:absolute;top:6px;right:0;width:7px;height:7px;border-radius:50%;background:var(--red)}
+.oftiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.oftile{display:flex;flex-direction:column;gap:6px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);cursor:pointer;font:inherit;color:inherit;text-align:left;min-width:0}
+.oftile.vacant{border-style:dashed}
+.ofjob{font:700 .82rem var(--display);color:var(--brass);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ofhero{display:flex;gap:8px;align-items:center;min-width:0}
+.ofname{display:flex;flex-direction:column;min-width:0;font-weight:700;line-height:1.2;overflow-wrap:anywhere}
+.ofname .dur,.ofname .why{font-weight:400}
+.ofempty{width:46px;height:46px;border-radius:12px;border:1px dashed var(--line);display:grid;place-items:center;color:var(--muted);flex:none;font:700 1.2rem var(--display)}
+.ofst{font-size:.8rem;line-height:1.25;color:var(--muted)}
+.bq.ofpick{grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px}
+.bq.ofpick .mbtns{grid-column:auto}
 .altiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .altile{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px 9px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);cursor:pointer;font:inherit;color:inherit;text-align:center;min-width:0}
 .altile img{width:58px;height:58px;margin-bottom:2px}
@@ -724,6 +774,14 @@ body.bfmode #chatdock{display:none!important}
 .maptools .dpickbtn[aria-pressed="true"]{border-color:var(--brass);color:var(--brass);background:var(--brass-soft)}
 .mapview{position:relative;touch-action:none;overscroll-behavior:contain;margin-top:8px;border-radius:8px;border:1px solid var(--line);overflow:hidden;height:min(58vh,520px);contain:strict}
 @supports (height:1svh){ .mapview{height:min(58svh,520px)} }
+.mapview.fs{position:fixed;top:0;left:0;right:0;bottom:0;height:auto;margin:0;border:0;border-radius:0;z-index:1500;background:var(--panel2)}
+.mapview.fs.rot{right:auto;bottom:auto;width:100vh;height:100vw;transform-origin:0 0;transform:translateX(100vw) rotate(90deg)}
+@supports (height:100dvh){ .mapview.fs.rot{width:100dvh} }
+.mapfsbar{display:none}
+.mapview.fs .mapfsbar{display:flex;position:absolute;top:calc(8px + env(safe-area-inset-top,0px));right:8px;gap:6px;z-index:6}
+.mapview.fs.rot .mapfsbar{top:8px}
+.mapfsbar .btn{min-width:40px;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+body.mapfs{overflow:hidden}
 .mapview canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 .mapbottom{display:grid;grid-template-columns:auto 1fr;gap:12px;margin-top:10px;align-items:start}
 #minic{width:132px;height:132px;image-rendering:pixelated;border-radius:6px;border:1px solid var(--line);cursor:pointer}
@@ -774,7 +832,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 :focus-visible{outline:2px solid var(--brass);outline-offset:2px}
 @media (prefers-reduced-motion: reduce){ #toast{transition:none} }
 @media (max-width:420px){
-  .res b{font-size:.92rem} .res small{font-size:.7rem}
+  .ledger .res b{font-size:.76rem} .ledger .res small{font-size:.6rem}
   nav.tabs button{padding:9px 3px 10px;font-size:.9rem;letter-spacing:0}
   .plot .nm{font-size:.72rem}
 }
@@ -782,6 +840,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 </head>
 <body>
 <div class="wrap">
+  <div class="ledger" id="ledger"></div>
   <header>
     <div class="hdl"><button class="hdav" id="hdav" data-act="me" aria-label="Me: your character and account" title="Me"></button><div style="min-width:0"><h1 id="cityname">Stonewatch</h1><div class="lordline" id="lordline"></div></div></div>
     <div class="chiprow">
@@ -798,17 +857,12 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
     <button class="speedchip iconchip helpchip" data-act="al-help" id="helpchip" style="display:none" aria-label="Help your alliance" title="Help your alliance"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12V6.5a1.5 1.5 0 0 1 3 0V11M11 10.5V4.5a1.5 1.5 0 0 1 3 0V11M14 10.5V5.5a1.5 1.5 0 0 1 3 0V12M17 11.5V9a1.5 1.5 0 0 1 3 0v5c0 4-3 7-7 7-3 0-4.6-1.4-6.2-4l-2.2-3.6a1.5 1.5 0 0 1 2.6-1.5L8 14"/></svg><b id="helpn"></b></button>
     <button class="speedchip iconchip helpchip" data-act="al-arena-go" id="monchip" style="display:none" aria-label="A monster is waiting at your alliance's Arena" title="Monster Arena"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19l4-14M10.5 20l3-15M16 19l3-12"/></svg><b id="monn"></b></button>
     <button class="speedchip iconchip helpchip" data-act="ry-list" id="rychip" style="display:none" aria-label="Rallies you haven't joined" title="Rallies"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 21V4"/><path d="M6 4h11l-2 4 2 4H6"/></svg><b id="ryn"></b></button>
+    <button class="speedchip iconchip helpchip wtchip" data-act="bully-go" id="bullychip" style="display:none" aria-label="A bully is marching on an ally" title="Bully attack"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="M13 19l6-6M16 16l4 4M19 21l2-2"/></svg><b id="bullyn"></b></button>
     <button class="speedchip iconchip helpchip wtchip" data-act="wt-open" id="wtchip" style="display:none" aria-label="Attacks heading for your alliance" title="Watchtower"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><b id="wtn"></b></button>
     </div>
   </header>
 
   <div class="citybar" id="citybar"></div>
-  <div class="ledger" id="ledger"></div>
-  <div class="popline">
-    <span>Population <b id="pop"></b></span>
-    <span>Fields staffed <b id="staff"></b></span>
-    <span>Mayor <b id="mayorlbl"></b></span>
-  </div>
 
   <div id="threats"></div>
   <div id="marchstrip"></div>
@@ -853,7 +907,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script>
 (function(){
 "use strict";
-var APP_VERSION = "0.2.3";
+var APP_VERSION = "0.2.4";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -1988,11 +2042,33 @@ function pickBarracks(i){ // lowest-level idle barracks that can train this unit
 }
 // one batch trains at a time per Barracks; extra batches wait in that Barracks' queue (q:true, dur) and start when it frees up
 function slotFree(sl){ var f=null; S.train.forEach(function(t){ if (t.slot!==sl) return; f = t.q ? f+t.dur : t.end; }); return f==null ? S.gt : f; }
+// 0.2.4: each Barracks holds as many waiting batches as its level (older saves with longer queues keep them, but can't add)
+function bqWaiting(sl){ var n=0; S.train.forEach(function(t){ if (t.slot===sl && t.q) n++; }); return n; }
+function bqRoom(sl){ var b=S.inside[sl]; return b ? Math.max(0, b.level-bqWaiting(sl)) : 0; }
+function barracksName(sl){ return "Barracks "+(barracksList().indexOf(sl)+1); }
+// no idle Barracks for this unit: the one with queue room that frees up soonest
+function pickQueue(i){ var req=barracksReq(i), best=-1; barracksList().forEach(function(sl){ if (S.inside[sl].level>=req && trainingAt(sl) && bqRoom(sl)>0 && (best<0 || slotFree(sl)<slotFree(best))) best=sl; }); return best; }
+// train on one Barracks: starts now when it's idle, otherwise joins its queue
+function trainOnWhy(tu,tn,sl){ var u=U[tu], b=S.inside[sl];
+  if (!b || b.type!=="barracks") return "No Barracks there";
+  if (missing(u.req).length) return "Locked";
+  if (b.level<barracksReq(tu)) return "Needs a level "+barracksReq(tu)+" Barracks";
+  if (trainingAt(sl) && bqRoom(sl)<1) return "The queue is full ("+bqWaiting(sl)+" / "+b.level+")";
+  if (!tn || tn<1) return "Enter an amount";
+  var c={}; for (var k in u.cost) c[k]=u.cost[k]*tn; if (!afford(c)) return "Not enough resources";
+  if (idlePop()<u.pop*tn) return "Not enough idle people ("+fmt(idlePop())+")";
+  return ""; }
+function trainOn(tu,tn,sl){ if (trainOnWhy(tu,tn,sl)) return false; var T=trainTime(tu);
+  var disc=1-0.01*Math.max(0,S.inside[sl].level-10), tc={}; for (var ck in U[tu].cost) tc[ck]=Math.ceil(U[tu].cost[ck]*tn*disc);
+  pay(tc,1); S.pop -= U[tu].pop*tn;
+  if (trainingAt(sl)) S.train.push({slot:sl,u:tu,n:tn,paid:tc,q:true,dur:T*tn,start:0,end:0});
+  else S.train.push({slot:sl,u:tu,n:tn,paid:tc,start:S.gt,end:S.gt+T*tn});
+  return true; }
 function promoteQueue(sl){ if (trainingAt(sl) && !trainingAt(sl).q) return; var nx=trainingAt(sl); if (!nx) return; nx.start=S.gt; nx.end=S.gt+nx.dur; delete nx.q; delete nx.dur; }
 // split tn troops over barracks so they all finish as close together as possible ("idle": idle barracks only, "all": queue onto busy ones too)
 function splitPlan(tu,tn,mode){
   var req=barracksReq(tu), T=trainTime(tu);
-  var bs=barracksList().filter(function(sl){ return S.inside[sl].level>=req && (mode!=="idle" || !trainingAt(sl)); }).map(function(sl){ return {slot:sl, free:slotFree(sl), n:0}; });
+  var bs=barracksList().filter(function(sl){ return S.inside[sl].level>=req && (mode==="idle" ? !trainingAt(sl) : (!trainingAt(sl) || bqRoom(sl)>0)); }).map(function(sl){ return {slot:sl, free:slotFree(sl), n:0}; });
   if (!bs.length || !(tn>0)) return null;
   bs.sort(function(a,b){ return a.free-b.free; });
   var k=1, sum=bs[0].free, L=sum+tn*T;
@@ -3251,6 +3327,7 @@ function resolveMarch0(m){
   if (m.preset!=null){ var pr=C().presets[m.preset]; if (pr && pr.auto && pr.stopOnLoss && (lost>0 || !won)){ pr.auto=false; note("march",pr.name+" auto-farm paused: "+(won?"lost "+fmt(lost)+" troops":"the attack failed")+" at "+tileName(q)); } }
   var rep={id:S.nextMarchId++, at:S.gt, tile:q.id, name:tileName(q), result:r.result, rounds:r.rounds, kb:r.kb, sent:m.t.slice(), left:r.attacker.slice(),
     had:cur.t.slice(), eleft:r.defender.slice(), forts:cur.f.slice(), fleft:r.forts.slice(), loot:loot, medal:medal, drops:drops, xp:xp, xpWait:xpWait, hero:hero?hero.name:null, occupied:occ, gate:gateClosed, lost:lost};
+  rep.tk=q.k; if (m.preset!=null){ rep.pre=m.preset; var rpr=C().presets[m.preset]; if (rpr) rep.pn=rpr.name; } // 0.2.4: the Reports hub folds a preset's farm runs and filters by target
   addReport(rep);
   if (histHero){ rep.historic=histHero.name; note("heroes",histHero.name+" joins you from "+rep.name+(S.waiting.indexOf(histHero)>=0?" and waits at the gate: free a place in your Feasting Hall":"")+"!"); }
   if (founded){ rep.founded=founded; note("march",(m.mission!=="found"?founded+" is yours! ":"A new city rises: "+founded+". ")+"Your troops stay on as its garrison."); return false; }
@@ -3334,6 +3411,8 @@ function presetHero(pr, used){ if (presetAutoHero(pr.hero)) return pickHero(pr.h
   var h=pr.hero?heroById(pr.hero):null; return h && C().heroes.indexOf(h)>=0 ? h : null; }
 function heroChoiceOpts(cur, list, label, fast){ return '<option value="0"'+(!cur?' selected':'')+'>No hero</option><option value="-1"'+(cur===HERO_BEST?' selected':'')+'>Best attack (free hero)</option>'+(fast?'<option value="-3"'+(cur===HERO_FAST?' selected':'')+'>Fastest (free hero)</option>':'')+'<option value="-2"'+(cur===HERO_ANY?' selected':'')+'>Any free hero</option>'+
   list.map(function(x){ return '<option value="'+x.id+'"'+(x.id===cur?' selected':'')+'>'+label(x)+'</option>'; }).join(""); }
+function presetsOf(m){ return m ? S.mpresets : S.presets; } // m: march presets (Rally Spot), else farm presets (Farms tab)
+function sheetPreset(){ return presetsOf(sheetFor.m)[sheetFor.p]; }
 function presetTotal(pr){ return pr.t.reduce(function(a,b){return a+b;},0); }
 function presetReady(pr){ if (!presetTotal(pr) || presetTotal(pr)>armyCap()) return false; for (var i=0;i<12;i++) if (pr.t[i]>S.troops[i]) return false; return true; }
 function farmTarget(id){ var q=TILE_BY[id]; return q && (q.k==="npc"||q.k==="ai"||q.k==="hc"||(VTYPES[q.k] && !S.map.owned[q.id])); }
@@ -3363,24 +3442,25 @@ function processAuto(){
 function presetSummary(pr){ var parts=[]; pr.t.forEach(function(n,i){ if (n) parts.push(fmt(n)+" "+U[i].name); }); return parts.length?parts.join(", "):"No troops set"; }
 var presetClip=null; // a copied preset: troops, hero choice and the pause-on-loss setting (never the farm list, since an NPC only sits on one list). Kept until you reload, so it can go to another city too.
 function presetsSection(){
-  var h='<div class="section"><div class="shead"><h3>March presets</h3><span class="dur">'+esc(S.name)+'</span></div><p class="hint">Ten per city, each with its own farm list. Save armies to launch in one tap, run them on an auto-farm rotation, or stack them into timed waves from a target on the Map. Presets higher on this list go first: a hero on several auto-farm presets goes to the highest one that\u2019s ready each time he\u2019s home (with Full garrisons only on a level 10 list, he hits it about once an hour and farms the lower list in between). Copy a preset, then Paste it onto another to duplicate its troops and hero'+(presetClip?' (copied: '+esc(presetClip.name)+')':'')+'.</p><div class="unitlist">';
-  S.presets.forEach(function(pr,pi){
-    var hh=presetHero(pr), running=S.marches.some(function(m){ return m.city===C().id && m.preset===pi; });
-    var rot=0; if (presetTotal(pr)) pr.farm.forEach(function(id){ var fq=TILE_BY[id]; if (fq) rot+=2*travelMs(pr.t,fq,hh?hh.id:0); });
-    h+='<div class="unit"><h4>'+esc(pr.name)+'</h4><span class="own" style="font-size:.85rem">'+(pr.auto?'<span class="badge">Auto-farming</span>':'')+'</span>'+
-      '<div class="us"><span>'+presetSummary(pr)+'</span><span>Hero <b>'+(pr.hero===HERO_BEST?'Best attack':pr.hero===HERO_FAST?'Fastest':pr.hero===HERO_ANY?'Any free':hh?esc(hh.name):"none")+'</b>'+(presetAutoHero(pr.hero)?' <span class="dur">('+(hh?'now '+esc(hh.name):'nobody free')+')</span>':'')+'</span><span>Farm list <b>'+pr.farm.length+'</b>'+(pr.farmMode?' <span class="dur">'+FARM_MODES[pr.farmMode].name+'</span>':'')+'</span>'+(rot?'<span>Full rotation <b>'+fmtT(realMs(rot))+'</b></span>':'')+(running?'<span><b>Out on a march</b></span>':'')+'</div>'+
-      '<div class="trainrow"><button class="btn ghost small" data-act="preset-edit" data-p="'+pi+'">Edit</button><button class="btn ghost small" data-act="preset-copy" data-p="'+pi+'"'+(presetTotal(pr)?'':' disabled')+'>Copy</button>'+(presetClip?'<button class="btn ghost small" data-act="preset-paste" data-p="'+pi+'">Paste</button>':'')+(pr.farm.length&&presetTotal(pr)?'<button class="btn small'+(pr.auto?' ghost':'')+'" data-act="preset-auto" data-p="'+pi+'">'+(pr.auto?'Stop auto-farm':'Start auto-farm')+'</button>':'')+
-      (presetTotal(pr)>armyCap()?'<span class="why">Over the '+fmt(armyCap())+'-troop march limit</span>':pr.auto && !presetReady(pr) && !running?'<span class="why">Waiting for troops</span>':pr.auto && pr.fullOnly && !running && FARM_WAIT[C().id+":"+pi]?'<span class="why">Waiting for a full garrison</span>':'')+(pr.fullOnly?'<span class="dur">Full garrisons only</span>':'')+'</div></div>';
+  var h='<div class="section"><div class="shead"><h3>March presets</h3><span class="dur">'+esc(S.name)+'</span></div><p class="hint">Ten per city for marches you send yourself: load one on the march screen, stack them into timed waves from a target on the Map, or occupy flats with one. Farming has its own ten presets, on the <button class="link" data-act="tab" data-tab="farms">Farms tab</button>.</p><div class="unitlist">';
+  S.mpresets.forEach(function(pr,pi){ var hh=presetHero(pr);
+    h+='<div class="unit"><h4>'+esc(pr.name)+'</h4><span class="own" style="font-size:.85rem">'+(presetTotal(pr)?fmt(presetTotal(pr))+' troops':'')+'</span>'+
+      '<div class="us"><span>'+presetSummary(pr)+'</span><span>Hero <b>'+(pr.hero===HERO_BEST?'Best attack':pr.hero===HERO_FAST?'Fastest':pr.hero===HERO_ANY?'Any free':hh?esc(hh.name):"none")+'</b>'+(presetAutoHero(pr.hero)?' <span class="dur">('+(hh?'now '+esc(hh.name):'nobody free')+')</span>':'')+'</span></div>'+
+      '<div class="trainrow"><button class="btn ghost small" data-act="preset-edit" data-m="1" data-p="'+pi+'">Edit</button><button class="btn ghost small" data-act="preset-copy" data-m="1" data-p="'+pi+'"'+(presetTotal(pr)?'':' disabled')+'>Copy</button>'+(presetClip?'<button class="btn ghost small" data-act="preset-paste" data-m="1" data-p="'+pi+'">Paste</button>':'')+
+      (presetTotal(pr)>armyCap()?'<span class="why">Over the '+fmt(armyCap())+'-troop march limit</span>':'')+'</div></div>';
   });
   return h+'</div></div>';
 }
-function presetSheet(pi){
-  var pr=S.presets[pi], fh=S.heroes.filter(function(x){ return !seatLocked(x); });
+function presetSheet(pi, mk){
+  var pr=presetsOf(mk)[pi], fh=S.heroes.filter(function(x){ return !seatLocked(x); });
   var h='<div class="head"><span class="ico">'+ICON.rally+'</span><div><h2>Edit '+esc(pr.name)+'</h2><div class="sub">'+esc(S.name)+'</div></div></div>';
+  if (mk) h=h.replace('<div class="sub">'+esc(S.name)+'</div>','<div class="sub">March preset, '+esc(S.name)+'</div>');
+  else h=h.replace('<div class="sub">'+esc(S.name)+'</div>','<div class="sub">Farm preset, '+esc(S.name)+'</div>');
   h+='<div><label class="sub" for="pname">Name</label><input type="text" id="pname" data-pfield="name" value="'+esc(pr.name)+'" maxlength="24"></div>';
-  h+='<div class="btnrow" style="justify-content:flex-end;margin:0"><button class="btn ghost small" data-act="preset-clear" data-p="'+pi+'">Clear all</button></div>';
+  h+='<div class="btnrow" style="justify-content:flex-end;margin:0"><button class="btn ghost small" data-act="preset-clear" data-p="'+pi+'"'+(mk?' data-m="1"':'')+'>Clear all</button></div>';
   h+='<div class="tscroll"><table class="gt wrap1" style="min-width:0"><tbody>'+U.map(function(u,i){ return '<tr><td>'+u.name+' <span class="dur">('+fmt(S.troops[i])+' home)</span></td><td><input type="number" min="0" data-ptroop="'+i+'" value="'+(pr.t[i]||"")+'" placeholder="0"></td></tr>'; }).join("")+'</tbody></table></div>';
   h+='<div><label class="sub" for="phero">Hero</label><select id="phero">'+heroChoiceOpts(pr.hero, fh, function(x){ return esc(x.name)+', Lv '+x.level+', Atk '+hs(x,"atk")+', Int '+hs(x,"int"); }, true)+'</select></div>';
+  if (mk) return h+'<div class="act"><span></span><button class="closebtn" data-act="close">Done</button></div>';
   h+='<label class="chk"><input type="checkbox" id="pstop"'+(pr.stopOnLoss?' checked':'')+'> Pause auto-farm if a battle loses any troops</label>';
   h+='<label class="chk"><input type="checkbox" id="pfull"'+(pr.fullOnly?' checked':'')+'> Only hit NPC cities and AI lords at full garrison: auto-farm skips any that won\u2019t be full when the march lands (no medals or items drop otherwise) and waits if none will be</label>';
   h+='<label class="chk"><input type="checkbox" id="pnocap"'+(pr.noCap?' checked':'')+'> Don\u2019t capture NPC cities: this preset\u2019s farm hits never take a city, even with room under your title and its loyalty at 0</label>';
@@ -3468,29 +3548,56 @@ function farmRebuild(pis){ // rebuild these presets' lists in order; an NPC neve
   return res;
 }
 function farmLevelsText(lv){ return Object.keys(lv).map(Number).sort(function(a,b){ return b-a; }).map(function(L){ return "L"+L+" ×"+lv[L]; }).join(", ")||"none"; }
-function viewFarms(){
-  var claimed=0, seen={}; S.cities.forEach(function(c){ (c.presets||[]).forEach(function(pr){ pr.farm.forEach(function(id){ if (!seen[id]){ seen[id]=1; claimed++; } }); }); });
-  var withMode=S.presets.filter(function(pr){ return !!pr.farmMode; }).length;
-  var h='<div class="section"><div class="shead"><h3>Farm planner</h3><span class="dur">'+esc(S.name)+'</span></div>'+
-    '<p class="hint">Pick a goal (and, if you like, one NPC level) for each preset and it fills its own farm list with NPC cities no other preset is using, nearest first, only ones that preset’s army beats'+'. <b>Training</b> lists run just over 1 hour of round trips, so every garrison has regrown to full strength when you come back. <b>Resources</b> lists run just over 4 hours, so the plunder has regrown too.</p>'+
-    '<div class="btnrow" style="margin-top:10px"><button class="btn small"'+(withMode?'':' disabled')+' data-act="farm-refill-all">Refill all lists</button>'+
-    '<button class="btn ghost danger small" data-act="farm-clear-all">'+(farmArmed?'Tap again to clear every list':'Clear all farm lists')+'</button></div>'+
-    '<p class="hint" style="margin-top:8px">'+fmt(claimed)+' NPC'+(claimed===1?'':'s')+' on farm lists across your cities. Clearing keeps each preset’s goal, so Refill all rebuilds them from scratch.</p></div><div class="unitlist" style="margin-top:12px">';
-  S.presets.forEach(function(pr,pi){
+// 0.2.4: the Farms tab is a hub: the planner's card on top, then a tile per preset; a tile opens that preset's page (FARMV)
+var FARMV=-1;
+function farmCardHtml(pr,pi){
     var hh=presetHero(pr), hid=hh?hh.id:0, rot=0, lv={}, msg=farmMsg[C().id+":"+pi], m=pr.farmMode?FARM_MODES[pr.farmMode]:null;
     pr.farm.forEach(function(id){ var fq=TILE_BY[id]; if (fq){ if (presetTotal(pr)) rot+=2*travelMs(pr.t,fq,hid); if (fq.L) lv[fq.L]=(lv[fq.L]||0)+1; } });
-    h+='<div class="unit"><h4>'+esc(pr.name)+'</h4><span class="own" style="font-size:.85rem">'+(pr.auto?'<span class="badge">Auto-farming</span>':'')+'</span>'+
+    var h='<div class="unit"><h4>'+esc(pr.name)+'</h4><span class="own" style="font-size:.85rem">'+(pr.auto?'<span class="badge">Auto-farming</span>':'')+'</span>'+
       '<div class="us"><span>'+presetSummary(pr)+'</span><span>Hero <b>'+(pr.hero===HERO_BEST?'Best attack':pr.hero===HERO_FAST?'Fastest':pr.hero===HERO_ANY?'Any free':hh?esc(hh.name):"none")+'</b>'+(presetAutoHero(pr.hero)?' <span class="dur">('+(hh?'now '+esc(hh.name):'nobody free')+')</span>':'')+'</span></div>'+
       '<div class="us"><span>Farm list <b>'+pr.farm.length+'</b></span>'+(rot?'<span>Round trip <b>'+fmtT(realMs(rot))+'</b>'+(m?' of '+m.hours+' h':'')+'</span>':'')+(pr.farm.length?'<span>'+farmLevelsText(lv)+'</span>':'')+'</div>'+
       '<div class="trainrow"><label class="dur" for="fl'+pi+'">NPC level</label><select id="fl'+pi+'" data-farmlvl="'+pi+'" style="width:auto">'+['<option value="0">Any</option>'].concat([1,2,3,4,5,6,7,8,9,10].map(function(n){ return '<option value="'+n+'"'+(pr.farmLevel===n?' selected':'')+'>Level '+n+'</option>'; })).join("")+'</select></div>'+
       '<div class="trainrow">'+[["off","Off"],["training","Training"],["resources","Resources"]].map(function(x){ var on=(x[0]==="off")?!pr.farmMode:pr.farmMode===x[0];
         return '<button class="chipbtn wide'+(on?' on':'')+'" data-act="farm-mode" data-p="'+pi+'" data-m="'+x[0]+'" aria-pressed="'+on+'">'+x[1]+'</button>'; }).join("")+'</div>'+
-      '<div class="trainrow"><button class="btn ghost small" data-act="preset-edit" data-p="'+pi+'">Edit army</button>'+
+      '<div class="trainrow"><button class="btn ghost small" data-act="preset-edit" data-p="'+pi+'">Edit army</button><button class="btn ghost small" data-act="preset-copy" data-p="'+pi+'"'+(presetTotal(pr)?'':' disabled')+'>Copy</button>'+(presetClip?'<button class="btn ghost small" data-act="preset-paste" data-p="'+pi+'">Paste</button>':'')+
       (pr.farmMode?'<button class="btn ghost small" data-act="farm-refill" data-p="'+pi+'">Refill list</button>':'')+
       (pr.farm.length&&presetTotal(pr)?'<button class="btn small'+(pr.auto?' ghost':'')+'" data-act="preset-auto" data-p="'+pi+'">'+(pr.auto?'Stop auto-farm':'Start auto-farm')+'</button>':'')+'</div>'+
       (msg?'<div class="fnote'+(msg.bad?' bad':'')+'">'+esc(msg.t)+'</div>':(!presetTotal(pr)?'<div class="fnote">No troops set yet. Use Edit army first.</div>':''))+'</div>';
-  });
-  return h+'</div>';
+  return h+'</div>'; }
+// a preset's farming over the last 24 hours, from its reports in this city
+function farmDay(pi){ var since=S.gt-DAY, n=0, w=0, loot=0; S.log.forEach(function(c){ if (c.p===pi && c.c===S.name && c.at>since && !c.d){ n++; if (c.r===1) w++; loot+=c.lo||0; } }); return {n:n, w:w, loot:loot}; }
+function farmTileHtml(pr,pi){ var tot=presetTotal(pr), m=pr.farmMode?FARM_MODES[pr.farmMode]:null, d=farmDay(pi), st, cls='';
+  if (!tot){ st='No troops set'; cls=' idle'; }
+  else if (pr.auto){ st='<b class="okc">Auto-farming</b>'; cls=' run'; }
+  else if (pr.farm.length) st='Ready \u00b7 not running';
+  else st=m?'Goal set \u00b7 list empty':'No farm list';
+  return '<button class="reptile fmtile'+cls+'" data-act="farm-page" data-p="'+pi+'"><span class="rtop"><span class="nm">'+esc(pr.name)+'</span><span class="n">'+(pr.farm.length?pr.farm.length:'')+'</span></span>'+
+    '<span class="ln">'+st+'</span><span class="ln">'+(m?esc(pr.farmMode.charAt(0).toUpperCase()+pr.farmMode.slice(1))+(pr.farmLevel?' \u00b7 level '+pr.farmLevel:''):'No goal')+(tot?' \u00b7 '+fmt(tot)+' troops':'')+'</span>'+
+    (d.n?'<span class="ln">24 h: <b>'+d.w+'</b> won'+(d.n>d.w?', <span class="badc">'+(d.n-d.w)+' lost</span>':'')+' \u00b7 '+fmt(d.loot)+' loot</span>':'')+'</button>'; }
+function viewFarms(){
+  if (FARMV>=0 && S.presets[FARMV]){ var pr=S.presets[FARMV], pi=FARMV, n=S.presets.length;
+    var fd=farmDay(pi), hh=presetHero(pr), hid=hh?hh.id:0;
+    var list='<details class="section det" data-det="fmlist"'+(DET.fmlist!==false?' open':'')+'><summary><b>Farm list</b> <span class="dur">'+pr.farm.length+' target'+(pr.farm.length===1?'':'s')+'</span></summary>'+
+      (pr.farm.length?'<div class="gearlist">'+pr.farm.map(function(id,k){ var q=TILE_BY[id]; if (!q) return '';
+        return '<div class="gearrow'+(pr.auto&&k===(pr.idx||0)?' t1':'')+'"><span class="gn">'+esc(tileName(q))+(pr.auto&&k===(pr.idx||0)?' <span class="dur">(next)</span>':'')+'</span><span class="gb">('+q.x+', '+q.y+')</span>'+
+          '<span class="dur" style="grid-column:1/-1">'+tdist(q).toFixed(1)+' tiles'+(presetTotal(pr)?' \u00b7 round trip '+fmtT(realMs(2*travelMs(pr.t,q,hid))):'')+'</span>'+
+          '<span class="btnrow" style="grid-column:1/-1;justify-content:flex-end;margin:0"><button class="btn ghost small" data-act="goto-tile" data-tile="'+id+'">Show</button><button class="btn ghost small danger" data-act="farm-remove" data-p="'+pi+'" data-k="'+k+'">Remove</button></span></div>'; }).join("")+'</div>'
+        :'<p class="hint">Empty. Pick a goal and tap Refill list, or add NPCs from their map tiles.</p>')+'</details>';
+    return '<div class="albk"><button class="link" data-act="farm-page" data-p="-1">\u2039 Farm planner</button></div><div class="unitlist">'+farmCardHtml(pr,pi)+'</div>'+
+      (fd.n?'<p class="hint" style="margin:8px 4px">Last 24 hours: <b>'+fd.w+'</b> won'+(fd.n>fd.w?', <span class="badc">'+(fd.n-fd.w)+' lost</span>':'')+', '+fmt(fd.loot)+' loot. <button class="link" data-act="rep-cat" data-v="atk" data-go="1">See the reports</button></p>':'')+list+
+      '<div class="wcnav"><button class="link" data-act="farm-page" data-p="'+((pi+n-1)%n)+'">\u2039 '+esc(S.presets[(pi+n-1)%n].name)+'</button><button class="link" data-act="farm-page" data-p="'+((pi+1)%n)+'">'+esc(S.presets[(pi+1)%n].name)+' \u203a</button></div>'; }
+  FARMV=-1;
+  var claimed=0, seen={}; S.cities.forEach(function(c){ (c.presets||[]).forEach(function(pr){ pr.farm.forEach(function(id){ if (!seen[id]){ seen[id]=1; claimed++; } }); }); });
+  var withMode=S.presets.filter(function(pr){ return !!pr.farmMode; }).length, running=S.presets.filter(function(pr){ return pr.auto; }).length, dl={n:0,w:0,loot:0};
+  S.presets.forEach(function(pr,pi){ var x=farmDay(pi); dl.n+=x.n; dl.w+=x.w; dl.loot+=x.loot; });
+  var h='<div class="section"><div class="shead"><h3>Farm planner</h3><span class="dur">'+esc(S.name)+'</span></div>'+
+    '<div class="fmstats"><div><b'+(running?' class="okc"':'')+'>'+running+'</b><span>auto-farming</span></div><div><b>'+fmt(claimed)+'</b><span>NPCs on lists</span></div><div><b>'+fmt(dl.loot)+'</b><span>loot in 24 h</span></div></div>'+
+    '<details class="det wcabout" data-det="fmabout"'+(DET.fmabout?' open':'')+'><summary>How the farm planner works</summary>'+'<p class="hint">Pick a goal (and, if you like, one NPC level) for each preset and it fills its own farm list with NPC cities no other preset is using, nearest first, only ones that preset’s army beats'+'. <b>Training</b> lists run just over 1 hour of round trips, so every garrison has regrown to full strength when you come back. <b>Resources</b> lists run just over 4 hours, so the plunder has regrown too.</p>'+
+    '<p class="hint">'+fmt(claimed)+' NPC'+(claimed===1?' is':'s are')+' on farm lists across your cities. Clearing keeps each preset\u2019s goal, so Refill all rebuilds them from scratch.</p></details>'+
+    '<div class="btnrow" style="margin-top:10px"><button class="btn small"'+(withMode?'':' disabled')+' data-act="farm-refill-all">Refill all lists</button>'+
+    '<button class="btn ghost danger small" data-act="farm-clear-all">'+(farmArmed?'Tap again to clear every list':'Clear all farm lists')+'</button></div></div>'+
+    '<div class="section"><div class="shead"><h3>Farm presets</h3><span class="dur">'+(dl.n?dl.w+' won'+(dl.n>dl.w?' \u00b7 '+(dl.n-dl.w)+' lost':'')+' in 24 h':'')+'</span></div><div class="reptiles">'+S.presets.map(farmTileHtml).join("")+'</div></div>';
+  return h;
 }
 function wavesSheet(){ if (!waveDraft.times) waveDraft.times=[];
   var d=waveDraft, q=TILE_BY[d.tile], h='<div class="head"><span class="ico">'+ICON.hourglass+'</span><div><h2>Timed waves on '+esc(tileName(q))+'</h2><div class="sub">('+q.x+', '+q.y+'), '+tdist(q).toFixed(1)+' tiles away</div></div></div>';
@@ -3499,7 +3606,7 @@ function wavesSheet(){ if (!waveDraft.times) waveDraft.times=[];
   h+='<p class="hint">'+(clk?'Set waves per preset, then each wave\u2019s landing time to the second (same-second waves hit in list order). Waves leave now and wait at the target: no rations, can\u2019t be attacked, can be recalled, up to 24 hours.':'Set waves per preset, in order. Each lands the chosen seconds after the one before; troops wait at the gate until they launch.')+'</p>';
   // one line per preset: name, then travel and troops on one clipped line, and the wave count on the right (0.1.168: fits a phone screen)
   h+='<div class="wvlist">';
-  S.presets.forEach(function(pr,pi){ var ph=presetHero(pr), tm=presetTotal(pr)?travelMs(pr.t,q,ph?ph.id:0):0;
+  S.mpresets.forEach(function(pr,pi){ var ph=presetHero(pr), tm=presetTotal(pr)?travelMs(pr.t,q,ph?ph.id:0):0;
     h+='<div class="wvrow"><div class="wvt"><b>'+esc(pr.name)+'</b><span class="dur wvs" title="'+esc(presetSummary(pr))+'">'+(tm?'travel '+fmtT(realMs(tm))+' \u00b7 ':'')+presetSummary(pr)+'</span></div><input class="wvn" type="number" inputmode="numeric" min="0" max="10" data-wave="'+pi+'" value="'+(d.n[pi]||"")+'" placeholder="0" aria-label="Waves from '+esc(pr.name)+'"></div>'; });
   h+='</div>';
   if (clk){ var pl0=wavePlan(true);
@@ -3515,7 +3622,7 @@ function wavesSheet(){ if (!waveDraft.times) waveDraft.times=[];
 // the clock-mode list of waves with their landing-time boxes; patched in place when a wave count changes, so typing never closes the keyboard
 function wavesTimesHtml(pl0){ var d=waveDraft; if (!pl0.list.length) return '';
   return '<div class="wvlist">'+pl0.list.map(function(w,k){ var wh=w.hero?heroById(w.hero):null;
-    return '<div class="wvrow"><div class="wvt"><b>'+(k+1)+'. '+esc(S.presets[w.pi].name)+'</b><span class="dur wvs">earliest '+wvClock(S.gt+w.travel)+' \u00b7 travel '+fmtT(realMs(w.travel))+(wh?' \u00b7 '+esc(wh.name):'')+'</span></div>'+hmsIn('data-wtime="'+k+'" aria-label="Wave '+(k+1)+' lands at"', d.times[k]||"", "wvtime")+'</div>'; }).join("")+'</div>'; }
+    return '<div class="wvrow"><div class="wvt"><b>'+(k+1)+'. '+esc(S.mpresets[w.pi].name)+'</b><span class="dur wvs">earliest '+wvClock(S.gt+w.travel)+' \u00b7 travel '+fmtT(realMs(w.travel))+(wh?' \u00b7 '+esc(wh.name):'')+'</span></div>'+hmsIn('data-wtime="'+k+'" aria-label="Wave '+(k+1)+' lands at"', d.times[k]||"", "wvtime")+'</div>'; }).join("")+'</div>'; }
 /* 0.1.176: time to the second as three pickers (hour, minute, second). iPhone ignores step="1" on <input type="time"> and has no seconds
    wheel; selects get proper wheels everywhere. The value lives in a hidden input carrying the old id/data attributes, so the code that
    reads it is unchanged: picking a wheel updates it and fires an input event on it. Value "HH:MM:SS" (24 hour), or "" when unset. */
@@ -3530,7 +3637,7 @@ function hmsPick(el){ var box=el.closest(".hms"); if (!box) return; var ss=box.q
 var waveDraft=null;
 function wavePlan(){
   var d=waveDraft, q=TILE_BY[d.tile], list=[], need=[0,0,0,0,0,0,0,0,0,0,0,0], heroUsed={};
-  S.presets.forEach(function(pr,pi){ for (var k=0;k<(d.n[pi]||0);k++){ var hero=presetHero(pr, heroUsed); var hid = hero && !hero.away && !seatLocked(hero) && !heroUsed[hero.id] ? hero.id : 0; if (hid) heroUsed[hid]=1;
+  S.mpresets.forEach(function(pr,pi){ for (var k=0;k<(d.n[pi]||0);k++){ var hero=presetHero(pr, heroUsed); var hid = hero && !hero.away && !seatLocked(hero) && !heroUsed[hero.id] ? hero.id : 0; if (hid) heroUsed[hid]=1;
     list.push({pi:pi, t:pr.t.slice(), hero:hid, travel:travelMs(pr.t,q,hid)}); pr.t.forEach(function(n,i){ need[i]+=n; }); } });
   var why="";
   if (!rallyLv()) why="Build a Rally Spot first";
@@ -3693,7 +3800,7 @@ function nextAiEvent(){ var best=null; S.aiWar.forEach(function(w){ var t=w.phas
 function handleAi(w){ if (w.phase==="wait"){ w.phase="out"; return; } resolveDefense(w); S.aiWar=S.aiWar.filter(function(x){ return x!==w; }); }
 function renderThreats(){
   var el=document.getElementById("threats"); if (!el) return;
-  var allyAlert = (S.alliance && S.alliance.bully && S.alliance.bully.next && bullyOf()) ? '<button class="threat ally" data-act="tab" data-tab="alliance"><b>\u2691 '+esc(bullyOf().name)+' \u2192 '+esc((TILE_BY[S.alliance.bully.next.target]||{ai:{name:"an ally"}}).ai.name)+'</b><span>lands in <span class="tt" data-t="'+S.alliance.bully.next.arr+'"></span></span></button>' : '';
+  var allyAlert = ''; // 0.2.4: a bully's march on an ally is the red chip at the top (bullychip) and the Kingdom tab's Bully section, not a card here
   var bl=beaconLv(), mine=S.aiWar.filter(function(w){ return w.city===C().id && (bl>0) && (w.phase!=="wait" || bl>=3); }), musters=S.aiWar.filter(function(w){ return w.city===C().id && w.phase==="wait"; });
   if (!mine.length){ if (el.innerHTML!==allyAlert) el.innerHTML=allyAlert; return; }
   var byAi={}; mine.forEach(function(w){ (byAi[w.ai]=byAi[w.ai]||[]).push(w); });
@@ -3725,15 +3832,14 @@ function viewMap(){
   var lv='<option value="0">Any level</option>'; for (var i=1;i<=10;i++) lv+='<option value="'+i+'">Level '+i+'</option>'; [12,14,16,18].forEach(function(i){ lv+='<option value="'+i+'">Level '+i+'</option>'; });
   return '<div class="btnrow" style="margin:0 0 8px;align-items:center;flex-wrap:nowrap"><button class="btn ghost small" style="flex:0 0 auto" data-act="march-open" data-tile="'+homeTileId()+'" data-mission="hide">Hide troops in the woods</button>'+bmJumpHtml()+'</div>'+
     '<div class="section"><div class="shead"><h3 id="realmh">'+esc(realmName())+'</h3><button class="link dur" id="mapstat" data-act="held-open" title="See every valley and flat you hold"></button></div>'+
-    '<div class="maptools" style="flex-wrap:nowrap"><button class="btn ghost small" data-act="map-zoom" data-z="1" aria-label="Zoom in">+</button><button class="btn ghost small" data-act="map-zoom" data-z="-1" aria-label="Zoom out">\u2212</button><button class="btn ghost small" data-act="map-home">My city</button><span class="dur" id="mapcoord" style="flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span><button class="btn ghost small dpickbtn" data-act="dpick" aria-pressed="'+(DPICK.on?'true':'false')+'" title="Tap decorations instead of tiles" aria-label="Pick decorations" style="margin-left:auto">\ud83d\uddbc\ufe0f</button></div>'+
+    '<div class="maptools" style="flex-wrap:nowrap"><button class="btn ghost small" data-act="map-zoom" data-z="1" aria-label="Zoom in">+</button><button class="btn ghost small" data-act="map-zoom" data-z="-1" aria-label="Zoom out">\u2212</button><button class="btn ghost small" data-act="map-home">My city</button><span class="dur" id="mapcoord" style="flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span><button class="btn ghost small dpickbtn" data-act="dpick" aria-pressed="'+(DPICK.on?'true':'false')+'" title="Tap decorations instead of tiles" aria-label="Pick decorations" style="margin-left:auto">\ud83d\uddbc\ufe0f</button><button class="btn ghost small" data-act="map-fs" title="Full screen" aria-label="Full screen">\u26f6</button></div>'+
     '<div id="mapfarmbox">'+mapFarmHtml()+'</div>'+
-    '<div class="mapview" id="mapview"><canvas id="mapc" aria-label="Map. Drag to pan, tap a tile to see it."></canvas><div class="mpop" id="mappop" hidden></div><div class="paintbar" id="paintbar" hidden></div></div>'+
+    '<div class="mapview" id="mapview"><canvas id="mapc" aria-label="Map. Drag to pan, tap a tile to see it."></canvas><div class="mpop" id="mappop" hidden></div><div class="paintbar" id="paintbar" hidden></div>'+
+      '<div class="mapfsbar"><button class="btn small" data-act="map-zoom" data-z="1" aria-label="Zoom in">+</button><button class="btn small" data-act="map-zoom" data-z="-1" aria-label="Zoom out">\u2212</button><button class="btn small" data-act="map-home">My city</button><button class="btn small" data-act="map-rot" aria-label="Turn sideways">\u27f3</button><button class="btn small" data-act="map-fs" aria-label="Leave full screen">\u2715</button></div></div>'+
     '<div class="mapbottom"><canvas id="minic" width="'+MAPW+'" height="'+MAPH+'" aria-label="Overview map. Tap to jump there."></canvas>'+
-    '<div class="finder"><div class="h3">Find nearest</div><select id="findtype">'+opts+'</select><select id="findlvl">'+lv+'</select><button class="btn small" data-act="map-find">Find</button>'+
-    '<div class="legend">'+Object.keys(VTYPES).map(function(k){ return '<span><i style="background:'+VTYPES[k].col+'"></i>'+VTYPES[k].name+'</span>'; }).join("")+'<span><i style="background:#4a4541"></i>NPC</span><span><i style="background:#2c6763"></i>AI lord</span><span><i style="background:'+HC_COL[12]+'"></i>HC 12</span><span><i style="background:'+HC_COL[14]+'"></i>HC 14</span><span><i style="background:'+HC_COL[16]+'"></i>HC 16</span><span><i style="background:'+HC_COL[18]+'"></i>Atlantis</span><span><i style="background:var(--brass)"></i>Yours</span></div>'+
-    '</div></div><p class="hint">Drag to pan, pinch or use + and \u2212 to zoom, tap the overview to jump. Historic cities sit on a grid: level 12s every 24 tiles, 14s and state capitals every 66, and Atlantis at the center (198, 198).</p></div>'+
+    '</div></div><p class="hint">Drag to pan, pinch or use + and \u2212 to zoom, tap the overview to jump, \u26f6 for full screen. Historic cities sit on a grid: level 12s every 24 tiles, 14s every 66, and Atlantis at the center (198, 198).</p></div>'+
     '<div id="bmpanel">'+bmPanel()+'</div>'+occPanel()+
-    '<div id="tileinfo"></div><div id="marchbox"></div><div class="section"><div class="act"><span class="dur">Every battle you fight is kept in Reports.</span><button class="btn ghost small" data-act="tab" data-tab="reports">Battle reports</button></div></div>';
+    '<details class="section det" id="tidet" data-det="tileinfo"'+(DET.tileinfo?' open':'')+(selTile?'':' hidden')+'><summary><b>Tile details</b> <span class="dur" id="tisum"></span></summary><div id="tileinfo"></div></details><div id="marchbox"></div>';
 }
 /* 0.1.243: show one preset's farm list on the map: every target outlined and numbered in farm order, and dotted on the overview.
    Per city (presets are), kept for the session only. */
@@ -3976,34 +4082,56 @@ function drawMap(){
 function selectTile(id, center){
   if (selTile!==id) armedTile=null; selTile=id; var q=TILE_BY[id]; if (center) centerOn(q.x,q.y); renderTileInfo(); drawMap();
 }
+/* ---------- 0.2.5: full-screen map, and turning it sideways ----------
+   Full screen fills the phone with the map (and asks the browser to hide its bars). Turn sideways first asks the phone for a real landscape;
+   if it says no (the installed app is locked to portrait), the map is turned 90 degrees on screen instead, and touches are read in the map's own frame. */
+var MAPFS={on:false, rot:false, want:false, real:false};
+function mapLocal(c, cx, cy){ var v=document.getElementById("mapview"); if (MAPFS.rot && v && v.classList.contains("rot")) return {x:cy, y:window.innerWidth-cx};
+  var rc=c.getBoundingClientRect(); return {x:cx-rc.left, y:cy-rc.top}; }
+function mapFsApply(){ var v=document.getElementById("mapview"); if (v){ v.classList.toggle("fs", MAPFS.on); v.classList.toggle("rot", MAPFS.on && MAPFS.rot); } document.body.classList.toggle("mapfs", MAPFS.on); requestDraw(); }
+function mapFs(on){ MAPFS.on=!!on;
+  if (on){ try { var de=document.documentElement; if (de.requestFullscreen && !document.fullscreenElement){ var fp=de.requestFullscreen({navigationUI:"hide"}); if (fp && fp.then) fp.then(function(){ MAPFS.real=true; }).catch(function(){}); } } catch(e){} }
+  else { MAPFS.rot=false; MAPFS.want=false; try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(e){}
+    try { if (document.fullscreenElement && document.exitFullscreen){ var xp=document.exitFullscreen(); if (xp && xp.catch) xp.catch(function(){}); } } catch(e){} MAPFS.real=false; }
+  mapFsApply(); }
+function mapRot(){ if (!MAPFS.on) return; MAPFS.want=!MAPFS.want;
+  if (!MAPFS.want){ MAPFS.rot=false; try { screen.orientation.unlock(); } catch(e){} mapFsApply(); return; }
+  var lp=null; try { if (screen.orientation && screen.orientation.lock && document.fullscreenElement) lp=screen.orientation.lock("landscape"); } catch(e){ lp=null; }
+  if (lp && lp.then) lp.then(function(){ MAPFS.rot=false; mapFsApply(); }).catch(function(){ MAPFS.rot=true; mapFsApply(); });
+  else { MAPFS.rot=true; mapFsApply(); } }
+// leaving the browser's full screen (the phone's back gesture) leaves the full-screen map too
+// the map was re-drawn (fresh element) or the tab changed (no map): keep full screen in step
+setInterval(function(){ if (!MAPFS.on) return; var v=document.getElementById("mapview"); if (!v || tab!=="map") mapFs(false); else if (!v.classList.contains("fs")) mapFsApply(); }, 300);
+document.addEventListener("fullscreenchange", function(){ if (!document.fullscreenElement && MAPFS.on && MAPFS.real) mapFs(false); });
 function setupMapInput(){
   var c=document.getElementById("mapc"); if (!c || c._wired) return; c._wired=true;
   c.addEventListener("contextlost",function(e){ e.preventDefault(); });
   c.addEventListener("contextrestored",function(){ miniDirty=true; requestDraw(); });
   if (window.ResizeObserver){ var ro=new ResizeObserver(function(){ requestDraw(); }); ro.observe(c.parentNode); }
   var pts={};
+  function L(e){ return mapLocal(c, e.clientX, e.clientY); }
   function panFrom(p){ drag={x:p.x,y:p.y,sx:p.x,sy:p.y,moved:true}; }
-  function pinchStart(){ var ids=Object.keys(pts), a=pts[ids[0]], b=pts[ids[1]], rc=c.getBoundingClientRect();
-    drag={pinch:Math.max(1,Math.hypot(a.x-b.x,a.y-b.y)), z:mv.z, mx:(a.x+b.x)/2-rc.left, my:(a.y+b.y)/2-rc.top, moved:true}; }
-  c.addEventListener("pointerdown",function(e){ try { c.setPointerCapture(e.pointerId); } catch(err){} pts[e.pointerId]={x:e.clientX,y:e.clientY};
-    var ids=Object.keys(pts); if (ids.length===1) drag={x:e.clientX,y:e.clientY,sx:e.clientX,sy:e.clientY,moved:false}; else if (ids.length===2) pinchStart(); });
-  c.addEventListener("pointermove",function(e){ if (!pts[e.pointerId] || !drag) return; pts[e.pointerId]={x:e.clientX,y:e.clientY};
+  function pinchStart(){ var ids=Object.keys(pts), a=pts[ids[0]], b=pts[ids[1]];
+    drag={pinch:Math.max(1,Math.hypot(a.x-b.x,a.y-b.y)), z:mv.z, mx:(a.x+b.x)/2, my:(a.y+b.y)/2, moved:true}; }
+  c.addEventListener("pointerdown",function(e){ try { c.setPointerCapture(e.pointerId); } catch(err){} var p0=L(e); pts[e.pointerId]=p0;
+    var ids=Object.keys(pts); if (ids.length===1) drag={x:p0.x,y:p0.y,sx:p0.x,sy:p0.y,moved:false}; else if (ids.length===2) pinchStart(); });
+  c.addEventListener("pointermove",function(e){ if (!pts[e.pointerId] || !drag) return; var p1=L(e); pts[e.pointerId]=p1;
     var ids=Object.keys(pts);
     if (ids.length>=2){ if (!drag.pinch) pinchStart(); var a=pts[ids[0]], b=pts[ids[1]], d=Math.hypot(a.x-b.x,a.y-b.y); zoomAt(drag.z*d/drag.pinch, drag.mx, drag.my); return; }
     if (drag.pinch || drag.x==null) { panFrom(pts[ids[0]]); return; }
-    var dx=e.clientX-drag.x, dy=e.clientY-drag.y; if (Math.abs(e.clientX-drag.sx)+Math.abs(e.clientY-drag.sy)>6) drag.moved=true;
-    drag.x=e.clientX; drag.y=e.clientY; mv.x-=dx/mv.z; mv.y-=dy/mv.z; clampView(); requestDraw(); });
+    var dx=p1.x-drag.x, dy=p1.y-drag.y; if (Math.abs(p1.x-drag.sx)+Math.abs(p1.y-drag.sy)>6) drag.moved=true;
+    drag.x=p1.x; drag.y=p1.y; mv.x-=dx/mv.z; mv.y-=dy/mv.z; clampView(); requestDraw(); });
   function up(e){ if (!pts[e.pointerId]) return; var wasTap = drag && !drag.moved && !drag.pinch && Object.keys(pts).length===1; delete pts[e.pointerId];
-    if (wasTap){ var rc=c.getBoundingClientRect(), tx=Math.floor(mv.x+(e.clientX-rc.left)/mv.z), ty=Math.floor(mv.y+(e.clientY-rc.top)/mv.z);
+    if (wasTap){ var pu=L(e), tx=Math.floor(mv.x+pu.x/mv.z), ty=Math.floor(mv.y+pu.y/mv.z);
       if (tx>=0 && ty>=0 && tx<MAPW && ty<MAPH){ if (advance(Date.now())) flushFinished(); if (PAINT.k){ paintOne(tx+","+ty); return; } if (CLR.on){ clrTap(tx+","+ty); return; }
         if (MOVE.e){ moveTap(tx+","+ty); return; }
-        if (DPICK.on){ decoPickTap(mv.x+(e.clientX-rc.left)/mv.z, mv.y+(e.clientY-rc.top)/mv.z); return; }
-        var wh=wizHit(e.clientX-rc.left, e.clientY-rc.top); MPOP.hide=false; selectTile(wh?wh.id:tx+","+ty,false); } }
+        if (DPICK.on){ decoPickTap(mv.x+pu.x/mv.z, mv.y+pu.y/mv.z); return; }
+        var wh=wizHit(pu.x, pu.y); MPOP.hide=false; selectTile(wh?wh.id:tx+","+ty,false); } }
     var left=Object.keys(pts);
     if (!left.length) drag=null; else if (left.length===1) panFrom(pts[left[0]]); else pinchStart();
     requestDraw(); }
   c.addEventListener("pointerup",up); c.addEventListener("pointercancel",up); c.addEventListener("lostpointercapture",up);
-  c.addEventListener("wheel",function(e){ e.preventDefault(); var rc=c.getBoundingClientRect(); zoomAt(mv.z*(e.deltaY<0?1.15:1/1.15), e.clientX-rc.left, e.clientY-rc.top); },{passive:false});
+  c.addEventListener("wheel",function(e){ e.preventDefault(); var pw=L(e); zoomAt(mv.z*(e.deltaY<0?1.15:1/1.15), pw.x, pw.y); },{passive:false});
   var mini=document.getElementById("minic");
   mini.addEventListener("click",function(e){ var rc=mini.getBoundingClientRect(); centerOn(Math.floor((e.clientX-rc.left)/rc.width*MAPW), Math.floor((e.clientY-rc.top)/rc.height*MAPH)); drawMap(); });
 }
@@ -4028,7 +4156,7 @@ function findNearest(type, lvl){
   return best;
 }
 /* ---------- occupy flats: one tap sends a preset to the nearest free flats of a chosen level ---------- */
-function occSet(){ var o=S.occ=S.occ||{lvl:1,p:0,n:1}; o.lvl=Math.max(1,Math.min(10,+o.lvl||1)); o.p=Math.max(0,Math.min(S.presets.length-1,+o.p||0)); o.n=Math.max(1,Math.min(99,Math.floor(+o.n||1))); return o; }
+function occSet(){ var o=S.occ=S.occ||{lvl:1,p:0,n:1}; o.lvl=Math.max(1,Math.min(10,+o.lvl||1)); o.p=Math.max(0,Math.min(S.mpresets.length-1,+o.p||0)); o.n=Math.max(1,Math.min(99,Math.floor(+o.n||1))); return o; }
 function occPendingHere(){ var me=C().id; return S.marches.filter(function(m){ return m.city===me && m.mission==="occupy" && (m.phase==="out"||m.phase==="wait"); }).length; }
 // 0.1.219: why the Rally Spot is full, in words: how many slots marches, camps and rally marches take
 // 0.1.220: every valley and flat you hold, by city; tap one to see it on the map
@@ -4063,18 +4191,18 @@ function occInfoText(){
   return "Free marches: "+free+" of "+rl+". Room to hold: "+occRoom()+" (Town Hall "+S.th+", "+ownedIds().length+" held).";
 }
 function occPanel(){
-  var o=occSet(), pr=S.presets[o.p], lv="", pp="";
+  var o=occSet(), pr=S.mpresets[o.p], lv="", pp="";
   for (var i=1;i<=10;i++) lv+='<option value="'+i+'"'+(o.lvl===i?' selected':'')+'>Level '+i+'</option>';
-  S.presets.forEach(function(p,pi){ pp+='<option value="'+pi+'"'+(o.p===pi?' selected':'')+'>'+(pi+1)+'. '+esc(p.name)+(presetTotal(p)?'':' (empty)')+'</option>'; });
+  S.mpresets.forEach(function(p,pi){ pp+='<option value="'+pi+'"'+(o.p===pi?' selected':'')+'>'+(pi+1)+'. '+esc(p.name)+(presetTotal(p)?'':' (empty)')+'</option>'; });
   var hh=pr.hero===HERO_BEST?"Best attack (free hero)":pr.hero===HERO_FAST?"Fastest (free hero)":pr.hero===HERO_ANY?"Any free hero":pr.hero>0?(heroById(pr.hero)?esc(heroById(pr.hero).name):"a hero who is gone"):"No hero";
-  return '<div class="section" id="occsec"><div class="shead"><h3>Occupy flats</h3><span class="dur">'+esc(S.name)+'</span></div>'+
+  return '<details class="section det" id="occsec" data-det="occ"'+(DET.occ?' open':'')+'><summary><b>Occupy flats</b> <span class="dur">'+esc(S.name)+'</span></summary>'+
     '<p class="hint">Finds the nearest free flats of the level you pick and sends the chosen preset to occupy each one. It stops when it runs out of free marches, room to hold, troops, rations or heroes, or if the preset would lose.</p>'+
-    '<div class="farmadd"><label class="dur" for="occlvl">Flat level</label><select id="occlvl">'+lv+'</select><label class="dur" for="occpre">Preset</label><select id="occpre">'+pp+'</select><label class="dur" for="occn">Take</label><input type="number" id="occn" min="1" max="'+Math.max(1,rallyLv())+'" value="'+o.n+'" style="width:4.5em"></div>'+
-    '<p class="dur" id="occpreset" style="margin:4px 0">'+(presetTotal(pr)?presetSummary(pr)+'. Hero: '+hh+'.':'This preset has no troops. Edit it in the Army tab.')+'</p>'+
-    '<div class="act"><span class="dur" id="occinfo">'+occInfoText()+'</span><button class="btn" data-act="occ-go">Occupy flats</button></div></div>';
+    '<div class="farmadd"><label class="dur" for="occlvl">Flat level</label><select id="occlvl">'+lv+'</select><label class="dur" for="occpre">March preset</label><select id="occpre">'+pp+'</select><label class="dur" for="occn">Take</label><input type="number" id="occn" min="1" max="'+Math.max(1,rallyLv())+'" value="'+o.n+'" style="width:4.5em"></div>'+
+    '<p class="dur" id="occpreset" style="margin:4px 0">'+(presetTotal(pr)?presetSummary(pr)+'. Hero: '+hh+'.':'This march preset has no troops. Edit it at the Rally Spot.')+'</p>'+
+    '<div class="act"><span class="dur" id="occinfo">'+occInfoText()+'</span><button class="btn" data-act="occ-go">Occupy flats</button></div></details>';
 }
 function occupyFlats(){
-  var o=occSet(), pr=S.presets[o.p], rl=rallyLv();
+  var o=occSet(), pr=S.mpresets[o.p], rl=rallyLv();
   if (!rl){ toast("Build a Rally Spot first"); return; }
   if (!presetTotal(pr)){ toast("That preset has no troops"); return; }
   if (presetTotal(pr)>armyCap()){ toast("That preset is over the "+fmt(armyCap())+"-troop march limit"); return; }
@@ -4132,7 +4260,7 @@ function bmCard(){ var el=document.getElementById("tileinfo"); if (!el || !selTi
   wrap.innerHTML=b ? '<button class="btn ghost small" data-act="bm-del" data-tile="'+selTile+'">\u2605 Bookmarked</button><input type="text" id="bm-label" maxlength="40" value="'+esc(b.n||"")+'" placeholder="Label (optional)" aria-label="Bookmark label" style="flex:1;min-width:0">'
     : '<button class="btn ghost small" data-act="bm-add" data-tile="'+selTile+'">\u2606 Bookmark</button>';
   hd.style.flexWrap="wrap"; hd.appendChild(wrap); }
-function renderTileInfo(){ renderTileInfoBase(); try { bmCard(); } catch(e){} try { ryCard(); } catch(e){} try { mapPop(); } catch(e){} }
+function renderTileInfo(){ renderTileInfoBase(); try { var td=document.getElementById("tidet"), ts=document.getElementById("tisum"); if (td){ td.hidden=!selTile; if (ts){ var tq=selTile&&TILE_BY[selTile]; ts.textContent=tq?tileName(tq)+" ("+tq.x+", "+tq.y+")":""; } } } catch(e){} try { bmCard(); } catch(e){} try { ryCard(); } catch(e){} try { mapPop(); } catch(e){} }
 /* ---------- map popup (0.1.135): tap a tile and its basics and main buttons open right on the map ---------- */
 var MPOP={hide:false};
 var MPOP_ACTS={attack:1, scout:2, occupy:3, conquer:4, found:5, transport:6, reinforce:7, allyguard:8, station:9};
@@ -4252,15 +4380,9 @@ function renderTileInfoBase(){
 }
 function renderMarchBox(){
   var el=document.getElementById("marchbox"); if (!el) return;
-  var rl=rallyLv(), h='<div class="section"><div class="shead"><h3>Marches</h3><span class="dur">'+rallyUsed()+' / '+rl+' out from here</span></div>';
-  if (!rl) h+='<p class="warn">Build a Rally Spot to send armies. Its level is how many can be out at once.</p>';
-  else if (!S.marches.length) h+='<p class="hint">No armies in the field.</p>';
-  S.marches.filter(function(m){ return m.city===C().id || true; }).forEach(function(m){
-    var q=TILE_BY[m.tile], n=m.t.reduce(function(a,b){return a+b;},0);
-    h+='<div class="bq"><span>'+((m.preset!=null||m.label!=null)?'<b>'+esc(S.cities[cityIndex(m.city)].presets[m.preset!=null?m.preset:m.label].name)+'</b>: ':'')+(m.phase==="wait"?"Wave queued for ":marchVerb(m))+esc(tileName(q))+(S.cities.length>1?' ('+esc(S.cities[cityIndex(m.city)].name)+')':'')+'</span><span class="qtime" id="mt-'+m.id+'"></span><span class="dur" style="grid-column:1/-1">'+esc(marchSummary(m))+'</span>'+(m.city===C().id?marchBtns(m):'')+'</div>';
-  });
+  var h=''; // 0.2.5: the all-marches list is gone from the map (march timers already show on every screen)
   var held=ownedIds();
-  h+='</div><div class="section"><div class="shead"><h3>Held valleys</h3><span class="dur">'+held.length+' / '+S.th+'</span></div>';
+  h+='<details class="section det" data-det="held"'+(DET.held?' open':'')+'><summary><b>Held valleys</b> <span class="dur">'+held.length+' / '+S.th+'</span></summary>';
   if (!held.length) h+='<p class="hint">None yet. Occupy valleys for production bonuses, or flats to establish NPC cities.</p>';
   else {
     var vb=valleyBonus(), tot=["food","lumber","stone","iron"].filter(function(k){ return vb[k]; }).map(function(k){ return '+'+pct(vb[k])+' '+k; });
@@ -4268,7 +4390,7 @@ function renderMarchBox(){
     h+='<div class="gearlist">'+held.map(function(id){ var q=TILE_BY[id]; if (!q) return ''; var bonus=VTYPES[q.k]&&VTYPES[q.k].res?'+'+pct(VALLEY_BONUS*q.L)+' '+VTYPES[q.k].res:'Flat, ready for an NPC city';
       return '<div class="gearrow"><span class="gn">Level '+q.L+' '+VTYPES[q.k].name+'</span><span class="gb">'+bonus+'</span><span class="dur">('+q.x+', '+q.y+'), '+tdist(q).toFixed(1)+' tiles</span><span class="btnrow" style="justify-content:flex-end"><button class="link" data-act="goto-tile" data-tile="'+id+'">Show</button><button class="link" data-act="release" data-tile="'+id+'">Release</button></span></div>'; }).join("")+'</div>';
   }
-  el.innerHTML=h+'</div>';
+  if (el._sig!==h){ el.innerHTML=h+'</details>'; el._sig=h; wireDetails(el); }
   var ms=document.getElementById("mapstat"); if (ms){ var allH=Object.keys(S.map.owned).filter(function(k){ return cityIndex(S.map.owned[k])>=0; }).length, allC=S.cities.reduce(function(a,c){ return a+(c.th||0); },0);
     ms.textContent = ownedIds().length+' / '+S.th+' valleys held'+(S.cities.length>1?' (all cities '+allH+' / '+allC+')':''); }
 }
@@ -4349,7 +4471,7 @@ function marchSheet(){
   if (camps.length) h+='<div><label class="sub" for="marchfrom">March from</label><select id="marchfrom"><option value="">'+esc(S.name)+' (the city)</option>'+camps.map(function(c){ var cq=TILE_BY[c.tile]; return '<option value="'+c.tile+'"'+(d.from===c.tile?' selected':'')+'>Camp at '+esc(cq?tileName(cq):c.tile)+' ('+fmt(sumT(c.t))+' troops)</option>'; }).join("")+'</select></div>';
   if (d.mission==="hide") h+='<p class="hint">They slip out into the woods around the city: attackers won\u2019t find them, and Recall brings them back instantly. They hunt for their own food. Each group takes a Rally Spot slot, like any march.</p>';
   if (d.mission==="scout") h+='<p class="hint">Only scouts go. They win if your scouts outnumber the defender\u2019s (each Informatics level counts for 10% more on either side). Success shows its army, fortifications and stockpile: rough counts below Informatics 3, exact from 3, plus research and hero from 6. Many targets keep no scouts at all.</p>';
-  if (d.mission!=="transport" && d.mission!=="scout") h+='<div class="farmadd"><span class="dur">Load preset:</span>'+S.presets.map(function(pr,pi){ return '<button class="chipbtn" data-act="march-preset" data-p="'+pi+'" title="'+esc(pr.name)+'"'+(presetTotal(pr)?'':' disabled')+'>'+(pi+1)+'</button>'; }).join("")+'</div>';
+  if (d.mission!=="transport" && d.mission!=="scout") h+=[["March",1],["Farm",0]].map(function(kd){ return '<div class="farmadd"><span class="dur">'+kd[0]+' preset:</span>'+presetsOf(kd[1]).map(function(pr,pi){ return '<button class="chipbtn" data-act="march-preset"'+(kd[1]?' data-m="1"':'')+' data-p="'+pi+'" title="'+esc(pr.name)+'"'+(presetTotal(pr)?'':' disabled')+'>'+(pi+1)+'</button>'; }).join("")+'</div>'; }).join("");
   h+='<div class="btnrow" style="justify-content:flex-end;margin:0"><button class="btn ghost small" data-act="march-clear">Clear all</button></div>'; // 0.1.210
   h+='<div class="tscroll"><table class="gt wrap1" style="min-width:0"><tbody>';
   U.forEach(function(u,i){ if (d.mission==="scout" && i!==2) return; if (!av[i] && (d.from || missing(u.req).length) && !(d.mission==="scout")) return; if (av[i]) any=true;
@@ -7095,20 +7217,48 @@ function wcFinish(p,res){
   else toast(won?"Won, losing "+fmt(lost)+(rating?"":". Not enough for a rating yet"):"The defenders held");
   lastSheet=""; renderSheet(); lastView="";
 }
-function viewCollege(){
-  var h='<div class="section"><div class="shead"><h3>War College</h3><span class="dur">'+wcStars()+' of '+wcMaxStars()+' ratings earned</span></div>'+
-    '<p class="hint">Battle puzzles. Plan an attack or hold the walls with '+esc(S.name)+'’s own troops, heroes, gear and research, then fight a simulated battle. Nothing dies for real, and you can retry as often as you like. The same plan always gets the same result. Each rating pays out once.</p></div>';
-  WC_TIERS.forEach(function(tr){
-    h+='<div class="section"><h3>'+tr.name+'</h3><p class="hint">'+tr.note+'</p><div class="gearlist">';
-    WC.filter(function(p){ return p.tier===tr.k; }).forEach(function(p){
-      var got=wcGot(p), b=wcSt().best[p.id], stars=""; for (var g=0; g<p.goals.length; g++) stars+= g<got?"★":"☆";
-      h+='<button class="gearrow'+(got===p.goals.length?' t3':got?' t1':'')+'" data-act="wc-open" data-id="'+p.id+'"><span class="gn">'+p.name+'</span><span class="gst">'+stars+'</span>'+
-        '<span class="dur" style="grid-column:1/-1">'+esc(wcGoalText(p,Math.min(got,p.goals.length-1)))+(b?' · best: '+(p.mode==="sent"?'sent '+fmt(b.sent||0):'lost '+fmt(b.lost)+(p.kind==="defense"?' prestige':'')):'')+'</span></button>';
-    });
-    h+='</div></div>';
-  });
-  return h;
-}
+// 0.2.4: the War College is a hub. Tiles per tier, grouped by kind; a tier opens its own page with the puzzles and its rules in a dropdown.
+var WCV=""; // the tier page open, "" for the hub
+var WC_GROUPS=[["Attacks","atk",["valley","npc1","npc6","hc12","precise"]],["Monsters & warlords","mon",["beast","den"]],["Sieges","siege",["siege_s","siege_m","siege_l"]],["Defense","def",["def_s","def_m","def_l","def_x"]],["Tech puzzles","tech",["tech_e","tech_h"]]];
+var WC_ICO={atk:'<path d="M4 20 14 10M14 4h6v6M20 4 9 15M6 15l3 3"/>', mon:'<path d="M5 9c0-4 3-6 7-6s7 2 7 6v5l-2 2v4h-3v-2h-4v2H7v-4l-2-2z"/><circle cx="9.5" cy="10" r="1.2"/><circle cx="14.5" cy="10" r="1.2"/>',
+  siege:'<path d="M4 21V9l2-2 2 2V6h3V4h2v2h3v3l2-2 2 2v12z"/><path d="M10 21v-4a2 2 0 0 1 4 0v4"/>', def:'<path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/>',
+  tech:'<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/><path d="M7.5 15h9"/>'};
+function wcIco(k){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+WC_ICO[k]+'</svg>'; }
+function wcTier(k){ for (var i=0;i<WC_TIERS.length;i++) if (WC_TIERS[i].k===k) return WC_TIERS[i]; return null; }
+function wcGroupOf(k){ for (var i=0;i<WC_GROUPS.length;i++) if (WC_GROUPS[i][2].indexOf(k)>=0) return WC_GROUPS[i]; return WC_GROUPS[0]; }
+function wcShort(tr){ return tr.name.replace(/^(Sieges|Defense|Tech Puzzles): /,""); }
+function wcTierSt(k){ var s={n:0, done:0, got:0, max:0}; WC.forEach(function(p){ if (p.tier!==k) return; var g=wcGot(p); s.n++; s.got+=g; s.max+=p.goals.length; if (g>=p.goals.length) s.done++; }); return s; }
+function wcBar(got,max){ return '<span class="wcbar"><i style="width:'+(max?got/max*100:0)+'%"></i></span>'; }
+function wcStarStr(p){ var got=wcGot(p), s=""; for (var g=0; g<p.goals.length; g++) s+= g<got?"★":"☆"; return s; }
+// the puzzle to pick up: the last one opened while it still has ratings to earn, else the next unfinished one in its tier, else the first unfinished anywhere
+function wcNext(){ var st=wcSt(), last=st.last?wcById(st.last):null, full=function(p){ return wcGot(p)>=p.goals.length; }, i;
+  if (last && !full(last)) return {p:last, again:true};
+  if (last){ var same=WC.filter(function(p){ return p.tier===last.tier && !full(p); }); if (same.length) return {p:same[0]}; }
+  for (i=0;i<WC_TIERS.length;i++){ var k=WC_TIERS[i].k, f=WC.filter(function(p){ return p.tier===k && !full(p); }); if (f.length) return {p:f[0]}; }
+  return null; }
+function wcRowHtml(p){ var got=wcGot(p), b=wcSt().best[p.id];
+  return '<button class="gearrow'+(got===p.goals.length?' t3':got?' t1':'')+'" data-act="wc-open" data-id="'+p.id+'"><span class="gn">'+p.name+'</span><span class="gst">'+wcStarStr(p)+'</span>'+
+    '<span class="dur" style="grid-column:1/-1">'+esc(wcGoalText(p,Math.min(got,p.goals.length-1)))+(b?' · best: '+(p.mode==="sent"?'sent '+fmt(b.sent||0):'lost '+fmt(b.lost)+(p.kind==="defense"?' prestige':'')):'')+'</span></button>'; }
+function wcHubHtml(){ var tot=wcStars(), max=wcMaxStars(), nx=wcNext();
+  var h='<div class="section"><div class="shead"><h3>War College</h3><span class="dur">'+fmt(tot)+' of '+fmt(max)+' ratings</span></div>'+wcBar(tot,max)+
+    '<details class="det wcabout" data-det="wcabout"'+(DET.wcabout?' open':'')+'><summary>How the War College works</summary><p class="hint">Battle puzzles. Plan an attack or hold the walls with '+esc(S.name)+'’s own troops, heroes, gear and research, then fight a simulated battle. Nothing dies for real, and you can retry as often as you like. The same plan always gets the same result. Each rating pays out once.</p></details>';
+  if (nx){ var tr=wcTier(nx.p.tier), g=Math.min(wcGot(nx.p), nx.p.goals.length-1);
+    h+='<button class="wcnext" data-act="wc-open" data-id="'+nx.p.id+'"><span class="dur">'+(nx.again?'Pick up where you left off':'Next up')+' · '+esc(wcShort(tr))+'</span><b>'+esc(nx.p.name)+' <span class="gst">'+wcStarStr(nx.p)+'</span></b><span class="dur">'+esc(wcGoalText(nx.p,g))+'</span></button>'; }
+  else h+='<p class="hint wcdone">Every puzzle rated. The college has nothing left to teach you.</p>';
+  h+='</div>';
+  WC_GROUPS.forEach(function(gr){ var gg=0, gm=0, tiles='';
+    gr[2].forEach(function(k){ var tr=wcTier(k); if (!tr) return; var s=wcTierSt(k); gg+=s.got; gm+=s.max;
+      tiles+='<button class="reptile wctile'+(s.got>=s.max?' done':s.got?' go':'')+'" data-act="wc-tier" data-v="'+k+'"><span class="rtop"><span class="nm">'+esc(wcShort(tr))+'</span><span class="n">'+s.got+'<small>/'+s.max+'</small></span></span>'+wcBar(s.got,s.max)+
+        '<span class="ln">'+(s.got>=s.max?'All rated':s.done?s.done+' of '+s.n+' puzzles done':s.got?s.got+' rating'+(s.got>1?'s':'')+' so far':s.n+' puzzles · not started')+'</span></button>'; });
+    h+='<div class="section"><div class="shead"><h3 class="wcgh">'+wcIco(gr[1])+esc(gr[0])+'</h3><span class="dur">'+gg+' / '+gm+'</span></div><div class="reptiles">'+tiles+'</div></div>'; });
+  return h; }
+function wcTierPage(k){ var tr=wcTier(k), s=wcTierSt(k), i=WC_TIERS.indexOf(tr), pv=WC_TIERS[i-1], nx=WC_TIERS[i+1], det="wcn_"+k, open=DET[det]!=null?DET[det]:!s.got;
+  var h='<div class="albk"><button class="link" data-act="wc-tier" data-v="">‹ War College</button></div><div class="section"><div class="shead"><h3>'+esc(tr.name)+'</h3><span class="dur">'+s.got+' of '+s.max+' ratings</span></div>'+wcBar(s.got,s.max)+
+    '<details class="det wcabout" data-det="'+det+'"'+(open?' open':'')+'><summary>How these puzzles work</summary><p class="hint">'+tr.note+'</p></details><div class="gearlist">'+
+    WC.filter(function(p){ return p.tier===k; }).map(wcRowHtml).join("")+'</div></div>';
+  h+='<div class="wcnav">'+(pv?'<button class="link" data-act="wc-tier" data-v="'+pv.k+'">‹ '+esc(wcShort(pv))+'</button>':'<span></span>')+(nx?'<button class="link" data-act="wc-tier" data-v="'+nx.k+'">'+esc(wcShort(nx))+' ›</button>':'')+'</div>';
+  return h; }
+function viewCollege(){ if (WCV && !wcTier(WCV)) WCV=""; return WCV?wcTierPage(WCV):wcHubHtml(); }
 function wcSheet(p){
   if (p.kind==="defense") return wcdSheet(p);
   if (p.kind==="tech") return tpSheet(p);
@@ -7599,13 +7749,16 @@ function migrate(s){
   if (s.notifOff && s.notifOff.build && s.notifOff.fort===undefined) s.notifOff.fort=true; // 0.1.110: fortifications got their own notification switch; anyone who had silenced "buildings and fortifications" keeps both silenced
   if (!s.alMember && Array.isArray(s.cities)) s.cities.forEach(function(cc){ cc.alAcad=false; cc.alBld=0; }); // 0.1.88: lending can only exist inside an alliance; this frees builders and Academies stuck as "lent" after leaving or switching off multiplayer
   s.dragons=s.dragons||{}; s.shopSeen=s.shopSeen||[]; s.giftSeen=s.giftSeen||[];
+  if (Array.isArray(s.cities)) s.cities.forEach(function(cc){ if (Array.isArray(cc.mpresets)) return; // 0.2.4: march presets split from farm presets; each city's start as copies of its presets (troops, hero, name)
+    cc.mpresets=(cc.presets||[]).slice(0,NPRESETS).map(function(p,i){ return {name:p.name||("March "+(i+1)), t:(p.t||[]).slice(0,12).concat([0,0,0,0,0,0,0,0,0,0,0,0]).slice(0,12), hero:p.hero||0}; });
+    while (cc.mpresets.length<NPRESETS) cc.mpresets.push({name:"March "+(cc.mpresets.length+1), t:[0,0,0,0,0,0,0,0,0,0,0,0], hero:0}); });
   if (Array.isArray(s.cities)) s.cities.forEach(function(cc){ if (cc.wallHero===undefined) cc.wallHero=null; }); // 0.1.115: the wall hero post starts empty (until now the mayor led the defense)
   s.me=s.me||{img:"",frame:"",city:"",march:""}; s.frames=s.frames||[]; FRAMES_FOR_ALL.forEach(function(f){ if (s.frames.indexOf(f)<0) s.frames.push(f); });
   return s;
 }
 var CITY_PLOTS=28; // 7 rows of 4
 var AUTO_ORDER=[9,11,10,5,8,7,6,4,3,2,1,0]; // default auto-train priority: siege, then archers, then the rest
-var CITY_KEYS = ["autoHeal","alAcad","alBld","tg","fg","autoFort","trainer","researcher","reserve","gate","goals","gorder","wounded","autoTrain","autoMayor","wallHero","builds","bq","rq","presets","wall","forts","fortQ","name","res","pop","tax","th","inside","fields","build","research","troops","train","mayor","heroes","innOffers","innRefreshAt"];
+var CITY_KEYS = ["autoHeal","alAcad","alBld","tg","fg","autoFort","trainer","researcher","reserve","gate","goals","gorder","wounded","autoTrain","autoMayor","wallHero","builds","bq","rq","presets","mpresets","wall","forts","fortQ","name","res","pop","tax","th","inside","fields","build","research","troops","train","mayor","heroes","innOffers","innRefreshAt"];
 function C(){ return S.cities[S.cur]; }
 var techVer=0, techCache={key:"",o:null};
 // Research is empire-wide: levels live in S.techG. A city only enjoys a level its own Academy can support.
@@ -7627,9 +7780,10 @@ function newCity(id,name,x,y){
   for (i=0;i<CITY_PLOTS;i++) inside.push(null); for (i=0;i<44;i++) fields.push(null);
   Object.keys(TECH).forEach(function(k){ tech[k]=0; });
   return {id:id,name:name,x:x,y:y,res:{food:10000,lumber:10000,stone:10000,iron:10000,gold:10000},pop:100,tax:20,th:1,inside:inside,fields:fields,tech:tech,
-    build:null,research:null,troops:[0,0,0,0,0,0,0,0,0,0,0,0],train:[],tg:[],fg:[],autoFort:false,autoHeal:false,alAcad:false,alBld:0,mayor:null,trainer:null,researcher:null,wallHero:null,heroes:[],innOffers:[],innRefreshAt:0,wall:0,forts:[0,0,0,0,0],fortQ:null,builds:[],bq:[],rq:[],presets:newPresets(),autoMayor:true,goals:[0,0,0,0,0,0,0,0,0,0,0,0],gorder:AUTO_ORDER.slice(),wounded:[],autoTrain:false,gate:"open",reserve:{food:0,lumber:0,stone:0,iron:0,gold:0}};
+    build:null,research:null,troops:[0,0,0,0,0,0,0,0,0,0,0,0],train:[],tg:[],fg:[],autoFort:false,autoHeal:false,alAcad:false,alBld:0,mayor:null,trainer:null,researcher:null,wallHero:null,heroes:[],innOffers:[],innRefreshAt:0,wall:0,forts:[0,0,0,0,0],fortQ:null,builds:[],bq:[],rq:[],presets:newPresets(),mpresets:newMPresets(),autoMayor:true,goals:[0,0,0,0,0,0,0,0,0,0,0,0],gorder:AUTO_ORDER.slice(),wounded:[],autoTrain:false,gate:"open",reserve:{food:0,lumber:0,stone:0,iron:0,gold:0}};
 }
 var NPRESETS=10;
+function newMPresets(){ var a=[]; for (var i=0;i<NPRESETS;i++) a.push({name:"March "+(i+1), t:[0,0,0,0,0,0,0,0,0,0,0,0], hero:0}); return a; } // 0.2.4: march presets, separate from the farm presets
 function newPresets(){ var a=[]; for (var i=0;i<NPRESETS;i++) a.push({name:"Preset "+(i+1), t:[0,0,0,0,0,0,0,0,0,0,0,0], hero:0, farm:[], auto:false, idx:0, stopOnLoss:true}); return a; }
 var BUILDERS=2;
 function buildOn(w,i){ for (var k=0;k<S.builds.length;k++){ var b=S.builds[k]; if (b.where===w && b.idx===i) return b; } return null; }
@@ -7934,7 +8088,8 @@ function hasSpeedups(forBuild){ return (S.items.s15||0)+(S.items.s60||0)+(S.item
 
 /* ---------- ledger + queue ---------- */
 var ledger = document.getElementById("ledger");
-ledger.innerHTML = RES.map(function(k){ return '<div class="res" title="'+RNAME[k]+'"><span class="ico">'+ICON[k]+'</span><b id="r-'+k+'"></b><small id="rr-'+k+'"></small></div>'; }).join("");
+ledger.innerHTML = RES.map(function(k){ return '<div class="res" title="'+RNAME[k]+'" aria-label="'+RNAME[k]+'"><span class="rtop"><span class="ico">'+ICON[k]+'</span><b id="r-'+k+'"></b></span><small id="rr-'+k+'"></small></div>'; }).join("")+ // 0.2.4: a thin bar pinned to the top
+  '<div class="res pop" title="Population" aria-label="Population"><span class="rtop"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"/><circle cx="17" cy="9" r="2.4"/><path d="M16 14.2c2.9.2 5 2.5 5 5.8"/></svg></span><b id="pop"></b></span><small id="popcap"></small></div>'; // population, with its cap underneath
 
 // what a march carries, in one line: its troops by unit, who leads it, and any cargo or plunder
 function troopList(t){ var p=[]; for (var i=0;i<12;i++) if (t[i]>0) p.push(fmt(t[i])+" "+uname(i,t[i])); return p.join(", ")||"no troops"; }
@@ -7950,7 +8105,7 @@ function marchSummary(m){
 }
 function marchVerb(m){ if (m.phase==="out" && m.reach && S.gt>=m.reach) return "Waiting to hit "; return m.phase==="wait" ? "Wave for " : m.phase==="back" ? "Returning from " : m.phase==="stay" ? (m.mission==="station"?"Camped at ":m.mission==="hide"?"Hiding in the woods around ":"Guarding ") : ({station:"Marching to camp at ",allyguard:"Marching to guard ",scout:"Scouting ",occupy:"Occupying ",found:"Founding at ",transport:"Carrying to ",reinforce:"Reinforcing ",attack:"Attacking ",conquer:"Conquering "}[m.mission]||"Marching to "); }
 function marchLine(m){
-  var q=TILE_BY[m.tile], nm=q?tileName(q):m.tile, pre=(m.preset!=null||m.label!=null)?S.presets[m.preset!=null?m.preset:m.label].name+": ":"";
+  var q=TILE_BY[m.tile], nm=q?tileName(q):m.tile, pre=m.preset!=null&&S.presets[m.preset]?S.presets[m.preset].name+": ":m.label!=null&&S.mpresets&&S.mpresets[m.label]?S.mpresets[m.label].name+": ":""; // farm runs name their farm preset, timed waves their march preset
   var verb = marchVerb(m);
   return {txt:pre+verb+nm, cls:m.phase==="back"?"back":(m.mission==="transport"||m.mission==="reinforce")?"friend":"out"};
 }
@@ -8066,12 +8221,10 @@ function tickText(){
     el.textContent = (r[k]<0?"−":"+")+fmt(Math.abs(r[k]))+"/h";
     el.className = r[k]<0 ? "neg" : "";
   });
-  document.getElementById("pop").textContent = fmt(S.pop)+" / "+fmt(popCap());
+  var pc=popCap(); setText(document.getElementById("pop"), fmt(S.pop)); setText(document.getElementById("popcap"), "/ "+fmt(pc)); // 0.2.4: in the top bar
   var ll=document.getElementById("lordline"), lh='<b>'+TITLES[S.title].name+(S.lord?' '+esc(S.lord):'')+'</b>'+(S.rank?', '+RANKS[S.rank].name:'')+', '+fmt(S.prestige)+' prestige \u00b7 '+fmt(powerOf().total)+' power';
   if (ll.innerHTML!==lh) ll.innerHTML=lh;
   var hav=document.getElementById("hdav"), hah=avatarHtml(S.me,S.lord||(S.lb&&S.lb.name)||S.name,"hd"); if (hav && hav._h!==hah){ hav.innerHTML=hah; hav._h=hah; }
-  document.getElementById("staff").textContent = pct(r.staff);
-  var m=mayor(); document.getElementById("mayorlbl").textContent = m ? m.name.split(" ")[0]+(mayorActive()?"":" (unpaid)") : "none";
   S.builds.forEach(function(b,k){ var t=document.getElementById("qb-t-"+k), bar=document.getElementById("qb-bar-"+k);
     if (t){ t.textContent=fmtT(realMs(b.end-S.gt)); bar.style.width = Math.min(100,(S.gt-b.start)/Math.max(1,b.end-b.start)*100)+"%"; }
     var spb=document.getElementById("qb-sp-"+k); if (spb){ var free=realMs(b.end-S.gt)<=FREE_MS; spb.textContent = free ? "Finish free" : "Speed up"; spb.style.display = (free||hasSpeedups(true)) ? "" : "none"; } });
@@ -8083,6 +8236,7 @@ function tickText(){
   var evc=document.getElementById("evchip"); if (evc){ var evo=evNow(), evd=evo&&EV_TRACK[evo.id]?"":"none"; if (evc.style.display!==evd) evc.style.display=evd; if (evo&&EV_TRACK[evo.id]){ var evkn=evk(evo.id).n; setText(document.getElementById("evn"), evkn<EV_TRACK[evo.id].max?String(evkn):"\u2713"); } }
   var ryc=document.getElementById("rychip"); if (ryc){ var ryl=ryOn()?ryOpen().length:0, ryd=ryl?"":"none"; if (ryc.style.display!==ryd) ryc.style.display=ryd; setText(document.getElementById("ryn"), ryl?String(ryl):""); if (sheetFor && sheetFor.kind==="rylist") renderSheet(); }
   var wtc=document.getElementById("wtchip"); if (wtc){ var wtl=alMine()?wtList().length:0, wtd=wtl?"":"none"; if (wtc.style.display!==wtd) wtc.style.display=wtd; setText(document.getElementById("wtn"), wtl?String(wtl):""); if (sheetFor && sheetFor.kind==="watch") renderSheet(); }
+  var buc=document.getElementById("bullychip"); if (buc){ var BU=S.alliance&&S.alliance.bully, bnx=BU&&BU.next&&bullyOf()?BU.next:null, bud=bnx?"":"none"; if (buc.style.display!==bud) buc.style.display=bud; if (bnx){ setText(document.getElementById("bullyn"), fmtT(realMs(Math.max(0,bnx.arr-S.gt)))); var btq=TILE_BY[bnx.target], bln=bullyOf().name+" is marching on "+(btq&&btq.ai?btq.ai.name:"an ally"); if (buc.title!==bln){ buc.title=bln; buc.setAttribute("aria-label",bln); } } }
   var mcp=document.getElementById("monchip"); if (mcp){ var mc=arCur(), md=mc?"":"none"; if (mcp.style.display!==md) mcp.style.display=md; if (mc){ var mln=arLive().length; setText(document.getElementById("monn"), (mln>1?mln+" \u00b7 ":"")+fmtT(Math.max(0,mc.ends-Date.now()))); } }
   document.querySelectorAll(".arleft").forEach(function(el){ var le=+el.dataset.ends-Date.now(); setText(el, le>0?fmtT(le):"closing"); });
   document.querySelectorAll(".gleft").forEach(function(el){ setText(el, fmtT(realMs(+el.dataset.gt-S.gt))); });
@@ -8098,7 +8252,7 @@ function tickText(){
   if (tab==="army"){ U.forEach(function(u,i){ updateTrainRow(i); }); setText(document.getElementById("idlepop"), fmt(idlePop())); }
   if (tab==="city") FORTS.forEach(function(f,i){ updateFortRow(i); });
   if (S.fortQ){ var fe=document.getElementById("fq-t"), fb=document.getElementById("fq-bar"); if (fe){ fe.textContent=fmtT(realMs(S.fortQ.end-S.gt)); fb.style.width=Math.min(100,(S.gt-S.fortQ.start)/Math.max(1,S.fortQ.end-S.fortQ.start)*100)+"%"; } }
-  renderThreats(); renderMarchStrip(); [].forEach.call(document.querySelectorAll("#threats .tt"), function(e){ e.textContent=fmtT(realMs(+e.dataset.t-S.gt)); });
+  renderThreats(); renderMarchStrip(); [].forEach.call(document.querySelectorAll("#threats .tt, #view .tt"), function(e){ e.textContent=fmtT(realMs(+e.dataset.t-S.gt)); });
   S.marches.forEach(function(m){ var el=document.getElementById("mt-"+m.id); if (el) el.textContent= m.phase==="stay" ? (m.mission==="hide"?"hidden":m.mission==="station"?"camped":"on guard") : (m.phase==="wait"?"launches in ":"")+fmtT(realMs(marchT(m)-S.gt))+(m.phase==="wait"?", lands in "+fmtT(realMs(m.arr-S.gt)):""); });
   S.train.forEach(function(t){ if (t.q) return; var el=document.getElementById("tq-t-"+t.slot), br=document.getElementById("tq-bar-"+t.slot);
     if (el){ el.textContent=fmtT(realMs(t.end-S.gt))+", done "+trClock(t.end); br.style.width=Math.min(100,(S.gt-t.start)/Math.max(1,t.end-t.start)*100)+"%"; } });
@@ -8347,6 +8501,20 @@ function heroPvpReports(kind, id, reps, defCity){ if (!reps || !reps.length || i
     else heroRec(hero, {pvp:true, def:true, won:!r.won, killed:aLost, lost:dLost, label:r.name+" (invasion defense)"});
     ch=true; });
   if (ch) save(); }
+// 0.2.4: what an office gives right now, and the picker sheet a tile opens
+function offEffect(role, mb){ mb=mb||mayorBonus(); return role==="mayor" ? 'production +'+pct(mb.prod)+', builds '+pct(1-1/(1+mb.build))+' faster' : role==="trainer" ? 'training '+pct(mb.train)+' faster' : role==="wallHero" ? 'leads the defense' : 'research '+pct(1-1/(1+mb.research))+' faster'; }
+function offPickSheet(){ var role=sheetFor.role, o=OFFICES.filter(function(x){ return x[0]===role; })[0]; if (!o) return '';
+  var cur=officer(role), mine=seatHolder(role), st=o[2];
+  var h='<div class="head"><span class="ico">'+ICON.crest+'</span><div style="flex:1;min-width:0"><h2>'+o[1]+'</h2><div class="sub">'+esc(o[3])+' \u00b7 uses '+STATN[st]+'</div></div><button class="btn ghost small" data-act="close" aria-label="Close">\u2715</button></div>';
+  h+='<div class="bq"><span>'+(cur?'<b>'+esc(cur.name)+'</b> '+(mine?'<span class="okc">your pick</span>':'<span class="dur">auto, borrowed</span>')+'<br><span class="dur">'+STATN[st]+' '+hs(cur,st)+' \u00b7 '+offEffect(role)+'</span>':'<span class="why">Vacant</span>'+(S.autoMayor&&role!=="wallHero"?'<br><span class="dur">Auto-fill will borrow a free hero when this job is needed.</span>':''))+'</span>'+
+    (mine?'<div class="mbtns"><button class="link" data-act="off-clear" data-role="'+role+'">'+(S.autoMayor&&role!=="wallHero"?'Back to auto':'Clear seat')+'</button></div>':'')+'</div>';
+  var list=S.heroes.slice().sort(function(a,b){ return hs(b,st)-hs(a,st); });
+  h+='<div class="h3" style="margin-top:10px">Appoint</div>'+(list.length?'<div class="herolist">'+list.map(function(hh){ var oo=officeOf(hh), here=mine&&mine.id===hh.id;
+    var note=hh.away?'<span class="why">away on a march</span>':here?'<span class="okc">in this seat</span>':oo?'<span class="dur">now '+oo[1].toLowerCase()+' (moves here)</span>':'';
+    return '<div class="bq ofpick">'+heroPortrait(hh,40)+'<span style="min-width:0"><b>'+esc(hh.name)+'</b> <span class="dur">Lv '+hh.level+'</span><br><span class="dur">'+STATN[st]+' <b>'+hs(hh,st)+'</b></span>'+(note?' \u00b7 '+note:'')+'</span>'+
+      '<div class="mbtns"><button class="btn small'+(here?' ghost':'')+'" data-act="off-set" data-role="'+role+'" data-id="'+hh.id+'"'+(hh.away||here?' disabled':'')+'>'+(here?'Seated':'Appoint')+'</button></div></div>'; }).join("")+'</div>':'<p class="hint">No heroes in this city yet.</p>');
+  if (role!=="wallHero") h+='<p class="hint" style="margin-top:8px">A hero you appoint is locked to the job: it stays home and auto-fill leaves the seat alone.</p>';
+  return h+'<button class="closebtn" data-act="close">Done</button>'; }
 function heroAutoHtml(h){ var a=h.auto||{pol:0,atk:0,int:0}, on=!!h.auto, d=HAD[h.id]||a;
   return '<div class="h3" style="margin-top:8px">Auto level-up</div><p class="hint">Every point '+esc(h.name)+' earns goes into politics, attack and intelligence by this ratio (for example 0 : 2 : 1 = two attack for every intelligence). Turning it on spends the unused points now.</p>'+
     '<div class="farmadd"><label class="dur" for="hauto-pol">Pol</label><input type="number" min="0" max="9" id="hauto-pol" value="'+(d.pol||0)+'" style="width:60px"><label class="dur" for="hauto-atk">Atk</label><input type="number" min="0" max="9" id="hauto-atk" value="'+(d.atk||0)+'" style="width:60px"><label class="dur" for="hauto-int">Int</label><input type="number" min="0" max="9" id="hauto-int" value="'+(d.int||0)+'" style="width:60px"></div>'+
@@ -8358,13 +8526,16 @@ function viewHeroes(){
     return '<div class="empty-state"><p>Build a Feasting Hall to house heroes and an Inn to hire them. Legendary heroes won on the wheel wait at the gate until you have room; lesser ones move on.</p><button class="btn" data-act="tab" data-tab="city">Go to city</button></div>';
   var mb=mayorBonus(), anyOff=OFFICES.some(function(o){ return officer(o[0]); }), ahN=ahAll().length;
   if (ahN) h+='<div class="section"><div class="act"><span class="dur">'+ahN+' hero'+(ahN>1?'es':'')+(S.cities.length>1?' across '+S.cities.length+' cities':'')+'</span><span class="btnrow"><button class="btn ghost small" data-act="armory-sheet">Armory</button><button class="btn small" data-act="ah-open">All heroes</button></span></div></div>'; // 0.1.244
-  h+='<div class="section"><div class="shead"><h3>Offices</h3><span class="dur">'+OFFICES.filter(function(o){ return officer(o[0]); }).length+' of '+OFFICES.length+' filled</span></div>'+
-    '<p class="hint">Four jobs, four heroes. A hero you seat yourself stays home (never in a march list); a seat auto-fill hands out doesn\u2019t hold its hero back. Officers earn experience while they serve. Appoint from a hero\u2019s page. The wall hero leads your troops whenever this city is attacked: with no wall hero, no hero leads the defense. The wall hero keeps working even when the treasury is empty.</p><div class="gearlist">'+
-    OFFICES.map(function(o){ var oh=officer(o[0]), eff = o[0]==="mayor" ? 'production +'+pct(mb.prod)+', buildings '+pct(1-1/(1+mb.build))+' faster' : o[0]==="trainer" ? 'training '+pct(mb.train)+' faster' : o[0]==="wallHero" ? 'leading the defense' : 'research '+pct(1-1/(1+mb.research))+' faster';
-      return '<div class="gearrow"><span class="gn">'+o[1]+'</span><span class="gb">'+(oh?esc(oh.name)+' ('+STATN[o[2]].slice(0,3)+' '+hs(oh,o[2])+')'+(!seatHolder(o[0])?' <span class="dur">auto, borrowed</span>':''):'vacant')+'</span><span class="dur" style="grid-column:1/-1">'+o[3]+' ('+STATN[o[2]]+').'+(oh?' Now: '+eff+'.':'')+'</span></div>'; }).join("")+'</div>';
+  // 0.2.4: offices as tiles (portrait, job, hero, what it gives); tap one to pick its hero. The rules fold into dropdowns.
+  h+='<div class="section"><div class="shead"><h3>Offices</h3><span class="dur">'+OFFICES.filter(function(o){ return officer(o[0]); }).length+' of '+OFFICES.length+' filled</span></div><div class="oftiles">'+
+    OFFICES.map(function(o){ var oh=officer(o[0]), mine=!!seatHolder(o[0]), eff=offEffect(o[0], mb);
+      return '<button class="oftile'+(oh?'':' vacant')+'" data-act="off-open" data-role="'+o[0]+'"><span class="ofjob">'+o[1]+'</span>'+
+        '<span class="ofhero">'+(oh?heroPortrait(oh,46):'<span class="ofempty" aria-hidden="true">?</span>')+'<span class="ofname">'+(oh?esc(oh.name)+'<span class="dur">'+STATN[o[2]].slice(0,3)+' '+hs(oh,o[2])+'</span>':'<span class="why">Vacant</span><span class="dur">tap to appoint</span>')+'</span></span>'+
+        '<span class="ofst">'+(oh?(mine?'<span class="okc">Your pick</span>':'Auto, borrowed')+' \u00b7 ':'')+(oh?eff:esc(o[3]))+'</span></button>'; }).join("")+'</div>';
   if (anyOff && S.res.gold<=0 && salary()>0) h+='<p class="warn">Your treasury is empty, so your mayor, trainer and researcher have stopped working (the wall hero stays on the wall). Raise taxes or trade for gold.</p>';
-  h+='<label class="chk" style="margin-top:8px"><input type="checkbox" id="automayor"'+(S.autoMayor?' checked':'')+'> Auto-fill each seat with the best free hero</label>'+
-    (S.autoMayor?'<p class="hint">An empty seat borrows the best hero who is home when its job needs one (Politics for the mayor, Attack for the trainer, Intelligence for the researcher), one job per hero, and lets go straight away: a build, research or training batch takes the borrowed hero\u2019s bonus when it starts, and production uses whoever is home right now. Borrowed heroes are never held back: they march and auto-farm as usual. A seat you pick yourself is locked (no marches) and its hero is never borrowed for another job. The wall hero is always yours to pick.</p>':'<p class="hint">You pick every officer. An empty seat does no work: no mayor means no production bonus, no trainer means no training bonus, no researcher means no research bonus.</p>');
+  h+='<label class="chk" style="margin-top:10px"><input type="checkbox" id="automayor"'+(S.autoMayor?' checked':'')+'> Auto-fill each seat with the best free hero</label>';
+  h+='<details class="det" data-det="offhow"'+(DET.offhow?' open':'')+'><summary class="dur">How offices work</summary><p class="hint">Four jobs, four heroes: the mayor (Politics) sets production and building speed, the trainer (Attack) training speed, the researcher (Intelligence) research speed. The wall hero (Attack) leads your troops whenever this city is attacked; with no wall hero, no hero leads the defense, and the wall hero keeps working even when the treasury is empty. Officers earn experience while they serve. A hero you seat yourself stays home (never in a march list).</p></details>';
+  h+='<details class="det" data-det="offauto"'+(DET.offauto?' open':'')+'><summary class="dur">How auto-fill works</summary>'+(S.autoMayor?'<p class="hint">An empty seat borrows the best hero who is home when its job needs one (Politics for the mayor, Attack for the trainer, Intelligence for the researcher), one job per hero, and lets go straight away: a build, research or training batch takes the borrowed hero\u2019s bonus when it starts, and production uses whoever is home right now. Borrowed heroes are never held back: they march and auto-farm as usual. A seat you pick yourself is locked (no marches) and its hero is never borrowed for another job. The wall hero is always yours to pick.</p>':'<p class="hint">Auto-fill is off: you pick every officer. An empty seat does no work: no mayor means no production bonus, no trainer means no training bonus, no researcher means no research bonus.</p>')+'</details>';
   h+='</div>';
   h+='<div class="section"><div class="shead"><h3>Feasting Hall</h3><span class="dur">'+S.heroes.length+' / '+cap+' heroes'+(salary()?', salaries '+fmt(salary())+' gold/h':'')+'</span></div>';
   if (!cap) h+='<p class="hint">Build a Feasting Hall to keep heroes.</p>';
@@ -10446,15 +10617,29 @@ function requestHelp(allyId){
   A.help.push({ally:allyId, city:C().id, t:t, arr:S.gt+travel, until:S.gt+travel+DAY});
   return "yes";
 }
-function viewAlliance(){
-  var A=AL(), b=bullyOf(), B=A.bully, d=dailyRec();
-  var h='<div class="section"><div class="shead"><h3 id="allyh">'+esc(allyName())+'</h3><span class="dur">'+A.allies.length+' / '+Math.min(ALLY_MAX,maxB("embassy"))+' allies (Embassy level '+maxB("embassy")+')</span></div>'+
-    '<div class="renrow"><label for="allyname2" class="sub">Rename kingdom</label><input id="allyname2" data-ren="ally" type="text" value="'+esc(A.name||"")+'" maxlength="28" placeholder="'+esc(realmName()+" Pact")+'"></div>'+
-    '<div class="repbar"><i style="width:'+repPct().toFixed(2)+'%"></i></div><p class="hint">Reputation <b>'+fmt(A.rep)+'</b> '+(A.rep>=REP_MAX?'(100%: maxed, and every point past '+fmt(REP_MAX)+' still counts on the high scores).':'of '+fmt(REP_MAX)+' ('+repPct().toFixed(1)+'%).')+' Allies answer a call for reinforcements '+Math.round(helpChance()*100)+'% of the time, and are likelier to accept an invitation as your standing grows.</p>'+
-    '<div class="h3" style="margin-top:8px">Today</div><div class="gearlist">'+
-    '<div class="gearrow'+(d.res?' t3':'')+'"><span class="gn">Send 10k+ resources to an ally</span><span class="gb">'+(d.res?'Done':'+50 rep')+'</span></div>'+
-    '<div class="gearrow'+(d.guard?' t3':'')+'"><span class="gn">Station troops with an ally</span><span class="gb">'+(d.guard?'Done':'+60 rep')+'</span></div>'+
-    '<div class="gearrow"><span class="gn">Defend an ally from a bully</span><span class="gb">+150 to +1,200 rep per wave</span></div></div></div>';
+// 0.2.4: the Kingdom tab is a hub: the kingdom's card on top, then a tile for each part (allies, bullies, the events), each opening its own page
+var KGV=""; // the page open, "" for the hub
+var KG_ICO={allies:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"/><circle cx="17" cy="9" r="2.4"/><path d="M16 14.2c2.9.2 5 2.5 5 5.8"/>',
+  bully:'<path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="M13 19l6-6M16 16l4 4M19 21l2-2"/>', war:'<path d="M5 21V4"/><path d="M5 4h12l-2.5 4L17 12H5"/>',
+  bf:'<path d="M3 20h18"/><path d="M5 20V10l3-2 3 2v10M13 20V8l3-2 3 2v12"/>', inv:'<path d="M4 12h11M11 8l4 4-4 4"/><path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4"/>',
+  pvp:'<path d="M4 4l9 9M4 4h4M4 4v4M20 4l-9 9M20 4h-4M20 4v4M6 18l3-3M18 18l-3-3M5 19l2 2M19 19l-2 2"/>', chal:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".8"/>',
+  arena:'<path d="M5 19l4-14M10.5 20l3-15M16 19l3-12"/>', log:'<path d="M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7"/><path d="M7 3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2M9 8h6M9 12h6M9 16h4"/>'};
+function kgIco(k){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+KG_ICO[k]+'</svg>'; }
+// title and status line of a section built for the old long page, so its tile can show the same state
+function kgHead(html){ var m=/<h3[^>]*>([^<]*)<\/h3><span class="dur">([\s\S]*?)<\/span>/.exec(html)||[]; var d=String(m[2]||"").replace(/<[^>]+>/g,"");
+  return {t:m[1]||"", d:d, alert:/^<div class="section bullybox"/.test(html), lock:/^unlocks at/i.test(d)}; }
+function kgTop(){
+  var A=AL(), d=dailyRec();
+  var h='<div class="section"><div class="shead"><h3 id="allyh">'+esc(allyName())+'</h3><span class="dur">'+A.allies.length+' / '+Math.min(ALLY_MAX,maxB("embassy"))+' allies</span></div>'+
+    '<div class="repbar"><i style="width:'+repPct().toFixed(2)+'%"></i></div><p class="hint kgrep">Reputation <b>'+fmt(A.rep)+'</b> of '+fmt(REP_MAX)+' ('+repPct().toFixed(1)+'%)</p>'+
+    '<details class="det wcabout" data-det="kgrep"'+(DET.kgrep?' open':'')+'><summary>How reputation works</summary><p class="hint">Reputation <b>'+fmt(A.rep)+'</b> '+(A.rep>=REP_MAX?'(100%: maxed, and every point past '+fmt(REP_MAX)+' still counts on the high scores).':'of '+fmt(REP_MAX)+' ('+repPct().toFixed(1)+'%).')+' Allies answer a call for reinforcements '+Math.round(helpChance()*100)+'% of the time, and are likelier to accept an invitation as your standing grows. Embassy level '+maxB("embassy")+' allows '+Math.min(ALLY_MAX,maxB("embassy"))+' allies.</p></details>'+
+    '<div class="kgtoday"><span class="dur">Today</span>'+
+    '<span class="kgt'+(d.res?' done':'')+'">'+(d.res?'\u2713 ':'')+'Send 10k+ resources to an ally <b>'+(d.res?'done':'+50')+'</b></span>'+
+    '<span class="kgt'+(d.guard?' done':'')+'">'+(d.guard?'\u2713 ':'')+'Station troops with an ally <b>'+(d.guard?'done':'+60')+'</b></span>'+
+    '<span class="kgt">Defend an ally from a bully <b>+150 to +1,200 a wave</b></span></div>'+
+    '<details class="det wcabout" data-det="kgren"'+(DET.kgren?' open':'')+'><summary>Rename the kingdom</summary>'+'<div class="renrow"><label for="allyname2" class="sub">Rename kingdom</label><input id="allyname2" data-ren="ally" type="text" value="'+esc(A.name||"")+'" maxlength="28" placeholder="'+esc(realmName()+" Pact")+'"></div>'+'</details></div>';
+  return h; }
+function kgAllies(){ var A=AL(), B=A.bully, h='';
   h+='<div class="section"><h3>Allies</h3>';
   if (!A.allies.length) h+='<p class="hint">No allies yet. Tap an AI lord on the map and choose Invite to your kingdom.</p>';
   allyTiles().forEach(function(q){
@@ -10467,9 +10652,11 @@ function viewAlliance(){
   h+='</div>';
   var help=(A.help||[]).filter(function(x){ return S.gt<x.until; });
   if (help.length) h+='<div class="section"><h3>Allied troops for you</h3>'+help.map(function(x){ var aq=TILE_BY[x.ally], c=S.cities[cityIndex(x.city)]; return '<div class="bq"><span>'+fmt(sumT(x.t))+' from '+esc(aq?aq.ai.name:"an ally")+' for '+esc(c?c.name:"")+'</span><span class="qtime">'+(x.arr>S.gt?'arrives in '+fmtT(realMs(x.arr-S.gt)):'stays '+fmtT(realMs(x.until-S.gt)))+'</span></div>'; }).join("")+'</div>';
+  return h; }
+function kgBully(){ var A=AL(), b=bullyOf(), B=A.bully, h='';
   if (B && b){
     var tq=TILE_BY[B.target], bq=TILE_BY[B.tile];
-    h+='<div class="section bullybox"><div class="shead"><h3>Bully: '+esc(b.name)+'</h3><span class="dur">leaves in '+fmtT(realMs(B.until-S.gt))+'</span></div>'+
+    h+='<div class="section bullybox" id="bullysec"><div class="shead"><h3>Bully: '+esc(b.name)+'</h3><span class="dur">leaves in '+fmtT(realMs(B.until-S.gt))+'</span></div>'+
       '<p class="hint">'+esc(bullyStyleName(b))+', IQ '+b.iq+', record '+b.wins+'-'+b.losses+'. Field army of about '+fmt(roughN(sumT(B.army)))+' raiding from a stronghold at ('+bq.x+', '+bq.y+').</p>'+
       (B.garrison?'<div class="effect"><b>Stronghold</b>: garrison about '+fmt(roughN(sumT(B.garrison)))+', '+fmt(roughN(B.forts[2]))+' archer towers and more fortifications, level '+B.wall+' walls, worn down '+Math.round(Math.max(0,1-(sumT(B.garrison)+B.forts.reduce(function(a,c){ return a+c; },0))/B.campStart)*100)+'%. Taking it ends the event: worth about '+fmt(Math.round(Math.min(8000,2500*(0.6+b.iq/200)*(1+0.25*b.wins))))+' rep plus its treasury. Scout it for exact numbers.</div>':'');
     if (friendOf(b)) h+='<p class="hint" style="color:var(--brass)">'+esc(friendOf(b).note)+'</p>';
@@ -10481,16 +10668,30 @@ function viewAlliance(){
     } else h+='<p class="hint">No more waves planned before '+esc(b.name)+' leaves.</p>';
     h+='</div>';
   } else h+='<div class="section"><h3>Bullies</h3><p class="hint">'+(A.allies.length?'All quiet. Each day there\'s a chance a bully moves into '+esc(realmName())+' for 1 to 3 days and goes after your allies.':'Bullies only come after kingdoms. Invite an AI lord from its map tile to get started.')+'</p></div>';
-  if (A.roster.length) h+='<details class="section det" data-det="known"'+(DET.known?' open':'')+'><summary><b>Known bullies</b> <span class="dur">'+A.roster.length+'</span></summary><div class="gearlist">'+A.roster.map(function(x){ var xf=friendOf(x);
+  if (A.roster.length) h+='<details class="section det" data-det="known"'+(DET.known!==false?' open':'')+'><summary><b>Known bullies</b> <span class="dur">'+A.roster.length+'</span></summary><div class="gearlist">'+A.roster.map(function(x){ var xf=friendOf(x);
     return '<div class="gearrow'+(xf?' t3':'')+'"><span class="gn">'+(xf?'\u2605 ':'')+esc(x.name)+'</span><span class="gb">'+esc(bullyStyleName(x))+', IQ '+x.iq+'</span><span class="dur">'+x.wins+' wins, '+x.losses+' losses</span></div>'; }).join("")+'</div><p class="hint">They remember you, and they\'ll be back for future kingdom events. A starred name is one of the old crowd: rarer, and a great deal harder.</p></details>';
-  h+=collapsify("ev_war", warSection(), repPct()>=50);
-  h+=collapsify("ev_bf", bfSection(), repPct()>=75);
-  if (invShown()) h+=collapsify("ev_inv", invSection(), true);
-  if (pvShown()) h+=collapsify("ev_pvp", pvSection(), true); // PvP: testers only for now (dev tools or the tester code)
-  h+=collapsify("ev_chal", chalSection(), A.rep>=REP_MAX);
-  if (soloArOn()) h+='<div id="soloar"></div>'+soloArenaHtml();
-  if (A.log.length) h+='<details class="section det" data-det="alog"'+(DET.alog?' open':'')+'><summary><b>Kingdom log</b></summary>'+A.log.slice(0,25).map(function(l){ return '<p class="hint">'+gameClock(l.at)+': '+esc(l.t)+'</p>'; }).join("")+'</details>';
-  return h;
+  return h; }
+function kgLog(){ var A=AL(), h='';
+  if (!A.log.length) return '<div class="section"><h3>Kingdom log</h3><p class="hint">Nothing has happened in the kingdom yet.</p></div>';
+  return '<div class="section"><h3>Kingdom log</h3>'+A.log.slice(0,40).map(function(l){ return '<p class="hint">'+gameClock(l.at)+': '+esc(l.t)+'</p>'; }).join("")+'</div>'; }
+function kgPages(){ var A=AL(), b=bullyOf(), B=A.bully, P=[];
+  var gu=allyTiles().filter(function(q){ return guardsAt(q.id).length; }).length, help=(A.help||[]).filter(function(x){ return S.gt<x.until; }).length, tq=B&&B.target?TILE_BY[B.target]:null;
+  P.push({k:"allies", name:"Allies", n:A.allies.length+'<small>/'+Math.min(ALLY_MAX,maxB("embassy"))+'</small>', html:kgAllies,
+    line:A.allies.length?(B&&b&&tq&&tq.ai?'<span class="badc">'+esc(tq.ai.name)+' targeted</span>':gu?gu+' with your guards':'None guarded')+(help?' \u00b7 '+help+' helping you':''):'None yet: invite AI lords from the map'});
+  P.push({k:"bully", name:"Bullies", n:A.roster.length?String(A.roster.length):'', html:kgBully, alert:!!(B&&b),
+    line:B&&b?esc(b.name)+(B.next?' \u00b7 next wave <span class="tt" data-t="'+B.next.arr+'"></span>':' \u00b7 leaves in '+fmtT(realMs(B.until-S.gt))):(A.allies.length?'All quiet':'They come once you have allies')});
+  [["war","Kingdom War",warSection],["bf","Battlefield",bfSection]].concat(invShown()?[["inv","Invasions",invSection]]:[]).concat(pvShown()?[["pvp","PvP",pvSection]]:[]).concat([["chal","Challenge",chalSection]]).forEach(function(x){
+    var html=x[2](), hd=kgHead(html), ln=hd.d;
+    if (x[0]==="inv" && ln==="multiplayer") ln="Invade other players, or be invaded";
+    P.push({k:x[0], name:x[1], html:function(){ return html; }, line:esc(ln.charAt(0).toUpperCase()+ln.slice(1)), alert:hd.alert, lock:hd.lock}); });
+  if (soloArOn()){ var sa=sarState(), lv=arLive().length; P.push({k:"arena", name:"Monster Arena", html:function(){ return '<div id="soloar"></div>'+soloArenaHtml(); }, alert:lv>0, line:lv?lv+' monster'+(lv>1?'s':'')+' up':(sa.lv?'Level '+sa.lv:'Not built yet')}); }
+  P.push({k:"log", name:"Kingdom log", html:kgLog, line:A.log.length?esc(A.log[0].t):'Nothing yet'});
+  return P; }
+function viewAlliance(){
+  var P=kgPages(), pg=null; P.forEach(function(x){ if (x.k===KGV) pg=x; }); if (KGV && !pg) KGV="";
+  if (pg) return '<div class="albk"><button class="link" data-act="kg-page" data-v="">\u2039 '+esc(allyName())+'</button></div>'+pg.html();
+  return kgTop()+'<div class="section"><div class="reptiles">'+P.map(function(x){
+    return '<button class="reptile kgtile'+(x.alert?' alert':'')+(x.lock?' lock':'')+'" data-act="kg-page" data-v="'+x.k+'"><span class="rtop">'+kgIco(x.k)+'<span class="nm">'+esc(x.name)+'</span>'+(x.n?'<span class="n">'+x.n+'</span>':'')+'</span><span class="ln">'+(x.lock?'\ud83d\udd12 ':'')+x.line+'</span></button>'; }).join("")+'</div></div>';
 }
 
 /* ---------- quests (tutorial) ---------- */
@@ -10897,11 +11098,11 @@ function claimQuest(id){
 }
 
 /* reports */
-var LOG_CAP=5000, FULL_CAP=300, repFilter="all", repPage=0, repQuery="";
+var LOG_CAP=5000, FULL_CAP=300, repPage=0, repQuery="";
 function isGearDrop(t){ return MAT.some(function(k){ return ITEMS[k] && t.indexOf(ITEMS[k].name)>=0; }); } // crafting materials (gear itself never drops)
 function compactRep(r){
   var killed=0, lootT=RES.reduce(function(a,k){ return a+((r.loot&&r.loot[k])||0); },0); for (var i=0;i<12;i++) killed+=(r.had[i]||0)-(r.eleft[i]||0);
-  return {id:r.id, at:r.at, sc:r.scout?1:0, n:(r.scout?"Scouted ":"")+r.name+(r.gate?" (gates shut)":""), tile:r.tile, r:r.result, d:r.def?1:0, l:r.lost||0, k:killed, lo:lootT, m:r.medal==null?-1:r.medal, g:(r.drops||[]).slice(), h:r.historic||null, f:r.founded||null, o:r.occupied?1:0, c:C().name};
+  return {id:r.id, at:r.at, sc:r.scout?1:0, n:(r.scout?"Scouted ":"")+r.name+(r.gate?" (gates shut)":""), tile:r.tile, r:r.result, d:r.def?1:0, l:r.lost||0, k:killed, lo:lootT, m:r.medal==null?-1:r.medal, g:(r.drops||[]).slice(), h:r.historic||null, f:r.founded||null, o:r.occupied?1:0, c:C().name, tk:r.tk||undefined, p:r.pre!=null?r.pre:undefined, pn:r.pn||undefined};
 }
 function bumpStats(c){
   if (c.sc) return;
@@ -10933,26 +11134,92 @@ function keepRep(id){ S.log.forEach(function(c){ if (c.id===id) c.fav=1; }); S.r
 var MON_RX=null; function monLog(c){ if (c.ar || c.mo) return true; if (c.sc) return false;
   if (!MON_RX){ var nm=[]; for (var k in MONSTERS) nm.push(MONSTERS[k]); [1,2].forEach(function(L){ nm.push(WIZ[L].n); }); MON_RX=new RegExp("\\b("+nm.map(function(x){ return x.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"); }).join("|")+")\\b"); }
   return MON_RX.test(String(c.n||"")); }
-function repMatch(c){
-  if (repFilter==="pvp") return !!c.pv && (!repQuery || (c.n+" "+c.c).toLowerCase().indexOf(repQuery.toLowerCase())>=0);
-  if (repFilter==="arena") return monLog(c) && (!repQuery || (c.n+" "+c.c).toLowerCase().indexOf(repQuery.toLowerCase())>=0);
-  if (c.pv && repFilter!=="all" && repFilter!=="fav") return false;
-  if (c.ar && repFilter!=="all" && repFilter!=="fav" && repFilter!=="win" && repFilter!=="loss") return false;
-  if (repFilter==="atk" && c.d) return false; if (repFilter==="def" && !c.d) return false;
-  if (repFilter==="win" && (c.d ? c.r===1 : c.r!==1)) return false; if (repFilter==="loss" && (c.d ? c.r!==1 : c.r===1)) return false;
-  if (repFilter==="fav" && !c.fav) return false;
-  if (repFilter==="medal" && c.m<0) return false; if (repFilter==="gear" && !c.g.some(isGearDrop)) return false;
-  if (repQuery && (c.n+" "+c.c).toLowerCase().indexOf(repQuery.toLowerCase())<0) return false;
-  return true;
-}
-function viewReports(){
-  var st=S.stats, f=[["all","All"],["atk","Attacks"],["def","Defenses"],["win","Victories"],["loss","Defeats"],["medal","Medals"],["gear","Materials"],["arena","Monsters"],["pvp","PvP"],["fav","\u2605 Saved"]];
-  var h='<div class="section"><h3>Lifetime record</h3><div class="statcards">'+
+/* ---------- 0.2.4: the Reports hub ----------
+   A tile per kind of report (count and a one-line summary), a page per kind with its own filters, the list grouped by day,
+   a preset's auto-farm hits folded into one "farm run" card, and "new" dots on the reports worth a look
+   (defenses, monster fights, PvP, and attacks you sent yourself that lost). Older reports start out read. */
+var REPV="", REPF="all", REPX={}, REPRD=0;
+var REP_CATS=[["def","Defenses"],["atk","Attacks"],["mon","Monsters"],["drops","Drops"],["pvp","PvP & invasions"],["scout","Scouting"],["fav","Saved"],["all","All reports"]];
+var REP_SUB={atk:[["all","All"],["val","Valleys"],["npc","NPC"],["hc","Historic"],["ai","AI lords"],["lost","Lost"]], def:[["all","All"],["held","Held"],["broke","Broken"]], mon:[["all","All"],["won","Won"],["lost","Lost"]], drops:[["all","All"],["medal","Medals"],["mat","Materials"]]};
+var REP_ICO={def:'<path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/>', atk:'<path d="M4 20 14 10M14 4h6v6M20 4 9 15M6 15l3 3"/>', mon:'<path d="M5 9c0-4 3-6 7-6s7 2 7 6v5l-2 2v4h-3v-2h-4v2H7v-4l-2-2z"/><circle cx="9.5" cy="10" r="1.2"/><circle cx="14.5" cy="10" r="1.2"/>',
+  drops:'<circle cx="12" cy="14" r="6"/><path d="M8 3h8l-2 5h-4z"/>', pvp:'<path d="M4 4l7 7M20 4l-7 7M8 15l-4 4M16 15l4 4M3 21l3-3M21 21l-3-3"/>', scout:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  fav:'<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>', all:'<path d="M4 6h16M4 12h16M4 18h10"/>'};
+function repIco(k){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+REP_ICO[k]+'</svg>'; }
+function repInCat(c, cat){
+  if (cat==="all") return true; if (cat==="fav") return !!c.fav; if (cat==="pvp") return !!c.pv; if (cat==="scout") return !!c.sc;
+  if (cat==="mon") return monLog(c); if (cat==="drops") return c.m>=0 || !!(c.g&&c.g.length);
+  if (cat==="def") return !!c.d && !c.pv; if (cat==="atk") return !c.d && !c.sc && !c.pv && !monLog(c);
+  return false; }
+// what was hit: valleys and flats, NPC cities, historic cities, AI lords (old reports: from the name)
+function repKind(c){ var k=c.tk||""; if (VTYPES[k] || k==="flat") return "val"; if (k==="npc"||k==="hc"||k==="ai") return k;
+  var n=String(c.n||""); if (/NPC city/i.test(n)) return "npc"; if (/historic city|Atlantis/i.test(n)) return "hc"; if (/\blord\b/i.test(n)) return "ai";
+  for (var vk in VTYPES) if (n.indexOf(VTYPES[vk].name)>=0) return "val"; return "other"; }
+function repSub(c, cat, f){ if (!f || f==="all") return true; var won=c.d ? c.r!==1 : c.r===1;
+  if (cat==="atk"){ if (f==="lost") return !won; return repKind(c)===f; }
+  if (cat==="def") return f==="held" ? c.r!==1 : c.r===1;
+  if (cat==="mon") return f==="won" ? c.r===1 : c.r!==1;
+  if (cat==="drops") return f==="medal" ? c.m>=0 : !!(c.g&&c.g.some(isGearDrop));
+  return true; }
+function repWorth(c){ return !!(c.d || c.pv || monLog(c) || (!c.sc && c.p==null && c.r!==1)); } // the ones that earn a "new" dot
+function repNew(c){ return !c.rd && c.at>(S.repSeen0||0) && repWorth(c); }
+var REPU={k:"", n:{}};
+function repUnread(cat){ var key=S.log.length+"|"+(S.log[0]?S.log[0].id:0)+"|"+REPRD+"|"+(S.repSeen0||0);
+  if (REPU.k!==key){ var n={}; REP_CATS.forEach(function(x){ n[x[0]]=0; }); S.log.forEach(function(c){ if (!repNew(c)) return; REP_CATS.forEach(function(x){ if (repInCat(c,x[0])) n[x[0]]++; }); }); REPU={k:key, n:n}; }
+  return cat ? (REPU.n[cat]||0) : REPU.n.all||0; }
+function repVerdict(c){ var v = c.pv ? (c.r===1?"Won":"Lost") : c.sc ? (c.r===1?"Scouted":"Caught") : c.d ? (c.r===1?"Broken":"Held") : (c.r===1?((c.l||c.wd)?"Victory":"Flawless"):c.r===3?"Stalemate":"Defeat");
+  return {v:v, good: c.d ? c.r!==1 : c.r===1}; }
+function repDate(gt){ return new Date(Date.now()+realMs(gt-S.gt)); }
+function repDay(gt){ var d=repDate(gt), n=new Date(), y=new Date(n.getTime()-864e5); return d.toDateString()===n.toDateString()?"Today":d.toDateString()===y.toDateString()?"Yesterday":d.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"}); }
+function repTime(gt){ return repDate(gt).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"}); }
+function repAgo(gt){ var ms=realMs(Math.max(0,S.gt-gt)); return ms<60000?"just now":fmtT(ms).replace(/ \d+s$/,"")+" ago"; }
+function repExtra(c){ var extra=[]; if (c.l) extra.push("lost "+fmt(c.l)); if (c.k) extra.push("killed "+fmt(c.k)); if (c.lo) extra.push((c.d?"lost ":"")+fmt(c.lo)+" loot"); if (c.m>=0) extra.push(MEDALS[c.m][1]+" medal"); if (c.g&&c.g.length) extra.push(c.g.join(", ")); if (c.h) extra.push(c.h+" captured"); if (c.f) extra.push(c.f+" taken"); if (c.o) extra.push("valley taken"); if (c.ar){ if (c.sent) extra.unshift(fmt(c.sent)+" sent"); if (c.wd) extra.push(fmt(c.wd)+" wounded"); } return extra; }
+function repRowHtml(c, sub){ var vv=repVerdict(c), ex=repExtra(c);
+  return '<button class="reprow2'+(sub?' sub':'')+'" data-act="rep-open" data-id="'+c.id+'">'+(repNew(c)?'<span class="rdot" aria-label="new"></span>':'<span class="rdot0"></span>')+'<span class="rt">'+repTime(c.at)+'</span><span class="rb">'+(c.fav?'<span style="color:var(--brass)">\u2605</span> ':'')+'<b class="'+(vv.good?'okc':'badc')+'">'+vv.v+'</b> '+esc(c.n)+(S.cities.length>1&&!c.d?' <span class="dur">from '+esc(c.c)+'</span>':'')+(ex.length?'<span class="rx">'+esc(ex.join(" \u00b7 "))+'</span>':'')+'</span></button>'; }
+// a preset's auto-farm hits in a row (same preset and city, same day, no gap over two hours): one card
+function repFoldable(c){ return c.p!=null && !c.d && !c.sc && !c.pv && !monLog(c); }
+function repItems(list){ var out=[], i=0;
+  while (i<list.length){ var c=list[i];
+    if (repFoldable(c)){ var j=i+1, day=repDay(c.at); while (j<list.length && repFoldable(list[j]) && list[j].p===c.p && list[j].c===c.c && repDay(list[j].at)===day && list[j-1].at-list[j].at<=2*HOUR) j++;
+      if (j-i>=3){ out.push({farm:list.slice(i,j)}); i=j; continue; } }
+    out.push({c:c}); i++; }
+  return out; }
+function repFarmHtml(g){ var a=g[0], z=g[g.length-1], won=0, lost=0, loot=0, tl=0, med={}, mats=0;
+  g.forEach(function(c){ if (c.r===1) won++; else lost++; loot+=c.lo||0; tl+=c.l||0; if (c.m>=0) med[c.m]=(med[c.m]||0)+1; mats+=(c.g||[]).filter(isGearDrop).length; });
+  var key=a.id, open=!!REPX[key], nm=a.pn||("Preset "+(a.p+1)), mt=Object.keys(med).map(function(m){ return med[m]+" "+MEDALS[m][1]+" medal"+(med[m]>1?"s":""); });
+  var h='<div class="farmrun"><div class="frh"><b>Farm run \u00b7 '+(a.p+1)+'. '+esc(nm)+'</b><span class="dur">'+repTime(z.at)+' \u2013 '+repTime(a.at)+'</span></div>'+
+    '<div class="frbar"><i style="width:'+(won/g.length*100)+'%"></i><u style="width:'+(lost/g.length*100)+'%"></u></div>'+
+    '<div class="frloot"><span><b class="okc">'+won+' won</b>'+(lost?' \u00b7 <span class="badc">'+lost+' lost</span>':'')+'</span><span><b>'+fmt(loot)+'</b> loot</span>'+(mt.length?'<span class="rmed">'+mt.join(", ")+'</span>':'')+(mats?'<span>'+mats+' material'+(mats>1?'s':'')+'</span>':'')+'<span>lost '+fmt(tl)+' troops</span></div>'+
+    '<button class="link frtog" data-act="rep-fx" data-k="'+key+'">'+(open?'\u2039 Hide the '+g.length+' reports':'\u203a Show the '+g.length+' reports')+'</button>';
+  if (open) h+='<div class="frsub">'+g.map(function(c){ return repRowHtml(c,true); }).join("")+'</div>';
+  return h+'</div>'; }
+function repHubHtml(){ var L=S.log, day=S.gt-DAY, st={}; REP_CATS.forEach(function(x){ st[x[0]]={n:0, w:0, l:0, loot:0, last:null, day:0, med:{}, mats:{}, br:0}; });
+  L.forEach(function(c){ REP_CATS.forEach(function(x){ var k=x[0]; if (!repInCat(c,k)) return; var s=st[k]; s.n++; if (!s.last) s.last=c;
+    if (c.at>day){ s.day++; var won=c.d?c.r!==1:c.r===1; if (won) s.w++; else s.l++; s.loot+=c.d?0:(c.lo||0); if (c.d && c.r===1) s.br++;
+      if (k==="drops"){ if (c.m>=0) s.med[c.m]=(s.med[c.m]||0)+1; (c.g||[]).forEach(function(g){ s.mats[g]=(s.mats[g]||0)+1; }); } } }); });
+  var line=function(k){ var s=st[k], nw=repUnread(k), b=nw?'<span class="rnew">'+nw+' new</span> ':''; var last=s.last;
+    if (k==="def") return b+(s.br?'<span class="badc">'+s.br+' broken</span> \u00b7 ':'')+(last?'last '+repAgo(last.at):'never attacked');
+    if (k==="atk") return s.day?'<b class="okc">'+s.w+' won</b>'+(s.l?' \u00b7 <span class="badc">'+s.l+' lost</span>':'')+' in 24 h<br>'+fmt(s.loot)+' loot':(last?'Last '+repAgo(last.at):'None yet');
+    if (k==="mon") return b+(last?esc(repVerdict(last).v)+': '+esc(last.n):'None yet')+(s.day?'<br>'+s.day+' in 24 h':'');
+    if (k==="drops"){ var parts=Object.keys(s.med).map(function(m){ return s.med[m]+' '+MEDALS[m][1]+' medal'+(s.med[m]>1?'s':''); }), mats=Object.keys(s.mats).map(function(g){ return s.mats[g]+' '+g; });
+      return parts.length||mats.length ? '<span class="rmed">'+esc(parts.concat(mats).slice(0,3).join(", "))+'</span> in 24 h' : (last?'Last '+repAgo(last.at):'None yet'); }
+    if (k==="pvp") return b+(last?'Last: '+esc(repVerdict(last).v.toLowerCase())+' \u00b7 '+repAgo(last.at):'None yet');
+    if (k==="scout") return last?'Last: '+esc(String(last.n).replace(/^Scouted /,""))+'<br>'+repAgo(last.at):'None yet';
+    if (k==="fav") return 'Reports you starred';
+    return 'Every report, newest first'; };
+  var tot=repUnread();
+  return '<div class="section"><div class="shead"><h3>Reports</h3><span class="dur">'+(tot?tot+' new':'')+'</span></div><div class="reptiles">'+REP_CATS.map(function(x){ var k=x[0], nw=repUnread(k);
+    return '<button class="reptile'+(k==="def"&&nw?' alert':'')+'" data-act="rep-cat" data-v="'+k+'"><span class="rtop">'+repIco(k)+'<span class="nm">'+esc(x[1])+'</span><span class="n">'+fmt(st[k].n)+'</span></span><span class="ln">'+line(k)+'</span></button>'; }).join("")+'</div>'; }
+function repLifeHtml(){ var st=S.stats;
+  return '<details class="section det" data-det="replife"'+(DET.replife?' open':'')+'><summary><b>Lifetime record</b> <span class="dur">'+fmt(st.atk)+' attacks'+(st.atk?' \u00b7 '+Math.round(st.win/st.atk*100)+'% won':'')+'</span></summary><div class="statcards">'+
     [["Attacks",fmt(st.atk)],["Victories",fmt(st.win)],["Flawless",fmt(st.flaw)],["Defenses held",fmt(st.held)+" / "+fmt(st.defs)],["Enemies killed",fmt(st.killT)],["Troops lost",fmt(st.lostT)],["Loot taken",fmt(st.loot)],["Medals",fmt(st.medals)],["Materials found",fmt(st.gear)]]
-      .map(function(x){ return '<div><b>'+x[1]+'</b><span>'+x[0]+'</span></div>'; }).join("")+'</div></div>';
-  h+='<div class="section"><div class="farmadd" style="margin-top:0">'+f.map(function(x){ return '<button class="chipbtn'+(repFilter===x[0]?' on':'')+'" data-act="rep-filter" data-f="'+x[0]+'">'+x[1]+'</button>'; }).join("")+'</div>'+
-    '<input type="text" id="repq" placeholder="Search by target or city" value="'+esc(repQuery)+'" style="margin-top:8px"><div id="replist"></div></div>';
-  return h;
+      .map(function(x){ return '<div><b>'+x[1]+'</b><span>'+x[0]+'</span></div>'; }).join("")+'</div></details>'; }
+function viewReports(){
+  if (REPV){ var cn=REP_CATS.filter(function(x){ return x[0]===REPV; })[0]; if (!cn){ REPV=""; return viewReports(); }
+    var sub=REP_SUB[REPV]||[];
+    return '<div class="albk"><button class="link" data-act="rep-cat" data-v="">\u2039 All reports</button></div><div class="section"><div class="shead"><h3>'+esc(cn[1])+'</h3><span class="dur" id="repcount"></span></div>'+
+      (sub.length?'<div class="chips">'+sub.map(function(x){ return '<button class="chipbtn'+(REPF===x[0]?' on':'')+'" data-act="rep-sub" data-v="'+x[0]+'">'+x[1]+'</button>'; }).join("")+'</div>':'')+
+      '<input type="text" id="repq" placeholder="Search by target or city" value="'+esc(repQuery)+'" style="margin-top:8px"><div id="replist"></div></div>'; }
+  return '<div id="rephub"></div><div class="section" style="margin-top:-2px"><input type="text" id="repq" placeholder="Search every report by target or city" value="'+esc(repQuery)+'"><div id="replist"></div></div>'+repLifeHtml();
 }
 // who did the killing: kb.a = the attacking side's units, kb.d = the defending side's units and fortifications
 function killName(side, idx, isSrc, n){
@@ -11024,16 +11291,24 @@ function reportDetailBase(r){
 }
 // the Reports tab asks every render tick; the list is only rebuilt when a report arrived or the filter, search, page or a star changed
 function fillRepList(force){
+  var hub=document.getElementById("rephub"); if (hub){ var hh=repHubHtml(); if (hub._sig!==hh){ hub.innerHTML=hh; hub._sig=hh; } }
   var el=document.getElementById("replist"); if (!el) return;
-  var key=S.log.length+"|"+(S.log[0]?S.log[0].id:0)+"|"+repFilter+"|"+repQuery+"|"+repPage+"|"+S.cities.length;
+  var cat=REPV||"all", q=repQuery.trim().toLowerCase();
+  var key=S.log.length+"|"+(S.log[0]?S.log[0].id:0)+"|"+cat+"|"+REPF+"|"+q+"|"+repPage+"|"+S.cities.length+"|"+REPRD+"|"+JSON.stringify(REPX);
   if (force) el._sig=""; else if (el._key===key) return;
-  var list=S.log.filter(repMatch), per=50, pages=Math.max(1,Math.ceil(list.length/per)); if (repPage>=pages) repPage=pages-1;
-  var h='<p class="dur" style="margin:8px 0">'+fmt(list.length)+' report'+(list.length===1?'':'s')+(S.log.length>=LOG_CAP?' (the oldest roll off after '+fmt(LOG_CAP)+'; lifetime totals keep everything)':'')+'</p>';
-  h+=list.slice(repPage*per,(repPage+1)*per).map(function(c){
-    var v = c.pv ? (c.r===1?"Won":"Lost") : c.sc ? (c.r===1?"Scouted":"Caught") : c.d ? (c.r===1?"Broken":"Held") : (c.r===1?((c.l||c.wd)?"Victory":"Flawless"):c.r===3?"Stalemate":"Defeat"), good = c.d ? c.r!==1 : c.r===1;
-    var extra=[]; if (c.l) extra.push("lost "+fmt(c.l)); if (c.k) extra.push("killed "+fmt(c.k)); if (c.lo) extra.push((c.d?"lost ":"")+fmt(c.lo)+" loot"); if (c.m>=0) extra.push(MEDALS[c.m][1]+" medal"); if (c.g.length) extra.push(c.g.join(", ")); if (c.h) extra.push(c.h+" captured"); if (c.f) extra.push(c.f+" taken"); if (c.o) extra.push("valley taken"); if (c.ar){ if (c.sent) extra.unshift(fmt(c.sent)+" sent"); if (c.wd) extra.push(fmt(c.wd)+" wounded"); }
-    return '<button class="reprow" data-act="rep-open" data-id="'+c.id+'"><span class="chev">›</span><span class="dur">'+(c.fav?'<span style="color:var(--brass)">\u2605</span> ':'')+gameClock(c.at)+'</span> <b class="'+(good?'okc':'badc')+'">'+v+'</b> '+esc(c.n)+(S.cities.length>1&&!c.d?' <span class="dur">from '+esc(c.c)+'</span>':'')+'<div class="dur">'+extra.join(", ")+'</div></button>';
-  }).join("");
+  if (!REPV && !q){ el.innerHTML=""; el._key=key; el._sig=""; return; } // the hub shows the list only while searching
+  var list=S.log.filter(function(c){ return repInCat(c,cat) && repSub(c,cat,REPF) && (!q || (c.n+" "+c.c).toLowerCase().indexOf(q)>=0); });
+  var items=repItems(list), per=40, pages=Math.max(1,Math.ceil(items.length/per)); if (repPage>=pages) repPage=pages-1;
+  var rc=document.getElementById("repcount"); if (rc) rc.textContent=fmt(list.length)+" kept";
+  var nw=REPV?repUnread(cat):0, h='';
+  if (!REPV) h+='<p class="dur" style="margin:8px 0 0">'+fmt(list.length)+' match'+(list.length===1?'':'es')+'</p>';
+  if (nw) h+='<div class="act" style="margin-top:6px"><span class="dur">'+nw+' new</span><button class="link" data-act="rep-readall">Mark all read</button></div>';
+  if (!list.length) h+='<p class="hint" style="margin-top:8px">'+(q?'Nothing matches that.':'No reports here yet.')+'</p>';
+  var lastDay="";
+  items.slice(repPage*per,(repPage+1)*per).forEach(function(it){ var c0=it.farm?it.farm[0]:it.c, d=repDay(c0.at);
+    if (d!==lastDay){ h+='<div class="repday">'+esc(d)+'</div>'; lastDay=d; }
+    h+= it.farm ? repFarmHtml(it.farm) : repRowHtml(it.c); });
+  if (S.log.length>=LOG_CAP) h+='<p class="dur" style="margin-top:8px">The oldest reports roll off after '+fmt(LOG_CAP)+'; lifetime totals keep everything.</p>';
   if (pages>1) h+='<div class="act" style="margin-top:10px"><button class="btn ghost small" data-act="rep-page" data-d="-1"'+(repPage?'':' disabled')+'>\u2039 Newer</button><span class="dur">Page '+(repPage+1)+' of '+pages+'</span><button class="btn ghost small" data-act="rep-page" data-d="1"'+(repPage<pages-1?'':' disabled')+'>Older \u203a</button></div>';
   el._key=key; if (el._sig!==h){ el.innerHTML=h; el._sig=h; }
 }
@@ -11176,10 +11451,11 @@ function goalLinesHtml(k){
       '<div class="tgu">'+(chips||'<span class="dur">Empty line: tap Edit to set it.</span>')+'</div></div>'; });
   return h+'<div class="btnrow" style="margin-top:8px"><button class="btn ghost small" data-act="tg-add" data-k="'+k+'">Add a line</button></div>';
 }
-function goalsSection(){
-  return '<div class="section"><div class="shead"><h3>Troop goals</h3><label class="chk"><input type="checkbox" id="autotrain"'+(S.autoTrain?' checked':'')+'> Auto-train</label></div>'+
+function goalsSection(){ var nl=tgLines().length;
+  return '<details class="section det" data-det="tgoals"'+(DET.tgoals?' open':'')+'><summary><b>Troop goals</b> <span class="dur">'+(S.autoTrain?'auto-train on':'auto-train off')+' \u00b7 '+nl+' line'+(nl===1?'':'s')+'</span></summary>'+
+    '<label class="chk" style="margin:6px 0"><input type="checkbox" id="autotrain"'+(S.autoTrain?' checked':'')+'> Auto-train</label>'+
     '<p class="hint">Goals are lines, worked top to bottom. Auto-train finishes line 1 before it starts line 2, and goes straight back up the moment a line above falls short, after a battle say. Within the active line, every idle Barracks takes the leftmost unit that is short. Counts include troops in training and out on marches. Each line has its own batch size: how many one Barracks trains at a time (Auto is about 30 minutes of work). For layered defenses, make line 1 one of each layer with batch 1, then bigger lines below to rebuild.</p>'+
-    goalLinesHtml("tg")+'</div>';
+    goalLinesHtml("tg")+'</details>';
 }
 function fortGoalsHtml(){
   var why=fortIdleWhy();
@@ -11188,6 +11464,43 @@ function fortGoalsHtml(){
     goalLinesHtml("fg")+(why?'<p class="dur" style="margin:4px 0 0">Wall crews idle: '+esc(why)+'</p>':'')+'</div>';
 }
 
+/* ---------- 0.2.4: the Barracks hub (a tile per Barracks) and a page per Barracks (its batch, its queue, train here) ---------- */
+var ARMYB=-1, BQD={u:-1, n:""};
+function barracksHub(bl){ if (!bl.length) return '';
+  var nBusy=bl.filter(function(sl){ return trainingAt(sl); }).length, lastEnd=0; bl.forEach(function(sl){ if (trainingAt(sl)) lastEnd=Math.max(lastEnd, slotFree(sl)); });
+  var h='<div class="section"><div class="shead"><h3>Barracks</h3><span class="dur">'+nBusy+' training, '+(bl.length-nBusy)+' idle'+(lastEnd?' \u00b7 all done '+trClock(lastEnd):'')+'</span></div><div class="altiles brtiles">';
+  bl.forEach(function(slot, n){ var t=trainingAt(slot), lv=S.inside[slot].level, w=bqWaiting(slot);
+    h+='<button class="altile '+(t?'run':'idle')+'" data-act="bar-open" data-slot="'+slot+'"><span class="bico">'+ICON.barracks+'</span><span class="nm">Barracks '+(n+1)+'</span><span class="lv">Level '+lv+'</span>'+
+      (t?'<span class="st">'+fmt(t.n)+' '+uname(t.u,t.n)+'</span><span class="tbar"><i id="tq-bar-'+slot+'"></i></span><span class="st dur" id="tq-t-'+slot+'"></span>':'<span class="st'+(S.autoTrain?' dur':' why')+'">'+esc(idleWhy(slot).replace(/^idle: /,""))+'</span>')+
+      '<span class="st dur">Queue '+w+' / '+lv+'</span></button>'; });
+  return h+'</div><p class="dur" style="margin:6px 0 0">'+fmt(trainedLastHour())+' trained in the last hour.</p></div>'; }
+function barracksPage(slot){ var b=S.inside[slot], lv=b.level, t=trainingAt(slot), sp=hasSpeedups(), w=bqWaiting(slot);
+  var h='<div class="albk"><button class="link" data-act="bar-hub">\u2039 All barracks</button></div>';
+  h+='<div class="section"><div class="alhead"><span class="bico big">'+ICON.barracks+'</span><div style="min-width:0"><h3 style="margin:0">'+barracksName(slot)+'</h3><span class="dur">Level '+lv+' \u00b7 queue '+w+' of '+lv+(lv>10?' \u00b7 '+(lv-10)+'% off training costs':'')+'</span></div></div></div>';
+  h+='<div class="section"><div class="shead"><h3>Training now</h3></div>';
+  if (t) h+='<div class="bq"><span><b>'+fmt(t.n)+' '+uname(t.u,t.n)+'</b></span><span class="qtime" id="tq-t-'+slot+'"></span><div class="bar"><i id="tq-bar-'+slot+'"></i></div><div class="qacts">'+(sp?'<button class="link strong" data-act="speedup" data-target="train" data-slot="'+slot+'">Speed up</button>':'')+'<button class="link" data-act="cancel-train" data-slot="'+slot+'">Cancel</button></div></div>';
+  else h+='<p class="hint" style="margin:0">'+esc(idleWhy(slot).replace(/^idle: /,"Idle: ").replace(/^idle$/,"Idle."))+'</p>';
+  var qend=t?t.end:S.gt, qh='';
+  S.train.forEach(function(qt,qi){ if (qt.slot===slot && qt.q){ qend+=qt.dur; qh+='<div class="bq"><span>'+fmt(qt.n)+' '+uname(qt.u,qt.n)+'<br><span class="dur">'+fmtT(realMs(qt.dur))+', done '+trClock(qend)+'</span></span><div class="mbtns"><button class="link" data-act="cancel-q" data-ti="'+qi+'">Cancel</button></div></div>'; } });
+  h+='<div class="h3" style="margin-top:10px">Queue <span class="dur">'+w+' of '+lv+'</span></div>'+(qh||'<p class="hint" style="margin:0">Nothing waiting. Anything you train here while it\u2019s busy waits in line.</p>')+'</div>';
+  // train here
+  var ok=U.map(function(u,i){ return i; }).filter(function(i){ return !missing(U[i].req).length && barracksReq(i)<=lv; });
+  if (BQD.u<0 || ok.indexOf(BQD.u)<0) BQD.u=ok.length?ok[ok.length-1]:-1;
+  h+='<div class="section"><div class="shead"><h3>'+(t?'Add to the queue':'Train here')+'</h3></div>';
+  if (!ok.length) h+='<p class="hint">Nothing can be trained here yet.</p>';
+  else { var n=Math.floor(+BQD.n||0), why=trainOnWhy(BQD.u,n,slot), T=trainTime(BQD.u), start=t?slotFree(slot):S.gt;
+    h+='<div class="trainrow"><select id="bqunit" aria-label="Troop">'+ok.map(function(i){ return '<option value="'+i+'"'+(i===BQD.u?' selected':'')+'>'+U[i].name+' ('+fmt(S.troops[i])+')</option>'; }).join("")+'</select>'+
+      '<input type="number" min="0" step="1" id="bqamt" value="'+esc(BQD.n)+'" placeholder="Amount" aria-label="How many"><button class="btn ghost small" data-act="bq-max">Max '+fmt(maxTrain(BQD.u))+'</button></div>'+
+      '<div id="bqcost" style="margin-top:6px">'+bqCostHtml()+'</div>'+
+      '<div class="trainrow" style="margin-top:6px"><button class="btn small" data-act="bq-train" id="bqbtn"'+(why?' disabled':'')+'>'+(t?'Add to queue':'Train')+(n>0?' '+fmt(n):'')+'</button><span id="bqinfo" class="'+(why?'why':'dur')+'">'+(why?esc(why):fmtT(realMs(start-S.gt+T*n))+', done '+trClock(start+T*n))+'</span></div>'; }
+  return h+'</div>'; }
+function bqCostHtml(){ var n=Math.floor(+BQD.n||0); if (!(n>0) || BQD.u<0) return ''; var c={}; for (var k in U[BQD.u].cost) c[k]=U[BQD.u].cost[k]*n; return '<span class="dur">Cost for '+fmt(n)+':</span> '+chips(c); }
+// typing an amount updates the cost, the button and the time in place (a redraw here would swallow the tap on Train)
+function bqRefresh(){ if (ARMYB<0) return; var n=Math.floor(+BQD.n||0), why=trainOnWhy(BQD.u,n,ARMYB), t=trainingAt(ARMYB), T=trainTime(BQD.u), start=t?slotFree(ARMYB):S.gt;
+  var bb=document.getElementById("bqbtn"), inf=document.getElementById("bqinfo"), co=document.getElementById("bqcost");
+  if (bb){ bb.disabled=!!why; bb.textContent=(t?"Add to queue":"Train")+(n>0?" "+fmt(n):""); }
+  if (inf){ inf.className=why?"why":"dur"; inf.textContent=why?why:fmtT(realMs(start-S.gt+T*n))+", done "+trClock(start+T*n); }
+  if (co){ var ch=bqCostHtml(); if (co.innerHTML!==ch) co.innerHTML=ch; } }
 /* army view */
 var trainAmt = {};
 function maxTrainAuto(i){
@@ -11205,9 +11518,9 @@ function trainWhy(i,n,mode){
   if (missing(u.req).length) return "Locked";
   if (!barracksList().length) return "Build a Barracks";
   if (mode==="all"){ if (!barracksList().some(function(sl){ return S.inside[sl].level>=barracksReq(i); })) return "Needs a level "+barracksReq(i)+" Barracks"; }
-  else {
-    if (idleBarracks()<0) return "All barracks busy";
-    if (pickBarracks(i)<0) return "Needs an idle level "+barracksReq(i)+" Barracks";
+  else if (pickBarracks(i)<0 && pickQueue(i)<0){ // 0.2.4: no idle one: queue on the Barracks that frees up soonest
+    if (!barracksList().some(function(sl){ return S.inside[sl].level>=barracksReq(i); })) return "Needs a level "+barracksReq(i)+" Barracks";
+    return "Every queue is full";
   }
   if (!n || n<1) return "Enter an amount";
   var c={}; for (var k in u.cost) c[k]=u.cost[k]*n;
@@ -11223,8 +11536,9 @@ function updateTrainRow(i){
   var tc=document.getElementById("tr-cost-"+i); if (tc){ var tch=trainCostHtml(i); if (tc.innerHTML!==tch) tc.innerHTML=tch; }
   var b=document.getElementById("tr-btn-"+i), inf=document.getElementById("tr-info-"+i); if (!b) return;
   var n=trainAmt[i]||0, why=trainWhy(i,n,"one");
-  b.disabled=!!why; setText(b, "Train"+(n>0?" "+fmt(n):""));
-  setText(inf, why ? why : fmtT(realMs(trainTime(i)*n))+(n>0?", done "+trClock(S.gt+trainTime(i)*n):""));
+  var qOn=!why && pickBarracks(i)<0 ? pickQueue(i) : -1, t0=qOn>=0 ? slotFree(qOn) : S.gt;
+  b.disabled=!!why; setText(b, (qOn>=0?"Queue":"Train")+(n>0?" "+fmt(n):""));
+  setText(inf, why ? why : (qOn>=0?"queues on "+barracksName(qOn)+", ":"")+fmtT(realMs(t0-S.gt+trainTime(i)*n))+(n>0?", done "+trClock(t0+trainTime(i)*n):""));
   inf.className = why ? "why" : "dur";
   // split buttons: share the order across every idle Barracks, or across all of them (busy ones queue their share)
   var notes=[]; [["idle","All idle"],["all","All"]].forEach(function(o){
@@ -11247,11 +11561,11 @@ function trainByHtml(i){ var L=trainByGt(); if (L==null || missing(U[i].req).len
   var mx=maxTrain(i), parts=[["one","One barracks"],["idle","All idle"],["all","All"]].map(function(o){ var n=trainByN(i,L,o[0]); if (!(n>0)) return ""; var cap=Math.min(n,mx); if (!(cap>0)) return "";
     return '<button class="link" data-act="train-by" data-unit="'+i+'" data-mode="'+o[0]+'" data-n="'+cap+'">'+o[1]+' '+fmt(cap)+(cap<n?' (all you can afford)':'')+'</button>'; }).filter(Boolean);
   if (!(mx>0)) return ""; return parts.length ? '<span class="dur">To finish by '+trClock(L)+': </span>'+parts.join(" \u00b7 ") : '<span class="dur">Nothing fits before '+trClock(L)+'.</span>'; }
-function trainByBar(){ var L=trainByGt();
-  return '<div class="section"><div class="shead"><h3>Finish by</h3><span class="dur" id="tr-bywhen">'+(L!=null?'Target '+trClock(L):(trainBy?'Pick a time':'Off'))+'</span></div>'+
+function trainByBar(){ var L=trainByGt(); // 0.2.4: a dropdown under Troop goals (opens by itself while a target is set)
+  return '<details class="section det" data-det="trby"'+(DET.trby||L!=null?' open':'')+'><summary><b>Finish by</b> <span class="dur" id="tr-bywhen">'+(L!=null?'Target '+trClock(L):(trainBy?'Pick a time':'Off'))+'</span></summary>'+
     '<p class="hint">Pick a time on your clock and every troop shows how many fit before it: on one idle Barracks, across the idle ones, or across all of them (busy ones queue behind what they\u2019re training). Tap a number to fill the amount, then use the matching button.</p>'+
     '<div class="trainrow">'+hmsIn('id="tr-by" aria-label="Finish by"', trainBy)+''+
-    '<button class="btn ghost small" data-act="train-by-last">Match the busiest barracks</button>'+(trainBy?'<button class="btn ghost small" data-act="train-by-clear">Clear</button>':'')+'</div></div>'; }
+    '<button class="btn ghost small" data-act="train-by-last">Match the busiest barracks</button>'+(trainBy?'<button class="btn ghost small" data-act="train-by-clear">Clear</button>':'')+'</div></details>'; }
 // troops at home, out marching (attacking, guarding allies, coming home) and their totals, for this city and every city
 function cityTroops(ci){ var c=S.cities[ci], home=c.troops.slice(), out=[0,0,0,0,0,0,0,0,0,0,0,0];
   S.marches.forEach(function(m){ if (m.city===c.id) m.t.forEach(function(n,i){ out[i]+=n; }); });
@@ -11270,22 +11584,13 @@ function troopTotals(){
   return h+'</details>';
 }
 function viewArmy(){
+  if (ARMYB>=0){ var ob=S.inside[ARMYB]; if (ob && ob.type==="barracks" && ob.level>0) return barracksPage(ARMYB); ARMYB=-1; }
   var bl=barracksList(), total=S.troops.reduce(function(a,b){return a+b;},0), r=simResearch();
   var h='<div class="section"><div class="shead"><h3>Your army</h3><span class="dur">'+fmt(total)+' at home, eating '+fmt(upkeep())+' food/h</span></div>'+
     '<p class="hint">Troops eat food but never starve; food just stops at zero. Training draws from idle people (population not working the fields): <b id="idlepop"></b> right now.</p>'+troopTotals();
   if (!bl.length) h+='<p class="warn">Build a Barracks on an empty city plot to train troops.</p>';
-  var sp=hasSpeedups(), nBusy=bl.filter(function(sl){ return trainingAt(sl); }).length, lastEnd=0; bl.forEach(function(sl){ if (trainingAt(sl)) lastEnd=Math.max(lastEnd, slotFree(sl)); });
-  if (bl.length) h+='<details class="det" data-det="barr"'+(DET.barr?' open':'')+' style="margin-top:6px"><summary><b>Barracks</b> <span class="dur">'+bl.length+' \u00b7 '+nBusy+' training, '+(bl.length-nBusy)+' idle'+(lastEnd?' \u00b7 all done '+trClock(lastEnd):'')+' \u00b7 '+fmt(trainedLastHour())+' trained in the last hour</span></summary>';
-  bl.forEach(function(slot,n){
-    var t=trainingAt(slot);
-    h+='<div class="bq"><span>Barracks '+(n+1)+', level '+S.inside[slot].level+(t?': '+fmt(t.n)+' '+uname(t.u,t.n):'<span class="dur"> '+idleWhy(slot)+'</span>')+'</span>';
-    if (t) h+='<span class="qtime" id="tq-t-'+slot+'"></span><div class="bar"><i id="tq-bar-'+slot+'"></i></div><div class="qacts">'+(sp?'<button class="link strong" data-act="speedup" data-target="train" data-slot="'+slot+'">Speed up</button>':'')+'<button class="link" data-act="cancel-train" data-slot="'+slot+'">Cancel</button></div>';
-    var qend=t?t.end:S.gt; S.train.forEach(function(qt,qi){ if (qt.slot===slot && qt.q){ qend+=qt.dur; h+='<div class="dur" style="grid-column:1/-1">Then '+fmt(qt.n)+' '+uname(qt.u,qt.n)+' ('+fmtT(realMs(qt.dur))+', done '+trClock(qend)+') <button class="link" data-act="cancel-q" data-ti="'+qi+'">Cancel</button></div>'; } });
-    h+='</div>';
-  });
-  if (bl.length) h+='</details>';
-  h+='</div>'+goalsSection()+(bl.length?trainByBar():'');
-  h+='<p class="hint" style="margin:0 2px 8px">Train sends an order to one idle Barracks. <b>All idle</b> shares it evenly across every idle Barracks that can train it. <b>All</b> shares it across every Barracks: busy ones queue their part behind what they are training, balanced so everything finishes together.</p><div class="unitlist">';
+  h+='</div>'+barracksHub(bl)+goalsSection()+(bl.length?trainByBar():'');
+  h+='<details class="det" data-det="trhow" style="margin:0 2px 8px"'+(DET.trhow?' open':'')+'><summary class="dur">How the train buttons work</summary><p class="hint"><b>Train</b> sends an order to one idle Barracks, or, when none is idle, to the queue of the one that frees up soonest. <b>All idle</b> shares it evenly across every idle Barracks that can train it. <b>All</b> shares it across every Barracks: busy ones queue their part behind what they are training, balanced so everything finishes together. Each Barracks holds as many waiting batches as its level.</p></details><div class="unitlist">';
   U.forEach(function(u,i){
     var miss=missing(u.req), st=effStats(i,r);
     h+='<div class="unit'+(miss.length?' locked':'')+'"><h4>'+u.name+'</h4><span class="own" title="Owned">'+fmt(S.troops[i])+'</span>'+
@@ -11474,7 +11779,7 @@ function unitName(t){ return t===14 ? "Archer\u2019s Towers" : U[t].name; }
 function renderSimResult(){
   var el=document.getElementById("simresult"); if (!el) return;
   if (simShow==="lo" && loRes){
-    el.innerHTML=loResultHtml(loRes, '<div class="farmadd" style="margin-top:8px"><label for="lopre" class="dur">Preset</label><select id="lopre">'+S.presets.map(function(p,i){ return '<option value="'+i+'">'+esc(p.name)+(sumT(p.t)?'':' (empty)')+'</option>'; }).join("")+'</select><button class="btn small" data-act="sim-opt-save">Save as preset</button></div>');
+    el.innerHTML=loResultHtml(loRes, '<div class="farmadd" style="margin-top:8px"><label for="lopre" class="dur">Preset</label><select id="lopre">'+[["March presets","m"],["Farm presets","f"]].map(function(g){ return '<optgroup label="'+g[0]+'">'+presetsOf(g[1]==="m").map(function(p,i){ return '<option value="'+g[1]+i+'">'+esc(p.name)+(sumT(p.t)?'':' (empty)')+'</option>'; }).join("")+'</optgroup>'; }).join("")+'</select><button class="btn small" data-act="sim-opt-save">Save as preset</button></div>');
     return; }
   if (!simOut) return;
   var h='<div class="section">';
@@ -11837,6 +12142,7 @@ function renderCityBar(){
 }
 function queueVis(){ var qd=document.querySelector(".queue"); if (qd) qd.style.display=(tab==="city"||tab==="bldg")?"":"none"; }
 function setTabs(){ renderCityBar(); queueVis();
+  var rtb=document.querySelector('nav.tabs [data-tab="reports"]'); if (rtb){ var rn=repUnread()>0; if (rtb.classList.contains("hasnew")!==rn) rtb.classList.toggle("hasnew", rn); }
   var gtb=document.querySelector('nav.tabs [data-tab="guild"]'); if (gtb && gtb.hidden!==!mpShown()) gtb.hidden=!mpShown(); document.querySelectorAll("nav.tabs button, .chiprow [data-tab]").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.tab===tab?"true":"false"); }); }
 
 /* ---------- sheet ---------- */
@@ -11972,6 +12278,8 @@ function renderSheetCore(){
     h=abuseSheet();
   } else if (sheetFor.kind==="moved"){
     h=movedSheet();
+  } else if (sheetFor.kind==="offpick"){
+    h=offPickSheet();
   } else if (sheetFor.kind==="cbdel"){
     if (sheetBody.contains(document.activeElement) && document.activeElement.tagName==="INPUT" && lastSheet) return;
     h=cbDelSheet();
@@ -12049,7 +12357,7 @@ function renderSheetCore(){
     h=gearPickSheet(gh, sheetFor.slot);
   } else if (sheetFor.kind==="preset"){
     if (sheetBody.contains(document.activeElement) && (document.activeElement.tagName==="INPUT"||document.activeElement.tagName==="SELECT") && lastSheet) return;
-    h=presetSheet(sheetFor.p);
+    h=presetSheet(sheetFor.p, sheetFor.m);
   } else if (sheetFor.kind==="whpick"){
     h=whPickSheet();
   } else if (sheetFor.kind==="decopick"){
@@ -12216,7 +12524,7 @@ function bqState(it){ // "go", "wait" or "drop"
 function uname(i,n){ var nm=U[i].name; return n===1?nm:/man$/.test(nm)?nm.replace(/man$/,"men"):nm==="Cavalry"?nm:nm==="Ballista"?"Ballistae":nm+"s"; }
 function startTrain(tu,tn,slot){
   if (trainWhy(tu,tn)) return false;
-  if (slot==null) slot=pickBarracks(tu);
+  if (slot==null){ slot=pickBarracks(tu); if (slot<0){ var qs=pickQueue(tu); return qs>=0 ? trainOn(tu,tn,qs) : false; } } // 0.2.4
   if (slot<0 || trainingAt(slot) || S.inside[slot].level<barracksReq(tu)) return false;
   var disc=1-0.01*Math.max(0,S.inside[slot].level-10), tc={}; for (var ck in U[tu].cost) tc[ck]=Math.ceil(U[tu].cost[ck]*tn*disc);
   pay(tc,1); S.pop -= U[tu].pop*tn;
@@ -12374,6 +12682,8 @@ document.addEventListener("click",function(e){
   if (act==="open-link"){ e.preventDefault(); var lu=a.dataset.u||""; if (!/^https?:\/\//i.test(lu)) return; if (window.confirm("Open this link in your browser?\n\n"+linkHost(lu)+"\n\nOnly open links from players you trust.")) { try { window.open(lu,"_blank","noopener,noreferrer"); } catch(x){} } return; }
   if (act==="rx-sel"){ if (e.target.closest(".rxbar") || window.getSelection && String(window.getSelection())) return; var rk=a.dataset.ch+":"+a.dataset.id; RXSEL=RXSEL===rk?"":rk; rxRefresh(); return; }
   if (act==="rx-close"){ RXSEL=""; rxRefresh(); return; }
+  if (act==="map-fs"){ mapFs(!MAPFS.on); return; }
+  if (act==="map-rot"){ mapRot(); return; }
   if (act==="ab-open"){ if (!cbOn()){ toast("Sign in to your cloud save first"); return; } openSheet({kind:"abuse", ch:a.dataset.ch, id:a.dataset.id, k:a.dataset.k||"", nm:a.dataset.nm||""}); return; }
   if (act==="ab-send"){ abuseSend(); return; }
   if (act==="moved-later"){ try { sessionStorage.setItem("ibory-moved", String(Date.now())); } catch(e){} closeSheet(); return; }
@@ -12469,18 +12779,19 @@ document.addEventListener("click",function(e){
     return; }
   if (act==="tabscroll"){ var nv=document.getElementById("tabs"); nv.scrollLeft += (+a.dataset.dir)*nv.clientWidth*0.7; setTimeout(updateTabArrows,350); return; }
   if (act==="city-go"){ // 0.2.1: from the map, stay put: same view, same tile picked, same scroll (so "Switch to X to build here" lands on the Establish button)
-    var cgStay=tab==="map", cgY=window.scrollY; closeSheet(); farmArmed=false; MAPFARM=-1; S.cur=+a.dataset.city; if (!cgStay){ mv.init=false; selTile=null; }
+    var cgStay=tab==="map", cgY=window.scrollY; closeSheet(); ARMYB=-1; FARMV=-1; farmArmed=false; MAPFARM=-1; S.cur=+a.dataset.city; if (!cgStay){ mv.init=false; selTile=null; }
     document.getElementById("cityname").textContent=S.name; lastView=""; refresh();
     if (cgStay){ window.scrollTo({top:cgY}); requestDraw(); } else window.scrollTo({top:0}); toast("Now viewing "+S.name); return; }
   if (act==="close"){ sheetBack(); return; }
   if (act==="settings"){ goPage("settings"); return; }
   if (act==="lb-open"){ var fresh=!S.lb; lbAutoJoin(); if (fresh && lbOn()) lbSync(true); goPage("lb"); setTimeout(function(){ lbFetch(); }, fresh&&lbOn()?1200:0); return; }
   if (act==="lb-refresh"){ lbFetch(); return; }
-  if (act==="wc-open"){ openSheet({kind:"wc", id:a.dataset.id}); return; }
+  if (act==="wc-open"){ wcSt().last=a.dataset.id; openSheet({kind:"wc", id:a.dataset.id}); return; }
+  if (act==="wc-tier"){ WCV=a.dataset.v||""; lastView=""; renderView(true); window.scrollTo({top:0}); return; }
   if (act==="wc-addwave"){ var wa=wcById(sheetFor&&sheetFor.id); if (!wa) return; var wd=wcDraftOf(wa); if (wd.waves.length<wa.waves) wd.waves.push({t:[0,0,0,0,0,0,0,0,0,0,0,0], hero:0}); lastSheet=""; renderSheet(); return; }
   if (act==="wc-clearwave"){ var wcr=wcById(sheetFor&&sheetFor.id); if (!wcr) return; var wcd=wcDraftOf(wcr), wcw=wcd.waves[+a.dataset.wave]; if (wcw) wcw.t=Z12(); lastSheet=""; renderSheet(); return; }
   if (act==="march-clear"){ marchDraft.t=Z12(); if (marchDraft.cargo) for (var ck in marchDraft.cargo) marchDraft.cargo[ck]=0; lastSheet=""; renderSheet(); return; }
-  if (act==="preset-clear"){ var pcl=S.presets[+a.dataset.p]; if (pcl){ pcl.t=Z12(); save(); } lastSheet=""; renderSheet(); return; }
+  if (act==="preset-clear"){ var pcl=presetsOf(a.dataset.m)[+a.dataset.p]; if (pcl){ pcl.t=Z12(); save(); } lastSheet=""; renderSheet(); return; }
   if (act==="rf-clear"){ RF.t={}; lastView=""; renderView(true); lastSheet=""; renderSheet(); return; }
   if (act==="wc-delwave"){ var wr=wcById(sheetFor&&sheetFor.id); if (!wr) return; var wd2=wcDraftOf(wr); if (wd2.waves.length>1) wd2.waves.splice(+a.dataset.wave,1); lastSheet=""; renderSheet(); return; }
   if (act==="wcd-run"){ var wdx=wcById(sheetFor&&sheetFor.id); if (!wdx) return; wcdRun(wdx); sheetBody.scrollTop=0; return; }
@@ -12584,6 +12895,9 @@ document.addEventListener("click",function(e){
   if (act==="dt-lv"){ if (a.dataset.v) DT.lv[a.dataset.p]=a.dataset.v; lastSheet=""; renderSheet(); return; }
   if (act==="dt-go"){ DT.mode="place"; DT.place=a.dataset.v; if (a.dataset.vv) DT.v[a.dataset.v]=a.dataset.vv; if (a.dataset.lv) DT.lv[a.dataset.v]=a.dataset.lv; DT.q=""; lastSheet=""; renderSheet(); var sb=document.getElementById("sheet"); if (sb) sb.scrollTop=0; return; }
   if (act==="ry-list"){ openSheet({kind:"rylist"}); return; }
+  if (act==="bully-go"){ closeSheet(); tab="alliance"; KGV="bully"; lastView=""; renderView(true); window.scrollTo({top:0}); return; }
+  if (act==="farm-page"){ FARMV=+a.dataset.p; farmArmed=false; lastView=""; renderView(true); window.scrollTo({top:0}); return; }
+  if (act==="kg-page"){ KGV=a.dataset.v||""; lastView=""; renderView(true); window.scrollTo({top:0}); return; }
   if (act==="ev-open"){ evBoardFetch(); openSheet({kind:"event"}); return; }
   if (act==="ry-fold"){ var fv=a.dataset.v==="1"; (a.dataset.keys||"").split(" ").forEach(function(k){ if (k) DET[k]=fv; }); lastView=""; renderView(true); return; }
   if (act==="ev-board"){ evBoardFetch(true); lastSheet=""; renderSheet(); return; }
@@ -12655,8 +12969,8 @@ document.addEventListener("click",function(e){
     if (act==="al-box-in"){ alBoxMove(1); return; }
     if (act==="al-box-out"){ alBoxMove(-1); return; }
     if (act==="al-box-undo"){ var bo=(S.alBoxOut||[]).filter(function(x){ return x.id===a.dataset.id; })[0]; if (!bo) return; for (var bk in bo.amt) S.alBox[bk]=(S.alBox[bk]||0)+bo.amt[bk]; S.alBoxOut=S.alBoxOut.filter(function(x){ return x!==bo; }); save(); toast("Put back in your box"); lastView=""; refresh(); return; }
-    if (act==="al-arena-go" && soloArOn()){ tab="alliance"; lastView=""; refresh(); setTimeout(function(){ var e=document.getElementById("soloar"); if (e) e.scrollIntoView({behavior:"smooth"}); },50); return; }
-    if (act==="al-arena-go"){ tab="guild"; ALS.sub="arena"; lastView=""; refresh(); ALS.last=0; alSync(); return; }
+    if (act==="al-arena-go" && soloArOn()){ closeSheet(); tab="alliance"; KGV="arena"; lastView=""; refresh(); window.scrollTo({top:0}); return; }
+    if (act==="al-arena-go"){ closeSheet(); tab="guild"; ALS.sub="rally"; lastView=""; refresh(); window.scrollTo({top:0}); ALS.last=0; alSync(); return; } // 0.2.4: monster fights are joined from Rallies (the Arena page only summons)
     if (act==="al-arena-send"){ var smid=+a.dataset.mid; if (!arById(smid)){ toast("The window has closed"); return; } openMarch(homeTileId(),"arena",smid); return; }
     if (act==="al-summon"){ var smt=a.dataset.type, sml=Math.max(1, +(ARL[smt]||0) || Math.min((alMine().econ.lv.arena||1), ((arMon().best[smt]||0)+1))); alDo("/al/summon",{type:smt, lv:sml},"Summoned! 5 minutes to march"); return; }
     if (act==="al-guard"){ var gd={}; RES.forEach(function(k){ gd[k]=Math.max(0,Math.floor(+(ARG&&ARG[k])||0)); }); alDo("/al/guard",{res:gd},"Saved",function(){ ARG=null; }); return; }
@@ -12775,6 +13089,11 @@ document.addEventListener("click",function(e){
     if (fb && realMs(fb.end-S.gt)<=FREE_MS){ fb.end=S.gt; if (fb.start>fb.end) fb.start=fb.end; if (advance(Date.now())) flushFinished(); refresh(); return; } }
   if (act==="speedup" && a.dataset.target==="research" && S.research && realMs(S.research.end-S.gt)<=FREE_MS){ S.research.end=S.gt; if (S.research.start>S.research.end) S.research.start=S.research.end; if (advance(Date.now())) flushFinished(); refresh(); return; }
   if (act==="speedup"){ openSheet({kind:"speedup",target:a.dataset.target,slot:+a.dataset.slot}); return; }
+  if (act==="bar-open"){ ARMYB=+a.dataset.slot; BQD.n=""; lastView=""; renderView(true); window.scrollTo({top:0}); return; }
+  if (act==="bar-hub"){ ARMYB=-1; lastView=""; renderView(true); return; }
+  if (act==="bq-max"){ BQD.n=String(maxTrain(BQD.u)); lastView=""; renderView(true); return; }
+  if (act==="bq-train"){ var bqn=Math.floor(+BQD.n||0), busy0=!!trainingAt(ARMYB); if (!trainOn(BQD.u,bqn,ARMYB)){ toast(trainOnWhy(BQD.u,bqn,ARMYB)||"Can\u2019t train that"); return; }
+    toast((busy0?"Queued ":"Training ")+fmt(bqn)+" "+uname(BQD.u,bqn)+" in "+barracksName(ARMYB)); BQD.n=""; save(); lastView=""; refresh(); return; }
   if (act==="train-max"){ var ui=+a.dataset.unit; trainAmt[ui]=maxTrain(ui); var inp=document.getElementById("tr-amt-"+ui); if (inp) inp.value=trainAmt[ui]; updateTrainRow(ui); return; }
   if (act==="train-by"){ var bu=+a.dataset.unit; trainAmt[bu]=+a.dataset.n||0; var bin=document.getElementById("tr-amt-"+bu); if (bin) bin.value=trainAmt[bu]; updateTrainRow(bu);
     var bb=document.getElementById(a.dataset.mode==="one"?"tr-btn-"+bu:"tr-"+a.dataset.mode+"-"+bu); if (bb && bb.focus) bb.focus(); return; }
@@ -13067,25 +13386,28 @@ document.addEventListener("click",function(e){
       p1.then(function(){ return window.caches ? caches.keys().then(function(ks){ return Promise.all(ks.map(function(k){ return caches.delete(k); })); }) : 0; })
         .then(function(){ return fetch(location.pathname, {cache:"reload"}); }).then(done, done); };
     try { go(); } catch(e){ done(); } return; }
-  if (act==="rep-open"){ var rid=+a.dataset.id, rc2=S.log.filter(function(x){ return x.id===rid; })[0], rr2=S.reports.filter(function(x){ return x.id===rid; })[0]; if (!rc2) return; openSheet({kind:"report", c:rc2, rep:rr2||null}); return; }
+  if (act==="rep-open"){ var rid=+a.dataset.id, rc2=S.log.filter(function(x){ return x.id===rid; })[0], rr2=S.reports.filter(function(x){ return x.id===rid; })[0]; if (!rc2) return; if (!rc2.rd){ rc2.rd=1; REPRD++; save(); setTimeout(function(){ fillRepList(); setTabs(); },0); } openSheet({kind:"report", c:rc2, rep:rr2||null}); return; }
   if (act==="rep-share"){ shareReport(); return; }
   if (act==="rep-share-copy"){ var su=document.getElementById("shareurl"); if (su){ su.select(); shareCopy(su.value); } return; }
   if (act==="rep-fav"){ if (!sheetFor || sheetFor.kind!=="report") return; var fc=sheetFor.c, on=!fc.fav;
     if (on) fc.fav=1; else delete fc.fav; if (sheetFor.rep){ if (on) sheetFor.rep.fav=1; else delete sheetFor.rep.fav; }
     toast(on?"Report saved. It won\u2019t roll off, and it\u2019s under \u2605 Saved.":"Report unsaved"); save(); lastSheet=""; renderSheet(); fillRepList(true); return; }
-  if (act==="rep-filter"){ repFilter=a.dataset.f; repPage=0; lastView=""; renderView(true); return; }
+  if (act==="rep-cat"){ if (a.dataset.go){ tab="reports"; setTabs(); } REPV=a.dataset.v||""; REPF="all"; repPage=0; repQuery=""; lastView=""; renderView(true); window.scrollTo({top:0}); return; }
+  if (act==="rep-sub"){ REPF=a.dataset.v; repPage=0; lastView=""; renderView(true); return; }
+  if (act==="rep-fx"){ var fk=a.dataset.k; if (REPX[fk]) delete REPX[fk]; else REPX[fk]=1; fillRepList(); return; }
+  if (act==="rep-readall"){ var rcat=REPV||"all"; S.log.forEach(function(c){ if (repNew(c) && repInCat(c,rcat)) c.rd=1; }); REPRD++; save(); fillRepList(true); setTabs(); return; }
   if (act==="rep-page"){ repPage=Math.max(0,repPage+(+a.dataset.d)); fillRepList(); window.scrollTo({top:0}); return; }
   if (act==="arrange"){ arrange = (arrange && arrange.w===a.dataset.aw) ? null : {w:a.dataset.aw, sel:null}; lastView=""; renderView(true); return; }
-  if (act==="preset-edit"){ openSheet({kind:"preset",p:+a.dataset.p}); return; }
-  if (act==="preset-copy"){ var cpp=S.presets[+a.dataset.p]; if (!cpp || !presetTotal(cpp)) return; presetClip={name:cpp.name, t:cpp.t.slice(), hero:cpp.hero, stopOnLoss:cpp.stopOnLoss, noCap:!!cpp.noCap}; toast("Copied "+cpp.name+"; Paste it onto another preset"); lastView=""; refresh(); return; }
-  if (act==="preset-paste"){ var ppp=S.presets[+a.dataset.p]; if (!ppp || !presetClip) return;
-    ppp.t=presetClip.t.slice(); ppp.stopOnLoss=presetClip.stopOnLoss; ppp.noCap=presetClip.noCap; ppp.hero=(presetClip.hero>0 && !C().heroes.some(function(x){ return x.id===presetClip.hero; })) ? 0 : presetClip.hero;
+  if (act==="preset-edit"){ openSheet({kind:"preset",p:+a.dataset.p,m:a.dataset.m?1:0}); return; }
+  if (act==="preset-copy"){ var cpp=presetsOf(a.dataset.m)[+a.dataset.p]; if (!cpp || !presetTotal(cpp)) return; presetClip={name:cpp.name, t:cpp.t.slice(), hero:cpp.hero, stopOnLoss:cpp.stopOnLoss, noCap:!!cpp.noCap, m:!!a.dataset.m}; toast("Copied "+cpp.name+"; Paste it onto another preset"); lastView=""; refresh(); return; }
+  if (act==="preset-paste"){ var ppp=presetsOf(a.dataset.m)[+a.dataset.p]; if (!ppp || !presetClip) return;
+    ppp.t=presetClip.t.slice(); if (!a.dataset.m && !presetClip.m){ ppp.stopOnLoss=presetClip.stopOnLoss; ppp.noCap=presetClip.noCap; } // farm settings only travel farm to farm ppp.hero=(presetClip.hero>0 && !C().heroes.some(function(x){ return x.id===presetClip.hero; })) ? 0 : presetClip.hero;
     toast("Pasted "+presetClip.name+" onto "+ppp.name); save(); lastView=""; refresh(); return; }
   if (act==="preset-auto"){ var pa=S.presets[+a.dataset.p]; pa.auto=!pa.auto; toast(pa.name+(pa.auto?" is auto-farming":" stopped")); processAuto(); refresh(); return; }
   if (act==="farm-toggle"){ var fp=S.presets[+a.dataset.p], ft=a.dataset.tile, fi=fp.farm.indexOf(ft);
     if (fi>=0){ fp.farm.splice(fi,1); toast("Removed from "+fp.name); } else { fp.farm.push(ft); toast("Added to "+fp.name+"\u2019s farm list ("+fp.farm.length+")"); }
     renderTileInfo(); mapFarmRefresh(); save(); return; }
-  if (act==="farm-remove"){ var fr=S.presets[+a.dataset.p]; fr.farm.splice(+a.dataset.k,1); if (fr.idx>=fr.farm.length) fr.idx=0; lastSheet=""; renderSheet(); mapFarmRefresh(); save(); return; }
+  if (act==="farm-remove"){ var fr=S.presets[+a.dataset.p]; fr.farm.splice(+a.dataset.k,1); if (fr.idx>=fr.farm.length) fr.idx=0; lastSheet=""; renderSheet(); if (tab==="farms"){ lastView=""; renderView(true); } mapFarmRefresh(); save(); return; }
   if (act==="farm-mode"){ var fmp=+a.dataset.p, fpr=S.presets[fmp], fmm=a.dataset.m; farmArmed=false;
     if (fmm==="off"){ fpr.farmMode=null; delete farmMsg[C().id+":"+fmp]; }
     else { fpr.farmMode=fmm; farmRebuild([fmp]); var fmsg=farmMsg[C().id+":"+fmp]; if (fmsg) toast(fpr.name+": "+fmsg.t); }
@@ -13097,7 +13419,7 @@ document.addEventListener("click",function(e){
   if (act==="farm-clear-all"){ if (!farmArmed){ farmArmed=true; lastView=""; renderView(true); return; }
     farmArmed=false; S.presets.forEach(function(pr,pi){ pr.farm=[]; pr.idx=0; pr.auto=false; delete farmMsg[C().id+":"+pi]; }); toast("Every farm list in "+S.name+" is cleared"); lastView=""; refresh(); return; }
   if (act==="farm-clear"){ var fc2=S.presets[+a.dataset.p]; fc2.farm=[]; fc2.idx=0; fc2.auto=false; lastSheet=""; renderSheet(); save(); return; }
-  if (act==="march-preset"){ var mp=S.presets[+a.dataset.p], mav=draftAvail(); marchDraft.t=mp.t.map(function(n,i){ return Math.min(n,mav[i]); });
+  if (act==="march-preset"){ var mp=presetsOf(a.dataset.m)[+a.dataset.p], mav=draftAvail(); marchDraft.t=mp.t.map(function(n,i){ return Math.min(n,mav[i]); });
     var mh=presetHero(mp); marchDraft.hero = marchDraft.from ? marchDraft.hero : (mh && !mh.away && !seatLocked(mh) ? mh.id : 0); marchDraft.preview=""; lastSheet=""; renderSheet(); return; }
   if (act==="waves-mode"){ waveDraft.mode=a.dataset.v; lastSheet=""; renderSheet(); return; }
   if (act==="waves-fill"){ var wpl=wavePlan(), ws=document.getElementById("wstart"), we=document.getElementById("wevery"); waveDraft.start=ws?ws.value:waveDraft.start; waveDraft.every=Math.max(0,Math.floor(+(we?we.value:waveDraft.every)||0));
@@ -13146,7 +13468,7 @@ document.addEventListener("click",function(e){
       onTick:function(pc){ loUi(true, pc); },
       onDone:function(res){ sim.atk.t=res.best.t.slice(); loRes=res; simShow="lo"; if (tab==="war"){ lastView=""; renderView(true); } loUi(false); toast("Layers optimized"); } });
     return; }
-  if (act==="sim-opt-save"){ var lp=document.getElementById("lopre"), li=lp?+lp.value:0, pr=S.presets[li]; if (!pr || !loRes) return; pr.t=loRes.best.t.slice(); save(); toast("Saved to "+pr.name); return; }
+  if (act==="sim-opt-save"){ var lp=document.getElementById("lopre"), lv0=lp?String(lp.value):"m0", pr=presetsOf(lv0.charAt(0)==="m")[+lv0.slice(1)||0]; if (!pr || !loRes) return; pr.t=loRes.best.t.slice(); save(); toast("Saved to "+pr.name); return; }
   if (act==="bf-opt"){
     if (LO){ loStop(); bfSimTxt="Stopped."; lastSheet=""; renderSheet(); return; }
     if (!bfOn() || !sheetFor || sheetFor.kind!=="bfsend" || sheetFor.b<0) return;
@@ -13217,6 +13539,11 @@ document.addEventListener("click",function(e){
   if (act==="office"||act==="mayor"){ var role=a.dataset.role||"mayor", oh=heroById(sheetFor.id); if (!oh) return; if (oh.away){ toast("That hero is away on a march"); return; }
     OFFICES.forEach(function(o){ if (S[o[0]]===oh.id) S[o[0]]=null; }); var prev=officer(role); if (prev) prev.autoSeat=false; S[role]=oh.id; oh.autoSeat=false; // a hand pick is locked
     var ofl=OFFICES.filter(function(o){ return o[0]===role; })[0]; toast(oh.name+" is now "+(ofl?ofl[1].toLowerCase():role)+(role!=="wallHero"?" (a seat you pick is locked: no marches, and auto-fill leaves it alone)":"")); save(); lastSheet=""; refresh(); return; }
+  if (act==="off-open"){ openSheet({kind:"offpick", role:a.dataset.role}); return; }
+  if (act==="off-set"){ var orl=a.dataset.role, ohh=heroById(+a.dataset.id); if (!ohh) return; if (ohh.away){ toast("That hero is away on a march"); return; }
+    OFFICES.forEach(function(o){ if (S[o[0]]===ohh.id) S[o[0]]=null; }); var oprev=officer(orl); if (oprev) oprev.autoSeat=false; S[orl]=ohh.id; ohh.autoSeat=false;
+    var ofx=OFFICES.filter(function(o){ return o[0]===orl; })[0]; toast(ohh.name+" is now "+(ofx?ofx[1].toLowerCase():orl)); autoOffices(); save(); lastSheet=""; refresh(); return; }
+  if (act==="off-clear"){ var orc=a.dataset.role, och=seatHolder(orc); S[orc]=null; if (och) och.autoSeat=false; autoOffices(); save(); lastSheet=""; refresh(); return; }
   if (act==="unoffice"||act==="unmayor"){ OFFICES.forEach(function(o){ if (S[o[0]]===sheetFor.id) S[o[0]]=null; }); var uh=heroById(sheetFor.id); if (uh) uh.autoSeat=false; autoOffices(); save(); lastSheet=""; refresh(); return; }
   if (act==="tome"){
     var bkk=a.dataset.book||"tome", th=heroById(sheetFor.id); if (!th || !(S.items[bkk]>0)) return;
@@ -13274,6 +13601,7 @@ document.addEventListener("click",function(e){
   }
 });
 document.addEventListener("input",function(e){ markDirty();
+  if (e.target.id==="bqamt"){ BQD.n=e.target.value; bqRefresh(); return; }
   if (e.target.dataset && e.target.dataset.hms){ hmsPick(e.target); return; }
   if (invInput(e)) return;
   if (e.target.id && /^aw-[gaw]\d+$/.test(e.target.id)){ awChange(e); return; }
@@ -13295,8 +13623,8 @@ document.addEventListener("input",function(e){ markDirty();
   if (e.target.id==="rytime"){ RYS.time=e.target.value.trim(); }
   if (e.target.id==="tr-by"){ trainBy=e.target.value.trim(); var L=trainByGt(); setText(document.getElementById("tr-bywhen"), L!=null?"Target "+trClock(L):(trainBy?"Pick a time":"Off")); U.forEach(function(u,i){ updateTrainRow(i); }); }
   if (e.target.dataset.unit!=null && e.target.tagName==="INPUT"){ var iu=+e.target.dataset.unit; trainAmt[iu]=Math.max(0,Math.floor(+e.target.value||0)); updateTrainRow(iu); }
-  if (e.target.dataset.ptroop!=null){ S.presets[sheetFor.p].t[+e.target.dataset.ptroop]=Math.max(0,Math.floor(+e.target.value||0)); save(); }
-  if (e.target.dataset.pfield==="name"){ S.presets[sheetFor.p].name=e.target.value.trim()||("Preset "+(sheetFor.p+1)); save(); }
+  if (e.target.dataset.ptroop!=null){ sheetPreset().t[+e.target.dataset.ptroop]=Math.max(0,Math.floor(+e.target.value||0)); save(); }
+  if (e.target.dataset.pfield==="name"){ sheetPreset().name=e.target.value.trim()||((sheetFor.m?"March ":"Preset ")+(sheetFor.p+1)); save(); }
   if (e.target.dataset.wave!=null){ waveDraft.n[+e.target.dataset.wave]=Math.max(0,Math.min(10,Math.floor(+e.target.value||0))); if (waveDraft.mode==="clock"){ var wvt=document.getElementById("wvtimes"); if (wvt){ wvt.innerHTML=wavesTimesHtml(wavePlan(true)); lastSheet=wavesSheet(); } } updateWaveInfo(); }
   if (e.target.dataset.wtime!=null && waveDraft){ waveDraft.times[+e.target.dataset.wtime]=e.target.value; updateWaveInfo(); }
   if ((e.target.id==="wstart" || e.target.id==="wevery") && waveDraft){ if (e.target.id==="wstart") waveDraft.start=e.target.value; else waveDraft.every=Math.max(0,Math.floor(+e.target.value||0)); }
@@ -13333,6 +13661,8 @@ document.addEventListener("input",function(e){ markDirty();
 });
 document.addEventListener("keydown",function(e){ if (e.key==="Enter" && e.target && e.target.id==="gifq"){ e.preventDefault(); GIFS.q=e.target.value.trim(); e.target.blur(); gifLoad(false); return; } if (e.key==="Enter" && e.target && e.target.id==="rxin"){ e.preventDefault(); var rb=document.querySelector('.rxbar [data-act="rx-any"]'); if (rb) rb.click(); return; } if (e.key==="Enter" && e.target && e.target.id==="alchatin"){ e.preventDefault(); alSend(); } if (e.key==="Enter" && e.target && e.target.id==="dockin"){ e.preventDefault(); if (dockCh==="world") wcSend(); else if (dockCh==="dm") dmSend(); else alSend("dockin"); } if (e.key==="Enter" && e.target && e.target.id==="dmto"){ e.preventDefault(); var dmb=document.querySelector('[data-act="dm-new"]'); if (dmb) dmb.click(); } });
 document.addEventListener("change",function(e){ markDirty();
+  if (e.target.id==="bqunit"){ BQD.u=+e.target.value; e.target.blur(); lastView=""; renderView(true); return; }
+  if (e.target.id==="bqamt"){ BQD.n=e.target.value; bqRefresh(); return; }
   if (e.target.id==="mapfarm"){ MAPFARM=+e.target.value; e.target.blur(); mapFarmRefresh(); if (MAPFARM>=0) mapFarmFit(); return; } // 0.1.243
   if (e.target.id==="bmjump"){ var bj=e.target.value; e.target.value=""; e.target.blur(); if (bj) mapGo(bj); return; }
   if (e.target.id==="ryfrom"){ RYS.from=+e.target.value; e.target.blur(); lastSheet=""; renderSheet(); return; }
@@ -13373,7 +13703,7 @@ document.addEventListener("change",function(e){ markDirty();
   if (e.target.id==="autofort"){ S.autoFort=e.target.checked; save(); processQueues(); lastView=""; refresh(); }
   if (e.target.id==="automayor"){ S.autoMayor=e.target.checked; autoOffices(); save(); lastView=""; refresh(); }
   if (e.target.dataset.farmlvl!=null){ var flp=+e.target.dataset.farmlvl, flr=S.presets[flp]; flr.farmLevel=+e.target.value||null; if (flr.farmMode){ farmRebuild([flp]); var flm=farmMsg[C().id+":"+flp]; if (flm) toast(flr.name+": "+flm.t); } lastView=""; refresh(); return; }
-  if (e.target.id==="phero"){ S.presets[sheetFor.p].hero=+e.target.value; save(); }
+  if (e.target.id==="phero"){ sheetPreset().hero=+e.target.value; save(); }
   if (e.target.id==="pstop"){ S.presets[sheetFor.p].stopOnLoss=e.target.checked; save(); }
   if (e.target.id==="pnocap"){ S.presets[sheetFor.p].noCap=e.target.checked; save(); }
   if (e.target.id==="pfull"){ S.presets[sheetFor.p].fullOnly=e.target.checked; save(); }
@@ -13432,6 +13762,7 @@ function capFixToast(){ if (!S.capFixed || !S.capFixed.length) return; var cf=S.
   toast("Conquered cities fixed: "+cf.map(function(x){ return x.name+" got "+x.n+" building"+(x.n>1?"s":"")+" at level "+x.L; }).join("; ")+"."); }
 setTimeout(capFixToast, 1500);
 setTimeout(movedMaybe, 2500);
+if (S.repSeen0==null){ S.repSeen0=S.gt; save(); } // 0.2.4: reports from before the Reports hub count as read
 // 0.2.2: heroes owed by historic cities captured before 0.1.250
 (function(){ var got=[]; try { got=hcHeroCatchUp(); } catch(e){ got=[]; } if (!got.length) return; save(); renderView(true);
   var first=S.cities[0]&&S.cities[0].name||"your first city";
