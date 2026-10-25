@@ -838,7 +838,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script>
 (function(){
 "use strict";
-var APP_VERSION = "0.2.1";
+var APP_VERSION = "0.2.2";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -2997,6 +2997,14 @@ function hcHeroDue(q){ if (!S.map.hhTaken) S.map.hhTaken={}; if (S.map.hhTaken[q
   if (q.L===12){ if (S.map.heroTaken && S.map.heroTaken[q.id]) return null; // gave its hero under the old random drop
     var left=HISTORIC.filter(function(n){ return !hhOwned(n); }); return left.length ? {pool:left} : null; }
   return HC_CITY_HERO[q.name] ? {fixed:HC_CITY_HERO[q.name]} : null; }
+// 0.2.2: historic cities you already held when 0.1.250 came in never break loyalty again, so their hero never arrived. Each one you still hold
+// gives it now, once (the same rule as breaking its loyalty: a level 12 one you didn't already get under the old drop gives one of the 40, a 14/16/18 its own).
+// The hero goes to your first city (it has the Feasting Hall); a full hall puts it at the gate. Returns [[hero name, city name], ...].
+function hcHeroCatchUp(){ var out=[]; if (!S.map) return out; if (!S.map.hhTaken) S.map.hhTaken={};
+  S.cities.forEach(function(c){ if (!c || !c.fieldCap) return; var id=c.x+","+c.y, hc=HC_AT[id]; if (!hc || S.map.hhTaken[id]) return;
+    var q={id:id, x:c.x, y:c.y, k:"hc", L:hc.L, name:hc.name}, h=withCity(0, function(){ return hcHeroGive(q); });
+    if (h) out.push([h.name, c.name]); else S.map.hhTaken[id]=true; }); // nothing due (all 40 owned, or the old drop already paid): don't look again
+  return out; }
 function hcHeroPreview(q){ var d=hcHeroDue(q); return !d ? "" : d.fixed ? d.fixed.name : "a historic hero"; }
 function hcHeroGive(q){ var d=hcHeroDue(q); if (!d) return null; var h;
   if (d.fixed){ var f=d.fixed; h={id:S.nextHeroId++, name:f.name, tier:f.tier||"historic", level:1, xp:0, pol:f.pol, atk:f.atk, int:f.int, pts:0, base:{pol:f.pol, atk:f.atk, int:f.int}, fixedName:true}; }
@@ -13336,6 +13344,12 @@ function capFixToast(){ if (!S.capFixed || !S.capFixed.length) return; var cf=S.
   toast("Conquered cities fixed: "+cf.map(function(x){ return x.name+" got "+x.n+" building"+(x.n>1?"s":"")+" at level "+x.L; }).join("; ")+"."); }
 setTimeout(capFixToast, 1500);
 setTimeout(movedMaybe, 2500);
+// 0.2.2: heroes owed by historic cities captured before 0.1.250
+(function(){ var got=[]; try { got=hcHeroCatchUp(); } catch(e){ got=[]; } if (!got.length) return; save(); renderView(true);
+  var first=S.cities[0]&&S.cities[0].name||"your first city";
+  got.forEach(function(g){ note("heroes", g[0]+" joins you from "+g[1]+"!"); }); flushFinished();
+  setTimeout(function(){ openSheet({kind:"msg", title:got.length>1?"Historic heroes join you":got[0][0]+" joins you",
+    body:got.map(function(g){ return g[0]+" (from "+g[1]+")"; }).join(", ")+(got.length>1?" have":" has")+" joined you at "+first+". "+(got.length>1?"These cities were":"This city was")+" taken before historic cities started giving their heroes, so "+(got.length>1?"their heroes are":"its hero is")+" here now. If the Feasting Hall is full, look at the gate."}); }, 1200); })();
 // 0.2.1: games that never named their map kept the old default alliance name; it follows the new map name
 if (!S.realm){ try { var al0=AL(); if (al0 && al0.name==="North March Pact"){ al0.name=realmName()+" Pact"; save(); } } catch(e){} }
 
