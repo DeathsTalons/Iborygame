@@ -1,11 +1,14 @@
 [
   {
-    "relation": ["delegate_permission/common.handle_all_urls"],
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
     "target": {
       "namespace": "android_app",
       "package_name": "com.iborygame.app",
       "sha256_cert_fingerprints": [
-        "3F:8D:4C:26:6B:98:9A:88:B9:16:82:B3:56:62:F5:BC:9D:99:AE:07:AE:7E:D8:24:A5:0C:E4:71:ED:D1:23:4B"
+        "3F:8D:4C:26:6B:98:9A:88:B9:16:82:B3:56:62:F5:BC:9D:99:AE:07:AE:7E:D8:24:A5:0C:E4:71:ED:D1:23:4B",
+        "9F:71:72:0E:BA:34:BC:CA:6E:34:DF:17:61:E9:07:26:7B:6E:C7:67:B3:87:B6:EB:E3:EA:8B:58:B6:98:06:E8"
       ]
     }
   }
