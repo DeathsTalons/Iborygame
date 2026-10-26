@@ -19,6 +19,9 @@
   .top .stat b{color:var(--text);font-weight:600}
   .top .stat.hot b{color:var(--bad)}
   .top .stat.blue b{color:var(--blue)}
+  .top .also{color:var(--muted);font-size:12px;margin-right:4px}
+  .top .also a{color:var(--accent);text-decoration:none;border-bottom:1px solid transparent}
+  .top .also a:hover{border-bottom-color:var(--accent)}
   h2.sec{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line);padding-bottom:5px}
   h2.sec .grow{flex:1}
   .n{display:inline-block;min-width:18px;padding:0 6px;border-radius:9px;background:var(--bad);color:#fff;font-size:11px;text-transform:none;letter-spacing:0;text-align:center;line-height:16px}
@@ -161,6 +164,7 @@
 <body>
 <div class="top">
   <h1>DOMINION DADDY</h1>
+  <span class="also">try also: <a href="https://atlas.iborygame.com" target="_blank" rel="noopener">DoA Atlas</a> · <a href="https://iborygame.com">Ibory</a></span>
   <span class="stat" id="stAttn" title="Alarms due, builds finished, barracks empty"><b>0</b> need you</span>
   <span class="stat blue" id="stAway" title="Marches out"><b>0</b> out</span>
   <span class="stat" id="stReady" title="Barb tiles ready to hit"><b>0</b> ready</span>
