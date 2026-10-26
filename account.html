@@ -17,6 +17,14 @@
   <nav aria-label="Main">
     <a href="/play/">Play</a>
     <a href="https://discord.gg/H8gErENmWe" rel="noopener">Discord</a>
+    <details class="more">
+      <summary>Other games</summary>
+      <div class="menu">
+        <span class="mhead">Tools for other games</span>
+        <a href="https://atlas.iborygame.com/" rel="noopener">Dominion Atlas<small>Alliance map for Dominion of Ages</small></a>
+        <a href="/dominion-daddy.html">Dominion Daddy<small>A Dominion of Ages tool</small></a>
+      </div>
+    </details>
     <a class="wide" href="/account.html" aria-current="page">Account</a>
   </nav>
 </header>
@@ -83,6 +91,13 @@ f.addEventListener("submit", function(e){
     })
     .catch(function(){ go.disabled = false; say("Couldn't reach the server. Check your connection and try again.", "bad"); });
 });
+</script>
+<script>
+// the Other games menu closes when you tap anywhere else, or press Escape
+(function(){ var d=document.querySelector(".bar details.more"); if (!d) return;
+  document.addEventListener("click", function(e){ if (d.open && !d.contains(e.target)) d.open=false; });
+  document.addEventListener("keydown", function(e){ if (e.key==="Escape" && d.open){ d.open=false; d.querySelector("summary").focus(); } });
+})();
 </script>
 </body>
 </html>
