@@ -1,0 +1,1473 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dominion Daddy</title>
+<style>
+  :root{
+    --bg:#121417; --panel:#1b1e24; --panel2:#23272f; --panel3:#2b303a; --line:#323744; --t:28px;
+    --text:#e6e8ec; --muted:#8b92a1; --accent:#e0a93b; --blue:#4aa3ff;
+    --good:#3fb97a; --bad:#e5534b; --warn:#e0a93b; --purple:#b57aff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);font:13px/1.35 system-ui,Segoe UI,Roboto,sans-serif}
+  body{padding:10px 12px 24px;min-width:300px}
+  h1{font-size:14px;margin:0;letter-spacing:.06em;color:var(--accent)}
+  .top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:8px}
+  .top .stat{display:inline-flex;align-items:center;gap:5px;color:var(--muted);font-size:12px}
+  .top .stat b{color:var(--text);font-weight:600}
+  .top .stat.hot b{color:var(--bad)}
+  .top .stat.blue b{color:var(--blue)}
+  h2.sec{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line);padding-bottom:5px}
+  h2.sec .grow{flex:1}
+  .n{display:inline-block;min-width:18px;padding:0 6px;border-radius:9px;background:var(--bad);color:#fff;font-size:11px;text-transform:none;letter-spacing:0;text-align:center;line-height:16px}
+  .n.good{background:var(--good);color:#06180f}
+  .n.zero{background:var(--panel2);color:var(--muted)}
+  .hidden{display:none !important}
+  body.manual .auto-only{display:none}
+  .muted{color:var(--muted);font-size:12px}
+  .hint{color:var(--muted);font-size:12px;margin:8px 0 0}
+  code{background:var(--panel2);padding:0 4px;border-radius:3px;font-size:12px}
+  .row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .row + .row{margin-top:6px}
+  .grow{flex:1;min-width:0}
+  input,select{background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:5px;padding:5px 7px;font:inherit;min-width:0;height:28px}
+  input:focus,select:focus{outline:1px solid var(--accent);outline-offset:-1px}
+  input.xs{width:54px} input.sm{width:68px} input.md{width:90px}
+  input[type=number]{padding-right:2px}
+  input[type=checkbox]{height:auto;accent-color:var(--accent)}
+  button{background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:5px;padding:4px 10px;cursor:pointer;font:inherit;height:28px;white-space:nowrap}
+  button.s{height:24px;padding:0 8px;font-size:12px}
+  button:hover{border-color:var(--accent)}
+  button:disabled{opacity:.45;cursor:default}
+  button:disabled:hover{border-color:var(--line)}
+  button.pri{background:var(--accent);color:#1a1303;border-color:var(--accent);font-weight:600}
+  button.on{border-color:var(--accent);color:var(--accent)}
+  button.x{color:var(--muted);padding:0;width:24px;height:24px;line-height:1;font-size:13px}
+  button.x:hover{color:var(--bad);border-color:var(--bad)}
+  button.ic{color:var(--muted);padding:0;width:24px;height:24px;line-height:1;font-size:12px}
+  .grab{cursor:grab;color:var(--muted);user-select:none;padding:0 2px;font-size:14px;line-height:1}
+  .grab:hover{color:var(--accent)}
+  .dragging{opacity:.4}
+  .dropat{outline:2px dashed var(--accent);outline-offset:2px}
+  .chk{display:inline-flex;align-items:center;gap:5px;color:var(--muted);font-size:12px;cursor:pointer;white-space:nowrap}
+  .chk input{margin:0}
+
+  /* marches strip */
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--blue);border-radius:16px;padding:3px 4px 3px 10px;font-variant-numeric:tabular-nums}
+  .chip.back{animation:flb 1s steps(2) infinite;border-color:var(--good)}
+  .chip b{color:var(--accent);font-weight:600}
+  .chip .t{font-weight:600;min-width:46px;text-align:right}
+
+  /* city cards */
+  #cities{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;align-items:start}
+  .card{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:7px;padding:8px 9px 9px;display:flex;flex-direction:column;gap:7px}
+  .card.run{border-left-color:var(--good)}
+  .card.due{border-left-color:var(--bad)}
+  .card.here{box-shadow:0 0 0 1px var(--accent)}
+  .card .hd{display:flex;align-items:center;gap:6px;min-height:24px}
+  .card .hd .name{font-weight:600;cursor:pointer;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .card .hd .xy{color:var(--muted);font-size:11px;white-space:nowrap}
+  .card .hd .tools{display:flex;gap:2px;margin-left:auto}
+  .card .hd .here-tag{font-size:10px;color:var(--accent);border:1px solid var(--accent);border-radius:9px;padding:0 6px;line-height:15px;white-space:nowrap}
+  .sec-h{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:2px 0 0}
+  .sec-h .free{color:var(--warn);text-transform:none;letter-spacing:0;font-size:11px}
+  .sec-h .ok{color:var(--good);text-transform:none;letter-spacing:0;font-size:11px}
+  .sec-h .cnt{text-transform:none;letter-spacing:0}
+  .rows{display:flex;flex-direction:column;gap:3px}
+  .r{display:grid;grid-template-columns:18px 1fr auto 24px;align-items:center;gap:6px;font-size:12px;background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:2px 3px 2px 7px;font-variant-numeric:tabular-nums;min-height:26px}
+  .r .ico{text-align:center;font-size:12px}
+  .r .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .r .nm b{color:var(--accent)}
+  .r .tm{font-weight:600;white-space:nowrap}
+  .r.done{border-color:var(--good);animation:flb 1s steps(2) infinite}
+  .r.done .tm{color:var(--good)}
+  .r.empty{background:transparent;border-style:dashed;color:var(--muted)}
+  details.more{margin:0}
+  details.more summary{cursor:pointer;font-size:12px;color:var(--muted);padding:2px 0 2px 7px;list-style:none;display:flex;align-items:center;gap:6px}
+  details.more summary::before{content:'▸';font-size:10px}
+  details.more[open] summary::before{content:'▾'}
+  details.more .rows{margin-top:3px}
+  .addrow{display:grid;grid-template-columns:1fr 84px auto;gap:5px}
+  .addrow input,.addrow button{height:26px;font-size:12px}
+  .card .ft{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px;margin-top:auto;padding-top:2px}
+  .card .ft .pill{background:var(--panel2);border-radius:9px;padding:0 7px;line-height:17px;font-size:11px}
+  .card .ft .pill.good{color:var(--good)}
+
+  /* barb fields */
+  #barbList{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-start}
+  .cblock{flex:0 0 auto;border:1px solid transparent;border-radius:7px;padding:5px}
+  .cblock.here{border-color:var(--line);box-shadow:0 0 0 1px var(--accent)}
+  .city{margin:0 0 5px;display:flex;align-items:center;gap:6px;padding-bottom:4px;border-bottom:1px solid var(--line);min-width:150px}
+  .city .name{color:var(--accent);font-size:12px;font-weight:600;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .city .badge{font-size:11px;padding:0 7px;border-radius:9px;background:var(--panel2);color:var(--muted);line-height:17px}
+  .city .badge.good{background:var(--good);color:#06180f}
+  .edit{background:var(--panel);border:1px solid var(--accent);border-radius:7px;padding:8px;margin-bottom:6px;max-width:270px}
+  .edit .lbl{color:var(--muted);font-size:12px;min-width:48px}
+  .grid{display:grid;gap:2px;margin-bottom:4px;width:max-content}
+  .tile{aspect-ratio:1;border:1px solid var(--line);border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+        user-select:none;cursor:pointer;line-height:1.1;overflow:hidden;font-variant-numeric:tabular-nums}
+  .tile b{font-size:calc(var(--t)*.4)}
+  .tile i{font-style:normal;font-size:calc(var(--t)*.27);color:var(--muted)}
+  .coords-on .tile b{font-size:calc(var(--t)*.34)}
+  .coords-on .tile i{font-size:calc(var(--t)*.22)}
+  .tile.empty{border-style:dashed;opacity:.45;cursor:default}
+  .coords-on .tile.empty{opacity:.7}
+  .grid.editing .tile.empty{opacity:.8;cursor:pointer}
+  .tile.info{background:var(--panel2);cursor:default}
+  .tile.ready{background:rgba(63,185,122,.22);border-color:var(--good)}
+  .tile.ready i{color:var(--good)}
+  .tile.cool{background:rgba(224,169,59,.16);border-color:var(--warn)}
+  .tile.cool i{color:var(--warn)}
+  .tile.center{border-color:var(--accent);color:var(--accent);cursor:default;background:var(--panel2);font-size:15px}
+  .tile:hover:not(.center):not(.empty):not(.info){filter:brightness(1.25)}
+  .tiny:not(.coords-on) .tile i{display:none}
+  .tile.away{box-shadow:inset 0 0 0 2px var(--blue)}
+  .tile.away i{color:var(--blue)}
+  .tile.back{box-shadow:inset 0 0 0 2px var(--blue);animation:flb 1s steps(2) infinite}
+  .tile.back i{color:var(--blue)}
+  @keyframes flb{50%{background:rgba(74,163,255,.35)}}
+
+  /* reader + settings panels */
+  details.panel{margin-top:14px;border:1px solid var(--line);border-radius:7px;background:var(--panel)}
+  details.panel > summary{cursor:pointer;padding:8px 10px;display:flex;align-items:center;gap:10px;list-style:none;font-weight:600}
+  details.panel > summary::before{content:'▸';color:var(--muted);font-size:11px}
+  details.panel[open] > summary::before{content:'▾'}
+  details.panel > summary .st{font-weight:400;color:var(--muted);font-size:12px}
+  details.panel > summary .st.live{color:var(--good)}
+  details.panel .body{padding:0 10px 10px;border-top:1px solid var(--line)}
+  .step{margin-top:10px}
+  .step .t{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .boxes{display:grid;grid-template-columns:auto 1fr auto auto;gap:4px 10px;align-items:center}
+  .boxes .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .boxes .bn{font-weight:600}
+  .boxes .bd{color:var(--muted);font-size:12px}
+  .boxes .bs{font-size:12px;color:var(--muted);white-space:nowrap}
+  .boxes .bs.ok{color:var(--good)}
+  .boxes .bs.on{color:var(--accent)}
+  .boxes .bb{display:flex;gap:4px}
+  #scrCanvas{width:100%;max-width:720px;border:1px solid var(--line);border-radius:6px;cursor:crosshair;display:block;background:#000}
+  #scrPlaceholder{max-width:720px;border:1px dashed var(--line);border-radius:6px;padding:28px 12px;text-align:center;color:var(--muted);font-size:12px}
+  #scrCrop{max-width:100%;border:1px solid var(--line);border-radius:6px;display:block;margin-top:6px;background:#fff}
+  pre.out{background:var(--panel2);padding:7px 9px;border-radius:6px;font:11px/1.45 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;max-height:260px;overflow:auto;margin:6px 0 0}
+  #slotMap select{height:26px;font-size:12px;padding:2px 4px}
+  .set .row + .row{margin-top:8px}
+  .set label.f{display:inline-flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}
+  textarea{width:100%;height:70px;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:5px;font:11px ui-monospace,Menlo,Consolas,monospace;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>DOMINION DADDY</h1>
+  <span class="stat" id="stAttn" title="Alarms due, builds finished, barracks empty"><b>0</b> need you</span>
+  <span class="stat blue" id="stAway" title="Marches out"><b>0</b> out</span>
+  <span class="stat" id="stReady" title="Barb tiles ready to hit"><b>0</b> ready</span>
+  <span class="stat" id="stReader"><b>off</b> reader</span>
+</div>
+
+<section id="paneM" class="hidden">
+  <h2 class="sec">Marches out <span class="n zero" id="nAway">0</span></h2>
+  <div class="chips" id="marches"></div>
+</section>
+
+<section id="paneB">
+  <h2 class="sec">Cities <span class="n zero" id="nAttn" title="Alarms due, builds finished, barracks empty">0</span><span class="grow"></span><button class="s" id="addCity">+ City</button></h2>
+  <div id="cities"></div>
+  <div id="start" class="hidden" style="background:var(--panel);border:1px dashed var(--line);border-radius:7px;padding:12px 14px;max-width:720px">
+    <b>Quick start</b>
+    <p class="muted" id="startNote" style="margin:6px 0 0">Dominion Daddy watches the game through screen sharing, so it's built for a <b>PC browser</b> (Chrome, Edge or Firefox) with the game open in another window. On a phone or tablet, or if you'd rather do it yourself, use <b>Manual mode</b> in Settings &amp; backup: cities, barb fields and alarms still work, you just enter things by hand.</p>
+    <ol class="muted" id="startAuto" style="margin:6px 0 0;padding-left:18px;line-height:1.7">
+      <li>Open <b>Screen reader</b> below and press <b>Start capture</b>, then pick the Dominion of Ages window.</li>
+      <li>Press <b>Draw</b> next to <b>City list</b> and drag a box from the top of your first city tab to the bottom of the last. A card and a barb field appear for every tab, then a form asks for each city's name and coordinates.</li>
+      <li>Draw the Construction, Barracks header and March list boxes the same way. That's it — timers and hits fill in by themselves.</li>
+    </ol>
+    <ol class="muted hidden" id="startManual" style="margin:6px 0 0;padding-left:18px;line-height:1.7">
+      <li>Press <b>+ City</b> for each of your cities and click a name to rename it.</li>
+      <li>On a city's barb field press <b>Edit</b>, enter the city's coordinates, then type a label (<b>5</b> for a barbarian town) and click tiles to paint them.</li>
+      <li>Click a <b>5</b> tile when you march at it: it turns amber for the 4-hour reset and flashes when the march is back (set the March time in Edit for that).</li>
+      <li>Use the alarm row on a card for anything with a timer: builds, research, barracks queues.</li>
+    </ol>
+  </div>
+  <div id="setup" class="hidden" style="background:var(--panel);border:1px solid var(--accent);border-radius:7px;padding:10px 14px 12px;max-width:720px;margin-top:8px">
+    <div class="row"><b>Finish setup</b><span class="muted">— name each city and enter its coordinates (open the city in game: they're shown next to its name)</span></div>
+    <div id="setupRows" style="display:grid;grid-template-columns:auto 1fr 64px 64px;gap:5px 8px;align-items:center;margin-top:8px"></div>
+    <div class="row" style="margin-top:8px"><button class="s" id="setupLater">Later</button><span class="muted">Coordinates are needed before targets can be painted on a field.</span></div>
+  </div>
+  <p class="hint">Alarm durations: <code>3h20m</code>, <code>45m</code>, <code>1:30:00</code>, <code>2d4h</code> (a bare number is minutes). <span class="auto-only">Build, research and barracks timers fill in from the screen reader below.</span></p>
+</section>
+
+<section id="paneC">
+  <h2 class="sec">Barb Fields <span class="n zero" id="nReady" title="Ready tiles">0</span>
+    <span class="grow"></span>
+    <span class="muted">Tile size</span><input type="range" id="tsz" min="16" max="80" step="2" style="padding:0;width:160px;height:20px">
+    <span class="muted" style="margin-left:8px">Show</span>
+    <button class="s" id="mTimer" data-mode="timer">Timer</button>
+    <button class="s" id="mCoords" data-mode="coords">Coords</button>
+    <button class="s" id="mMarch" data-mode="march" title="Round-trip march time to each tile">March</button>
+  </h2>
+  <div id="barbList"></div>
+  <p class="hint">Click a <b>5</b> tile to mark it marched at; click again while it's cooling to undo. A tile flashing blue is a march that's back: click it to dismiss. <b>Shift+click</b> copies a tile's coordinates. Other labels (valleys) are just notes. <b>Edit</b> sets the city's coordinates, size and march time.</p>
+</section>
+
+<details class="panel" id="reader">
+  <summary>Screen reader <span class="st" id="scrState">off</span></summary>
+  <div class="body">
+    <p class="muted" style="margin:8px 0 0">Reads pixels from the window you pick, the same way you look at it. It never clicks, types or talks to the game. Share the <b>game window</b> (not the whole screen) for the sharpest text. Draw the <b>City list</b> box first: it counts your city tabs and makes a card and a barb field for each one.</p>
+
+    <div class="step">
+      <div class="t">1 · Capture</div>
+      <div class="row">
+        <button id="scrStart" class="pri">Start capture</button>
+        <button id="scrStop" disabled>Stop</button>
+        <button id="scrTest" disabled title="Read everything once and show what it would do, without changing anything">Read now (test)</button>
+        <span class="muted" id="scrStatus"></span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="t">2 · Boxes — press Draw, then drag on the preview</div>
+      <div class="boxes" id="boxes"></div>
+      <div class="row" id="slotRow" style="margin-top:8px">
+        <span class="muted" id="slotInfo"></span>
+        <button class="s" id="slotAdjust">Adjust</button>
+        <span id="slotEdit" class="row hidden" style="display:inline-flex;gap:4px">
+          <span class="muted">tabs:</span><input class="xs" id="scrSlots" type="number" min="1" max="12">
+          <span class="muted">top → bottom:</span><span id="slotMap" class="row" style="display:inline-flex;gap:4px"></span>
+        </span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="t">3 · Preview</div>
+      <div id="scrPlaceholder">Start capture to see the preview here, then draw the boxes on it.</div>
+      <canvas id="scrCanvas" class="hidden"></canvas>
+      <video id="scrVideo" muted playsinline style="position:absolute;width:2px;height:2px;opacity:0;pointer-events:none"></video>
+    </div>
+
+    <div class="step">
+      <div class="t">4 · Options</div>
+      <div class="row">
+        <label class="chk"><input type="checkbox" id="scrApply"> Auto-apply (otherwise it only reports)</label>
+        <label class="chk" title="Targets it sees that aren't on any field get painted on the closest city's field"><input type="checkbox" id="scrPaint"> Auto-paint new targets</label>
+        <span class="muted">Scan every</span><input class="xs" id="scrEvery" type="number" min="2" max="60"><span class="muted">s</span>
+        <span class="muted">Countdown means</span>
+        <select id="scrMeans"><option value="back">time until back home</option><option value="arrive">time until arrival</option></select>
+        <span class="muted">Builders per city</span><input class="xs" id="buildSlots" type="number" min="1" max="4">
+        <label class="chk"><input type="checkbox" id="scrDebug"> Show what the reader sees</label>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="t">Last read</div>
+      <canvas id="scrCrop" class="hidden"></canvas>
+      <pre class="out" id="scrOut">Nothing read yet.</pre>
+    </div>
+  </div>
+</details>
+
+<details class="panel set">
+  <summary>Settings &amp; backup</summary>
+  <div class="body">
+    <div class="row" style="margin-top:10px">
+      <label class="f">March distance <select id="dist"><option value="euc">straight line</option><option value="cheb">diagonal = 1 tile</option></select></label>
+      <label class="f">Field reset (hours) <input class="sm" id="cdH" type="number" min="0" step="0.25"></label>
+    </div>
+    <div class="row">
+      <label class="chk"><input type="checkbox" id="fy"> Y goes up the map (flip Y)</label>
+      <label class="chk"><input type="checkbox" id="fx"> X goes left on the map (flip X)</label>
+      <label class="chk"><input type="checkbox" id="snd"> Sound alerts</label>
+      <label class="chk"><input type="checkbox" id="ntf"> Desktop notifications</label>
+    </div>
+    <div class="row">
+      <label class="chk" title="Hide the screen reader and enter everything by hand (phones, or if you prefer)"><input type="checkbox" id="manual"> Manual mode (no screen reader)</label>
+    </div>
+    <div class="row">
+      <button id="exp" class="pri">Download backup</button>
+      <button id="imp">Restore backup…</button>
+      <input type="file" id="impFile" accept=".json,application/json" class="hidden">
+      <button id="wipe" class="x" style="width:auto;padding:0 10px">Reset all</button>
+      <span class="muted">Your data lives in this browser only. Download a backup to move it to another browser or computer, or just to be safe.</span>
+    </div>
+  </div>
+</details>
+
+<script>
+(function(){
+'use strict';
+// =====================================================================================
+//  STATE
+// =====================================================================================
+const KEY = 'dominionDaddy.v1', OLD_KEY = 'evonyTracker.v1', VER = 6;
+const uid = () => Math.random().toString(36).slice(2, 9);
+const odd = n => { n = Math.min(13, Math.max(3, parseInt(n, 10) || 7)); return n % 2 ? n : n + 1; };
+const newCity = name => ({id: uid(), name, cx: null, cy: null, w: 7, h: 7, tiles: {}, paint: '5', marchStr: '', marchMs: 0,
+                          alarms: [], builds: [], bar: {}, barN: 0, alabel: '', dur: ''});
+const defaults = () => ({
+  v: VER, cooldownH: 4, sound: true, notify: false, tile: 28, tileMode: 'timer', dist: 'euc', flipX: false, flipY: false, buildSlots: 2,
+  cities: [], manual: !(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia),   // no screen capture (phones): start in manual mode
+  ocr: {regions: {march: null, build: null, city: null, barracks: null}, slots: 0, found: 0, slotMap: [], target: 'city', every: 5, apply: true, autoPaint: true, autoCities: true, means: 'back', debug: false},
+  cur: null
+});
+
+let S;
+try { S = JSON.parse(localStorage.getItem(KEY) || localStorage.getItem(OLD_KEY)) || defaults(); } catch(e){ S = defaults(); }   // older versions saved under the old name
+migrate(S);
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} };
+
+function migrate(S){
+  const D = defaults();
+  if(!S.cities){ S.cities = (S.barracks || []).map(b => Object.assign(newCity(b.name), b)); delete S.barracks; }
+  if(!S.v || S.v < 3){ S.cooldownH = 2; delete S.barbs; S.v = 3; }
+  if(S.v < 4){                                            // tiles were keyed "row,col"; now "dx,dy" from the city
+    S.cities.forEach(c => { const w = c.w || 7, h = c.h || 7, nt = {}; for(const k in (c.tiles || {})){ const [r, col] = k.split(',').map(Number); nt[(col - Math.floor(w/2)) + ',' + (r - Math.floor(h/2))] = c.tiles[k]; } c.tiles = nt; });
+    S.v = 4;
+  }
+  if(S.v < 5){ S.cooldownH = 4; S.v = 5; }
+  if(S.v < 6){
+    S.tileMode = S.coords ? 'coords' : (S.showMarch ? 'march' : 'timer'); delete S.coords; delete S.showMarch;
+    const o = S.ocr || {};
+    S.ocr = Object.assign({}, D.ocr, {regions: {march: o.region || null, build: o.regionB || null, city: o.regionC || null, barracks: o.regionD || null},
+      slots: o.slots || 0, slotMap: o.slotMap || [], every: o.every || 5, apply: !!o.apply, autoPaint: o.autoPaint !== false, means: o.means || 'back'});
+    S.v = 6;
+  }
+  S.ocr = Object.assign({}, D.ocr, S.ocr || {});
+  S.ocr.regions = Object.assign({march: null, build: null, city: null, barracks: null}, S.ocr.regions || {});
+  if(S.ocr.autoCities === undefined) S.ocr.autoCities = true;
+  if(S.manual === undefined) S.manual = !(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia);   // no screen capture here (phones): manual mode
+  if(!['timer', 'coords', 'march'].includes(S.tileMode)) S.tileMode = 'timer';
+  S.buildSlots = Math.min(4, Math.max(1, parseInt(S.buildSlots, 10) || 2));
+  S.tile = S.tile || 28; S.dist = S.dist || 'euc';
+  if(S.cooldownH == null) S.cooldownH = 4;
+  S.cities.forEach(c => {
+    c.w = odd(c.w); c.h = odd(c.h); c.tiles = c.tiles || {}; c.paint = c.paint == null ? '5' : c.paint;
+    if(c.cx === undefined) c.cx = null; if(c.cy === undefined) c.cy = null;
+    c.marchStr = c.marchStr || ''; c.marchMs = c.marchMs || 0;
+    c.alarms = Array.isArray(c.alarms) ? c.alarms : [];
+    if(c.endsAt && c.endsAt > Date.now()) c.alarms.push({id: uid(), label: c.troop || 'Training', endsAt: c.endsAt, alerted: false});
+    delete c.endsAt; delete c.idleSince; delete c.lastDur; delete c.troop; delete c.alerted;
+    c.alabel = c.alabel || ''; c.dur = c.dur || '';
+    // builds: one record per builder slot / research; older saves used "group#rand" keys
+    c.builds = (Array.isArray(c.builds) ? c.builds : []).filter(b => b && b.endsAt).map(b => ({
+      id: b.id || uid(), kind: b.kind === 'research' ? 'research' : 'build', name: b.name || '?',
+      base: b.base || baseName(b.name || ''), endsAt: b.endsAt, alerted: !!b.alerted, miss: 0
+    }));
+    const research = c.builds.filter(b => b.kind === 'research').sort((a, b) => b.endsAt - a.endsAt);
+    if(research.length > 1) c.builds = c.builds.filter(b => b.kind !== 'research' || b === research[0]);   // only one research at a time
+    c.bar = (c.bar && typeof c.bar === 'object') ? c.bar : {}; c.barN = c.barN || 0;
+  });
+}
+
+// =====================================================================================
+//  SMALL HELPERS
+// =====================================================================================
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cdMs = () => Math.max(0, S.cooldownH) * 3600000;
+const hasXY = c => c.cx != null && c.cy != null;
+const cityById = id => S.cities.find(c => c.id === id);
+function parseDur(s){                                   // "3h20m" "45m" "1:30:00" "2d4h" "90" (minutes)
+  s = String(s || '').trim().toLowerCase(); if(!s) return 0;
+  if(s.includes(':')){ const p = s.split(':').map(n => parseInt(n, 10) || 0); return (p.length === 2 ? p[0]*3600 + p[1]*60 : p[0]*3600 + (p[1]||0)*60 + (p[2]||0)) * 1000; }
+  if(/^\d+(\.\d+)?$/.test(s)) return Math.round(parseFloat(s) * 60000);
+  let ms = 0, m, re = /(\d+(?:\.\d+)?)\s*([dhms])/g;
+  while((m = re.exec(s))) ms += parseFloat(m[1]) * {d: 86400, h: 3600, m: 60, s: 1}[m[2]] * 1000;
+  return Math.round(ms);
+}
+function parseSec(s){                                   // march time: a bare number means seconds
+  s = String(s || '').trim().toLowerCase(); if(!s) return 0;
+  if(s.includes(':')){ const p = s.split(':').map(n => parseInt(n, 10) || 0); return (p.length === 2 ? p[0]*60 + p[1] : p[0]*3600 + (p[1]||0)*60 + (p[2]||0)) * 1000; }
+  if(/^\d+(\.\d+)?$/.test(s)) return Math.round(parseFloat(s) * 1000);
+  return parseDur(s);
+}
+function fmt(ms){                                       // 1d 02:03:04
+  ms = Math.max(0, Math.floor(ms / 1000));
+  const d = Math.floor(ms / 86400), h = Math.floor(ms % 86400 / 3600), m = Math.floor(ms % 3600 / 60), s = ms % 60, p = n => String(n).padStart(2, '0');
+  return (d ? d + 'd ' : '') + (h || d ? p(h) + ':' : '') + p(m) + ':' + p(s);
+}
+function fmtShort(ms){                                  // 1h05m · 9:45
+  const s = Math.max(0, Math.ceil(ms / 1000));
+  if(s >= 3600) return Math.floor(s / 3600) + 'h' + String(Math.floor(s % 3600 / 60)).padStart(2, '0') + 'm';
+  return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+}
+const longT = ms => { const s = Math.max(0, Math.ceil(ms / 1000)); return s >= 86400 ? Math.floor(s / 86400) + 'd ' + Math.floor(s % 86400 / 3600) + 'h' : fmtShort(ms); };
+const distOf = (dx, dy) => S.dist === 'cheb' ? Math.max(Math.abs(dx), Math.abs(dy)) : Math.hypot(dx, dy);
+function marchInfo(c, key){
+  if(!c.marchMs) return null;
+  const [dx, dy] = key.split(',').map(Number), out = Math.round(c.marchMs * distOf(dx, dy));
+  return {out, round: out * 2};
+}
+const normName = s => String(s || '').toLowerCase().replace(/[^a-z]/g, '');
+function baseName(name){ return String(name || '').replace(/\(?\s*l[vy]\.?\s*\S*\)?/i, '').replace(/[^A-Za-z ]+/g, ' ').replace(/\s+/g, ' ').trim(); }
+function similar(a, b){                                 // Dice coefficient on letter bigrams: "barracks" vs "baracks" = 0.86
+  a = normName(a); b = normName(b);
+  if(!a || !b) return 0; if(a === b) return 1;
+  if(a.length < 3 || b.length < 3) return a === b ? 1 : 0;
+  const grams = s => { const m = new Map(); for(let i = 0; i < s.length - 1; i++){ const g = s.slice(i, i + 2); m.set(g, (m.get(g) || 0) + 1); } return m; };
+  const ga = grams(a), gb = grams(b); let hit = 0;
+  for(const [g, n] of ga) hit += Math.min(n, gb.get(g) || 0);
+  return 2 * hit / (a.length - 1 + b.length - 1);
+}
+
+// =====================================================================================
+//  ALERTS
+// =====================================================================================
+let ac;
+function beep(){
+  if(!S.sound) return;
+  try {
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    [0, 0.18].forEach(t => { const o = ac.createOscillator(), g = ac.createGain(); o.frequency.value = 880; o.connect(g); g.connect(ac.destination);
+      g.gain.setValueAtTime(0.15, ac.currentTime + t); g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + t + 0.15); o.start(ac.currentTime + t); o.stop(ac.currentTime + t + 0.16); });
+  } catch(e){}
+}
+function notify(msg){
+  beep();
+  if(S.notify && 'Notification' in window && Notification.permission === 'granted'){ try { new Notification('Dominion Daddy', {body: msg}); } catch(e){} }
+}
+
+// =====================================================================================
+//  CITY CARDS
+// =====================================================================================
+const isHere = (c, now) => !!(S.cur && S.cur.id === c.id && now - S.cur.at < 90000);
+function renderCities(){
+  $('cities').innerHTML = S.cities.map(c => `<div class="card" data-id="${c.id}">
+    <div class="hd">
+      <span class="grab" title="Drag to reorder">⠿</span>
+      <span class="name" data-act="rename" title="Click to rename">${esc(c.name)}</span>
+      ${hasXY(c) ? `<span class="xy">${c.cx},${c.cy}</span>` : ''}
+      <span class="here-tag hidden" data-here>on screen</span>
+      <span class="tools">
+        <button class="ic" data-act="left" title="Move earlier">◀</button>
+        <button class="ic" data-act="right" title="Move later">▶</button>
+        <button class="x" data-act="del" title="Remove city">✕</button>
+      </span>
+    </div>
+    <div data-builds></div>
+    <div data-bars></div>
+    <div>
+      <div class="sec-h">Alarms</div>
+      <div class="rows" data-alarms style="margin-top:3px"></div>
+      <div class="addrow" style="margin-top:4px">
+        <input data-f="alabel" placeholder="label (e.g. collect gold)" value="${esc(c.alabel)}">
+        <input data-f="dur" placeholder="3h20m" value="${esc(c.dur)}">
+        <button class="pri s" data-act="alarm" title="Set the alarm">⏰ Set</button>
+      </div>
+    </div>
+    <div class="ft">Barb field <span class="pill" data-rdy="${c.id}"></span></div>
+  </div>`).join('');
+  $('start').classList.toggle('hidden', S.cities.length > 0);
+  if(!S.cities.length && !S.manual) $('reader').open = true;
+  renderSetup();
+  if(window.__slotRefresh) window.__slotRefresh();
+  tick();
+}
+let setupLater = false;
+function renderSetup(){
+  const todo = S.cities.filter(c => !hasXY(c));
+  const show = todo.length > 0 && !setupLater;
+  $('setup').classList.toggle('hidden', !show);
+  if(!show) return;
+  $('setupRows').innerHTML = '<span class="muted">tab</span><span class="muted">name</span><span class="muted">x</span><span class="muted">y</span>' + todo.map(c => `
+    <span class="muted">${S.cities.indexOf(c) + 1}</span>
+    <input data-sf="name" data-cid="${c.id}" value="${esc(c.name)}">
+    <input class="xs" inputmode="numeric" data-sf="cx" data-cid="${c.id}" placeholder="x" value="${c.cx == null ? '' : c.cx}">
+    <input class="xs" inputmode="numeric" data-sf="cy" data-cid="${c.id}" placeholder="y" value="${c.cy == null ? '' : c.cy}">`).join('');
+}
+$('setupRows').addEventListener('input', e => {
+  const f = e.target.dataset.sf, c = cityById(e.target.dataset.cid); if(!f || !c) return;
+  if(f === 'name'){ c.name = e.target.value.trim() || c.name; }
+  else { const v = parseInt(e.target.value, 10); c[f] = isNaN(v) ? null : v; }
+  save();
+});
+$('setupRows').addEventListener('change', e => { if(e.target.dataset.sf){ renderCities(); renderBarbs(); } });   // re-render once a field is left, not on every keystroke
+$('setupLater').onclick = () => { setupLater = true; renderSetup(); };
+$('cities').addEventListener('input', e => {
+  const f = e.target.dataset.f; if(!f) return;
+  const c = cityById(e.target.closest('.card').dataset.id); if(!c) return;
+  c[f] = e.target.value; save();
+});
+$('cities').addEventListener('keydown', e => { if(e.key === 'Enter' && e.target.dataset.f) e.target.closest('.card').querySelector('[data-act=alarm]').click(); });
+$('cities').addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if(!el) return;
+  const act = el.dataset.act, card = el.closest('.card'), c = cityById(card.dataset.id); if(!c) return;
+  if(act === 'rename'){ const n = prompt('Rename city', c.name); if(n && n.trim()) c.name = n.trim(); }
+  else if(act === 'del'){
+    const n = Object.keys(c.tiles).length;
+    if(!confirm('Remove ' + c.name + (n ? ' and its ' + n + ' field tile' + (n > 1 ? 's' : '') : '') + '?')) return;
+    S.cities = S.cities.filter(x => x !== c);
+  }
+  else if(act === 'alarm'){
+    const ms = parseDur(c.dur);
+    if(!ms){ card.querySelector('[data-f=dur]').focus(); return; }
+    c.alarms.push({id: uid(), label: (c.alabel || '').trim() || 'Alarm', endsAt: Date.now() + ms, alerted: false});
+    c.dur = ''; c.alabel = '';
+  }
+  else if(act === 'ax'){ c.alarms = c.alarms.filter(a => a.id !== el.dataset.id); }
+  else if(act === 'bx'){ c.builds = c.builds.filter(b => b.id !== el.dataset.id); }
+  else if(act === 'barx'){ delete c.bar[el.dataset.id]; }
+  else if(act === 'left' || act === 'right'){
+    const i = S.cities.indexOf(c), j = i + (act === 'left' ? -1 : 1);
+    if(j < 0 || j >= S.cities.length) return;
+    [S.cities[i], S.cities[j]] = [S.cities[j], S.cities[i]];
+  }
+  else return;
+  save();
+  if(act === 'ax' || act === 'bx' || act === 'barx') tick(); else { renderCities(); renderBarbs(); }
+});
+$('addCity').onclick = () => { S.cities.push(newCity('City ' + (S.cities.length + 1))); save(); renderCities(); renderBarbs(); };
+
+// one timer row: icon | name | time | ✕
+const rowHTML = (ico, name, tmAttr, act, id, done, title) =>
+  `<div class="r ${done ? 'done' : ''}"><span class="ico">${ico}</span><span class="nm" title="${esc(title || name)}">${name}</span><span class="tm" ${tmAttr}></span><button class="x" data-act="${act}" data-id="${esc(id)}" title="${done ? 'Dismiss' : 'Remove'}">✕</button></div>`;
+
+function renderCardSections(c, card, now){
+  // builders + research
+  const bx = card.querySelector('[data-builds]');
+  const builds = c.builds.filter(b => b.kind === 'build').sort((a, b) => a.endsAt - b.endsAt), research = c.builds.find(b => b.kind === 'research');
+  const sig = c.builds.map(b => b.id + (now >= b.endsAt ? 'd' : 'r')).join(',') + '|' + S.buildSlots;
+  if(bx.dataset.sig !== sig){
+    bx.dataset.sig = sig;
+    let html = '';
+    if(builds.length || research){
+      const free = Math.max(0, S.buildSlots - builds.filter(b => now < b.endsAt).length);
+      html += `<div class="sec-h">Builders <span class="cnt">${Math.min(builds.length, S.buildSlots)}/${S.buildSlots}</span>${free ? `<span class="free">· ${free} free</span>` : `<span class="ok">· all busy</span>`}</div><div class="rows" style="margin-top:3px">` +
+        builds.map(b => rowHTML('🔨', esc(b.name), `data-tm="${b.id}"`, 'bx', b.id, now >= b.endsAt)).join('') +
+        (builds.length < S.buildSlots && !builds.length ? `<div class="r empty"><span class="ico">🔨</span><span class="nm">no construction running</span><span></span><span></span></div>` : '') + '</div>';
+      html += `<div class="sec-h" style="margin-top:6px">Research</div><div class="rows" style="margin-top:3px">` +
+        (research ? rowHTML('🔍', esc(research.name), `data-tm="${research.id}"`, 'bx', research.id, now >= research.endsAt) : `<div class="r empty"><span class="ico">🔍</span><span class="nm">nothing researching</span><span></span><span></span></div>`) + '</div>';
+    }
+    bx.innerHTML = html;
+  }
+  // barracks: shortest first, the rest folded
+  const br = card.querySelector('[data-bars]');
+  const bars = Object.keys(c.bar).map(n => Object.assign({n}, c.bar[n])).sort((a, b) => a.endsAt - b.endsAt || (+a.n) - (+b.n));
+  const bsig = bars.map(b => b.n + (now >= b.endsAt ? 'd' : 'r')).join(',') + '|' + c.barN;
+  if(br.dataset.sig !== bsig){
+    const wasOpen = !!br.querySelector('details[open]');
+    br.dataset.sig = bsig;
+    const row = b => rowHTML('🏛', `Barracks <b>${esc(b.n)}</b>`, `data-tmb="${esc(b.n)}"`, 'barx', b.n, now >= b.endsAt, 'Barracks ' + b.n);
+    const empties = bars.filter(b => now >= b.endsAt).length;
+    br.innerHTML = bars.length ? `<div class="sec-h">Barracks <span class="cnt">${bars.length}${c.barN ? '/' + c.barN : ''} recorded</span>${empties ? `<span class="free">· ${empties} empty</span>` : ''}</div><div class="rows" style="margin-top:3px">${row(bars[0])}</div>` +
+      (bars.length > 1 ? `<details class="more" ${wasOpen ? 'open' : ''}><summary>${bars.length - 1} more</summary><div class="rows">${bars.slice(1).map(row).join('')}</div></details>` : '') : '';
+  }
+  // alarms
+  const ab = card.querySelector('[data-alarms]');
+  const alarms = c.alarms.slice().sort((a, b) => a.endsAt - b.endsAt);
+  const asig = alarms.map(a => a.id + (now >= a.endsAt ? 'd' : 'r')).join(',');
+  if(ab.dataset.sig !== asig){
+    ab.dataset.sig = asig;
+    ab.innerHTML = alarms.map(a => rowHTML('⏰', esc(a.label), `data-tma="${a.id}"`, 'ax', a.id, now >= a.endsAt)).join('');
+    ab.classList.toggle('hidden', !alarms.length);
+  }
+  // live times
+  const ends = {}; c.builds.forEach(b => ends[b.id] = b.endsAt);
+  card.querySelectorAll('[data-tm]').forEach(el => { const e = ends[el.dataset.tm]; if(e != null) el.textContent = now >= e ? 'DONE!' : fmtShort(e - now); });
+  card.querySelectorAll('[data-tmb]').forEach(el => { const b = c.bar[el.dataset.tmb]; if(b) el.textContent = now >= b.endsAt ? 'EMPTY!' : longT(b.endsAt - now); });
+  const aend = {}; c.alarms.forEach(a => aend[a.id] = a.endsAt);
+  card.querySelectorAll('[data-tma]').forEach(el => { const e = aend[el.dataset.tma]; if(e != null) el.textContent = now >= e ? 'DONE!' : fmt(e - now); });
+}
+
+// =====================================================================================
+//  BARB FIELDS  (tiles keyed by offset from the city "dx,dy")
+// =====================================================================================
+const EDIT = {};
+const ax = c => (c.w - 1) / 2, ay = c => (c.h - 1) / 2;
+const keyOf = (c, r, k) => (k - ax(c)) + ',' + (r - ay(c));
+function xyOf(c, key){
+  if(!hasXY(c)) return null;
+  const [dx, dy] = key.split(',').map(Number);
+  return {x: c.cx + (S.flipX ? -dx : dx), y: c.cy + (S.flipY ? -dy : dy)};
+}
+const isBarb = t => !!t && String(t.label).trim() === '5';         // only barbarian towns (label 5) get timers
+function tileState(t, now){
+  if(!t) return 'empty';
+  if(!isBarb(t)) return 'info';
+  return (t.hitAt && now < t.hitAt + cdMs()) ? 'cool' : 'ready';
+}
+function cellsHTML(c){
+  let cells = '';
+  for(let r = 0; r < c.h; r++) for(let k = 0; k < c.w; k++){
+    const key = keyOf(c, r, k);
+    cells += key === '0,0' ? `<div class="tile center" title="${esc(c.name)}${hasXY(c) ? ' (' + c.cx + ',' + c.cy + ')' : ''}">★</div>`
+                           : `<div class="tile empty" data-act="tile" data-cid="${c.id}" data-k="${key}"></div>`;
+  }
+  return cells;
+}
+function renderBarbs(){
+  $('barbList').innerHTML = S.cities.map(c => {
+    const ed = !!EDIT[c.id];
+    return `<div class="cblock" data-cid="${c.id}">
+      <div class="city">
+        <span class="grab" title="Drag to reorder">⠿</span>
+        <span class="name" title="${esc(c.name)}${hasXY(c) ? ' (' + c.cx + ',' + c.cy + ')' : ''}">${esc(c.name)}</span>
+        <span class="badge" data-rdy="${c.id}"></span>
+        <span class="grow"></span>
+        <button class="s ${ed ? 'on' : ''}" data-act="edit" data-cid="${c.id}">${ed ? 'Done' : 'Edit'}</button>
+      </div>
+      ${ed ? `<div class="edit">
+        <div class="row"><span class="lbl">City at</span>
+          <span class="muted">x</span><input class="xs" inputmode="numeric" data-f="cx" data-cid="${c.id}" placeholder="x" value="${c.cx == null ? '' : c.cx}">
+          <span class="muted">y</span><input class="xs" inputmode="numeric" data-f="cy" data-cid="${c.id}" placeholder="y" value="${c.cy == null ? '' : c.cy}"></div>
+        <div class="row"><span class="lbl">Size</span>
+          <input class="xs" type="number" min="3" max="13" step="2" data-f="w" data-cid="${c.id}" value="${c.w}"><span class="muted">×</span>
+          <input class="xs" type="number" min="3" max="13" step="2" data-f="h" data-cid="${c.id}" value="${c.h}"></div>
+        <div class="row"><span class="lbl">March</span>
+          <input class="xs" data-f="march" data-cid="${c.id}" placeholder="45s" value="${esc(c.marchStr || '')}">
+          <span class="muted" data-mshow="${c.id}">${c.marchMs ? '= ' + fmtShort(c.marchMs) : ''} to the next tile</span></div>
+        <div class="row"><span class="lbl">Paint</span>
+          <input class="xs" data-f="paint" data-cid="${c.id}" placeholder="5" maxlength="4" value="${esc(c.paint)}">
+          <span class="muted">then click tiles · blank erases</span></div>
+        <div class="row" style="margin-top:8px">
+          <button class="s" data-act="allready" data-cid="${c.id}">All ready</button>
+          <button class="s" data-act="cleargrid" data-cid="${c.id}">Clear grid</button></div>
+      </div>` : ''}
+      <div class="grid ${ed ? 'editing' : ''}" style="grid-template-columns:repeat(${c.w},var(--t))">${cellsHTML(c)}</div>
+    </div>`;
+  }).join('');
+  tick();
+}
+$('barbList').addEventListener('input', e => {
+  const f = e.target.dataset.f; if(!f) return;
+  const c = cityById(e.target.dataset.cid); if(!c) return;
+  const wrap = e.target.closest('.cblock');
+  if(f === 'paint'){ c.paint = e.target.value.trim(); save(); }
+  else if(f === 'march'){ c.marchStr = e.target.value.trim(); c.marchMs = parseSec(c.marchStr); save(); const sh = wrap.querySelector('[data-mshow]'); if(sh) sh.textContent = (c.marchMs ? '= ' + fmtShort(c.marchMs) : '') + ' to the next tile'; tick(); }
+  else if(f === 'cx' || f === 'cy'){ const v = parseInt(e.target.value, 10); c[f] = isNaN(v) ? null : v; save(); renderCities(); tick(); }
+  else if(f === 'w' || f === 'h'){
+    if(!parseInt(e.target.value, 10)) return;
+    c[f] = odd(e.target.value); save();
+    const grid = wrap.querySelector('.grid'); grid.style.gridTemplateColumns = `repeat(${c.w},var(--t))`; grid.innerHTML = cellsHTML(c); tick();
+  }
+});
+$('barbList').addEventListener('change', e => { const f = e.target.dataset.f; if(f === 'w' || f === 'h'){ const c = cityById(e.target.dataset.cid); if(c) e.target.value = c[f]; } });
+$('barbList').addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if(!el) return;
+  const act = el.dataset.act, c = cityById(el.dataset.cid); if(!c) return;
+  if(act === 'edit'){ EDIT[c.id] = !EDIT[c.id]; renderBarbs(); return; }
+  if(act === 'allready'){ Object.values(c.tiles).forEach(t => t.hitAt = null); save(); tick(); return; }
+  if(act === 'cleargrid'){ if(confirm('Clear every tile for ' + c.name + '?')){ c.tiles = {}; save(); renderBarbs(); } return; }
+  if(act === 'tile'){
+    const k = el.dataset.k, t = c.tiles[k], now = Date.now();
+    if(e.shiftKey && !EDIT[c.id]){ const xy = xyOf(c, k); if(xy){ try { navigator.clipboard.writeText(xy.x + ',' + xy.y); } catch(_){} } return; }
+    if(EDIT[c.id]){ if(c.paint){ if(t) t.label = c.paint; else c.tiles[k] = {label: c.paint, hitAt: null}; } else delete c.tiles[k]; }
+    else {
+      if(!t || !isBarb(t)) return;
+      if(tileState(t, now) === 'ready'){ t.hitAt = now; const mi = marchInfo(c, k); if(mi){ t.backAt = now + mi.round; t.lastBack = t.backAt; t.alerted = false; t.ack = false; } }   // marched at
+      else if(t.backAt && now >= t.backAt && !t.ack){ t.backAt = null; t.ack = true; t.alerted = true; }   // returned: dismiss the alert only
+      else { t.hitAt = null; t.backAt = null; t.alerted = true; t.ack = true; }                               // undo while cooling
+    }
+    save(); tick();
+  }
+});
+
+// =====================================================================================
+//  TICK  (once a second: countdowns, alerts, badges)
+// =====================================================================================
+let marchSig = '';
+function tick(){
+  const now = Date.now();
+  let attn = 0, totalReady = 0, needSave = false;
+  const returned = [];
+  S.cities.forEach(c => {
+    c.alarms.forEach(a => { if(now >= a.endsAt && !a.alerted){ a.alerted = true; needSave = true; notify(c.name + ': ' + a.label); } });
+    c.builds.forEach(b => { if(now >= b.endsAt && !b.alerted){ b.alerted = true; needSave = true; notify(c.name + ': ' + b.name + ' finished'); } });
+    for(const n in c.bar){ const b = c.bar[n]; if(now >= b.endsAt && !b.alerted){ b.alerted = true; needSave = true; notify(c.name + ': barracks ' + n + ' is empty'); } }
+    const due = c.alarms.filter(a => now >= a.endsAt).length + c.builds.filter(b => now >= b.endsAt).length + Object.values(c.bar).filter(b => now >= b.endsAt).length;
+    attn += due;
+    const card = document.querySelector(`#cities .card[data-id="${c.id}"]`);
+    if(card){
+      renderCardSections(c, card, now);
+      const live = c.alarms.length + c.builds.length + Object.keys(c.bar).length, here = isHere(c, now);
+      card.classList.toggle('due', due > 0); card.classList.toggle('run', due === 0 && live > 0); card.classList.toggle('here', here);
+      card.querySelector('[data-here]').classList.toggle('hidden', !here);
+    }
+    const fb = document.querySelector(`#barbList .cblock[data-cid="${c.id}"]`);
+    if(fb) fb.classList.toggle('here', isHere(c, now));
+  });
+
+  // tiles
+  document.querySelectorAll('#barbList .tile[data-k]').forEach(el => {
+    const c = cityById(el.dataset.cid); if(!c) return;
+    const key = el.dataset.k, t = c.tiles[key], st = tileState(t, now), xy = xyOf(c, key);
+    const timer = st === 'cool' ? fmtShort(t.hitAt + cdMs() - now) : (st === 'ready' ? 'ready' : '');
+    const mi = isBarb(t) ? marchInfo(c, key) : null;
+    const away = !!(t && t.backAt && now < t.backAt), back = !!(t && t.backAt && now >= t.backAt && !t.ack);
+    const line2 = (S.tileMode === 'coords' && xy) ? xy.x + '<br>' + xy.y : away ? '↩' + fmtShort(t.backAt - now) : back ? '✓ back' : (S.tileMode === 'march' && mi) ? fmtShort(mi.round) : timer;
+    const sig = st + '|' + (t ? t.label : '') + '|' + line2 + '|' + away + back;
+    if(el.dataset.sig !== sig){
+      el.dataset.sig = sig;
+      el.className = 'tile ' + st + (away ? ' away' : '') + (back ? ' back' : '');
+      el.innerHTML = (t ? `<b>${esc(t.label)}</b>` : '') + (line2 ? `<i>${line2}</i>` : '');
+      const tip = [];
+      if(xy) tip.push(xy.x + ',' + xy.y);
+      if(mi) tip.push('march ' + fmtShort(mi.out) + ' out · ' + fmtShort(mi.round) + ' round trip');
+      if(t && t.hitAt) tip.push('marched ' + new Date(t.hitAt).toLocaleTimeString() + (st === 'cool' ? ' · ready in ' + timer : ''));
+      el.title = tip.join(' · ');
+    }
+  });
+
+  // marches out
+  const marches = []; let backCount = 0;
+  S.cities.forEach(c => {
+    for(const key in c.tiles){
+      const t = c.tiles[key]; if(!t.backAt) continue;
+      const isBack = now >= t.backAt;
+      if(isBack && !t.alerted){ t.alerted = true; needSave = true; const xy = xyOf(c, key); returned.push(c.name + (xy ? ' ' + xy.x + ',' + xy.y : '')); }
+      if(isBack && t.ack) continue;
+      if(isBack) backCount++;
+      marches.push({c, key, t, returned: isBack});
+    }
+  });
+  marches.sort((a, b) => a.t.backAt - b.t.backAt);
+  renderMarches(marches, now);
+
+  // ready counts
+  const counts = {};
+  S.cities.forEach(c => {
+    let r = 0, n = 0;
+    for(const key in c.tiles){ const [dx, dy] = key.split(',').map(Number); if(Math.abs(dx) > ax(c) || Math.abs(dy) > ay(c) || !isBarb(c.tiles[key])) continue; n++; if(tileState(c.tiles[key], now) === 'ready') r++; }
+    counts[c.id] = {r, n}; totalReady += r;
+  });
+  document.querySelectorAll('[data-rdy]').forEach(el => {
+    const pc = counts[el.dataset.rdy] || {r: 0, n: 0};
+    el.textContent = pc.n ? pc.r + ' ready / ' + pc.n : 'no barbs painted';
+    if(el.classList.contains('badge')) el.textContent = pc.n ? pc.r + '/' + pc.n : '–';
+    el.classList.toggle('good', pc.r > 0);
+  });
+  if(needSave) save();
+  setBadge($('nAttn'), attn, ''); setBadge($('nReady'), totalReady, 'good');
+  $('stAttn').querySelector('b').textContent = attn; $('stAttn').classList.toggle('hot', attn > 0);
+  $('stAway').querySelector('b').textContent = marches.filter(m => !m.returned).length;
+  $('stReady').querySelector('b').textContent = totalReady;
+  const tp = []; if(attn) tp.push(attn + ' due'); if(backCount) tp.push(backCount + ' back');
+  document.title = (tp.length ? '(' + tp.join(', ') + ') ' : '') + 'Dominion Daddy';
+  if(returned.length) notify('March returned: ' + returned.join(', '));
+}
+function setBadge(el, n, cls){ el.textContent = n; el.classList.toggle('zero', n === 0); el.classList.toggle('good', n > 0 && cls === 'good'); }
+function renderMarches(list, now){
+  $('paneM').classList.toggle('hidden', !list.length);
+  const sig = list.map(m => m.c.id + m.key + (m.returned ? 'r' : 'a')).join(',');
+  if(sig !== marchSig){
+    marchSig = sig;
+    $('marches').innerHTML = list.map(m => {
+      const xy = xyOf(m.c, m.key), where = xy ? xy.x + ',' + xy.y : m.key;
+      return `<div class="chip ${m.returned ? 'back' : ''}"><b>${esc(m.c.name)}</b><span>${esc(where)}</span>
+        <span class="t" data-mt data-cid="${m.c.id}" data-k="${m.key}"></span>
+        <button class="x" data-act="mx" data-cid="${m.c.id}" data-k="${m.key}" title="${m.returned ? 'Dismiss' : 'Cancel march'}">✕</button></div>`;
+    }).join('');
+  }
+  list.forEach(m => { const el = $('marches').querySelector(`[data-mt][data-cid="${m.c.id}"][data-k="${m.key}"]`); if(el) el.textContent = m.returned ? 'BACK!' : fmt(m.t.backAt - now); });
+  setBadge($('nAway'), list.filter(m => !m.returned).length, '');
+}
+$('marches').addEventListener('click', e => {
+  const b = e.target.closest('[data-act=mx]'); if(!b) return;
+  const c = cityById(b.dataset.cid), t = c && c.tiles[b.dataset.k];
+  if(t){ t.backAt = null; t.ack = true; t.alerted = true; save(); tick(); }
+});
+
+// =====================================================================================
+//  TEXT PARSING  (pure functions over OCR text)
+// =====================================================================================
+const TIME_COLON = /(?<!\d)(\d{1,2}):(\d{2})(?::(\d{2}))?(?!\d)/;
+const TIME_UNITS = /(?<!\w)(?:\d{1,3}\s*(?:d|h|m|rn|s)(?![a-z])\s*)+/i;          // 31m 08s · 1h 05m 12s · 29s
+const UNIT_SECS = {d: 86400, h: 3600, m: 60, rn: 60, s: 1};                      // "rn" is a common misread of "m"
+const COORD_RES = [
+  /[\(\[{]\s*(\d{1,4})\s*[,.;:]\s*(\d{1,4})/,                                      // (643,94)
+  /X\s*[:=]?\s*(\d{1,4})\D{0,4}?Y\s*[:=]?\s*(\d{1,4})/i,                           // X:643 Y:94
+  /(?<!\d)(\d{1,4})\s*,\s*(\d{1,4})(?!\d)/                                         // 643,94
+];
+const fixZeros = s => s.replace(/(?<=\d)[oO](?=\s|[dhms:]|$)|(?<![A-Za-z])[oO](?=\d)|(?<=\d[dhms]\s{0,2})[oO](?=[dhms](?![a-z]))|(?<=[\d:])[oO](?=[\d:])/g, '0')   // 1h3om -> 1h30m, 8h Om -> 8h 0m
+                       .replace(/(?<![A-Za-z\d])[iIl](?=\d{0,2}\s*[dhms](?![a-z]))|(?<=\d)[iIl](?=\s*[dhms](?![a-z]))/g, '1');                                              // ih 30m -> 1h 30m
+function findTime(str){
+  str = fixZeros(str);
+  const w = str.match(TIME_UNITS);
+  if(w){ let secs = 0, t; const re = /(\d{1,3})\s*(d|h|m|rn|s)/gi; while((t = re.exec(w[0]))) secs += (+t[1]) * UNIT_SECS[t[2].toLowerCase()]; return secs; }
+  const c = str.match(TIME_COLON);
+  if(c && +c[2] < 60) return c[3] != null ? (+c[1]) * 3600 + (+c[2]) * 60 + (+c[3]) : (+c[1]) * 60 + (+c[2]);
+  return null;
+}
+const linesIn = input => Array.isArray(input) ? input.map(l => ({text: String(l.text || ''), conf: +l.conf || 0})) : String(input || '').split(/\r?\n/).map(t => ({text: t, conf: 0}));
+const stripTimes = str => str.replace(new RegExp(TIME_UNITS.source, 'gi'), ' ').replace(new RegExp(TIME_COLON.source, 'g'), ' ');
+function findCoord(str){ const clean = stripTimes(str); for(const re of COORD_RES){ const m = clean.match(re); if(m) return {x: +m[1], y: +m[2]}; } return null; }
+function modeOf(ctx){
+  if(/\bsend\b|reinf|transport|trade/i.test(ctx)) return 'skip';
+  if(/ret[uo]r?[mn]|\bback\b|home/i.test(ctx)) return 'back';
+  if(/att?ack|attac|arriv|march|gather/i.test(ctx)) return 'arrive';
+  return null;
+}
+function nameOf(line){
+  let t = line.split(/[\(\[{]/)[0];
+  t = /\b(send|ret[uo]r?[mn]|att?ack)\b/i.test(t) ? t.replace(/^.*?\b(send|ret[uo]r?[mn]|att?ack)\b\s*/i, '') : t.replace(/^[^A-Za-z]+/, '');
+  return t.replace(/[^A-Za-z' -]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+// march list rows -> [{x, y, secs, mode, name}]
+function parseMarchText(input){
+  const L = linesIn(input).map(l => ({text: l.text.trim(), conf: l.conf})).filter(l => l.text), out = [];
+  for(let i = 0; i < L.length; i++){
+    const co = findCoord(L[i].text); if(!co) continue;
+    let ctx = L[i].text, secs = findTime(L[i].text);
+    for(let j = i + 1; secs == null && j <= i + 2 && j < L.length; j++){ if(findCoord(L[j].text)) break; ctx += ' ' + L[j].text; secs = findTime(L[j].text); }
+    out.push({x: co.x, y: co.y, secs, mode: modeOf(ctx), name: nameOf(L[i].text), conf: L[i].conf});
+  }
+  return out;
+}
+// construction panel rows -> [{kind, name, base, secs, clean}]   "Rally Spot Lv8   1h 30m"   "Iron Working (Lv8)   26h 58m"
+const LV_RE = /\(?\s*(?<![A-Za-z])l[vy]\.?\s*[\dOoIlBSZ?!|]{1,2}\s*\)?/i;   // the level digit is often misread: Lv9 -> LvO, Lv8 -> LvB, Lv7 -> Lv?
+function parseBuildText(input){
+  const out = [];
+  for(const line of linesIn(input)){
+    const raw = fixZeros(line.text);
+    const secs = findTime(raw);
+    if(secs == null || secs <= 0 || secs > 90 * 86400) continue;
+    if(!LV_RE.test(raw)) continue;                                               // only rows with a level are build/research rows
+    let name = stripTimes(raw).replace(/speed\s*up/ig, ' ');
+    const research = /\(\s*l[vy]/i.test(name);
+    const lv = name.match(LV_RE); if(lv) name = name.slice(0, lv.index + lv[0].length);
+    name = name.replace(/[|\\\/_~=<>\[\]{}'"‘’“”`]+/g, ' ').replace(/^[^A-Za-z]+/, '').replace(/[^A-Za-z0-9)]+$/, '').replace(/\s+/g, ' ').trim();
+    const base = baseName(name);
+    if(base.length < 3) continue;
+    const clean = /l[vy]\.?\s*\d{1,2}/i.test(name);                                // level digit read as a digit
+    out.push({kind: research ? 'research' : 'build', name, base, secs, clean, conf: line.conf});
+  }
+  return out;
+}
+// barracks panel -> {n, total, secs, clean}   "Barracks 11 / 14"  "Total training time: 08:43:01"
+const digitsOf = t => parseInt(String(t).replace(/[Oo]/g, '0').replace(/[Il|]/g, '1'), 10);
+function parseBarracksText(input, hint){
+  const lines = linesIn(input).map(l => fixZeros(l.text));
+  let secs = null, at = -1;
+  for(let i = 0; i < lines.length; i++){
+    if(!/tot|training\s*t/i.test(lines[i])) continue;
+    const m = lines[i].match(/(\d{1,4})\s*:\s*(\d{2})\s*:\s*(\d{2})(?!\d)/);
+    if(m && +m[2] < 60 && +m[3] < 60){ secs = (+m[1]) * 3600 + (+m[2]) * 60 + (+m[3]); at = i; break; }
+  }
+  if(secs == null) return null;
+  const skip = i => i === at || /queue|wait|[x×]\s*\d|time/i.test(lines[i]);
+  let n = null, total = 0, clean = false;
+  for(let i = 0; i < lines.length && n == null; i++){
+    if(skip(i)) continue;
+    const m = lines[i].match(/((?<![A-Za-z0-9])[\dOoIl|]{1,2}|(?<=[A-Za-z])\d{1,2})\s*[\/|]\s*([\dOoIl|]{1,2})(?![\dA-Za-z])/);
+    const a = m && digitsOf(m[1]), b = m && digitsOf(m[2]);
+    if(m && a >= 1 && a <= b){ n = a; total = b; clean = true; }
+  }
+  for(let i = 0; i < lines.length && n == null; i++){                             // "1/714": the slash read as a digit
+    if(skip(i)) continue;
+    const m = lines[i].match(/((?<![A-Za-z0-9])[\dOoIl|]{1,2}|(?<=[A-Za-z])\d{1,2})\s*[\/|]\s*[\dOoIl|]{1,3}(?![\dA-Za-z])/);
+    const a = m && digitsOf(m[1]);
+    if(m && a >= 1 && a <= 30) n = a;
+  }
+  for(let i = 0; i < lines.length && n == null; i++){                             // "11714": slash read as a digit, spaces gone
+    if(skip(i)) continue;
+    const m = lines[i].match(/(?<![A-Za-z0-9])(\d{3,5})(?![\dA-Za-z])/); if(!m) continue;
+    const D = m[1], cands = [];
+    for(let k = 1; k <= 2; k++) for(let t = 1; t <= 2; t++){ if(k + 1 + t !== D.length) continue; const a = +D.slice(0, k), b = +D.slice(D.length - t); if(a >= 1 && b <= 30 && a <= b) cands.push({a, b}); }
+    const pick = cands.find(c => hint && c.b === hint) || cands[0];
+    if(pick){ n = pick.a; total = pick.b; }
+  }
+  return {n, total, secs, clean};
+}
+
+// =====================================================================================
+//  APPLYING WHAT WAS READ
+// =====================================================================================
+const TOL_MS = 90000;                                   // panels show minutes; smaller wobble is the same timer
+
+// --- city position / tiles ---
+const offsetFor = (c, x, y) => ({dx: S.flipX ? -(x - c.cx) : (x - c.cx), dy: S.flipY ? -(y - c.cy) : (y - c.cy)});
+function findTile(x, y){                                // my painted tile at a map coordinate; nearest city wins when fields overlap
+  const cands = [];
+  for(const c of S.cities){
+    if(!hasXY(c)) continue;
+    const {dx, dy} = offsetFor(c, x, y);
+    if(Math.abs(dx) > ax(c) || Math.abs(dy) > ay(c) || (dx === 0 && dy === 0)) continue;
+    const key = (dx + 0) + ',' + (dy + 0);
+    cands.push({c, key, t: c.tiles[key] || null, d: Math.hypot(dx, dy)});
+  }
+  cands.sort((a, b) => a.d - b.d);
+  return cands.find(k => k.t) || cands[0] || null;
+}
+function nearestCity(x, y){
+  let best = null;
+  for(const c of S.cities){
+    if(!hasXY(c)) continue;
+    const {dx, dy} = offsetFor(c, x, y); if(dx === 0 && dy === 0) continue;
+    const d = Math.hypot(dx, dy); if(!best || d < best.d) best = {c, dx, dy, d};
+  }
+  return best;
+}
+const ownCity = name => name ? S.cities.find(c => similar(c.name, name) >= 0.8) : null;
+function shortLabel(name){
+  if(/barb/i.test(name || '')) return '5';
+  const words = String(name || '').split(' ').filter(Boolean);
+  if(!words.length) return '?';
+  if(words.length > 1) return words.map(w => w[0].toUpperCase()).join('').slice(0, 4);
+  return words[0][0].toUpperCase() + words[0].slice(1, 3).toLowerCase();
+}
+const MAX_REACH = 6;
+
+// confirmation memory: a NEW thing (a tile to paint, a timer to add) has to show up in two scans in a row.
+// Refreshing something that already exists is applied straight away.
+const SEEN = {};                                        // key -> {v, at, scan}
+let SCAN = 1;                                           // bumped once per scan
+const nextScan = () => ++SCAN;
+function confirmed(key, value, tol){
+  const p = SEEN[key], now = Date.now();
+  if(p && p.scan === SCAN) return p.ok;                 // same scan: keep whatever was decided the first time
+  const ok = !!(p && now - p.at < 120000 && (tol ? Math.abs(p.v - value) <= tol : p.v === value));
+  SEEN[key] = {v: value, at: now, scan: SCAN, ok};
+  return ok;
+}
+
+function applyReads(entries, dry){                      // march list rows -> mark tiles / return times
+  const now = Date.now(), res = [], groups = new Map();
+  let changed = false, relayout = false;
+  for(const e of entries){                              // learn a city's own coordinates from a row that names it ("Send Wednesday (604,117)")
+    const own = ownCity(e.name);
+    if(own && !hasXY(own)){
+      if(!dry && !confirmed('own|' + own.id, e.x * 10000 + e.y)){ res.push(own.name + ' looks to be at ' + e.x + ',' + e.y + ' — will set it if the next read agrees'); continue; }
+      res.push((dry ? 'would set ' : 'set ') + own.name + "'s coordinates to " + e.x + ',' + e.y);
+      if(!dry){ own.cx = e.x; own.cy = e.y; changed = relayout = true; }
+    }
+  }
+  for(const e of entries){
+    const label = e.x + ',' + e.y + (e.name ? ' ' + e.name : '') + (e.mode ? ' ' + e.mode : '') + (e.secs != null ? ' ' + fmtShort(e.secs * 1000) : '');
+    if(e.mode === 'skip'){ res.push(label + ' → skipped (not a hit)'); continue; }
+    if(ownCity(e.name)){ res.push(label + ' → skipped (your own city)'); continue; }
+    let hit = findTile(e.x, e.y);
+    if(!hit || !hit.t){
+      if(!S.ocr.autoPaint){ res.push(label + (hit ? ' → ' + hit.c.name + ': nothing painted there' : ' → not on any field')); continue; }
+      const near = nearestCity(e.x, e.y);
+      if(!near){ res.push(label + ' → no city has coordinates yet'); continue; }
+      const reach = Math.max(Math.abs(near.dx), Math.abs(near.dy));
+      if(reach > MAX_REACH){ res.push(label + ' → nearest city ' + near.c.name + ' is ' + reach + ' tiles away (max ' + MAX_REACH + '), not painted'); continue; }
+      const c = near.c, lab = shortLabel(e.name), key = (near.dx + 0) + ',' + (near.dy + 0);
+      const w = Math.abs(near.dx) > ax(c) ? odd(2 * Math.abs(near.dx) + 1) : c.w, h = Math.abs(near.dy) > ay(c) ? odd(2 * Math.abs(near.dy) + 1) : c.h;
+      const grow = (w !== c.w || h !== c.h) ? ' and grow its field to ' + w + '×' + h : '';
+      if(dry){ res.push(label + ' → would paint "' + lab + '" on ' + c.name + grow); continue; }
+      if(!confirmed('paint|' + c.id + '|' + key, lab)){ res.push(label + ' → new target: will paint "' + lab + '" on ' + c.name + ' if the next read agrees'); continue; }
+      c.w = w; c.h = h; c.tiles[key] = {label: lab, hitAt: null};
+      res.push(label + ' → painted "' + lab + '" on ' + c.name + grow);
+      changed = relayout = true;
+      hit = {c, key, t: c.tiles[key]};
+    }
+    if(!isBarb(hit.t)){ res.push(label + ' → ' + hit.c.name + ': ' + hit.t.label + ' (valley, no timers)'); continue; }
+    const id = hit.c.id + '|' + hit.key, g = groups.get(id) || Object.assign({labels: [], backs: [], ests: [], sure: false}, hit);
+    g.labels.push(label);
+    const mi = marchInfo(hit.c, hit.key);
+    if(e.secs != null && e.secs <= 21600){
+      const mode = e.mode || S.ocr.means;
+      if(mode === 'arrive'){ if(mi){ g.backs.push(now + e.secs * 1000 + mi.out); g.sure = true; } else g.ests.push(now + e.secs * 2000); }
+      else { g.backs.push(now + e.secs * 1000); g.sure = true; }
+    }
+    groups.set(id, g);
+  }
+  for(const g of groups.values()){
+    const {c, key, t} = g, mi = marchInfo(c, key);
+    const guessed = !g.backs.length && g.ests.length > 0;
+    const backAt = g.backs.length ? Math.max(...g.backs) : (g.ests.length ? Math.max(...g.ests) : (mi ? now + mi.round : null));
+    const tag = g.labels.join('  +  '), active = t.backAt && now < t.backAt;
+    if(tileState(t, now) === 'ready'){
+      res.push(tag + ' → ' + (dry ? 'would mark ' : 'marked ') + c.name + ' tile' + (backAt ? ', back in ' + fmtShort(backAt - now) + (guessed ? ' (estimate: set March in ' + c.name + "'s Edit for exact times)" : '') : ''));
+      if(!dry){ t.hitAt = now; if(backAt != null){ t.backAt = backAt; t.lastBack = backAt; t.alerted = false; t.ack = false; } else { t.backAt = null; t.alerted = true; t.ack = true; } changed = true; }
+    } else if(g.sure && backAt != null && ((active && Math.abs(backAt - t.backAt) > 4000) || (!active && backAt > (t.lastBack || 0) + 60000))){
+      res.push(tag + ' → ' + (dry ? 'would update ' : 'updated ') + c.name + ' return time to ' + fmtShort(backAt - now));
+      if(!dry){ t.backAt = backAt; t.lastBack = backAt; t.alerted = false; t.ack = false; changed = true; }
+    } else res.push(tag + ' → ' + c.name + ': already tracked');
+  }
+  if(changed){ save(); if(relayout){ renderCities(); renderBarbs(); } else tick(); }
+  return res;
+}
+
+// --- construction panel: at most ONE research and `buildSlots` constructions per city ---
+// Rows and existing timers are paired per building name (fuzzy, so "Barracks Lv?" still means Barracks):
+// first exact time matches, then leftovers in time order (a sped-up build), then what's left is new / gone.
+function applyBuilds(c, rows, dry){
+  const now = Date.now(), res = [];
+  let changed = false;
+  const research = rows.filter(r => r.kind === 'research').sort((a, b) => (b.clean - a.clean) || (b.conf || 0) - (a.conf || 0)).slice(0, 1);
+  const builds = rows.filter(r => r.kind === 'build').slice(0, S.buildSlots);
+  const pairs = [], newRows = [], claimed = new Set();
+  // research: whatever is researching replaces whatever was researching
+  const oldR = c.builds.find(b => b.kind === 'research');
+  if(research.length){ if(oldR){ pairs.push([research[0], oldR]); claimed.add(oldR.id); } else newRows.push(research[0]); }
+  // builds: cluster rows by name, pair with timers of the same name
+  const groups = [];
+  for(const r of builds){ const g = groups.find(g => similar(g.base, r.base) >= 0.7); if(g) g.rows.push(r); else groups.push({base: r.base, rows: [r]}); }
+  for(const g of groups){
+    const timers = c.builds.filter(b => b.kind === 'build' && !claimed.has(b.id) && similar(b.base, g.base) >= 0.7);
+    const rowsLeft = g.rows.slice().sort((a, b) => a.secs - b.secs), timersLeft = timers.slice().sort((a, b) => a.endsAt - b.endsAt);
+    for(const r of rowsLeft.slice()){                                                  // exact matches first
+      const t = timersLeft.find(b => Math.abs(b.endsAt - (now + r.secs * 1000)) <= TOL_MS);
+      if(t){ pairs.push([r, t]); claimed.add(t.id); rowsLeft.splice(rowsLeft.indexOf(r), 1); timersLeft.splice(timersLeft.indexOf(t), 1); }
+    }
+    while(rowsLeft.length && timersLeft.length){                                        // then re-timed ones, in order
+      const r = rowsLeft.shift(), t = timersLeft.shift(); pairs.push([r, t]); claimed.add(t.id);
+    }
+    newRows.push(...rowsLeft);
+  }
+  const labelOf = r => (r.kind === 'research' ? 'research ' : 'build ') + r.name + ' ' + fmtShort(r.secs * 1000);
+  for(const [r, t] of pairs){
+    const endsAt = now + r.secs * 1000, lab = labelOf(r), renamed = r.kind === 'research' && similar(t.base, r.base) < 0.7;
+    if(!dry) t.miss = 0;                                                                   // it was seen, whatever else happens
+    if(Math.abs(endsAt - t.endsAt) > TOL_MS || renamed){
+      if(!dry && now < t.endsAt && !confirmed('retime|' + t.id, r.secs, 120)){ res.push(lab + ' → differs from ' + fmtShort(t.endsAt - now) + ': will update if the next read agrees'); continue; }
+      res.push(lab + ' → ' + (dry ? 'would update ' : 'updated ') + c.name + (renamed ? ' (replaces ' + t.name + ')' : ''));
+      if(!dry){ t.endsAt = endsAt; t.alerted = false; if(r.clean || renamed){ t.name = r.name; t.base = r.base; } changed = true; }
+    } else {
+      res.push(lab + ' → ' + c.name + ': already tracked');
+      if(!dry && r.clean && t.name !== r.name){ t.name = r.name; t.base = r.base; changed = true; }   // keep the cleanest spelling of the level
+    }
+  }
+  newRows.forEach((r, i) => {
+    const lab = labelOf(r);
+    if(!dry && !confirmed('build|' + c.id + '|' + r.kind + '|' + normName(r.base) + '|' + i, r.secs, 120)){ res.push(lab + ' → new: will add if the next read agrees'); return; }
+    res.push(lab + ' → ' + (dry ? 'would add to ' : 'added to ') + c.name);
+    if(!dry){ const nb = {id: uid(), kind: r.kind, name: r.name, base: r.base, endsAt: now + r.secs * 1000, alerted: false, miss: 0}; c.builds.push(nb); claimed.add(nb.id); changed = true; }
+  });
+  // the panel was on screen, so timers it no longer lists were sped up or cancelled (two misses in a row, so one bad read can't delete)
+  if(rows.length){
+    for(const b of c.builds.slice()){
+      if(claimed.has(b.id) || now >= b.endsAt - 5000) continue;
+      const gone = (b.miss || 0) + 1;
+      res.push(b.name + ' → ' + (dry ? 'would remove (no longer listed)' : gone >= 2 ? 'removed (no longer listed)' : 'not listed this read'));
+      if(!dry){ b.miss = gone; if(gone >= 2){ c.builds = c.builds.filter(x => x !== b); changed = true; } }
+    }
+  }
+  // hard caps, whatever happened above
+  if(!dry){
+    const rs = c.builds.filter(b => b.kind === 'research').sort((a, b) => b.endsAt - a.endsAt);
+    if(rs.length > 1){ c.builds = c.builds.filter(b => b.kind !== 'research' || b === rs[0]); changed = true; }
+    const bs = c.builds.filter(b => b.kind === 'build').sort((a, b) => (b.miss || 0) - (a.miss || 0) || (now >= b.endsAt) - (now >= a.endsAt) || a.endsAt - b.endsAt);
+    while(bs.length > S.buildSlots){ const drop = bs.shift(); c.builds = c.builds.filter(b => b !== drop); changed = true; res.push(drop.name + ' → dropped (more than ' + S.buildSlots + ' builders)'); }
+  }
+  if(changed && !dry){ save(); tick(); }
+  return res;
+}
+
+// --- barracks panel ---
+function applyBarracks(c, r, dry){
+  const now = Date.now();
+  if(!r) return ['no "Total training time" found'];
+  if(r.n == null) return ['read total ' + longT(r.secs * 1000) + ' but not the barracks number ("1 / 14"): put that line inside the purple box'];
+  const key = String(r.n), endsAt = now + r.secs * 1000, old = c.bar[key], lab = 'barracks ' + r.n + (r.total ? '/' + r.total : '') + ' ' + longT(r.secs * 1000);
+  const ok = () => { if(r.total) c.barN = r.total; save(); tick(); };
+  if(!old){
+    if(dry) return [lab + ' → would record for ' + c.name];
+    if(!confirmed('bar|' + c.id + '|' + key, r.secs, 120)) return [lab + ' → will record for ' + c.name + ' if the next read agrees'];
+    c.bar[key] = {endsAt, alerted: r.secs === 0}; ok();
+    return [lab + ' → recorded for ' + c.name];
+  }
+  if(Math.abs(endsAt - old.endsAt) <= TOL_MS) return [lab + ' → ' + c.name + ': already tracked'];
+  if(dry) return [lab + ' → would update ' + c.name];
+  if(!confirmed('bar|' + c.id + '|' + key, r.secs, 120) && now < old.endsAt) return [lab + ' → differs from ' + longT(old.endsAt - now) + ': will update if the next read agrees'];
+  old.endsAt = endsAt; old.alerted = r.secs === 0; ok();
+  return [lab + ' → updated ' + c.name];
+}
+
+// --- city list: which tab is highlighted ---
+function detectRedBand(px, w, h){
+  const need = Math.max(20, Math.round(w * 0.3)), rows = [];
+  for(let y = 0; y < h; y++){
+    let run = 0, best = 0;
+    for(let x = 0; x < w; x++){ const i = (y * w + x) * 4, r = px[i], g = px[i+1], b = px[i+2]; if(r >= 140 && g <= 100 && b <= 100 && r - g >= 70){ run++; if(run > best) best = run; } else run = 0; }   // red frame of the selected tab (loose: video frames lose colour)
+    if(best >= need) rows.push(y);
+  }
+  if(!rows.length) return null;
+  const top = rows[0], bottom = rows[rows.length - 1];
+  return bottom - top >= 8 ? {top, bottom} : null;
+}
+// the city tabs: each has a bright gold (or red, when selected) bottom edge and they sit at an even spacing;
+// anything bright but off that rhythm (the arrow button above the list) is ignored
+function detectTabs(px, w, h){
+  const rows = [], lum = [];
+  for(let y = 0; y < h; y++){
+    let n = 0, l = 0;
+    for(let x = 0; x < w; x++){ const i = (y * w + x) * 4, r = px[i], g = px[i+1], b = px[i+2]; l += 0.299 * r + 0.587 * g + 0.114 * b; if(r > 120 && r >= g && g >= b && r - b > 60) n++; }                    // warm (gold / orange / red) frame pixels; loose, so compressed video still counts
+    rows.push(n / w); lum.push(l / w);
+  }
+  const peak = Math.max(...rows); if(peak < 0.12) return null;
+  const edges = [];                                           // centre of each run of bright rows
+  for(let y = 0, start = -1; y <= h; y++){
+    const on = y < h && rows[y] >= peak * 0.6;
+    if(on && start < 0) start = y;
+    if(!on && start >= 0){ edges.push((start + y - 1) / 2); start = -1; }
+  }
+  if(edges.length < 2) return null;
+  // a tab boundary is two bright lines a few px apart (bottom of one tab, top of the next): merge those into one edge
+  const gaps = []; for(let i = 1; i < edges.length; i++) gaps.push(edges[i] - edges[i - 1]);
+  const big = gaps.slice().sort((a, b) => a - b)[Math.floor(gaps.length * 0.75)];
+  for(let i = edges.length - 1; i > 0; i--) if(edges[i] - edges[i - 1] < big * 0.35){ edges[i - 1] = (edges[i - 1] + edges[i]) / 2; edges.splice(i, 1); }
+  if(edges.length < 2) return null;
+  const diffs = []; for(let i = 1; i < edges.length; i++) diffs.push(edges[i] - edges[i - 1]);
+  const spacing = diffs.slice().sort((a, b) => a - b)[Math.floor(diffs.length / 2)];
+  if(spacing < 12) return null;
+  const near = (a, b) => Math.abs(a - b) <= spacing * 0.15;
+  const lattice = edges.filter((e, i) => (i > 0 && near(e - edges[i - 1], spacing)) || (i < edges.length - 1 && near(edges[i + 1] - e, spacing)));
+  if(lattice.length < 1) return null;
+  // the first edge may be the TOP of the first tab rather than a bottom: is there tab artwork above it?
+  const mean = (a, b) => { a = Math.max(0, Math.round(a)); b = Math.min(h - 1, Math.round(b)); let t = 0, n = 0; for(let y = a; y <= b; y++){ t += lum[y]; n++; } return n ? t / n : 0; };
+  const e0 = lattice[0], inside = mean(e0 + 3, e0 + spacing - 3), roomAbove = e0 - 3 >= spacing * 0.5;
+  const strayAbove = edges.some(e => !lattice.includes(e) && e < e0 - 3 && e > e0 - spacing);        // a bright line off the rhythm up there = the arrow button, not a tab
+  const tabAbove = roomAbove && !strayAbove && mean(e0 - spacing + 3, e0 - 3) >= inside * 0.75;
+  const bottoms = tabAbove ? lattice : lattice.slice(1);
+  if(!bottoms.length) return null;
+  return {count: bottoms.length, spacing, bottoms, edges: edges.map(Math.round)};
+}
+const slotCount = () => Math.max(1, S.ocr.slots || S.ocr.found || S.cities.length);
+function slotOf(band, h, tabs){
+  const mid = (band.top + band.bottom + 1) / 2;
+  if(tabs && tabs.bottoms && tabs.bottoms.length){ const i = tabs.bottoms.findIndex(b => mid <= b + 2 && mid > b - tabs.spacing - 2); if(i >= 0) return i; }
+  return Math.min(slotCount() - 1, Math.max(0, Math.floor(mid / (h / slotCount()))));
+}
+function cityOfSlot(i){
+  const id = (S.ocr.slotMap || [])[i];
+  if(id === '') return null;
+  return cityById(id) || S.cities[i] || null;
+}
+window.__evony = {detectTabs, ensureCities, parseMarchText, applyReads, findTile, nearestCity, parseBuildText, applyBuilds, detectRedBand, slotOf, cityOfSlot, parseBarracksText, applyBarracks, similar, confirmed, nextScan, SEEN, get S(){ return S; }, get agreeRows(){ return agreeRows; }};
+
+// =====================================================================================
+//  SCREEN READER  (capture → crop → threshold → OCR; two passes that must agree)
+// =====================================================================================
+const OCR = {stream: null, worker: null, scanTimer: null, prevTimer: null, busy: false, drag: null, lastRead: 0};
+const scrVideo = $('scrVideo'), scrCanvas = $('scrCanvas'), scrCrop = $('scrCrop');
+const REGIONS = [
+  {k: 'march',    color: '#e0a93b', name: 'March list',       desc: 'the list of marches (Attack / Return rows with coordinates)'},
+  {k: 'build',    color: '#3fb97a', name: 'Construction',     desc: 'the build + research timers panel'},
+  {k: 'city',     color: '#4aa3ff', name: 'City list',        desc: 'the column of city tabs on the side — top edge of the first to bottom edge of the last'},
+  {k: 'barracks', color: '#b57aff', name: 'Barracks header',  desc: '"Barracks 1 / 14" and "Total training time" lines only'}
+];
+const regionOf = k => S.ocr.regions[k];
+function setState(txt, live){ const el = $('scrState'); el.textContent = txt; el.classList.toggle('live', !!live); $('stReader').querySelector('b').textContent = txt; }
+const scrStatus = msg => { $('scrStatus').textContent = msg || ''; };
+function renderBoxes(){
+  $('boxes').innerHTML = REGIONS.map(r => {
+    const set = !!regionOf(r.k), drawing = S.ocr.target === r.k;
+    return `<span class="dot" style="background:${r.color}"></span><span><span class="bn">${r.name}</span> <span class="bd">— ${r.desc}</span></span>
+      <span class="bs ${drawing ? 'on' : set ? 'ok' : ''}" data-bs="${r.k}">${drawing ? (set ? 'set · drag to redraw' : 'drag on the preview') : set ? 'set' : 'not set'}</span>
+      <span class="bb"><button class="s ${drawing ? 'on' : ''}" data-draw="${r.k}">Draw</button><button class="s" data-clear="${r.k}" ${set ? '' : 'disabled'}>Clear</button></span>`;
+  }).join('');
+}
+$('boxes').addEventListener('click', e => {
+  const d = e.target.closest('[data-draw]'), c = e.target.closest('[data-clear]');
+  if(d){ S.ocr.target = d.dataset.draw; save(); renderBoxes(); drawPreview(); if(!OCR.stream) scrStatus('Start capture first, then drag on the preview.'); }
+  if(c){ S.ocr.regions[c.dataset.clear] = null; save(); renderBoxes(); drawPreview(); }
+});
+function renderSlotMap(){
+  const n = slotCount(); $('scrSlots').value = n;
+  const custom = S.ocr.slots || (S.ocr.slotMap || []).some((id, i) => id !== undefined && id !== (S.cities[i] ? S.cities[i].id : ''));
+  $('slotInfo').textContent = (S.ocr.found ? S.ocr.found + ' city tabs found. ' : 'City tabs are counted when the City list box is read. ') + (custom ? 'Custom tab order in use.' : 'Tabs map to your cards top → bottom (drag cards to reorder).');
+  $('slotMap').innerHTML = Array.from({length: n}, (_, i) => {
+    const cur = (S.ocr.slotMap && S.ocr.slotMap[i] !== undefined) ? S.ocr.slotMap[i] : (S.cities[i] ? S.cities[i].id : '');
+    return `<select data-slot="${i}" title="Game tab ${i + 1}"><option value="">(none)</option>` + S.cities.map(c => `<option value="${c.id}" ${c.id === cur ? 'selected' : ''}>${esc(c.name)}</option>`).join('') + '</select>';
+  }).join('');
+}
+$('slotMap').addEventListener('change', e => {
+  const i = +e.target.dataset.slot; if(isNaN(i)) return;
+  const n = slotCount(), m = Array.from({length: n}, (_, k) => (S.ocr.slotMap && S.ocr.slotMap[k] !== undefined) ? S.ocr.slotMap[k] : (S.cities[k] ? S.cities[k].id : ''));
+  m[i] = e.target.value; S.ocr.slotMap = m; save();
+});
+$('scrSlots').onchange = e => { S.ocr.slots = Math.min(12, Math.max(1, parseInt(e.target.value, 10) || 0)); if(S.ocr.slots === S.ocr.found) S.ocr.slots = 0; save(); renderSlotMap(); };
+$('slotAdjust').onclick = () => { $('slotEdit').classList.toggle('hidden'); $('slotAdjust').classList.toggle('on'); };
+window.__slotRefresh = renderSlotMap;
+
+async function loadTesseract(){
+  if(window.Tesseract) return;
+  await new Promise((ok, bad) => { const el = document.createElement('script'); el.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'; el.onload = ok; el.onerror = () => bad(new Error('Could not load the text reader (it needs an internet connection the first time).')); document.head.appendChild(el); });
+}
+function restartScan(){
+  clearInterval(OCR.scanTimer); OCR.scanTimer = null;
+  if(OCR.worker && OCR.stream) OCR.scanTimer = setInterval(() => scanOnce(false), Math.max(2, S.ocr.every) * 1000);
+}
+async function startCapture(){
+  if(OCR.stream) return;
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia){ scrStatus('This browser cannot capture the screen.'); return; }
+  try {
+    scrStatus('Pick the Dominion of Ages window…');
+    OCR.stream = await navigator.mediaDevices.getDisplayMedia({video: {width: {ideal: 4096}, height: {ideal: 4096}, frameRate: {ideal: 5, max: 10}}, audio: false});
+  } catch(e){ OCR.stream = null; scrStatus('Capture cancelled.'); return; }
+  scrVideo.srcObject = OCR.stream;
+  try { await scrVideo.play(); } catch(e){}
+  OCR.stream.getVideoTracks()[0].addEventListener('ended', stopCapture);
+  $('scrStart').disabled = true; $('scrStop').disabled = false;
+  $('scrPlaceholder').classList.add('hidden'); scrCanvas.classList.remove('hidden');
+  drawPreview(); OCR.prevTimer = setInterval(drawPreview, 1000);
+  setState('loading', true);
+  try {
+    scrStatus('Loading the text reader (a few seconds the first time)…');
+    await loadTesseract();
+    OCR.worker = await Tesseract.createWorker('eng');
+    await OCR.worker.setParameters({tessedit_pageseg_mode: '6', preserve_interword_spaces: '1'});
+  } catch(e){ scrStatus(String((e && e.message) || e)); setState('error'); return; }
+  $('scrTest').disabled = false;
+  const any = REGIONS.some(r => regionOf(r.k));
+  scrStatus(any ? 'Watching.' : 'Press Draw next to City list, then drag a box around your city tabs on the preview.');
+  setState(S.ocr.apply ? 'live' : 'test', true);
+  restartScan();
+  if(any) scanOnce(true);
+}
+function stopCapture(){
+  clearInterval(OCR.scanTimer); clearInterval(OCR.prevTimer); OCR.scanTimer = OCR.prevTimer = null;
+  if(OCR.stream){ OCR.stream.getTracks().forEach(t => t.stop()); OCR.stream = null; }
+  scrVideo.srcObject = null;
+  if(OCR.worker){ try { OCR.worker.terminate(); } catch(e){} OCR.worker = null; }
+  $('scrStart').disabled = false; $('scrStop').disabled = true; $('scrTest').disabled = true;
+  $('scrPlaceholder').classList.remove('hidden'); scrCanvas.classList.add('hidden');
+  scrStatus('Stopped.'); setState('off');
+}
+// --- preview + box drawing ---
+function sizePreview(){
+  const w = Math.min(720, scrVideo.videoWidth), h = Math.round(w * scrVideo.videoHeight / scrVideo.videoWidth);
+  if(scrCanvas.width !== w) scrCanvas.width = w; if(scrCanvas.height !== h) scrCanvas.height = h;
+  return {w, h, g: scrCanvas.getContext('2d')};
+}
+function strokeRegion(g, r, w, h, color, label){
+  if(!r) return;
+  g.strokeStyle = color; g.lineWidth = 2; g.strokeRect(r.x * w, r.y * h, r.w * w, r.h * h);
+  if(label){ g.font = 'bold 11px system-ui'; const tw = g.measureText(label).width + 8; g.fillStyle = color; g.fillRect(r.x * w, Math.max(0, r.y * h - 15), tw, 15); g.fillStyle = '#111'; g.fillText(label, r.x * w + 4, Math.max(11, r.y * h - 4)); }
+}
+function strokeAll(g, w, h){ REGIONS.forEach(r => strokeRegion(g, regionOf(r.k), w, h, r.color, r.name)); }
+function drawPreview(){
+  if(!OCR.stream || !scrVideo.videoWidth || OCR.drag) return;
+  const {w, h, g} = sizePreview(); g.drawImage(scrVideo, 0, 0, w, h); strokeAll(g, w, h);
+}
+const dragRect = d => ({x: Math.min(d.a.x, d.b.x), y: Math.min(d.a.y, d.b.y), w: Math.abs(d.a.x - d.b.x), h: Math.abs(d.a.y - d.b.y)});
+function canvasPt(e){ const b = scrCanvas.getBoundingClientRect(); return {x: Math.min(1, Math.max(0, (e.clientX - b.left) / b.width)), y: Math.min(1, Math.max(0, (e.clientY - b.top) / b.height))}; }
+scrCanvas.addEventListener('mousedown', e => { if(!OCR.stream || !scrVideo.videoWidth) return; e.preventDefault(); const pt = canvasPt(e); OCR.drag = {a: pt, b: pt}; });
+window.addEventListener('mousemove', e => {
+  if(!OCR.drag) return;
+  OCR.drag.b = canvasPt(e);
+  const {w, h, g} = sizePreview(); g.drawImage(scrVideo, 0, 0, w, h); strokeAll(g, w, h);
+  strokeRegion(g, dragRect(OCR.drag), w, h, '#fff');
+});
+window.addEventListener('mouseup', () => {
+  if(!OCR.drag) return;
+  const r = dragRect(OCR.drag); OCR.drag = null;
+  if(r.w > 0.01 && r.h > 0.01){ S.ocr.regions[S.ocr.target] = r; save(); renderBoxes(); scanOnce(true); }
+  drawPreview();
+});
+// --- grab a region as a black-on-white bitmap for the reader ---
+// mode 'white' keeps near-white pixels (game lists: white text on colored rows); 'dark' keeps dark pixels (dark text on light panels); 'raw' = the colors
+function grabRegion(r, mode, scale, thr){
+  if(!r || !scrVideo.videoWidth) return null;
+  const sx = r.x * scrVideo.videoWidth, sy = r.y * scrVideo.videoHeight, sw = r.w * scrVideo.videoWidth, sh = r.h * scrVideo.videoHeight;
+  const c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(sw * scale)); c.height = Math.max(1, Math.round(sh * scale));
+  const g = c.getContext('2d'); g.imageSmoothingQuality = 'high';
+  g.drawImage(scrVideo, sx, sy, sw, sh, 0, 0, c.width, c.height);
+  if(mode === 'raw') return c;
+  const im = g.getImageData(0, 0, c.width, c.height), px = im.data;
+  for(let i = 0; i < px.length; i += 4){
+    const r = px[i], gg = px[i+1], b = px[i+2];
+    const ink = mode === 'white' ? Math.min(r, gg, b) >= thr : (0.299 * r + 0.587 * gg + 0.114 * b) < thr;
+    px[i] = px[i+1] = px[i+2] = ink ? 0 : 255;
+  }
+  g.putImageData(im, 0, 0);
+  return c;
+}
+// read a region twice at different scales / thresholds; returns [{text, conf, canvas}]
+async function readRegion(r, mode, targetW){
+  const sw = r.w * scrVideo.videoWidth, base = Math.max(1, Math.min(4, targetW / sw));
+  const passes = mode === 'white' ? [[base, 185], [Math.min(5, base * 1.4), 170]] : [[base, 150], [Math.min(5, base * 1.25), 165]];
+  const out = [];
+  for(const [sc, thr] of passes){
+    const c = grabRegion(r, mode, sc, thr);
+    const {data} = await OCR.worker.recognize(c);
+    const lines = (data.lines && data.lines.length) ? data.lines.map(l => ({text: l.text, conf: l.confidence})) : linesIn(data.text);
+    out.push({text: data.text || '', lines, conf: data.confidence || 0, canvas: c});
+  }
+  return out;
+}
+// combine the two passes: rows are paired one-to-one (fuzzy name, values within tol) so two identical rows stay two rows;
+// a row only one pass saw is kept unless it was a very poor read. Wrong rows can't do harm on their own: adding or
+// re-timing anything needs two scans in a row to agree (see confirmed()).
+function agreeRows(passes, same, valOf, tol){
+  const A = (passes[0] && passes[0].rows || []).slice(), B = (passes[1] && passes[1].rows || []).slice(), out = [];
+  const better = (a, b) => (b.clean && !a.clean) || (b.conf || 0) > (a.conf || 0) + 10 ? b : a;
+  for(const a of A){
+    let i = B.findIndex(b => same(a, b) && (!valOf || Math.abs(valOf(a) - valOf(b)) <= tol));
+    if(i < 0) i = B.findIndex(b => same(a, b));                   // same thing, different value: the more confident read wins
+    if(i >= 0) out.push(better(a, B.splice(i, 1)[0]));
+    else if((a.conf || 0) >= 60) out.push(a);
+  }
+  for(const b of B) if((b.conf || 0) >= 60) out.push(b);
+  return out;
+}
+// make sure there is a card (and field) for every tab the reader can see
+function ensureCities(n, dry){
+  const notes = [];
+  if(!S.ocr.autoCities || !n) return notes;
+  if(S.ocr.found !== n){ if(!dry){ S.ocr.found = n; save(); } }
+  if(S.cities.length < n){
+    if(dry) notes.push('would add ' + (n - S.cities.length) + ' cit' + (n - S.cities.length > 1 ? 'ies' : 'y') + ' to match the ' + n + ' tabs');
+    else { while(S.cities.length < n) S.cities.push(newCity('City ' + (S.cities.length + 1))); setupLater = false; save(); renderCities(); renderBarbs(); notes.push('added cities to match the ' + n + ' tabs — name them and enter their coordinates under Finish setup'); }
+  } else if(S.cities.length > n) notes.push(S.cities.length + ' cities here but ' + n + ' tabs read: extra cards are left alone');
+  return notes;
+}
+async function readCity(dry){
+  const r = regionOf('city'); if(!r) return null;
+  const raw = grabRegion(r, 'raw', 1);
+  const im = raw.getContext('2d').getImageData(0, 0, raw.width, raw.height);
+  let tabs = detectTabs(im.data, raw.width, raw.height);
+  const band = detectRedBand(im.data, raw.width, raw.height);
+  let how = tabs ? 'edges at ' + tabs.edges.join(',') + ' px, spacing ' + Math.round(tabs.spacing) : 'no tab edges found';
+  if((!tabs || tabs.count < 2) && band){                                 // fallback: the box spans the tabs, the red frame is one tab tall
+    const th = band.bottom - band.top + 1, n = Math.round(raw.height / (th + 2));
+    if(n >= 2){ tabs = {count: n, spacing: th + 2, bottoms: Array.from({length: n}, (_, i) => (i + 1) * (th + 2)), edges: []}; how = 'estimated from the box height / selected tab height'; }
+  }
+  if(S.ocr.slots) tabs = Object.assign({}, tabs || {spacing: raw.height / S.ocr.slots, bottoms: [], edges: []}, {count: S.ocr.slots, manual: true});
+  const notes = tabs ? ensureCities(tabs.count, dry) : [];
+  const head = tabs ? tabs.count + ' tabs' + (tabs.manual ? ' (set by hand)' : '') + ' [' + how + ']' : 'tab edges not found — draw the box from the top of the first tab to the bottom of the last';
+  if(!band) return {text: head + ' · no selected (red) tab found', notes};
+  const i = slotOf(band, raw.height, tabs), city = cityOfSlot(i);
+  return {city, text: head + ' · selected tab ' + (i + 1) + (city ? ' → ' + city.name : ' → no card for that tab yet'), notes};
+}
+async function scanOnce(forceDry){
+  if(OCR.busy || !OCR.worker || !OCR.stream) return;
+  const R = S.ocr.regions;
+  if(!R.march && !R.build && !R.city && !R.barracks){ $('scrOut').textContent = 'Draw a box on the preview first.'; return; }
+  OCR.busy = true; nextScan();
+  const dry = !!forceDry || !S.ocr.apply, parts = [], t0 = Date.now();
+  try {
+    let cur = null;
+    if(R.city){
+      const rc = await readCity(dry);
+      parts.push('--- city list ---\n' + (rc ? [rc.text].concat(rc.notes || []).join('\n') : '(nothing)'));
+      if(rc && rc.city){ cur = rc.city; if(!dry) S.cur = {id: cur.id, at: Date.now()}; }
+    }
+    if(!cur && S.cur && Date.now() - S.cur.at < 30000) cur = cityById(S.cur.id) || null;
+    const noCity = 'not applied: no city detected' + (R.city ? '' : ' (draw the City list box)');
+    if(R.build){
+      const passes = (await readRegion(R.build, 'white', 900)).map(p => Object.assign(p, {rows: parseBuildText(p.lines)}));
+      const rows = agreeRows(passes, (a, b) => a.kind === b.kind && similar(a.base, b.base) >= 0.7, r => r.secs, 120);
+      const res = !cur ? [noCity] : rows.length ? applyBuilds(cur, rows, dry) : ['no build/research rows read'];
+      parts.push('--- construction' + (cur ? ' for ' + cur.name : '') + ' ---\n' + passes.map((p, i) => '[pass ' + (i + 1) + ' ' + Math.round(p.conf) + '%] ' + (p.text.trim().replace(/\s*\n\s*/g, ' | ') || '(nothing)')).join('\n') + '\n→ ' + res.join('\n→ '));
+      if(S.ocr.debug) showCrop(passes[0].canvas);
+    }
+    if(R.barracks){
+      const passes = (await readRegion(R.barracks, 'dark', 900)).map(p => Object.assign(p, {row: parseBarracksText(p.lines, cur && cur.barN)}));
+      const reads = passes.map(p => p.row).filter(Boolean);
+      let r = null;
+      if(reads.length){
+        const clean = reads.filter(x => x.clean && x.n != null), pool = clean.length ? clean : reads.filter(x => x.n != null);
+        const n = pool.length ? pool[0].n : null;
+        const sameN = reads.filter(x => x.n === n || x.n == null);
+        r = {n, total: Math.max(0, ...pool.map(x => x.total)), secs: sameN.length ? sameN[0].secs : reads[0].secs, clean: !!clean.length};
+        if(n != null && reads.length >= 2 && reads.every(x => x.n != null) && reads[0].n !== reads[1].n && !clean.length) r.n = null;   // the passes disagree and neither is clean
+      }
+      const res = !cur ? [noCity] : applyBarracks(cur, r, dry);
+      parts.push('--- barracks' + (cur ? ' for ' + cur.name : '') + ' ---\n' + passes.map((p, i) => '[pass ' + (i + 1) + ' ' + Math.round(p.conf) + '%] ' + (p.text.trim().replace(/\s*\n\s*/g, ' | ') || '(nothing)')).join('\n') + '\n→ ' + res.join('\n→ '));
+      if(S.ocr.debug && !R.build) showCrop(passes[0].canvas);
+    }
+    if(R.march){
+      const passes = (await readRegion(R.march, 'white', 1350)).map(p => Object.assign(p, {rows: parseMarchText(p.lines)}));
+      const rows = agreeRows(passes, (a, b) => a.x === b.x && a.y === b.y && a.mode === b.mode, r => r.secs == null ? -1 : r.secs, 20);
+      const res = applyReads(rows, dry);
+      parts.push('--- marches ---\n' + passes.map((p, i) => '[pass ' + (i + 1) + ' ' + Math.round(p.conf) + '%] ' + (p.text.trim().replace(/\s*\n\s*/g, ' | ') || '(nothing)')).join('\n') + '\n→ ' + (res.length ? res.join('\n→ ') : 'no coordinates read'));
+      if(S.ocr.debug && !R.build && !R.barracks) showCrop(passes[0].canvas);
+    }
+    OCR.lastRead = Date.now();
+    $('scrOut').textContent = (dry ? '(test mode: nothing was changed)\n' : '') + 'read in ' + ((Date.now() - t0) / 1000).toFixed(1) + 's at ' + new Date().toLocaleTimeString() + '\n\n' + parts.join('\n\n');
+  } catch(e){ $('scrOut').textContent = 'Read failed: ' + ((e && e.message) || e); }
+  finally { OCR.busy = false; }
+}
+function showCrop(c){ scrCrop.classList.remove('hidden'); scrCrop.width = c.width; scrCrop.height = c.height; scrCrop.getContext('2d').drawImage(c, 0, 0); }
+
+// reader controls
+renderBoxes(); renderSlotMap();
+$('scrStart').onclick = startCapture;
+$('scrStop').onclick = stopCapture;
+$('scrTest').onclick = () => scanOnce(true);
+$('scrApply').checked = !!S.ocr.apply;
+$('scrApply').onchange = e => { S.ocr.apply = e.target.checked; save(); if(OCR.worker) setState(S.ocr.apply ? 'live' : 'test', true); scrStatus(S.ocr.apply ? 'Auto-apply is ON.' : 'Test mode: it only reports.'); };
+$('scrPaint').checked = !!S.ocr.autoPaint;
+$('scrPaint').onchange = e => { S.ocr.autoPaint = e.target.checked; save(); };
+$('scrEvery').value = S.ocr.every;
+$('scrEvery').oninput = e => { S.ocr.every = Math.min(60, Math.max(2, parseInt(e.target.value, 10) || 5)); save(); restartScan(); };
+$('scrMeans').value = S.ocr.means;
+$('scrMeans').onchange = e => { S.ocr.means = e.target.value; save(); };
+$('buildSlots').value = S.buildSlots;
+$('buildSlots').onchange = e => { S.buildSlots = Math.min(4, Math.max(1, parseInt(e.target.value, 10) || 2)); save(); tick(); };
+$('scrDebug').checked = !!S.ocr.debug;
+$('scrDebug').onchange = e => { S.ocr.debug = e.target.checked; save(); scrCrop.classList.toggle('hidden', !S.ocr.debug); };
+scrCrop.classList.toggle('hidden', !S.ocr.debug);
+
+// =====================================================================================
+//  VIEW OPTIONS, SETTINGS, BACKUP
+// =====================================================================================
+function applyManual(){
+  document.body.classList.toggle('manual', !!S.manual);
+  $('reader').classList.toggle('hidden', !!S.manual);
+  $('startAuto').classList.toggle('hidden', !!S.manual); $('startManual').classList.toggle('hidden', !S.manual);
+  $('stReader').classList.toggle('hidden', !!S.manual);
+  if(S.manual && OCR.stream) stopCapture();
+}
+applyManual();
+function applyView(){
+  document.documentElement.style.setProperty('--t', S.tile + 'px');
+  document.body.classList.toggle('tiny', S.tile < 24);
+  document.body.classList.toggle('coords-on', S.tileMode === 'coords');
+  document.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('on', b.dataset.mode === S.tileMode));
+}
+applyView();
+$('tsz').value = S.tile;
+$('tsz').oninput = e => { S.tile = parseInt(e.target.value, 10) || 28; applyView(); save(); };
+document.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { S.tileMode = b.dataset.mode; applyView(); save(); tick(); });
+$('fx').checked = !!S.flipX; $('fx').onchange = e => { S.flipX = e.target.checked; save(); tick(); };
+$('fy').checked = !!S.flipY; $('fy').onchange = e => { S.flipY = e.target.checked; save(); tick(); };
+$('dist').value = S.dist; $('dist').onchange = e => { S.dist = e.target.value; save(); tick(); };
+$('cdH').value = S.cooldownH; $('cdH').oninput = e => { S.cooldownH = parseFloat(e.target.value) || 0; save(); tick(); };
+$('snd').checked = !!S.sound; $('snd').onchange = e => { S.sound = e.target.checked; save(); if(S.sound) beep(); };
+$('ntf').checked = !!S.notify;
+$('ntf').onchange = e => { S.notify = e.target.checked; save(); if(S.notify && 'Notification' in window && Notification.permission === 'default') Notification.requestPermission(); };
+$('exp').onclick = () => {
+  const blob = new Blob([JSON.stringify(S, null, 1)], {type: 'application/json'}), a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'dominion-daddy-' + new Date().toISOString().slice(0, 10) + '.json';
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+};
+$('imp').onclick = () => $('impFile').click();
+$('impFile').onchange = async e => {
+  const f = e.target.files[0]; if(!f) return;
+  try {
+    const d = JSON.parse(await f.text());
+    if(!Array.isArray(d.cities)) throw 0;
+    if(!confirm('Replace everything here with the backup "' + f.name + '" (' + d.cities.length + ' cities)?')) return;
+    S = d; migrate(S); save(); location.reload();
+  } catch(err){ alert('That file is not a Dominion Daddy backup.'); }
+  e.target.value = '';
+};
+$('manual').checked = !!S.manual;
+$('manual').onchange = e => { S.manual = e.target.checked; save(); applyManual(); };
+$('wipe').onclick = () => { if(confirm('Erase all cities and field data?')){ S = defaults(); save(); location.reload(); } };
+
+// =====================================================================================
+//  DRAG TO REORDER (shared order for cards and fields)
+// =====================================================================================
+function moveTo(fromId, toId){
+  const from = S.cities.findIndex(c => c.id === fromId), to = S.cities.findIndex(c => c.id === toId);
+  if(from < 0 || to < 0 || from === to) return;
+  const [c] = S.cities.splice(from, 1); S.cities.splice(to, 0, c);
+  save(); renderCities(); renderBarbs();
+}
+function setupDnD(box, itemSel, getId){
+  let dragId = null;
+  box.addEventListener('mousedown', e => { const h = e.target.closest('.grab'); if(!h) return; const it = h.closest(itemSel); if(it) it.draggable = true; });
+  box.addEventListener('dragstart', e => { const it = e.target.closest ? e.target.closest(itemSel) : null; if(!it || !it.draggable) return; dragId = getId(it); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', dragId); it.classList.add('dragging'); });
+  box.addEventListener('dragover', e => { if(!dragId) return; e.preventDefault(); box.querySelectorAll('.dropat').forEach(x => x.classList.remove('dropat')); const it = e.target.closest(itemSel); if(it && getId(it) !== dragId) it.classList.add('dropat'); });
+  box.addEventListener('drop', e => { if(!dragId) return; e.preventDefault(); const it = e.target.closest(itemSel), from = dragId; dragId = null; if(it) moveTo(from, getId(it)); });
+  box.addEventListener('dragend', () => { dragId = null; box.querySelectorAll(itemSel).forEach(i => { i.draggable = false; i.classList.remove('dragging', 'dropat'); }); });
+}
+setupDnD($('cities'), '.card', el => el.dataset.id);
+setupDnD($('barbList'), '.cblock', el => el.dataset.cid);
+document.addEventListener('mouseup', () => document.querySelectorAll('[draggable=true]').forEach(i => i.draggable = false));
+
+// =====================================================================================
+save();
+renderCities(); renderBarbs();
+setInterval(tick, 1000);
+})();
+</script>
+</body>
+</html>
