@@ -9,10 +9,201 @@
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
+<script id="i18n">window.IBORY_V="0.2.7";
+/* ---------- translations (0.2.7) ----------
+   The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
+   screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
+   A language file is I18N.load({ "English text": "translation", "Level {0}": "... {0}" }): keys are the English with
+   {0},{1}.. for the parts that change (numbers, names); those parts are translated too when they are known text.
+   Lookups: exact text, then the text with its numbers taken out, then templates (indexed by their rarest word), then the
+   text cut at " · " and at sentence ends. Anything inside translate="no" (chat lines, names people typed) is left alone.
+   Translator mode (Settings, Language) lets a reviewer tap any text, see the English and fix the translation in place;
+   fixes stay on the phone (localStorage ibory-tr-fix-<code>) until exported and merged into the language file. */
+(function(){
+  var LANGS = { en:{ name:"English" }, ar:{ name:"\u0627\u0644\u0639\u0631\u0628\u064a\u0629", dir:"rtl",
+    fonts:"https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;700&family=Reem+Kufi:wght@500;700&display=swap" } };
+  var L = "";
+  try { var qm = location.search.match(/[?&]lang=([a-z]{2})\b/); if (qm && LANGS[qm[1]]) localStorage.setItem("ibory-lang", qm[1]); L = localStorage.getItem("ibory-lang") || ""; } catch(e){}
+  if (!LANGS[L]) L = /^ar\b/i.test(navigator.language || "") ? "ar" : "en";
+  var I = window.I18N = { lang:L, langs:LANGS, on:false, d:{}, fix:{}, n:0, miss:{} };
+  var D = {}, T = [], IDX = {}, C = new Map();
+  function key(s){ return String(s).replace(/[\s\u00a0]+/g, " ").trim(); }
+  var WORD = /[A-Za-z][A-Za-z'\u2019-]{2,}/g, NUM = /[-+]?[\d\u0660-\u0669][\d\u0660-\u0669,\u066c]*(?:[.\u066b][\d\u0660-\u0669]+)?[kMBT]?(?![A-Za-z]{2})/g;
+  // in a right-to-left language, numbers and Latin names dropped into a sentence are isolated (U+2066..U+2069) so "+2,691/h" or "(170, 170)" keep their order
+  var RTL = !!(LANGS[L] && LANGS[L].dir === "rtl");
+  function iso(v){ return RTL && v && !/[\u0600-\u06ff\u2066-\u2069]/.test(v) ? "\u2066" + v + "\u2069" : v; }
+  function fill(v, vals){ return v.replace(/\{(\d+)\}/g, function(m, i){ return vals[i] != null ? iso(vals[i]) : m; }); }
+  function build(){
+    D = {}; var k; for (k in I.d) D[k] = I.d[k]; for (k in I.fix) D[k] = I.fix[k];
+    T = []; IDX = {}; C = new Map(); var freq = {};
+    for (k in D){ if (k.indexOf("{") < 0 || !/\{\d+\}/.test(k)) continue;
+      var lit = k.replace(/\{\d+\}/g, " "), w = lit.match(WORD) || lit.match(/[A-Za-z]{2,}/g); if (!w) continue;
+      var t = { k:k, w:w, lit:lit.replace(/\s/g, "").length }; T.push(t); w.forEach(function(x){ freq[x] = (freq[x] || 0) + 1; }); }
+    T.forEach(function(t){ var a = t.w[0]; t.w.forEach(function(x){ if (freq[x] < freq[a]) a = x; }); (IDX[a] = IDX[a] || []).push(t); t.w = null; });
+  }
+  function rx(t){ if (!t.re){ var parts = t.k.split(/(\{\d+\})/), order = [], s = "^";
+      // a slot glued to a following letter ("{0}s", a plural) is one word, taken whole: "Swordsmans" -> "Swordsman" + "s"
+      parts.forEach(function(p, i){ var m = p.match(/^\{(\d+)\}$/); if (m){ order.push(+m[1]); s += /^[A-Za-z]/.test(parts[i + 1] || "") ? "(\\S*)" : "(.*?)"; } else s += p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/ /g, "\\s+"); });
+      t.re = new RegExp(s + "$"); t.order = order; } return t.re; }
+  // a slot left in English must look like a name ("Ravenhold", "Valley 5", "Yara Thorne"); "of Generals II" or "boards. Alliances" means the template is wrong
+  var NAMEY = /^[A-Z0-9\u2066(#][^\s]*(\s+(?:[A-Z0-9(#][^\s]*|of|the|de|von|al|ibn|la|le|du|da|van))*$/;
+  function tpl(k, depth){
+    var ws = k.match(/[A-Za-z][A-Za-z'\u2019-]+/g); if (!ws) return null; var cands = [], seen = {};
+    for (var i = 0; i < ws.length; i++){ var b = IDX[ws[i]]; if (!b || seen[ws[i]]) continue; seen[ws[i]] = 1;
+      for (var j = 0; j < b.length; j++){ var t = b[j], m = rx(t).exec(k); if (m) cands.push({ t:t, m:m }); } }
+    cands.sort(function(a, b){ return b.t.lit - a.t.lit; });
+    for (var c = 0; c < cands.length && c < 8; c++){ var best = cands[c], vals = [], lost = 0, kept = best.t.lit, okk = true;
+      best.t.order.forEach(function(slot, i){ var raw = best.m[i + 1], tr2 = depth < 3 ? trr(raw, depth + 1) : null; vals[slot] = tr2 ? raw.match(/^\s*/)[0] + tr2.v + raw.match(/\s*$/)[0] : raw;
+        var lat = (raw.match(/[A-Za-z]/g) || []).length; if ((!tr2 || tr2.part) && lat){ lost += lat; if (!NAMEY.test(raw.trim())) okk = false; } else kept += lat; });
+      if (okk && (best.t.lit >= 4 || lost <= 1.5 * kept)) return { v:fill(D[best.t.k], vals), k:best.t.k }; }
+    return null;
+  }
+  // returns {v: translated, k: the key that matched} or null
+  function look(k, depth){
+    var v = D[k]; if (v != null) return { v:v, k:k };
+    if (/[\d\u0660-\u0669]/.test(k)){ var nums = [], k2 = k.replace(NUM, function(m){ nums.push(m); return "{" + (nums.length - 1) + "}"; }); v = D[k2]; if (v != null) return { v:fill(v, nums), k:k2 }; }
+    var r = tpl(k, depth || 0); if (r) return r;
+    // "Unlocks at.." shown capitalised, "auto-farming" shown lower case
+    var kc = /^[A-Z][a-z]/.test(k) ? k[0].toLowerCase() + k.slice(1) : /^[a-z]/.test(k) ? k[0].toUpperCase() + k.slice(1) : null;
+    if (kc && depth < 3){ var rc = look(kc, depth + 1); if (rc && !rc.part) return rc; }
+    // symbols and numbers at the edges: "\ud83d\udd12 Unlocks at 50% rep", "+3 Attack", "Metal Casting 5"
+    var rn = k.match(/^(.*[a-z].*?) (I{1,3}|IV|VI{0,3}|IX|X)$/); if (rn && depth < 3){ var rx2 = tr(rn[1], depth + 1); if (rx2 != null) return { v:rx2 + " " + iso(rn[2]), k:key(rn[1]) }; }
+    if (depth < 3){ var pre = k.match(/^(?:[^\sA-Za-z(\u201c"']+\s+|[^\sA-Za-z\d(\u201c"'+\-]+)*/)[0], post = k.slice(pre.length).match(/(?:\s+[^\sA-Za-z.!?)\u201d"']+|[.:!?\u2026]+)*$/)[0];
+      if (pre || post){ var core = k.slice(pre.length, k.length - post.length); if (/[A-Za-z]/.test(core)){ var x = tr(core, depth + 1); if (x != null) return { v:pre + x + post, k:key(core) }; } } }
+    if (depth < 2){
+      var cut = null, sep = "";
+      [" \u00b7 ", " \u2014 ", " | "].forEach(function(x){ if (!cut && k.indexOf(x) > 0){ cut = k.split(x); sep = x; } });
+      if (!cut){ var ss = k.split(/(?<=[.!?:)])\s+(?=[A-Z0-9(\u201c"])/); if (ss.length > 1){ cut = ss; sep = " "; } }
+      if (!cut && k.indexOf(", ") > 0){ cut = k.split(", "); sep = "\u060c "; }
+      if (!cut){ var ci = k.indexOf(": "); if (ci > 0){ cut = [k.slice(0, ci), k.slice(ci + 2)]; sep = ": "; } }
+      // greedy: the longest run of pieces that translates as one line, then the next run ("Sentence one. Sentence two. 2m 13s.")
+      if (cut){ var any = false, all = true, out = [], i = 0;
+        while (i < cut.length){ var got = null, j;
+          for (j = cut.length; j > i + 1; j--){ var x2 = trr(cut.slice(i, j).join(sep), depth + 1); if (x2 && !x2.part){ got = x2; break; } }
+          if (!got){ j = i + 1; got = trr(cut[i], depth + 1); }
+          if (got){ any = true; if (got.part) all = false; out.push(got.v); } else { if (/[A-Za-z]{2}/.test(cut[i])) all = false; out.push(cut.slice(i, j).join(sep)); }
+          i = j; }
+        if (any) return { v:out.join(sep), k:null, part:!all }; }
+    }
+    return null;
+  }
+  var LT = new Map();
+  function tr(s, depth){ var r = trr(s, depth); return r ? r.v : null; }
+  function trr(s, depth){ var k = key(s); if (!k || !/[A-Za-z]/.test(k)) return null;
+    var c = C.get(k); if (c !== undefined) return c;
+    if (C.size > 20000){ C.clear(); LT.clear(); }   // timers make a new string every second: keep the cache bounded
+    var r = look(k, depth || 0); C.set(k, r); if (r) LT.set(k, r.k); if ((!r || r.part) && I.on && !depth) I.miss[k] = 1; return r; }
+  I.t = function(s){ if (!I.on) return s; var r = tr(s, 0); return r == null ? s : r; };
+  I.keyOf = function(en){ var k = key(en); tr(k, 0); return LT.has(k) ? LT.get(k) : null; };
+  // ---- the DOM side
+  var SKIP = "script,style,textarea,[translate=no],.notr,#i18n-ui";
+  function skipEl(el){ return !el || (el.closest ? el.closest(SKIP) : false); }
+  function doText(n){
+    var v = n.nodeValue; if (!v || n.__out === v) return; var p = n.parentNode; if (!p || p.nodeType !== 1 || skipEl(p)) return;
+    var en = v;
+    // code that appends to a translated node (el.textContent += " more") gives us translation + English: rebuild the English
+    if (p.__trOut && v.indexOf(p.__trOut) === 0 && v !== p.__trOut) en = p.__trIn + v.slice(p.__trOut.length);
+    var r = tr(en, 0); n.__en = en;
+    if (r == null && RTL && /^\s*[+\-\u2212(]?\s*[\d\u0660-\u0669]/.test(en) && !/[A-Za-z\u0600-\u06ff]{2}|[\u2066-\u2069]/.test(en)) r = iso(key(en));   // a lone number with its sign and unit
+    if (r == null){ n.__out = null; return; }
+    var out = (v.match(/^\s*/)[0]) + r + (v.match(/\s*$/)[0]); n.__out = out; p.__trOut = out; p.__trIn = en;
+    if (out !== v) n.nodeValue = out;
+  }
+  var ATTR = ["title", "placeholder", "aria-label", "alt"];
+  function doAttr(el, a){ var v = el.getAttribute(a); if (!v) return; var st = el.__trA || (el.__trA = {}); if (st[a] && st[a].o === v) return;
+    if (skipEl(el)) return; var r = tr(v, 0); if (r == null) return; st[a] = { o:r, e:v }; if (r !== v) el.setAttribute(a, r); }
+  function doTree(root){
+    if (root.nodeType === 3){ doText(root); return; }
+    if (root.nodeType !== 1 || skipEl(root)) return;
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null), n; while ((n = w.nextNode())) doText(n);
+    for (var i = 0; i < ATTR.length; i++){ if (root.hasAttribute && root.hasAttribute(ATTR[i])) doAttr(root, ATTR[i]); }
+    var els = root.querySelectorAll("[title],[placeholder],[aria-label],[alt]"); for (var j = 0; j < els.length; j++) for (var a = 0; a < ATTR.length; a++) if (els[j].hasAttribute(ATTR[a])) doAttr(els[j], ATTR[a]);
+  }
+  var MO = null;
+  function onMut(list){ for (var i = 0; i < list.length; i++){ var m = list[i];
+    if (m.type === "childList"){ for (var j = 0; j < m.addedNodes.length; j++) doTree(m.addedNodes[j]); }
+    else if (m.type === "characterData") doText(m.target);
+    else if (m.type === "attributes") doAttr(m.target, m.attributeName); } }
+  function start(){ if (MO) return; MO = new MutationObserver(onMut);
+    MO.observe(document, { childList:true, subtree:true, characterData:true, attributes:true, attributeFilter:ATTR });
+    if (document.documentElement) doTree(document.documentElement); }
+  // re-translate everything from the English kept on each node (after a fix)
+  I.refresh = function(){ build(); var w = document.createTreeWalker(document.documentElement, NodeFilter.SHOW_TEXT, null), n;
+    while ((n = w.nextNode())){ if (n.__en != null && n.__out != null && n.nodeValue === n.__out){ n.__out = null; n.nodeValue = n.__en; } else if (n.__en != null && n.__out == null && n.nodeValue === n.__en) doText(n); }
+    document.querySelectorAll("*").forEach(function(el){ var st = el.__trA; if (!st) return; for (var a in st){ if (el.getAttribute(a) === st[a].o){ var e = st[a].e; delete st[a]; el.setAttribute(a, e); } } });
+    if (MO) onMut(MO.takeRecords()); };
+  I.load = function(dict){ I.d = dict || {}; try { I.fix = JSON.parse(localStorage.getItem("ibory-tr-fix-" + L) || "{}"); } catch(e){ I.fix = {}; }
+    I.n = Object.keys(I.d).length; I.on = true; build(); start(); };
+  I.setLang = function(code){ try { localStorage.setItem("ibory-lang", code); } catch(e){} location.reload(); };
+  // pop-ups from the game
+  ["alert", "confirm", "prompt"].forEach(function(f){ var o = window[f]; if (!o) return; window[f] = function(msg){ var a = [].slice.call(arguments);
+    if (I.on && typeof msg === "string") a[0] = msg.split("\n").map(function(l){ var r = tr(l, 0); return r == null ? l : r; }).join("\n"); return o.apply(window, a); }; });
+  // ---- translator mode: tap text, see the English, fix the translation; fixes stay on this phone until exported
+  var TM = { on:false, pick:true, box:null };
+  try { TM.on = localStorage.getItem("ibory-trmode") === "1" && L !== "en"; } catch(e){}
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]; }); }
+  function saveFix(){ try { localStorage.setItem("ibory-tr-fix-" + L, JSON.stringify(I.fix)); } catch(e){} }
+  function ui(){ var b = document.getElementById("i18n-ui"); if (!b){ b = document.createElement("div"); b.id = "i18n-ui"; b.setAttribute("dir", LANGS[L].dir || "ltr"); document.body.appendChild(b); b.addEventListener("click", uiClick); } return b; }
+  function bar(){ var n = Object.keys(I.fix).length;
+    return '<div class="trbar"><b>' + esc(I.t("Translator mode")) + '</b><span>' + esc(I.t("Fixes")) + ': ' + n + '</span>' +
+      '<button data-tr="pick" class="' + (TM.pick ? "on" : "") + '">' + esc(I.t("Pick text")) + ': ' + esc(I.t(TM.pick ? "On" : "Off")) + '</button>' +
+      '<button data-tr="export">' + esc(I.t("Export fixes")) + '</button><button data-tr="off">✕</button></div>'; }
+  function drawBar(){ if (!TM.on){ var o = document.getElementById("i18n-ui"); if (o) o.remove(); document.documentElement.classList.remove("trpick"); return; }
+    TM.box = null; ui().innerHTML = bar() + (TM.pick ? '<div class="tren" style="margin-top:4px">' + esc(I.t("Tap text to fix it")) + '</div>' : ""); document.documentElement.classList.toggle("trpick", TM.pick); }
+  function nodesIn(el){ var out = [], seen = {}, up = 0;
+    while (el && up < 4 && !out.length){ var w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null), n;
+      while ((n = w.nextNode()) && out.length < 8){ var en = n.__en != null ? n.__en : (/[A-Za-z]{2}/.test(n.nodeValue) ? n.nodeValue : null); if (en == null) continue; en = key(en); if (!en || seen[en]) continue; seen[en] = 1; out.push(en); }
+      ["title", "placeholder", "aria-label"].forEach(function(a){ var st = el.__trA && el.__trA[a]; var en = st ? st.e : (el.getAttribute && /[A-Za-z]{2}/.test(el.getAttribute(a) || "") ? el.getAttribute(a) : null); if (en && !seen[en] && out.length < 8){ seen[en] = 1; out.push(key(en)); } });
+      el = el.parentElement; up++; }
+    return out; }
+  function editor(texts){ TM.box = texts.map(function(en){ var k = I.keyOf(en) || en; return { en:en, k:k, v:D[k] != null ? D[k] : "" }; });
+    var h = bar() + TM.box.map(function(r, i){ return '<div class="trrow"><div class="tren">' + esc(r.en) + (r.k !== r.en ? '<br>→ ' + esc(r.k) : "") + '</div>' +
+      (r.v ? "" : '<div class="tren">' + esc(I.t("No translation yet")) + '</div>') + '<textarea data-i="' + i + '" dir="' + (LANGS[L].dir || "ltr") + '">' + esc(r.v) + '</textarea></div>'; }).join("") +
+      '<div class="trbar" style="margin-top:6px"><button data-tr="save" class="on">' + esc(I.t("Save")) + '</button><button data-tr="cancel">' + esc(I.t("Cancel")) + '</button></div>';
+    ui().innerHTML = h; }
+  function uiClick(e){ var b = e.target.closest("[data-tr]"); if (!b) return; var a = b.getAttribute("data-tr"); e.stopPropagation();
+    if (a === "pick"){ TM.pick = !TM.pick; drawBar(); }
+    else if (a === "off") I.trMode(false);
+    else if (a === "cancel") drawBar();
+    else if (a === "save"){ ui().querySelectorAll("textarea").forEach(function(t){ var r = TM.box[+t.getAttribute("data-i")], v = t.value.trim(); if (!r) return;
+        if (v && v !== r.v) I.fix[r.k] = v; else if (!v && I.fix[r.k] != null) delete I.fix[r.k]; });
+      saveFix(); I.refresh(); drawBar(); }
+    else if (a === "export") I.exportFixes(); }
+  document.addEventListener("click", function(e){ if (!TM.on || !TM.pick || !e.isTrusted) return; if (e.target.closest && e.target.closest("#i18n-ui")) return;
+    e.preventDefault(); e.stopPropagation(); var t = nodesIn(e.target); if (t.length) editor(t); }, true);
+  I.trMode = function(on){ TM.on = !!on && L !== "en"; TM.pick = true; try { localStorage.setItem("ibory-trmode", TM.on ? "1" : "0"); } catch(e){} drawBar(); };
+  I.trOn = function(){ return TM.on; };
+  I.exportFixes = function(){ var data = JSON.stringify({ lang:L, version:window.IBORY_V || "", at:new Date().toISOString(), fixes:I.fix, missing:Object.keys(I.miss).slice(0, 3000) }, null, 1);
+    try { navigator.clipboard && navigator.clipboard.writeText(data); } catch(e){}
+    try { var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], { type:"application/json" })); a.download = "ibory-" + L + "-fixes-" + new Date().toISOString().slice(0, 10) + ".json"; document.body.appendChild(a); a.click(); a.remove(); } catch(e){}
+    var t = document.getElementById("toast"); if (t){ t.textContent = I.t("Copied. Send the file or paste it to Cody."); t.classList.add("show"); setTimeout(function(){ t.classList.remove("show"); }, 3500); } };
+  I.clearFixes = function(){ I.fix = {}; saveFix(); I.refresh(); drawBar(); };
+  document.addEventListener("DOMContentLoaded", function(){ if (TM.on) drawBar(); });
+  // the offline worker translates phone notifications too: tell it which language this player reads
+  try { if (navigator.serviceWorker) navigator.serviceWorker.ready.then(function(r){ if (r.active) r.active.postMessage({ iboryLang:L }); }).catch(function(){}); } catch(e){}
+  if (L !== "en"){ var de = document.documentElement; de.lang = L; if (LANGS[L].dir) de.dir = LANGS[L].dir;
+    if (LANGS[L].fonts) document.write('<link rel="stylesheet" href="' + LANGS[L].fonts + '">');
+    document.write('<script src="lang/' + L + '.js?v=' + (window.IBORY_V || "") + '"><\/script>'); }
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
+/* 0.2.7 right-to-left languages (Arabic): Arabic fonts, no letter-spacing (it breaks joined letters), no small caps */
+html[lang="ar"]{--display:"Reem Kufi","Noto Sans Arabic","Cinzel",serif; --body:"Noto Sans Arabic","Alegreya Sans","Segoe UI",sans-serif}
+html[lang="ar"] *{letter-spacing:0!important; font-variant:normal!important; text-transform:none!important}
+html[dir="rtl"] canvas{direction:ltr}
+html[dir="rtl"] .ledger{direction:ltr}
+#i18n-ui{position:fixed;z-index:9999;inset:auto 8px calc(8px + env(safe-area-inset-bottom,0px)) 8px;background:var(--panel);color:var(--ink);border:2px solid var(--brass);border-radius:10px;padding:8px;font:14px/1.35 var(--body);box-shadow:0 4px 18px rgba(0,0,0,.45);max-height:70vh;overflow:auto}
+#i18n-ui .trbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+#i18n-ui .trrow{border-top:1px solid var(--line);padding:6px 0}
+#i18n-ui .tren{direction:ltr;text-align:left;color:var(--muted);font-size:13px;word-break:break-word}
+#i18n-ui textarea{width:100%;min-height:44px;font:15px/1.4 var(--body);background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:5px}
+#i18n-ui button{font:inherit;padding:4px 10px;border-radius:6px;border:1px solid var(--line);background:var(--panel2);color:var(--ink)}
+#i18n-ui button.on{border-color:var(--brass);color:var(--brass)}
+html.trpick #view *, html.trpick .sheet *{cursor:help}
+html.trpick .trhl{outline:2px dashed var(--brass)!important}
 :root{
   --bg:#d8dbd2; --panel:#eceee7; --panel2:#e0e3d9; --ink:#20261f; --muted:#596156;
   --brass:#86661b;--green:#4c9a5c; --brass-soft:rgba(160,120,30,.14); --red:#9e2f38; --grass:#56703d;
@@ -907,7 +1098,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script>
 (function(){
 "use strict";
-var APP_VERSION = "0.2.6";
+var APP_VERSION = "0.2.7";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -5092,7 +5283,7 @@ function sancHtml(E, my){ var Sx=E.sanc; if (!Sx) return ''; var L=Sx.lv; my=my|
     '<p class="hint">Offer gems and the angels watch over every member\u2019s forge. <b>Delicate Gems</b> keep the <b>Halo of Fortune</b> shining: +1% success on every star upgrade per Sanctuary level. <b>Flawless Gems</b> keep the <b>Guardian\u2019s Wings</b> spread: a failed upgrade loses at most a few stars instead of falling all the way ('+Sx.guardTable.map(function(g,i){ return 'level '+(i+1)+': '+g; }).join(", ")+'). Offered gems are stored. The alliance chooses when to light each one, and it only burns while lit ('+fmt(Sx.burnD)+' Delicate or '+fmt(Sx.burnF)+' Flawless a week at this level), so save your upgrades for when it\u2019s shining.</p>';
   if (!L) return h+'<p class="why">Build the Sanctuary of Grace in the Alliance City first.</p></div>';
   var line=function(n,burn,lit){ return '<br><span class="dur">'+fmt(n)+' gems stored'+(n>0?' \u00b7 '+(lit?'about '+(Math.round(n/burn*70)/10)+' days left at this rate':'enough for about '+(Math.round(n/burn*70)/10)+' days lit'):'')+'</span>'; };
-  var tog=function(w,lit,n){ return my.can.bank?'<div class="mbtns"><button class="link strong" data-act="al-sanc-light" data-w="'+w+'" data-on="'+(lit?0:1)+'"'+(!lit&&!n?' disabled':'')+'>'+(lit?(w==="d"?'Put out':'Fold'):(w==="d"?'Light it':'Spread them'))+'</button></div>':''; };
+  var tog=function(w,lit,n){ return my.can.bank?'<div class="mbtns"><button class="link strong" data-act="al-sanc-light" data-which="'+w+'" data-on="'+(lit?0:1)+'"'+(!lit&&!n?' disabled':'')+'>'+(lit?(w==="d"?'Put out':'Fold'):(w==="d"?'Light it':'Spread them'))+'</button></div>':''; };
   h+='<div class="bq"><span><b>Halo of Fortune</b> '+(Sx.litD?'<span class="okc">shining: +'+Sx.luck+'% success</span>':'<span class="why">dark</span>')+line(Sx.d,Sx.burnD,Sx.litD)+'</span>'+tog("d",Sx.litD,Sx.d)+'</div>';
   h+='<div class="bq"><span><b>Guardian\u2019s Wings</b> '+(Sx.litF?'<span class="okc">spread: a failure loses at most '+Sx.guard+' star'+(Sx.guard===1?'':'s')+'</span>':'<span class="why">folded</span>')+line(Sx.f,Sx.burnF,Sx.litF)+'</span>'+tog("f",Sx.litF,Sx.f)+'</div>';
   if (!my.can.bank) h+='<p class="dur">Members with the bank permission light them.</p>';
@@ -6384,7 +6575,7 @@ function linkify(t, opt){ t=String(t==null?"":t); var re=/(https?:\/\/[^\s<>"]+|
     var href=/^www\./i.test(u)?"https://"+u:u, ik=chatImgUrl(href);
     if (ik){ var bl=opt&&opt.blur&&!CIMG_SEEN[href]; out+=esc(t.slice(last,m.index))+'<span class="cimgw'+(bl?' blur':'')+'" data-act="img-open" data-u="'+esc(href)+'" role="button" aria-label="'+(ik==="gif"?"GIF":"Picture")+'"><img src="'+esc(href)+'" loading="lazy" alt=""></span>'+esc(tail); last=m.index+m[0].length; continue; }
     out+=esc(t.slice(last,m.index))+'<a class="clink" href="'+esc(href)+'" target="_blank" rel="noopener noreferrer nofollow ugc" data-act="open-link" data-u="'+esc(href)+'">'+esc(u)+'</a>'+esc(tail); last=m.index+m[0].length; }
-  return out+esc(t.slice(last)); }
+  return '<span translate="no">'+out+esc(t.slice(last))+'</span>'; } // 0.2.7: what players typed is never run through the translator
 function linkHost(u){ try { return new URL(u).host; } catch(e){ return u; } }
 var RX={w:{}, a:{}, d:{}}, RXSEL="", RX_QUICK=["\ud83d\udc4d","\u2764\ufe0f","\ud83d\ude02","\ud83d\ude2e","\ud83d\ude22","\ud83d\udd25","\u2694\ufe0f","\ud83c\udfc6"];
 function rxTake(ch, map, from){ if (!map) return; var R=RX[ch]; for (var id in R) if (+id>=from) delete R[id]; for (var k in map) R[k]=map[k]; }
@@ -8508,12 +8699,13 @@ function offPickSheet(){ var role=sheetFor.role, o=OFFICES.filter(function(x){ r
   var cur=officer(role), mine=seatHolder(role), st=o[2];
   var h='<div class="head"><span class="ico">'+ICON.crest+'</span><div style="flex:1;min-width:0"><h2>'+o[1]+'</h2><div class="sub">'+esc(o[3])+' \u00b7 uses '+STATN[st]+'</div></div><button class="btn ghost small" data-act="close" aria-label="Close">\u2715</button></div>';
   h+='<div class="bq"><span>'+(cur?'<b>'+esc(cur.name)+'</b> '+(mine?'<span class="okc">your pick</span>':'<span class="dur">auto, borrowed</span>')+'<br><span class="dur">'+STATN[st]+' '+hs(cur,st)+' \u00b7 '+offEffect(role)+'</span>':'<span class="why">Vacant</span>'+(S.autoMayor&&role!=="wallHero"?'<br><span class="dur">Auto-fill will borrow a free hero when this job is needed.</span>':''))+'</span>'+
-    (mine?'<div class="mbtns"><button class="link" data-act="off-clear" data-role="'+role+'">'+(S.autoMayor&&role!=="wallHero"?'Back to auto':'Clear seat')+'</button></div>':'')+'</div>';
+    (mine?'<div class="mbtns"><button class="btn ghost small danger" data-act="off-clear" data-role="'+role+'">'+(S.autoMayor&&role!=="wallHero"?'Unseat (back to auto)':'Unseat')+'</button></div>':'')+'</div>';
   var list=S.heroes.slice().sort(function(a,b){ return hs(b,st)-hs(a,st); });
   h+='<div class="h3" style="margin-top:10px">Appoint</div>'+(list.length?'<div class="herolist">'+list.map(function(hh){ var oo=officeOf(hh), here=mine&&mine.id===hh.id;
     var note=hh.away?'<span class="why">away on a march</span>':here?'<span class="okc">in this seat</span>':oo?'<span class="dur">now '+oo[1].toLowerCase()+' (moves here)</span>':'';
     return '<div class="bq ofpick">'+heroPortrait(hh,40)+'<span style="min-width:0"><b>'+esc(hh.name)+'</b> <span class="dur">Lv '+hh.level+'</span><br><span class="dur">'+STATN[st]+' <b>'+hs(hh,st)+'</b></span>'+(note?' \u00b7 '+note:'')+'</span>'+
-      '<div class="mbtns"><button class="btn small'+(here?' ghost':'')+'" data-act="off-set" data-role="'+role+'" data-id="'+hh.id+'"'+(hh.away||here?' disabled':'')+'>'+(here?'Seated':'Appoint')+'</button></div></div>'; }).join("")+'</div>':'<p class="hint">No heroes in this city yet.</p>');
+      // 0.2.7: the seated hero's own row unseats it, so nobody has to open the hero sheet to step it down
+      '<div class="mbtns">'+(here?'<button class="btn ghost small danger" data-act="off-clear" data-role="'+role+'">Unseat</button>':'<button class="btn small" data-act="off-set" data-role="'+role+'" data-id="'+hh.id+'"'+(hh.away?' disabled':'')+'>Appoint</button>')+'</div></div>'; }).join("")+'</div>':'<p class="hint">No heroes in this city yet.</p>');
   if (role!=="wallHero") h+='<p class="hint" style="margin-top:8px">A hero you appoint is locked to the job: it stays home and auto-fill leaves the seat alone.</p>';
   return h+'<button class="closebtn" data-act="close">Done</button>'; }
 function heroAutoHtml(h){ var a=h.auto||{pol:0,atk:0,int:0}, on=!!h.auto, d=HAD[h.id]||a;
@@ -12070,6 +12262,31 @@ function anchorKey(el){
   for (var k in el.dataset) if (k!=="act" && k!=="wired") sel+='[data-'+k.replace(/[A-Z]/g,function(m){ return "-"+m.toLowerCase(); })+'="'+CSS.escape(el.dataset[k])+'"]';
   return sel;
 }
+// patch el's children to match html, touching only what changed (text, attributes, nodes whose kind differs). Inputs being typed in keep
+// their value; text the translator has turned into another language counts as unchanged while its English is the same.
+function morphDom(el, html){ var t=document.createElement(el.tagName); t.innerHTML=html; morphKids(el, t); }
+function morphKids(a, b){
+  var ac=a.childNodes, bc=b.childNodes, i;
+  for (i=0;i<bc.length;i++){ var x=ac[i], y=bc[i];
+    if (!x){ a.appendChild(y.cloneNode(true)); continue; }
+    if (x.nodeType!==y.nodeType || x.nodeName!==y.nodeName || (x.nodeType===1 && ((x.id||"")!==(y.id||"") || x.getAttribute("data-act")!==y.getAttribute("data-act")))){ a.replaceChild(y.cloneNode(true), x); continue; }
+    if (x.nodeType===3){ if (x.nodeValue!==y.nodeValue && x.__en!==y.nodeValue) x.nodeValue=y.nodeValue; continue; }
+    if (x.nodeType!==1) continue;
+    morphAttrs(x, y);
+    if (x.tagName==="TEXTAREA"){ continue; }
+    morphKids(x, y); }
+  while (ac.length>bc.length) a.removeChild(a.lastChild);
+}
+function morphAttrs(x, y){
+  var tr=x.__trA||{}, j, n;
+  for (j=x.attributes.length-1;j>=0;j--){ n=x.attributes[j].name; if (!y.hasAttribute(n) && n!=="data-wired") x.removeAttribute(n); }
+  for (j=0;j<y.attributes.length;j++){ n=y.attributes[j].name; var nv=y.attributes[j].value;
+    if (x.getAttribute(n)===nv || (tr[n] && tr[n].e===nv && x.getAttribute(n)===tr[n].o)) continue;
+    if (n==="value" && x===document.activeElement) continue;
+    x.setAttribute(n, nv); if (n==="value" && "value" in x) x.value=nv; if (n==="checked") x.checked=true; }
+  if (x.tagName==="INPUT" && (x.type==="checkbox" || x.type==="radio")) x.checked=y.hasAttribute("checked");
+  if (x.tagName==="DETAILS") x.open=y.hasAttribute("open");
+}
 function viewAnchors(v){
   var out=[], vh=window.innerHeight, seen={};
   var add=function(el){ if (out.length>=6 || !el || !v.contains(el)) return; var r=el.getBoundingClientRect(); if (r.bottom<0 || r.top>vh || !r.height) return;
@@ -12122,8 +12339,11 @@ function renderView(force){
   document.body.classList.toggle("bfmode", bfOn()||pvOn());
   var h = bfOn()?viewBattlefield():pvOn()?viewPvp():tab==="items"?viewItems():tab==="alliance"?viewAlliance():tab==="farms"?viewFarms():tab==="bldg"?viewBuilding():tab==="heroes"?viewHeroes():tab==="army"?viewArmy():tab==="college"?viewCollege():viewCity();
   if (h===lastView && !force) return;
-  var vsig=tab+"|"+S.cur+"|"+(tab==="bldg"&&pg?pg.w+pg.i:""), anc=(vsig===viewSig)?viewAnchors(v):null; viewSig=vsig;
-  lastView=h; v.innerHTML=h; setTabs(); wireDetails(v); restoreAnchor(v,anc);
+  var vsig=tab+"|"+S.cur+"|"+(tab==="bldg"&&pg?pg.w+pg.i:"")+"|"+(tab==="army"?ARMYB:"");
+  // 0.2.7: the Army tab redraws every time a batch finishes (every few seconds with auto-train on small batches). Rebuilding the whole page
+  // threw away the scroll and stopped a fling mid-swipe; now the same page is patched in place (morphDom), so only the numbers change.
+  if (tab==="army" && vsig===viewSig && v.firstChild){ lastView=h; morphDom(v,h); setTabs(); wireDetails(v); lastTapEl=null; }
+  else { var anc=(vsig===viewSig)?viewAnchors(v):null; viewSig=vsig; lastView=h; v.innerHTML=h; setTabs(); wireDetails(v); restoreAnchor(v,anc); }
   if (document.getElementById("m-have")) updateMarket();
   if (tab==="army") U.forEach(function(u,i){ updateTrainRow(i); });
   if (tab==="city" || tab==="bldg") FORTS.forEach(function(f,i){ updateFortRow(i); });
@@ -12233,6 +12453,9 @@ function renderSheetCore(){
     h='<div class="head"><div><h2>Settings</h2><div class="sub">Timers keep running while you\u2019re away.</div></div></div>'+
 
       '<div><div class="h3" style="margin-bottom:6px">Theme</div><div class="speeds">'+[["auto","Match phone"],["light","Light"],["dark","Dark"]].map(function(t){ return '<button data-act="theme" data-v="'+t[0]+'" aria-pressed="'+(getTheme()===t[0])+'">'+t[1]+'</button>'; }).join("")+'</div></div>'+
+      // 0.2.7 language: the names stay in their own script (translate="no"); picking one reloads the game in it
+      '<div><div class="h3" style="margin-bottom:6px">Language</div><div class="speeds" translate="no">'+Object.keys(I18N.langs).map(function(c){ return '<button data-act="lang" data-v="'+c+'" aria-pressed="'+(I18N.lang===c)+'">'+I18N.langs[c].name+'</button>'; }).join("")+'</div>'+
+        (I18N.lang!=="en"?'<p class="hint" style="margin:6px 0 0">The game is translated by volunteers. Tap Translator mode to fix any line you see, then Export fixes and send them in.</p><div class="btnrow" style="margin-top:6px"><button class="btn ghost small" data-act="trmode">Translator mode: '+(I18N.trOn()?'On':'Off')+'</button>'+(Object.keys(I18N.fix).length?'<button class="btn ghost small" data-act="tr-export">Export fixes</button><button class="btn ghost small danger" data-act="tr-clear">Clear fixes</button>':'')+'</div>':'')+'</div>'+
       '<div class="sub" id="offlinestat">'+offlineStatus()+'</div>'+
       '<div class="sub">This realm has stood <b id="saveage"></b>.</div>'+
       '<div class="sub">Ibory version <b>'+APP_VERSION+'</b></div>'+
@@ -12665,7 +12888,7 @@ function flushFinished(){ if (!finished.length) return; var list=shownFinished()
 
 document.addEventListener("click",function(e){
   lastTapEl=e.target.closest("[data-act],[data-w]")||null;
-  var p=e.target.closest("[data-w]");
+  var p=e.target.closest("[data-w]:not([data-act])"); // 0.2.7: a button with its own action is never a city plot (the Sanctuary's Light it opened a field tile)
   if (p && arrange && p.dataset.w===arrange.w && !p.classList.contains("locked")){
     var pi2=+p.dataset.i, arr2 = arrange.w==="in"?S.inside:S.fields;
     if (arrange.sel==null){ if (arr2[pi2]) arrange.sel=pi2; }
@@ -12832,6 +13055,10 @@ document.addEventListener("click",function(e){
     var lv={id:S.lb.id, token:S.lb.token}; S.lb.on=false; S.lb.optedOut=true; save(); try { fetch(LB_URL+"/leave",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(lv)}); } catch(e){}
     lbData={}; toast("You left the high scores"); lastSheet=""; renderSheet(); return; }
   if (act==="gate"){ S.gate = S.gate==="closed" ? "open" : "closed"; toast(S.name+"\u2019s gate is "+S.gate); save(); lastView=""; refresh(); return; }
+  if (act==="lang"){ if (a.dataset.v!==I18N.lang){ save(); I18N.setLang(a.dataset.v); } return; }
+  if (act==="trmode"){ I18N.trMode(!I18N.trOn()); closeSheet(); return; }
+  if (act==="tr-export"){ I18N.exportFixes(); return; }
+  if (act==="tr-clear"){ I18N.clearFixes(); lastSheet=""; renderSheet(); return; }
   if (act==="theme"){ try { localStorage.setItem("stonewatch-theme", a.dataset.v); } catch(e){} applyTheme(); lastSheet=""; renderSheet(); if (tab==="map") requestDraw(); return; }
   if (act==="save-export"){ saveUi= saveUi==="export"?"":"export"; exportShown=saveUi==="export"?exportCode():""; armed=null; lastSheet=""; renderSheet(); return; }
   if (act==="save-import-open"){ saveUi= saveUi==="import"?"":"import"; armed=null; lastSheet=""; renderSheet(); return; }
@@ -12980,7 +13207,7 @@ document.addEventListener("click",function(e){
     if (act==="al-medal"){ var gk=a.dataset.k, gn=Math.max(0,Math.floor(+MEMD[gk]||0)); if (!gn){ toast("Type how many medals to give"); return; } if (gn>(S.medals[gk]||0)){ toast("You don\u2019t have that many "+medalName(gk)+" medals"); return; } if (ALS.donating) return; ALS.donating=true;
       alPost("/al/medal",{k:gk, n:gn}).then(function(d){ ALS.donating=false; if (d.error){ toast(d.error); return; } var tk=Math.max(0,Math.min(gn,+d.took||0)); S.medals[gk]=Math.max(0,(S.medals[gk]||0)-tk); MEMD[gk]=""; save(); toast("Gave "+fmt(tk)+" "+medalName(gk)+" medals"+(tk<gn?" (the monument only had room for that many)":"")+". Thank you!"); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); ALS.last=0; alSync(); refresh(); })
         .catch(function(){ ALS.donating=false; toast("Couldn\u2019t reach the server"); }); return; }
-    if (act==="al-sanc-light"){ var lon=a.dataset.on==="1", lw=a.dataset.w; alDo("/al/sanc/light",{which:lw, on:lon}, lon?(lw==="d"?"The Halo of Fortune is shining":"The Guardian\u2019s Wings are spread"):"Put out: the gems are saved"); return; }
+    if (act==="al-sanc-light"){ var lon=a.dataset.on==="1", lw=a.dataset.which; alDo("/al/sanc/light",{which:lw, on:lon}, lon?(lw==="d"?"The Halo of Fortune is shining":"The Guardian\u2019s Wings are spread"):"Put out: the gems are saved"); return; }
     if (act==="al-ars-up"){ alDo("/al/ars/up",{slot:+a.dataset.slot, kind:a.dataset.kind},a.dataset.kind==="star"?"Star added":a.dataset.kind==="tier"?"Raised a tier":"Forged"); return; }
     if (act==="al-ars-give"){ var ag={}, any2=0; for (var mk2 in ARS_MN){ var av2=Math.max(0,Math.floor(+ARSD[mk2]||0)); if (av2>(S.items[mk2]||0)){ toast("You don\u2019t have that many "+ARS_MN[mk2]); return; } ag[mk2]=av2; any2+=av2; }
       if (!any2){ toast("Type how many to give"); return; } if (ALS.donating) return; ALS.donating=true;
@@ -13544,7 +13771,7 @@ document.addEventListener("click",function(e){
   if (act==="off-set"){ var orl=a.dataset.role, ohh=heroById(+a.dataset.id); if (!ohh) return; if (ohh.away){ toast("That hero is away on a march"); return; }
     OFFICES.forEach(function(o){ if (S[o[0]]===ohh.id) S[o[0]]=null; }); var oprev=officer(orl); if (oprev) oprev.autoSeat=false; S[orl]=ohh.id; ohh.autoSeat=false;
     var ofx=OFFICES.filter(function(o){ return o[0]===orl; })[0]; toast(ohh.name+" is now "+(ofx?ofx[1].toLowerCase():orl)); autoOffices(); save(); lastSheet=""; refresh(); return; }
-  if (act==="off-clear"){ var orc=a.dataset.role, och=seatHolder(orc); S[orc]=null; if (och) och.autoSeat=false; autoOffices(); save(); lastSheet=""; refresh(); return; }
+  if (act==="off-clear"){ var orc=a.dataset.role, och=seatHolder(orc); S[orc]=null; if (och){ och.autoSeat=false; toast(och.name+" stepped down"); } autoOffices(); save(); lastSheet=""; refresh(); return; }
   if (act==="unoffice"||act==="unmayor"){ OFFICES.forEach(function(o){ if (S[o[0]]===sheetFor.id) S[o[0]]=null; }); var uh=heroById(sheetFor.id); if (uh) uh.autoSeat=false; autoOffices(); save(); lastSheet=""; refresh(); return; }
   if (act==="tome"){
     var bkk=a.dataset.book||"tome", th=heroById(sheetFor.id); if (!th || !(S.items[bkk]>0)) return;

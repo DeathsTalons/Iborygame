@@ -2,7 +2,9 @@
 
 A slow, punishing, real-time medieval strategy game set in the fallen kingdom. Build cities, raise heroes, farm valleys and siege historic cities, alone or with an alliance.
 
-Version 0.2.6
+Version 0.2.7
+
+Play in English or Arabic (Settings, Language). / العب بالعربية: الإعدادات، اللغة.
 
 - Play: https://iborygame.com/play/ (open it in Chrome on Android and choose **Install app**)
 - Community, patch notes and bug reports: the Ibory Discord

@@ -1,5 +1,6 @@
 // Ibory offline worker. Bump CACHE on every release so phones pick up the new index.html.
-const CACHE = "ibory-v0.2.6";
+const CACHE = "ibory-v0.2.7";
+const LANG_FILES = ["lang/ar.js"];
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "badge-96.png"];
 // 0.1.235: the art lives in art/ (it used to be base64 inside index.html). ART is built from art/FILES.json by art/tools/build_art.py; keep it in step.
 const ART = ["art/hero-alaric.jpg", "art/hero-alexander-the-great.jpg", "art/hero-attila.jpg", "art/hero-belisarius.jpg", "art/hero-boudica.jpg", "art/hero-charlemagne.jpg", "art/hero-charles-martel.jpg", "art/hero-cleopatra-2.jpg", "art/hero-constantine.jpg", "art/hero-cyrus-the-great.jpg", "art/hero-dracula.jpg", "art/hero-el-cid.jpg", "art/hero-frederick-barbarossa.jpg", "art/hero-genghis-khan.jpg", "art/hero-hadrian.jpg", "art/hero-hannibal-barca.jpg", "art/hero-harald-hardrada.jpg", "art/hero-joan-of-arc.jpg", "art/hero-julius-caesar.jpg", "art/hero-justinian.jpg", "art/hero-leonidas.jpg", "art/hero-marcus-aurelius.jpg", "art/hero-octavian.jpg", "art/hero-otto-the-great.jpg", "art/hero-pericles.jpg", "art/hero-ramesses-ii.jpg", "art/hero-richard-the-lionheart.jpg", "art/hero-robert-the-bruce.jpg", "art/hero-saladin.jpg", "art/hero-scipio-africanus.jpg", "art/hero-spartacus.jpg", "art/hero-sun-tzu.jpg", "art/hero-themistocles.jpg", "art/hero-theodoric.jpg", "art/hero-tomyris.jpg", "art/hero-trajan.jpg", "art/hero-vercingetorix.jpg", "art/hero-william-the-conqueror.jpg", "art/hero-william-wallace.jpg", "art/hero-xerxes.jpg", "art/hero-zenobia.jpg", "art/pack-bridges.png", "art/pack-castlewalls.png", "art/pack-caves.png", "art/pack-cottage.png", "art/pack-farm.png", "art/pack-flowers.png", "art/pack-ruins.png", "art/pack-temple.png", "art/pack-undead.png", "art/pack-village.png", "art/pack-wild.png", "art/road-road-px-brick.png", "art/road-road-px-cobble.png", "art/road-road-px-sand.png", "art/road-road-px-slate.png", "art/road-road-px-terra.png", "art/tile-hc12.png", "art/tile-hc14.png", "art/tile-hc16.png", "art/tile-hc18.png", "art/tile-npc10.png", "art/vamp-1.png", "art/vamp-2.png", "art/vamp-3.png", "art/wiz-1.png", "art/wiz-2.png"];
@@ -10,6 +11,11 @@ self.addEventListener("install", (e) => {
     await Promise.all(FILES.map((f) => fetch(new Request(f, { cache: "reload" })).then((r) => { if (!r.ok) throw new Error(f); return c.put(f, r); })));
     const old = (await caches.keys()).filter((k) => k !== CACHE && k.startsWith("ibory-v"));
     const prev = old.length ? await caches.open(old[old.length - 1]) : null;
+    // 0.2.7: a language file is only downloaded by players who picked that language; if the old cache had it, fetch this release's copy now so it works offline
+    await Promise.all(LANG_FILES.map(async (f) => {
+      const had = prev ? await prev.match(f, { ignoreSearch: true }) : null; if (!had) return;
+      const r = await fetch(new Request(f, { cache: "reload" })); if (r.ok) await c.put(f, r);
+    }));
     await Promise.all(ART.map(async (f) => {
       const hit = prev ? await prev.match(f) : null;
       if (hit) return c.put(f, hit);
@@ -46,13 +52,46 @@ self.addEventListener("fetch", (e) => {
   );
 });
 
+// 0.2.7: notifications in the player's language. The page tells us its language (message {iboryLang}); we keep it in the cache, and
+// translate a push's title (and body, except private messages, which are what a player typed) from the cached language file:
+// exact lines, lines with their numbers taken out, then the file's {0} templates. Anything unknown stays in English.
+const PREF = "ibory-pref";
+self.addEventListener("message", (e) => {
+  if (e.data && e.data.iboryLang) e.waitUntil(caches.open(PREF).then((c) => c.put("lang", new Response(String(e.data.iboryLang)))));
+});
+async function pushLang() { try { const r = await (await caches.open(PREF)).match("lang"); return r ? await r.text() : "en"; } catch (x) { return "en"; } }
+let DICT = null;
+async function dict(lang) {
+  if (DICT && DICT.lang === lang) return DICT;
+  const r = await caches.match("lang/" + lang + ".js", { ignoreSearch: true }); if (!r) return null;
+  const t = await r.text(), a = t.indexOf("I18N.load("), b = t.lastIndexOf(");"); if (a < 0 || b < a) return null;
+  const d = JSON.parse(t.slice(a + 10, b)), tpl = [];
+  for (const k in d) if (/\{\d+\}/.test(k)) { const order = []; const re = new RegExp("^" + k.split(/(\{\d+\})/).map((p) => { const m = p.match(/^\{(\d+)\}$/); if (m) { order.push(+m[1]); return "(.+?)"; } return p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }).join("") + "$"); tpl.push({ k, re, order, lit: k.replace(/\{\d+\}/g, "").length }); }
+  tpl.sort((x, y) => y.lit - x.lit);
+  return (DICT = { lang, d, tpl });
+}
+function trPush(D, s, depth) {
+  s = String(s || "").trim(); if (!s || !/[A-Za-z]/.test(s)) return s;
+  if (D.d[s] != null) return D.d[s];
+  const nums = [], k2 = s.replace(/[-+]?\d[\d,]*(?:\.\d+)?[kMB]?(?![A-Za-z]{2})/g, (m) => { nums.push(m); return "{" + (nums.length - 1) + "}"; });
+  if (D.d[k2] != null) return D.d[k2].replace(/\{(\d+)\}/g, (m, i) => "\u2066" + nums[i] + "\u2069");
+  if ((depth || 0) < 2) for (const t of D.tpl) { if (t.lit < 4) break; const m = t.re.exec(s); if (!m) continue;
+    const v = []; t.order.forEach((slot, i) => { v[slot] = trPush(D, m[i + 1], (depth || 0) + 1); });
+    return D.d[t.k].replace(/\{(\d+)\}/g, (x, i) => (/[\u0600-\u06ff]/.test(v[i] || "") ? v[i] : "\u2066" + v[i] + "\u2069")); }
+  return s;
+}
+async function localPush(m) {
+  try { const lang = await pushLang(); if (lang === "en") return m; const D = await dict(lang); if (!D) return m;
+    return Object.assign({}, m, { t: trPush(D, m.t || "Ibory"), b: m.k === "dm" ? m.b : trPush(D, m.b) }); } catch (x) { return m; }
+}
+
 // 0.1.206: pushes from the server (rally calls and results, private messages). If Ibory is open on screen it already shows these itself,
 // so nothing pops up; otherwise the phone shows the notification.
 self.addEventListener("push", (e) => {
   let m = {}; try { m = e.data ? e.data.json() : {}; } catch (x) { m = { b: e.data ? e.data.text() : "" }; }
   e.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((cs) => {
     if (m.k !== "test" && cs.some((c) => c.visibilityState === "visible")) return;
-    return self.registration.showNotification(m.t || "Ibory", { body: m.b || "", icon: "icon-192.png", badge: "badge-96.png", tag: m.tag || "ibory-" + (m.k || "push"), renotify: true, data: { k: m.k || "" } });
+    return localPush(m).then((m) => self.registration.showNotification(m.t || "Ibory", { body: m.b || "", icon: "icon-192.png", badge: "badge-96.png", tag: m.tag || "ibory-" + (m.k || "push"), renotify: true, data: { k: m.k || "" } }));
   }));
 });
 
