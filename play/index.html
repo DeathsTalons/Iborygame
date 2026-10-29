@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.14";
+window.IBORY_V="0.2.15";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1153,7 +1153,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script>
 (function(){
 "use strict";
-var APP_VERSION = "0.2.14";
+var APP_VERSION = "0.2.15";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -5379,7 +5379,7 @@ function arsHtml(E, my){ var A=E.ars; if (!A) return ''; var L=(E.lv&&E.lv.arsen
   return h+'</div>'; }
 function sancHtml(E, my){ var Sx=E.sanc; if (!Sx) return ''; var L=Sx.lv; my=my||{can:{}};
   var h='<div class="section"><div class="shead"><h3>Sanctuary of Grace</h3><span class="dur">'+(L?'level '+L+' of 10':'not built')+'</span></div>'+
-    '<p class="hint">Offer gems and the angels watch over every member\u2019s forge. <b>Delicate Gems</b> keep the <b>Halo of Fortune</b> shining: +1% success on every star upgrade per Sanctuary level. <b>Flawless Gems</b> keep the <b>Guardian\u2019s Wings</b> spread: a failed upgrade loses at most a few stars instead of falling all the way ('+Sx.guardTable.map(function(g,i){ return 'level '+(i+1)+': '+g; }).join(", ")+'). Offered gems are stored. The alliance chooses when to light each one, and it only burns while lit ('+fmt(Sx.burnD)+' Delicate or '+fmt(Sx.burnF)+' Flawless a week at this level), so save your upgrades for when it\u2019s shining.</p>';
+    '<p class="hint">Offer gems and the angels watch over every member\u2019s forge. <b>Delicate Gems</b> keep the <b>Halo of Fortune</b> shining: +1% success on every star upgrade per Sanctuary level. <b>Flawless Gems</b> keep the <b>Guardian\u2019s Wings</b> spread: a failed upgrade loses fewer stars instead of falling all the way (most it can lose, '+Sx.guardTable.map(function(g,i){ return 'level '+(i+1)+': '+g; }).join(", ")+'). Offered gems are stored. The alliance chooses when to light each one, and it only burns while lit ('+fmt(Sx.burnD)+' Delicate or '+fmt(Sx.burnF)+' Flawless a week at this level), so save your upgrades for when it\u2019s shining.</p>';
   if (!L) return h+'<p class="why">Build the Sanctuary of Grace in the Alliance City first.</p></div>';
   var line=function(n,burn,lit){ return '<br><span class="dur">'+fmt(n)+' gems stored'+(n>0?' \u00b7 '+(lit?'about '+(Math.round(n/burn*70)/10)+' days left at this rate':'enough for about '+(Math.round(n/burn*70)/10)+' days lit'):'')+'</span>'; };
   var tog=function(w,lit,n){ return my.can.bank?'<div class="mbtns"><button class="link strong" data-act="al-sanc-light" data-which="'+w+'" data-on="'+(lit?0:1)+'"'+(!lit&&!n?' disabled':'')+'>'+(lit?(w==="d"?'Put out':'Fold'):(w==="d"?'Light it':'Spread them'))+'</button></div>':''; };

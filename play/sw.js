@@ -1,5 +1,5 @@
 // Ibory offline worker. Bump CACHE on every release so phones pick up the new index.html.
-const CACHE = "ibory-v0.2.14";
+const CACHE = "ibory-v0.2.15";
 const LANG_FILES = ["lang/ar.js", "lang/es.js", "lang/vi.js", "lang/ru.js", "lang/zh.js", "lang/zh-TW.js", "lang/ja.js", "lang/ko.js"];
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "badge-96.png"];
 // 0.1.235: the art lives in art/ (it used to be base64 inside index.html). ART is built from art/FILES.json by art/tools/build_art.py; keep it in step.
