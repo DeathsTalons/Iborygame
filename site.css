@@ -98,7 +98,26 @@ html[lang="ar"] *{letter-spacing:0!important;text-transform:none!important}
   .brand{font-size:1.2rem;gap:8px}
   .brand img{width:30px;height:30px}
 }
-.bar nav a.lang{display:inline-flex;align-items:center;gap:6px}
-.bar nav a.lang svg{flex:none}
-@media (max-width:420px){ .bar nav a.lang span{display:none} }
+/* the language menu (0.2.8): a globe and the current language; just the globe on narrow phones */
+.more.langs summary{display:inline-flex;align-items:center;gap:6px}
+.more.langs summary svg{flex:none}
+.more.langs .menu{min-width:160px}
+.more.langs .menu a[aria-current]{color:var(--gold-hi)}
+@media (max-width:420px){ .more.langs summary span{display:none} .more.langs summary::after{margin-left:4px} }
 @media (max-width:380px){ .bar nav{gap:9px} }
+@media (max-width:420px){
+  .more.langs summary::after{display:none}
+  .bar{gap:6px}
+  .bar nav{gap:10px}
+  .brand{font-size:1.1rem;gap:6px}
+}
+@media (max-width:370px){ .brand span.bn{display:none} .bar nav{gap:8px;font-size:.9rem} }
+.page table{table-layout:fixed}
+.page th,.page td{overflow-wrap:break-word;-webkit-hyphens:auto;hyphens:auto}
+/* 0.2.8 Vietnamese pages: Cinzel has no Vietnamese accents, so headings use Cormorant SC */
+html[lang="vi"],html[lang="ru"]{--display:"Cormorant SC","Cinzel",Georgia,serif}
+html[lang="zh"]{--display:"Noto Serif SC","Cinzel",serif;--body:"Noto Sans SC","Alegreya Sans",system-ui,sans-serif}
+html[lang="zh-TW"]{--display:"Noto Serif TC","Cinzel",serif;--body:"Noto Sans TC","Alegreya Sans",system-ui,sans-serif}
+html[lang="ja"]{--display:"Noto Serif JP","Cinzel",serif;--body:"Noto Sans JP","Alegreya Sans",system-ui,sans-serif}
+html[lang^="zh"] *,html[lang="ja"] *{letter-spacing:0!important;text-transform:none!important}
+html[lang^="zh"] body,html[lang="ja"] body{line-height:1.8}

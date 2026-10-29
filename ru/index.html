@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ibory</title>
+<meta name="description" content="Ibory — медленная и беспощадная средневековая стратегия в реальном времени. Строй города, собирай героев из истории, грабь долины и осаждай исторические города — в одиночку или с альянсом.">
+<meta name="theme-color" content="#252a27">
+<link rel="icon" href="/img/icon-192.png">
+<meta property="og:title" content="Ibory">
+<meta property="og:description" content="Медленная и беспощадная средневековая стратегия в реальном времени. Бесплатно, без рекламы и без покупок, дающих силу.">
+<meta property="og:image" content="https://iborygame.com/img/icon-512.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Alegreya+Sans:wght@400;500;700&family=Cormorant+SC:wght@600;700&display=swap" rel="stylesheet">
+<link rel="alternate" hreflang="en" href="https://iborygame.com/">
+<link rel="alternate" hreflang="es" href="https://iborygame.com/es/">
+<link rel="alternate" hreflang="vi" href="https://iborygame.com/vi/">
+<link rel="alternate" hreflang="ru" href="https://iborygame.com/ru/">
+<link rel="alternate" hreflang="zh" href="https://iborygame.com/zh/">
+<link rel="alternate" hreflang="zh-TW" href="https://iborygame.com/zh-TW/">
+<link rel="alternate" hreflang="ja" href="https://iborygame.com/ja/">
+<link rel="alternate" hreflang="ar" href="https://iborygame.com/ar/">
+<link rel="stylesheet" href="/site.css">
+<style>
+/* hero: the game's own map, full bleed, with the title held on its left */
+.hero{position:relative;min-height:min(84vh,720px);display:flex;align-items:center;overflow:hidden;border-bottom:1px solid var(--rule)}
+.hero .ground{position:absolute;inset:0;background:url(/img/map.webp) center/cover no-repeat;image-rendering:pixelated;transform:scale(1.04)}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(28,32,30,.96) 0%,rgba(28,32,30,.86) 38%,rgba(28,32,30,.35) 72%,rgba(28,32,30,.15) 100%),linear-gradient(0deg,rgba(28,32,30,.9) 0%,rgba(28,32,30,0) 40%)}
+.hero .in{position:relative;z-index:1;max-width:1120px;width:100%;margin:0 auto;padding:56px 24px 64px}
+.hero h1{font:700 clamp(2.3rem,5.2vw,3.9rem)/1.08 var(--display);margin:0;max-width:13ch;letter-spacing:.01em}
+.hero p.lede{font-size:1.2rem;max-width:34ch;color:var(--ink);margin:20px 0 28px}
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+
+/* the build queue: Ibory's real-time clock, ticking */
+.queue{margin-top:40px;display:inline-grid;grid-template-columns:auto auto;align-items:center;gap:4px 18px;background:rgba(28,32,30,.88);border:1px solid #4a534d;border-radius:10px;padding:14px 18px}
+.queue .what{font-size:.98rem;color:var(--dim)}
+.queue .left{font:700 1.5rem var(--display);font-variant-numeric:tabular-nums;color:var(--gold-hi);grid-row:span 2;text-align:right;min-width:9.5ch}
+.queue .why{font-size:.92rem;color:var(--dim)}
+.queue .why b{color:var(--ink);font-weight:500}
+
+/* how it plays */
+.plays{max-width:1120px;margin:0 auto;padding:72px 24px 24px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:48px;align-items:start}
+.plays h2,.heroes h2{font:700 clamp(1.7rem,3.5vw,2.3rem)/1.15 var(--display);margin:0 0 14px}
+.plays h3{font:700 1.15rem var(--display);color:var(--gold-hi);margin:28px 0 4px}
+.plays p{margin:0;max-width:52ch;color:#d9ddd6}
+.strip{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 4px 14px;margin:0 -4px}
+.strip figure{flex:0 0 min(62%,250px);margin:0;scroll-snap-align:start}
+.strip img{width:100%;height:auto;border-radius:14px;border:1px solid #4a534d;background:var(--slate-deep)}
+.strip figcaption{font-size:.92rem;color:var(--dim);margin-top:8px}
+
+/* heroes from history */
+.heroes{max-width:1120px;margin:0 auto;padding:56px 24px 24px}
+.heroes p{max-width:60ch;color:#d9ddd6;margin:0 0 22px}
+.faces{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:10px;list-style:none;padding:0;margin:0}
+.faces li{font-size:.85rem;color:var(--dim);line-height:1.25}
+.faces img{width:100%;height:auto;aspect-ratio:1;border-radius:8px;border:2px solid #6b5a2c;margin-bottom:6px}
+
+/* closing */
+.last{max-width:1120px;margin:0 auto;padding:56px 24px 8px}
+.last p{max-width:56ch;color:#d9ddd6}
+
+@media (max-width:860px){
+  .plays{grid-template-columns:minmax(0,1fr);gap:28px;padding-top:56px}
+  .faces{grid-template-columns:repeat(5,minmax(0,1fr))}
+}
+@media (max-width:560px){
+  .hero{min-height:88vh}
+  .hero::after{background:linear-gradient(0deg,rgba(28,32,30,.97) 0%,rgba(28,32,30,.9) 46%,rgba(28,32,30,.45) 100%)}
+  .hero{align-items:flex-end}
+  .hero .in{padding:40px 16px 40px}
+  .hero p.lede{font-size:1.1rem}
+  .queue{display:grid;margin-top:28px}
+  .queue .left{font-size:1.3rem}
+  .plays,.heroes,.last{padding-left:16px;padding-right:16px}
+  .faces{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .faces li:nth-child(n+9){display:none}
+}
+@media (prefers-reduced-motion:no-preference){
+  .hero .ground{animation:drift 60s ease-in-out infinite alternate}
+  @keyframes drift{from{transform:scale(1.04) translate(0,0)}to{transform:scale(1.1) translate(-2%,-1.5%)}}
+}
+</style>
+</head>
+<body>
+<header class="bar">
+  <a class="brand" href="/ru/"><img src="/img/icon-192.png" alt="">Ibory</a>
+  <nav aria-label="Главное меню">
+    <a href="/play/?lang=ru">Играть</a>
+    <a href="https://discord.gg/H8gErENmWe" rel="noopener">Discord</a>
+    <details class="more">
+      <summary>Другие игры</summary>
+      <div class="menu">
+        <span class="mhead">Инструменты для других игр</span>
+        <a href="https://atlas.iborygame.com/" rel="noopener">Dominion Atlas<small>Карта альянса для Dominion of Ages</small></a>
+        <a href="/dominion-daddy.html">Dominion Daddy<small>Инструмент для Dominion of Ages</small></a>
+      </div>
+    </details>
+    <details class="more langs"><summary aria-label="Language"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg><span>Русский</span></summary><div class="menu"><a href="/" lang="en" hreflang="en">English</a><a href="/es/" lang="es" hreflang="es">Español</a><a href="/vi/" lang="vi" hreflang="vi">Tiếng Việt</a><a href="/ru/" lang="ru" hreflang="ru" aria-current="true">Русский</a><a href="/zh/" lang="zh" hreflang="zh">简体中文</a><a href="/zh-TW/" lang="zh-TW" hreflang="zh-TW">繁體中文</a><a href="/ja/" lang="ja" hreflang="ja">日本語</a><a href="/ar/" lang="ar" hreflang="ar">العربية</a></div></details>
+    <a class="wide" href="/ru/account.html">Аккаунт</a>
+  </nav>
+</header>
+
+<main>
+<section class="hero">
+  <div class="ground" role="img" aria-label="Карта мира Ibory: долины, города NPC и исторический город в павшем королевстве"></div>
+  <div class="in">
+    <h1>Короля больше нет. Королевство — твоё.</h1>
+    <p class="lede">Медленная средневековая стратегия в реальном времени. Бесплатно, без рекламы и без покупок, которые делают тебя сильнее.</p>
+    <div class="cta">
+      <a class="btn main" href="/play/?lang=ru">Играть в браузере</a>
+      <a class="btn quiet" href="https://discord.gg/H8gErENmWe" rel="noopener">Наш Discord</a>
+    </div>
+    <div class="queue" aria-live="off">
+      <span class="what">Ратуша до 10-го уровня</span>
+      <span class="left" id="left">3d 22h 14m</span>
+      <span class="why">Реальное время. Закрой игру — строители <b>продолжат работу</b>.</span>
+    </div>
+  </div>
+</section>
+
+<section class="plays">
+  <div>
+    <h2>Как играть</h2>
+    <h3>Строй на годы вперёд</h3>
+    <p>Преврати один город в королевство. Постройки и исследования идут часами, потом днями, и у каждого города своё древо технологий. Кнопки ускорения нет.</p>
+    <h3>Бой по цифрам</h3>
+    <p>Все битвы идут на одном движке с одинаковыми правилами для тебя, городов NPC и других игроков. Важны типы войск, укрепления, исследования и характеристики героев, а Маг войны покажет любой бой раунд за раундом. Проверяй планы в симуляторе битв и в задачах Военной академии.</p>
+    <h3>Один или с альянсом</h3>
+    <p>Играй в одиночку сколько угодно. Создай бесплатный аккаунт ради облачных сохранений, рейтинга, мирового чата, сборов и подкреплений альянса, вторжений по желанию и полей битвы PvP.</p>
+  </div>
+  <div class="strip" tabindex="0" aria-label="Скриншоты игры">
+    <figure><img src="/img/screen-city.webp" width="540" height="1168" alt="Экран города: ресурсы, строители и участки под постройки" loading="lazy"><figcaption>Твой город и его строители</figcaption></figure>
+    <figure><img src="/img/screen-map.webp" width="540" height="1168" alt="Карта мира с уровнями долин и городов NPC на каждой клетке" loading="lazy"><figcaption>Карта павшего королевства</figcaption></figure>
+    <figure><img src="/img/screen-college.webp" width="540" height="1168" alt="Список боевых задач Военной академии" loading="lazy"><figcaption>Задачи Военной академии</figcaption></figure>
+    <figure><img src="/img/screen-war.webp" width="540" height="1168" alt="Симулятор битв с численностью войск обеих сторон" loading="lazy"><figcaption>Симулятор битв</figcaption></figure>
+  </div>
+</section>
+
+<section class="heroes">
+  <h2>Герои истории</h2>
+  <p>Крути колесо, чтобы получить героев: они поведут твои походы, будут управлять городами и защищать стены. Величайшие ждут в исторических городах на карте: сломи лояльность города, и его герой перейдёт к тебе.</p>
+  <ul class="faces">
+    <li><img src="/img/hero-joan-of-arc.webp" alt="" loading="lazy">Жанна д'Арк</li>
+    <li><img src="/img/hero-genghis-khan.webp" alt="" loading="lazy">Чингисхан</li>
+    <li><img src="/img/hero-saladin.webp" alt="" loading="lazy">Саладин</li>
+    <li><img src="/img/hero-boudica.webp" alt="" loading="lazy">Боудикка</li>
+    <li><img src="/img/hero-charlemagne.webp" alt="" loading="lazy">Карл Великий</li>
+    <li><img src="/img/hero-leonidas.webp" alt="" loading="lazy">Леонид</li>
+    <li><img src="/img/hero-tomyris.webp" alt="" loading="lazy">Томирис</li>
+    <li><img src="/img/hero-sun-tzu.webp" alt="" loading="lazy">Сунь-цзы</li>
+    <li><img src="/img/hero-julius-caesar.webp" alt="" loading="lazy">Юлий Цезарь</li>
+    <li><img src="/img/hero-cleopatra-2.webp" alt="" loading="lazy">Клеопатра</li>
+  </ul>
+</section>
+
+<section class="last">
+  <h2 style="font:700 clamp(1.7rem,3.5vw,2.3rem)/1.15 var(--display);margin:0 0 12px">Это надолго</h2>
+  <p>Медали выпадают меньше чем в 1% побед. Снаряжение куётся из очень редких материалов, а исторический герой — настоящее достижение. Если тебе это по душе, ты здесь свой.</p>
+  <div class="cta" style="margin-top:22px"><a class="btn main" href="/play/?lang=ru">Играть в браузере</a></div>
+</section>
+</main>
+
+<footer class="foot"><div>
+  <a href="/play/?lang=ru">Играть</a>
+  <a href="https://discord.gg/H8gErENmWe" rel="noopener">Discord</a>
+  <a href="/ru/account.html">Твой аккаунт</a>
+  <a href="/ru/privacy.html">Политика конфиденциальности</a>
+  <span>© 2026 Ibory. Портреты героев — произведения, перешедшие в общественное достояние.</span>
+</div></footer>
+
+<script>
+// the build queue counts down in real time, like the game's own timers
+(function(){
+  var el=document.getElementById("left"); if (!el) return;
+  var end=Date.now()+((3*24+22)*3600+14*60+6)*1000;
+  function pad(n){ return (n<10?"0":"")+n; }
+  function tick(){ var s=Math.max(0,Math.floor((end-Date.now())/1000)), d=Math.floor(s/86400), h=Math.floor(s%86400/3600), m=Math.floor(s%3600/60);
+    el.textContent=d+"d "+h+"h "+pad(m)+"m "+pad(s%60)+"s"; }
+  tick(); setInterval(tick,1000);
+})();
+</script>
+<script>
+// the Other games menu closes when you tap anywhere else, or press Escape
+(function(){ document.querySelectorAll(".bar details.more").forEach(function(d){
+  document.addEventListener("click", function(e){ if (d.open && !d.contains(e.target)) d.open=false; });
+  document.addEventListener("keydown", function(e){ if (e.key==="Escape" && d.open){ d.open=false; d.querySelector("summary").focus(); } }); });
+})();
+</script>
+</body>
+</html>

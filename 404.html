@@ -31,6 +31,12 @@
 <main class="page">
 <h1>Nothing here</h1>
 <p>That page doesn't exist. Head to <a href="/">the home page</a> or <a href="/play/">play Ibory</a>.</p>
+<p lang="es">Esa página no existe. Ve a <a href="/es/">la página principal</a> o <a href="/play/?lang=es">juega a Ibory</a>.</p>
+<p lang="vi">Trang này không tồn tại. Về <a href="/vi/">trang chủ</a> hoặc <a href="/play/?lang=vi">chơi Ibory</a>.</p>
+<p lang="ru">Такой страницы нет. Вернись на <a href="/ru/">главную</a> или <a href="/play/?lang=ru">играй в Ibory</a>.</p>
+<p lang="zh">页面不存在。返回<a href="/zh/">首页</a>或<a href="/play/?lang=zh">开始游玩 Ibory</a>。</p>
+<p lang="zh-TW">頁面不存在。返回<a href="/zh-TW/">首頁</a>或<a href="/play/?lang=zh-TW">開始遊玩 Ibory</a>。</p>
+<p lang="ja">ページが見つかりません。<a href="/ja/">トップページ</a>に戻るか、<a href="/play/?lang=ja">Ibory をプレイ</a>してください。</p>
 <p lang="ar" dir="rtl">هذه الصفحة غير موجودة. اذهب إلى <a href="/ar/">الصفحة الرئيسية</a> أو <a href="/play/?lang=ar">العب إيبوري</a>.</p>
 </main>
 <footer class="foot"><div>
@@ -42,9 +48,9 @@
 </div></footer>
 <script>
 // the Other games menu closes when you tap anywhere else, or press Escape
-(function(){ var d=document.querySelector(".bar details.more"); if (!d) return;
+(function(){ document.querySelectorAll(".bar details.more").forEach(function(d){
   document.addEventListener("click", function(e){ if (d.open && !d.contains(e.target)) d.open=false; });
-  document.addEventListener("keydown", function(e){ if (e.key==="Escape" && d.open){ d.open=false; d.querySelector("summary").focus(); } });
+  document.addEventListener("keydown", function(e){ if (e.key==="Escape" && d.open){ d.open=false; d.querySelector("summary").focus(); } }); });
 })();
 </script>
 </body>
