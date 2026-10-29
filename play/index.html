@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.13";
+window.IBORY_V="0.2.14";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1153,7 +1153,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script>
 (function(){
 "use strict";
-var APP_VERSION = "0.2.13";
+var APP_VERSION = "0.2.14";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -8160,6 +8160,7 @@ function bkSnapshot(why, force){
   if (saveLocked || typeof S==="undefined" || !S) return;
   var now=Date.now(); if (!force && now-bkLast<BK_EVERY) return;
   var json; try { json=JSON.stringify(S); } catch(e){ return; }
+  if (stCap && stUsed()+json.length > stCap*0.75) return; // 0.2.14: this device ran out once; copies never crowd the game again
   var m={at:now, why:why, score:bkScoreOf(S), cities:S.cities.length, prestige:Math.floor(S.prestige||0), ver:APP_VERSION}, bm=bkMeta(BK_BEST);
   if (!bm || m.score>=bm.score) bkPut(BK_BEST,json,m);
   if (bm && m.score<0.05*bm.score) return;
@@ -8176,6 +8177,10 @@ if (loadFail){ try { localStorage.setItem(BK_RESCUE, loadRaw); } catch(e){} save
 else if (!loadRaw){ var bkb=bkMeta(BK_BEST); if (bkb && bkb.score>=1000) recoverOffer=true; }
 if (!S) S = newState();
 S.speed=1; // real time
+// 0.2.14: make-up time. A full browser storage stopped saves (see save()), and players lost a night: every existing game gets 8 hours once,
+// run by the normal catch-up below. Marked in the save and on the device, so restoring an older copy or a cloud save can't take it twice.
+var COMP_0214=false;
+try { if (loadRaw && !loadFail && S && !S.comp0214 && !localStorage.getItem("ibory-comp-0214")){ S.comp0214=1; S.real-=8*HOUR; COMP_0214=true; localStorage.setItem("ibory-comp-0214","1"); } } catch(e){}
 installProxies(S);
 if (S.bf && S.bf.active) S.bf.last=Date.now(); // time with the app closed never counts
 S.cities.forEach(function(cc,ci){ withCity(ci,function(){
@@ -8219,7 +8224,20 @@ var exportShown=""; // 0.1.235: the Settings sheet redraws twice a second; the s
 // Storage full used to be swallowed; now it toasts once and shows in Settings (saveErr).
 var S_DIRTY=false, saveAt=0, saveErr="";
 function markDirty(){ S_DIRTY=true; }
-function save(){ if (saveLocked) return; try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); S_DIRTY=false; saveAt=Date.now(); if (saveErr){ saveErr=""; } } catch(e){ if (!saveErr){ saveErr=String(e&&e.name||e); try { toast("Couldn\u2019t save the game: storage is full or blocked. Free some space or export a save code."); } catch(x){} } } }
+/* 0.2.14: the game itself always gets the room. The safety copies (up to 7 full copies of the save) could fill the browser's ~5 MB once a
+   save grew big, and then every save failed: the phone kept an old save and a night's progress was gone on the next open. Now a save that
+   doesn't fit deletes copies (least needed first) until it does, and the copies learn this device's limit (stCap) and stay well under it. */
+var stCap=0; try { stCap=+localStorage.getItem("ibory-stcap")||0; } catch(e){} // characters in storage when a write first failed on this device (0 = never hit the limit); kept across opens
+function stUsed(){ var n=0; try { for (var i=0;i<localStorage.length;i++){ var k=localStorage.key(i), v=localStorage.getItem(k); n+=k.length+(v?v.length:0); } } catch(e){} return n; }
+function stFreeOne(){ var order=[CB_UNDO].concat(BK_PRE, BK_RING.slice().sort(function(a,b){ var x=bkMeta(a), y=bkMeta(b); return (x?x.at:0)-(y?y.at:0); }), [BK_BEST]);
+  for (var i=0;i<order.length;i++){ try { if (localStorage.getItem(order[i])!=null || localStorage.getItem(order[i]+"-m")!=null){ localStorage.removeItem(order[i]); localStorage.removeItem(order[i]+"-m"); return true; } } catch(e){} } return false; }
+function save(){ if (saveLocked) return; var json;
+  try { json=JSON.stringify(S); localStorage.setItem(SAVE_KEY, json); }
+  catch(e){ if (!json){ saveErrShow(e); return; } var cap=stUsed()+json.length; if (!stCap || cap<stCap) stCap=cap; var done=false;
+    while (!done && stFreeOne()){ try { localStorage.setItem(SAVE_KEY, json); done=true; } catch(e2){} }
+    if (!done){ saveErrShow(e); return; } }
+  S_DIRTY=false; saveAt=Date.now(); if (saveErr){ saveErr=""; } if (stCap && save.capKept!==stCap){ try { localStorage.setItem("ibory-stcap", String(stCap)); save.capKept=stCap; } catch(e){} } }
+function saveErrShow(e){ var first=!saveErr; saveErr=String(e&&e.name||e); if (first || Date.now()-(saveErrShow.at||0)>10*60000){ saveErrShow.at=Date.now(); try { toast("Couldn\u2019t save the game: this browser\u2019s storage is full or blocked. Save to the cloud or export a save code in Settings."); } catch(x){} } }
 function saveIfDirty(){ if (S_DIRTY || Date.now()-saveAt>60000) save(); }
 
 function getSlot(w,i){ return w==="wall" ? {type:"walls",level:S.wall||0} : w==="th" ? {type:"townhall",level:S.th} : (w==="in" ? S.inside[i] : S.fields[i]); }
@@ -14175,6 +14193,7 @@ refresh();
 function capFixToast(){ if (!S.capFixed || !S.capFixed.length) return; var cf=S.capFixed; delete S.capFixed; save();
   toast("Conquered cities fixed: "+cf.map(function(x){ return x.name+" got "+x.n+" building"+(x.n>1?"s":"")+" at level "+x.L; }).join("; ")+"."); }
 setTimeout(capFixToast, 1500);
+if (COMP_0214){ save(); setTimeout(function compShow(){ if (sheetFor){ setTimeout(compShow, 3000); return; } openSheet({kind:"msg", title:"8 hours of make-up time", body:"Sorry about last night: a full browser storage stopped the game from saving, and progress was lost. Your game has just run 8 extra hours to make up for it, and the storage problem is fixed."}); }, 2600); }
 setTimeout(movedMaybe, 2500);
 if (S.repSeen0==null){ S.repSeen0=S.gt; save(); } // 0.2.4: reports from before the Reports hub count as read
 // 0.2.2: heroes owed by historic cities captured before 0.1.250
