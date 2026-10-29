@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.15";
+window.IBORY_V="0.2.16";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1153,7 +1153,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script>
 (function(){
 "use strict";
-var APP_VERSION = "0.2.15";
+var APP_VERSION = "0.2.16";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -8204,6 +8204,7 @@ function storageStatus(){
   if (storPersisted===true) return "Saving: this browser keeps your save and won\u2019t clear it on its own \u2713";
   return "Saving: kept on this phone. Some browsers clear it when you close them or run low on space, so set up a cloud save as a backup.";
 }
+function storageUse(){ var o=stBreak(); return "Space used on this device: your game "+stMB(o.game)+", safety copies "+stMB(o.copies)+", hero pictures "+stMB(o.pics)+", other "+stMB(o.other)+"."; }
 function offlineStatus(){
   if (!("serviceWorker" in navigator) || !/^https:/.test(location.protocol) || /claude\.ai|claudeusercontent/.test(location.hostname)) return "Offline play: available in the installed app.";
   return navigator.serviceWorker.controller ? "Offline play: ready \u2713" : "Offline play: not ready yet. Close and reopen the app once with internet.";
@@ -8235,8 +8236,22 @@ function save(){ if (saveLocked) return; var json;
   try { json=JSON.stringify(S); localStorage.setItem(SAVE_KEY, json); }
   catch(e){ if (!json){ saveErrShow(e); return; } var cap=stUsed()+json.length; if (!stCap || cap<stCap) stCap=cap; var done=false;
     while (!done && stFreeOne()){ try { localStorage.setItem(SAVE_KEY, json); done=true; } catch(e2){} }
+    // 0.2.16: still too big (iPhones hold about half what other browsers do): trim old reports, a step at a time, until it fits
+    for (var ts=0; !done && ts<4; ts++) if (stTrim(ts)){ try { json=JSON.stringify(S); localStorage.setItem(SAVE_KEY, json); done=true; if (!save.trimSaid){ save.trimSaid=1; setTimeout(function(){ try { toast("Storage on this device was full, so older reports were trimmed to keep your game saving."); } catch(x){} }, 50); } } catch(e3){} }
     if (!done){ saveErrShow(e); return; } }
   S_DIRTY=false; saveAt=Date.now(); if (saveErr){ saveErr=""; } if (stCap && save.capKept!==stCap){ try { localStorage.setItem("ibory-stcap", String(stCap)); save.capKept=stCap; } catch(e){} } }
+function stTrim(step){ var b, n=0;
+  if (step===0){ S.reports.forEach(function(r,i){ if (i>=30 && !r.fav && r.ww){ delete r.ww; n++; } }); return n>0; } // War Wizard replays on all but the newest 30
+  if (step===1){ b=S.reports.length; trimKeepFav(S.reports,100); return S.reports.length<b; }
+  if (step===2){ b=S.log.length; trimKeepFav(S.log,2000); return S.log.length<b; }
+  if (step===3){ b=S.log.length+S.reports.length; trimKeepFav(S.log,500); trimKeepFav(S.reports,30); return S.log.length+S.reports.length<b; }
+  return false; }
+// what this device's storage holds, in MB (browsers keep text as 2 bytes a character)
+function stBreak(){ var o={game:0, copies:0, pics:0, other:0}, cp={}; [CB_UNDO,BK_BEST,BK_RESCUE].concat(BK_RING,BK_PRE).forEach(function(k){ cp[k]=1; cp[k+"-m"]=1; });
+  try { for (var i=0;i<localStorage.length;i++){ var k=localStorage.key(i), v=localStorage.getItem(k), n=(k.length+(v?v.length:0))*2;
+    if (k===SAVE_KEY) o.game+=n; else if (cp[k]) o.copies+=n; else if (k.indexOf("ibory-himg:")===0) o.pics+=n; else o.other+=n; } } catch(e){}
+  return o; }
+function stMB(n){ return (n/1048576).toFixed(n<1048576?2:1)+" MB"; }
 function saveErrShow(e){ var first=!saveErr; saveErr=String(e&&e.name||e); if (first || Date.now()-(saveErrShow.at||0)>10*60000){ saveErrShow.at=Date.now(); try { toast("Couldn\u2019t save the game: this browser\u2019s storage is full or blocked. Save to the cloud or export a save code in Settings."); } catch(x){} } }
 function saveIfDirty(){ if (S_DIRTY || Date.now()-saveAt>60000) save(); }
 
@@ -12649,6 +12664,7 @@ function renderSheetCore(){
       '<div class="sub">Ibory version <b>'+APP_VERSION+'</b></div>'+
       '<div class="btnrow"><button class="btn ghost small" data-act="force-update">Update now</button></div><div class="hint">Gets the newest version of the game and reloads. Your save is not touched.</div>'+
       '<div class="sub" id="storstat">'+storageStatus()+'</div>'+
+      '<div class="sub dur">'+storageUse()+' <span translate="no">v'+APP_VERSION+'</span></div>'+
       '<div><div class="h3" style="margin-bottom:6px">Multiplayer</div><div class="speeds"><button data-act="mp-set" data-v="on" aria-pressed="'+mpShown()+'">On</button><button data-act="mp-set" data-v="off" aria-pressed="'+!mpShown()+'">Off: single player</button></div>'+
         (S.mpLocked?'<div class="hint" style="color:var(--bad,#c0392b)">This account was removed from the high scores, so it is locked to single player: no alliances, invasions, PvP or world chat.</div>':'')+'<div class="hint">Off hides alliances, invasions and PvP. Your high scores: <b>'+(S.mp?'multiplayer boards (for good)':'single-player boards')+'</b>.</div></div>'+
       (alMine()?'<div><div class="h3" style="margin-bottom:6px">Watchtower alerts</div>'+wtTypeBtns()+'</div>':'')+
