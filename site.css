@@ -119,5 +119,7 @@ html[lang="vi"],html[lang="ru"]{--display:"Cormorant SC","Cinzel",Georgia,serif}
 html[lang="zh"]{--display:"Noto Serif SC","Cinzel",serif;--body:"Noto Sans SC","Alegreya Sans",system-ui,sans-serif}
 html[lang="zh-TW"]{--display:"Noto Serif TC","Cinzel",serif;--body:"Noto Sans TC","Alegreya Sans",system-ui,sans-serif}
 html[lang="ja"]{--display:"Noto Serif JP","Cinzel",serif;--body:"Noto Sans JP","Alegreya Sans",system-ui,sans-serif}
-html[lang^="zh"] *,html[lang="ja"] *{letter-spacing:0!important;text-transform:none!important}
-html[lang^="zh"] body,html[lang="ja"] body{line-height:1.8}
+html[lang="ko"]{--display:"Noto Serif KR","Cinzel",serif;--body:"Noto Sans KR","Alegreya Sans",system-ui,sans-serif}
+html[lang="ko"] body{word-break:keep-all;overflow-wrap:break-word}
+html[lang^="zh"] *,html[lang="ja"] *,html[lang="ko"] *{letter-spacing:0!important;text-transform:none!important}
+html[lang^="zh"] body,html[lang="ja"] body,html[lang="ko"] body{line-height:1.8}

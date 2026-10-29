@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.9";
+window.IBORY_V="0.2.10";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -27,6 +27,7 @@ window.IBORY_V="0.2.9";
     zh:{ name:"\u7b80\u4f53\u4e2d\u6587", fonts:"https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap" },
     "zh-TW":{ name:"\u7e41\u9ad4\u4e2d\u6587", fonts:"https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap" },
     ja:{ name:"\u65e5\u672c\u8a9e", fonts:"https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@600;700&display=swap" },
+    ko:{ name:"\ud55c\uad6d\uc5b4", fonts:"https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@600;700&display=swap" },
     ar:{ name:"\u0627\u0644\u0639\u0631\u0628\u064a\u0629", dir:"rtl",
     fonts:"https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;700&family=Reem+Kufi:wght@500;700&display=swap" } };
   var L = "";
@@ -208,7 +209,9 @@ html[lang="vi"],html[lang="ru"]{--display:"Cormorant SC","Cinzel",Georgia,serif}
 html[lang="zh"]{--display:"Noto Serif SC","Cinzel",serif; --body:"Noto Sans SC","Alegreya Sans",sans-serif}
 html[lang="zh-TW"]{--display:"Noto Serif TC","Cinzel",serif; --body:"Noto Sans TC","Alegreya Sans",sans-serif}
 html[lang="ja"]{--display:"Noto Serif JP","Cinzel",serif; --body:"Noto Sans JP","Alegreya Sans",sans-serif}
-html[lang^="zh"] *,html[lang="ja"] *{letter-spacing:0!important; font-variant:normal!important; text-transform:none!important}
+html[lang="ko"]{--display:"Noto Serif KR","Cinzel",serif; --body:"Noto Sans KR","Alegreya Sans",sans-serif}
+html[lang="ko"] body{word-break:keep-all; overflow-wrap:break-word}
+html[lang^="zh"] *,html[lang="ja"] *,html[lang="ko"] *{letter-spacing:0!important; font-variant:normal!important; text-transform:none!important}
 html[dir="rtl"] canvas{direction:ltr}
 html[dir="rtl"] .ledger{direction:ltr}
 #i18n-ui{position:fixed;z-index:9999;inset:auto 8px calc(8px + env(safe-area-inset-bottom,0px)) 8px;background:var(--panel);color:var(--ink);border:2px solid var(--brass);border-radius:10px;padding:8px;font:14px/1.35 var(--body);box-shadow:0 4px 18px rgba(0,0,0,.45);max-height:70vh;overflow:auto}
@@ -536,6 +539,7 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(-
 
 .section{margin-top:16px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
 .section:first-child{margin-top:0}
+#marchbox>.section:first-child{margin-top:16px} /* 0.2.9: a gap between Tile details and Held valleys */
 .section h3,.h3{margin:0 0 4px;font:700 1rem var(--display);letter-spacing:.03em}
 .shead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
 .hint{color:var(--muted);font-size:.9rem;margin:2px 0 0}
@@ -885,6 +889,9 @@ body.bfmode #chatdock{display:none!important}
 .mpop .mpx{background:none;border:0;font-size:1.2rem;line-height:1;padding:0 2px;color:var(--muted)}
 .mpop .mpb{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
 .mpop .mpb .btn{padding:5px 9px;font-size:.82rem;min-height:0}
+.mpop .mpfarm{display:flex;gap:4px;margin-top:6px;align-items:center}
+.mpop .mpfarm select{flex:1 1 auto;min-width:0;padding:4px 6px;font-size:.82rem;min-height:0}
+.mpop .mpfarm .btn{padding:5px 10px;font-size:.82rem;min-height:0;flex:0 0 auto}
 .bmjump{flex:1 1 0;min-width:0;width:auto;max-width:none;margin:0;padding-top:6px;padding-bottom:6px}
 .alm a.clink{color:var(--brass);text-decoration:underline;word-break:break-all}
 .rxs{display:flex;flex-wrap:wrap;gap:4px;margin:3px 0 1px}
@@ -990,11 +997,22 @@ body.bfmode #chatdock{display:none!important}
 .mapfsbar .btn{min-width:40px;box-shadow:0 2px 8px rgba(0,0,0,.35)}
 body.mapfs{overflow:hidden}
 .mapview canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
-.mapbottom{display:grid;grid-template-columns:auto 1fr;gap:12px;margin-top:10px;align-items:start}
+.mapbottom{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;margin-top:10px;align-items:start}
+/* 0.2.9: the picked tile at a glance, beside the overview (the full card stays in Tile details below) */
+.glance{height:132px;overflow-y:auto;font-size:.8rem;line-height:1.3;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.glance .gl-h{font-weight:700;margin-bottom:2px;overflow-wrap:anywhere}
+.glance .gl-t{color:var(--dim);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;margin-top:5px}
+.glance .us{display:flex;flex-wrap:wrap;gap:1px 8px;font-size:.8rem;margin:0}
+.glance .us span{white-space:nowrap}
+.glance .gl-res{display:flex;flex-wrap:wrap;gap:2px 8px}
+.glance .gl-res span{display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+.glance .gl-res svg{width:13px;height:13px}
+.glance .hint{font-size:.78rem;margin:3px 0 0}
+.glance .link{font-size:.8rem;margin-top:5px;display:inline-block}
 #minic{width:132px;height:132px;image-rendering:pixelated;border-radius:6px;border:1px solid var(--line);cursor:pointer}
 .finder{display:grid;gap:6px}
 .finder select{width:100%}
-@media (min-width:560px){ #minic{width:198px;height:198px} }
+@media (min-width:560px){ #minic{width:198px;height:198px} .glance{height:198px} }
 .mapwrap{overflow:auto;max-height:62vh;border-radius:8px;border:1px solid var(--line);margin-top:8px;-webkit-overflow-scrolling:touch;background:var(--panel2)}
 .mapwrap canvas{display:block;cursor:pointer}
 .legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.82rem;color:var(--muted);margin-top:8px}
@@ -1028,6 +1046,8 @@ dialog::backdrop{background:rgba(10,12,10,.5)}
 .closebtn{justify-self:end;border:0;background:none;color:var(--muted);cursor:pointer;text-decoration:underline;padding:0}
 .speeds{display:flex;gap:8px;flex-wrap:wrap}
 .speeds button{flex:1;border:1px solid var(--line);background:var(--panel2);border-radius:8px;padding:10px;cursor:pointer;font-weight:700;min-width:70px}
+.speeds.langs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))} /* 0.2.10: nine languages, three to a row, names never split */
+.speeds.langs button{min-width:0;padding:10px 4px;white-space:nowrap;word-break:normal;overflow-wrap:normal;overflow:hidden;text-overflow:ellipsis}
 .speeds button[aria-pressed="true"]{border-color:var(--brass);color:var(--brass);background:var(--brass-soft)}
 .danger{color:var(--red)}
 textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);resize:vertical}
@@ -1114,7 +1134,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script>
 (function(){
 "use strict";
-var APP_VERSION = "0.2.9";
+var APP_VERSION = "0.2.10";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -4043,7 +4063,7 @@ function viewMap(){
     '<div id="mapfarmbox">'+mapFarmHtml()+'</div>'+
     '<div class="mapview" id="mapview"><canvas id="mapc" aria-label="Map. Drag to pan, tap a tile to see it."></canvas><div class="mpop" id="mappop" hidden></div><div class="paintbar" id="paintbar" hidden></div>'+
       '<div class="mapfsbar"><button class="btn small" data-act="map-zoom" data-z="1" aria-label="Zoom in">+</button><button class="btn small" data-act="map-zoom" data-z="-1" aria-label="Zoom out">\u2212</button><button class="btn small" data-act="map-home">My city</button><button class="btn small" data-act="map-rot" aria-label="Turn sideways">\u27f3</button><button class="btn small" data-act="map-fs" aria-label="Leave full screen">\u2715</button></div></div>'+
-    '<div class="mapbottom"><canvas id="minic" width="'+MAPW+'" height="'+MAPH+'" aria-label="Overview map. Tap to jump there."></canvas>'+
+    '<div class="mapbottom"><canvas id="minic" width="'+MAPW+'" height="'+MAPH+'" aria-label="Overview map. Tap to jump there."></canvas><div id="mapglance" class="glance"></div>'+
     '</div></div><p class="hint">Drag to pan, pinch or use + and \u2212 to zoom, tap the overview to jump, \u26f6 for full screen. Historic cities sit on a grid: level 12s every 24 tiles, 14s every 66, and Atlantis at the center (198, 198).</p></div>'+
     '<div id="bmpanel">'+bmPanel()+'</div>'+occPanel()+
     '<details class="section det" id="tidet" data-det="tileinfo"'+(DET.tileinfo?' open':'')+(selTile?'':' hidden')+'><summary><b>Tile details</b> <span class="dur" id="tisum"></span></summary><div id="tileinfo"></div></details><div id="marchbox"></div>';
@@ -4442,7 +4462,7 @@ function troopRows(t, forts, wall){
   var h='';
   t.forEach(function(n,i){ if (n>0) h+='<span>'+U[i].name+' <b>'+fmt(n)+'</b></span>'; });
   if (forts) forts.forEach(function(n,i){ if (n>0) h+='<span>'+FORTN[i]+' <b>'+fmt(n)+'</b></span>'; });
-  if (wall) h+='<span>Wall <b>level '+wall+'</b></span>';
+  if (wall) h+='<span>Wall level <b>'+wall+'</b></span>'; // 0.2.9: the number alone in bold, so "Wall level" translates as one piece
   return h ? '<div class="us">'+h+'</div>' : '<p class="hint">Undefended.</p>';
 }
 // ---- map bookmarks: any tile, with an optional label; kept for the whole kingdom (not per city) ----
@@ -4467,7 +4487,7 @@ function bmCard(){ var el=document.getElementById("tileinfo"); if (!el || !selTi
   wrap.innerHTML=b ? '<button class="btn ghost small" data-act="bm-del" data-tile="'+selTile+'">\u2605 Bookmarked</button><input type="text" id="bm-label" maxlength="40" value="'+esc(b.n||"")+'" placeholder="Label (optional)" aria-label="Bookmark label" style="flex:1;min-width:0">'
     : '<button class="btn ghost small" data-act="bm-add" data-tile="'+selTile+'">\u2606 Bookmark</button>';
   hd.style.flexWrap="wrap"; hd.appendChild(wrap); }
-function renderTileInfo(){ renderTileInfoBase(); try { var td=document.getElementById("tidet"), ts=document.getElementById("tisum"); if (td){ td.hidden=!selTile; if (ts){ var tq=selTile&&TILE_BY[selTile]; ts.textContent=tq?tileName(tq)+" ("+tq.x+", "+tq.y+")":""; } } } catch(e){} try { bmCard(); } catch(e){} try { ryCard(); } catch(e){} try { mapPop(); } catch(e){} }
+function renderTileInfo(){ renderTileInfoBase(); try { tileGlance(); } catch(e){} try { var td=document.getElementById("tidet"), ts=document.getElementById("tisum"); if (td){ td.hidden=!selTile; if (ts){ var tq=selTile&&TILE_BY[selTile]; ts.textContent=tq?tileName(tq)+" ("+tq.x+", "+tq.y+")":""; } } } catch(e){} try { bmCard(); } catch(e){} try { ryCard(); } catch(e){} try { mapPop(); } catch(e){} }
 /* ---------- map popup (0.1.135): tap a tile and its basics and main buttons open right on the map ---------- */
 var MPOP={hide:false};
 var MPOP_ACTS={attack:1, scout:2, occupy:3, conquer:4, found:5, transport:6, reinforce:7, allyguard:8, station:9};
@@ -4497,12 +4517,36 @@ function mapPop(){ var el=document.getElementById("mappop"); if (!el) return;
   var bm=bmAt(q.id);
   var loyH=""; if ((q.k==="npc"||q.k==="hc"||q.k==="ai") && !S.map.owned[q.id]){ var lv=Math.floor(loyOf(q)); loyH='<span class="mploy'+(lv<=30?' low':lv<70?' mid':'')+'" title="Loyalty: at 0 a win takes the city">Loyalty '+lv+'</span>'; } // 0.1.190
   var ph='<div class="mpt"><b>'+esc(tileName(q))+'</b>'+loyH+'<button class="mpx" data-act="mpop-close" aria-label="Close">\u00d7</button></div><div class="dur">'+mapPopInfo(q)+'</div>'+
-    '<div class="mpb">'+btns.map(function(x){ return x.h; }).join("")+'<button class="btn ghost" data-act="'+(bm?'bm-del':'bm-add')+'" data-tile="'+q.id+'" aria-label="'+(bm?'Remove bookmark':'Bookmark')+'">'+(bm?'\u2605':'\u2606')+'</button><button class="btn ghost mpbrush'+(S.deco&&S.deco.at[q.id]&&S.deco.at[q.id].length?' on':'')+'" data-act="deco-open" data-tile="'+q.id+'" aria-label="Decorate this tile" title="Decorate"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M20.7 3.3a1 1 0 0 0-1.4 0L11 11.6l1.4 1.4 8.3-8.3a1 1 0 0 0 0-1.4z" fill="currentColor"/><path d="M9.6 13c-1.8 0-3.1 1.3-3.3 3-.2 1.4-.9 2.3-2.3 2.8 1 .9 2.4 1.2 3.9 1.2 2.6 0 4.6-1.8 4.6-4.1 0-.5-.1-1-.3-1.4z" fill="currentColor"/></svg></button><button class="btn ghost" data-act="mpop-more">Details</button></div>';
-  if (el._h!==ph){ el.innerHTML=ph; el._h=ph; } el.hidden=false; mapPopPos(); }
+    '<div class="mpb">'+btns.map(function(x){ return x.h; }).join("")+'<button class="btn ghost" data-act="'+(bm?'bm-del':'bm-add')+'" data-tile="'+q.id+'" aria-label="'+(bm?'Remove bookmark':'Bookmark')+'">'+(bm?'\u2605':'\u2606')+'</button><button class="btn ghost mpbrush'+(S.deco&&S.deco.at[q.id]&&S.deco.at[q.id].length?' on':'')+'" data-act="deco-open" data-tile="'+q.id+'" aria-label="Decorate this tile" title="Decorate"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M20.7 3.3a1 1 0 0 0-1.4 0L11 11.6l1.4 1.4 8.3-8.3a1 1 0 0 0 0-1.4z" fill="currentColor"/><path d="M9.6 13c-1.8 0-3.1 1.3-3.3 3-.2 1.4-.9 2.3-2.3 2.8 1 .9 2.4 1.2 3.9 1.2 2.6 0 4.6-1.8 4.6-4.1 0-.5-.1-1-.3-1.4z" fill="currentColor"/></svg></button><button class="btn ghost" data-act="mpop-more">Details</button></div>'+mpopFarmHtml(q);
+  if (el._h!==ph){ el.innerHTML=ph; el._h=ph; var fsel=el.querySelector("#mpfarmsel"); if (fsel) fsel.addEventListener("change", function(){ MPOPFARM=+fsel.value; el._h=""; mapPop(); }); } el.hidden=false; mapPopPos(); }
+// 0.2.9: add the tile to a farm preset from the popup: pick the preset, then Add (Remove when it's already on that list)
+var MPOPFARM=0;
+function mpopFarmHtml(q){ if (!document.querySelector('#tileinfo [data-act="farm-toggle"]') || !S.presets || !S.presets.length) return '';
+  if (MPOPFARM>=S.presets.length) MPOPFARM=0; var on=S.presets[MPOPFARM].farm.indexOf(q.id)>=0;
+  return '<div class="mpfarm"><select id="mpfarmsel" aria-label="Farm preset">'+S.presets.map(function(pr,pi){ var has=pr.farm.indexOf(q.id)>=0; return '<option value="'+pi+'"'+(pi===MPOPFARM?' selected':'')+'>'+(pi+1)+'. '+esc(pr.name)+(has?' \u2713':'')+' ('+pr.farm.length+')</option>'; }).join("")+'</select>'+
+    '<button class="btn ghost" data-act="mpop-farm" data-tile="'+q.id+'">'+(on?'Remove':'Add')+'</button></div>'; }
 function mapPopPos(){ var el=document.getElementById("mappop"), c=document.getElementById("mapc"); if (!el || el.hidden || !c || !selTile) return; var q=TILE_BY[selTile]; if (!q) return;
   var W=c.clientWidth, H=c.clientHeight, z=mv.z, px=(q.x-mv.x)*z, py=(q.y-mv.y)*z, w=el.offsetWidth||232, h=el.offsetHeight||110;
   var left=Math.max(4, Math.min(W-w-4, px+z/2-w/2)), top=py+z+6; if (top+h>H-4) top=py-h-6; if (top<4) top=Math.max(4, Math.min(H-h-4, py+z+6));
   el.style.left=Math.round(left)+"px"; el.style.top=Math.round(top)+"px"; }
+// 0.2.9: what the picked tile holds and carries, in the box beside the overview: defenders, loot and its one key fact; "All details" opens the full card
+function tileGlance(){ var el=document.getElementById("mapglance"); if (!el) return;
+  var q=selTile && TILE_BY[selTile], h;
+  if (!q) h='<p class="hint">Tap a tile to see its defenders and loot here.</p>';
+  else { h='<div class="gl-h">'+esc(tileName(q))+' <span class="dur">('+q.x+', '+q.y+')</span></div>';
+    try {
+      if (q.k==="home") h+='<p class="hint">One of your cities.</p>';
+      else { var cur=current(q), intel=needScout(q)?intelOf(q):null, shown=intel||cur;
+        if (needScout(q) && !intel) h+='<div class="gl-t">Defenders</div><p class="hint">Unknown. Scout it first.</p>';
+        else if (shown && shown.t){ var tS=intel && intel.inf<3 ? intel.t.map(roughN) : shown.t, fS=(q.k==="npc"||q.k==="hc"||q.k==="ai") ? (intel && intel.inf<3 ? null : shown.f) : null;
+          h+='<div class="gl-t">Defenders</div>'+troopRows(tS, fS, shown.wall); }
+        var rs=(!needScout(q)||intel) && shown && shown.res;
+        if (rs) h+='<div class="gl-t">Loot</div><div class="gl-res">'+RES.map(function(k){ var n=intel?roughN(intel.res[k]):rs[k]; return n>0 ? '<span title="'+RNAME[k]+'">'+ICON[k]+fmt(n)+'</span>' : ''; }).join("")+'</div>';
+        if (VTYPES[q.k] && VTYPES[q.k].res) h+='<p class="hint">Hold it for +'+pct(VALLEY_BONUS*q.L)+' '+VTYPES[q.k].res+'.</p>';
+      }
+    } catch(e){}
+    h+='<button class="link" data-act="mpop-more">All details \u2193</button>'; }
+  if (el._h!==h){ el.innerHTML=h; el._h=h; } }
 function renderTileInfoBase(){
   var el=document.getElementById("tileinfo"); if (!el) return;
   if (!selTile){ el.innerHTML=''; return; }
@@ -12475,7 +12519,7 @@ function renderSheetCore(){
 
       '<div><div class="h3" style="margin-bottom:6px">Theme</div><div class="speeds">'+[["auto","Match phone"],["light","Light"],["dark","Dark"]].map(function(t){ return '<button data-act="theme" data-v="'+t[0]+'" aria-pressed="'+(getTheme()===t[0])+'">'+t[1]+'</button>'; }).join("")+'</div></div>'+
       // 0.2.7 language: the names stay in their own script (translate="no"); picking one reloads the game in it
-      '<div><div class="h3" style="margin-bottom:6px">Language</div><div class="speeds" translate="no">'+Object.keys(I18N.langs).map(function(c){ return '<button data-act="lang" data-v="'+c+'" aria-pressed="'+(I18N.lang===c)+'">'+I18N.langs[c].name+'</button>'; }).join("")+'</div>'+
+      '<div><div class="h3" style="margin-bottom:6px">Language</div><div class="speeds langs" translate="no">'+Object.keys(I18N.langs).map(function(c){ return '<button data-act="lang" data-v="'+c+'" aria-pressed="'+(I18N.lang===c)+'">'+I18N.langs[c].name+'</button>'; }).join("")+'</div>'+
         (I18N.lang!=="en"?'<p class="hint" style="margin:6px 0 0">The game is translated by volunteers. Tap Translator mode to fix any line you see, then Export fixes and send them in.</p><div class="btnrow" style="margin-top:6px"><button class="btn ghost small" data-act="trmode">Translator mode: '+(I18N.trOn()?'On':'Off')+'</button>'+(Object.keys(I18N.fix).length?'<button class="btn ghost small" data-act="tr-export">Export fixes</button><button class="btn ghost small danger" data-act="tr-clear">Clear fixes</button>':'')+'</div>':'')+'</div>'+
       '<div class="sub" id="offlinestat">'+offlineStatus()+'</div>'+
       '<div class="sub">This realm has stood <b id="saveage"></b>.</div>'+
@@ -13439,7 +13483,9 @@ document.addEventListener("click",function(e){
   if (act==="held-open"){ openSheet({kind:"held"}); return; }
   if (act==="held-go"){ var hgt=a.dataset.tile; closeSheet(); if (tab!=="map" && !bfOn()){ tab="map"; lastView=""; renderView(true); } setTimeout(function(){ mapGo(hgt); }, 60); return; }
   if (act==="mpop-close"){ MPOP.hide=true; mapPop(); return; }
-  if (act==="mpop-more"){ var mti=document.getElementById("tileinfo"); if (mti && mti.scrollIntoView) mti.scrollIntoView({behavior:"smooth",block:"start"}); return; }
+  if (act==="mpop-more"){ // 0.2.9: open Tile details if it's shut, then scroll to it once it has laid out (and leave full screen first)
+    if (MAPFS.on) mapFs(false); DET.tileinfo=true; var mtd=document.getElementById("tidet"); if (mtd){ mtd.hidden=false; mtd.open=true; } renderTileInfo();
+    setTimeout(function(){ var t=document.getElementById("tidet"); if (t){ t.open=true; if (t.scrollIntoView) t.scrollIntoView({behavior:"smooth",block:"start"}); } }, 60); return; }
   if (act==="bm-sort"){ bmSort=a.dataset.s; bmRefresh(); return; }
   if (act==="map-farmfit"){ mapFarmFit(); return; }
   if (act==="map-zoom"){ zoomTo(mv.z*(+a.dataset.z>0?1.35:1/1.35)); return; }
@@ -13653,6 +13699,9 @@ document.addEventListener("click",function(e){
     ppp.t=presetClip.t.slice(); if (!a.dataset.m && !presetClip.m){ ppp.stopOnLoss=presetClip.stopOnLoss; ppp.noCap=presetClip.noCap; } // farm settings only travel farm to farm ppp.hero=(presetClip.hero>0 && !C().heroes.some(function(x){ return x.id===presetClip.hero; })) ? 0 : presetClip.hero;
     toast("Pasted "+presetClip.name+" onto "+ppp.name); save(); lastView=""; refresh(); return; }
   if (act==="preset-auto"){ var pa=S.presets[+a.dataset.p]; pa.auto=!pa.auto; toast(pa.name+(pa.auto?" is auto-farming":" stopped")); processAuto(); refresh(); return; }
+  if (act==="mpop-farm"){ var mfs=document.getElementById("mpfarmsel"); if (mfs) MPOPFARM=+mfs.value; var mfp=S.presets[MPOPFARM], mft=a.dataset.tile; if (!mfp || !mft) return; var mfi=mfp.farm.indexOf(mft);
+    if (mfi>=0){ mfp.farm.splice(mfi,1); if (mfp.idx>=mfp.farm.length) mfp.idx=0; toast("Removed from "+mfp.name); } else { mfp.farm.push(mft); toast("Added to "+mfp.name+"\u2019s farm list ("+mfp.farm.length+")"); }
+    renderTileInfo(); mapFarmRefresh(); mapPop(); save(); return; }
   if (act==="farm-toggle"){ var fp=S.presets[+a.dataset.p], ft=a.dataset.tile, fi=fp.farm.indexOf(ft);
     if (fi>=0){ fp.farm.splice(fi,1); toast("Removed from "+fp.name); } else { fp.farm.push(ft); toast("Added to "+fp.name+"\u2019s farm list ("+fp.farm.length+")"); }
     renderTileInfo(); mapFarmRefresh(); save(); return; }
