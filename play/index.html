@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.11";
+window.IBORY_V="0.2.13";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -514,6 +514,11 @@ nav.tabs{display:block;margin:0}
 .tconn{display:block;width:100%;height:22px;fill:none;stroke:var(--line);stroke-width:2}.tconn.lit{stroke:var(--brass)}
 .altabs{display:flex;border-bottom:1px solid var(--line);margin:4px 0 10px}.altabs button{flex:1 1 0;min-width:0;border:0;background:none;padding:10px 2px 11px;cursor:pointer;color:var(--muted);font:600 1rem var(--display);letter-spacing:.03em;border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap}
 .altabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--brass)}.aldot{color:var(--brass)}
+.wdbox{border-radius:12px;overflow:hidden;max-width:560px;margin:0 auto}.wdmap{display:block;width:100%;height:auto}.wdhit{cursor:pointer}
+.wdtag{font:700 15px var(--display)}.wdsm{font:500 12px var(--body)}
+.wdleg{display:flex;flex-wrap:wrap;gap:6px 12px;margin:8px 0 2px;font-size:13px;color:var(--muted)}.wdleg span{display:inline-flex;align-items:center;gap:5px}.wdleg i{display:inline-block;width:12px;height:12px;border-radius:3px;border:2px solid}.wdleg i.wdopen{border:2px dashed #8d928a}
+.wdhow{margin:6px 0 0;padding-left:20px}.wdhow li{margin:4px 0}
+.wdinfo{margin-top:8px;padding:10px 12px;border-radius:10px;background:var(--panel2)}.wdinfo h4{margin:0 0 4px}.wdinfo p{margin:4px 0 0}
 .alsubs{display:flex;flex-wrap:wrap;gap:6px;margin:-2px 0 10px}.alsubs .chipbtn{flex:0 0 auto}
 nav.tabs .tabrow{display:flex;gap:2px;border-bottom:1px solid var(--line)}
 nav.tabs button{border:0;background:none;padding:9px 6px 10px;cursor:pointer;color:var(--muted);font:500 1rem var(--display);letter-spacing:.03em;border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap;flex:1 1 auto;text-align:center}
@@ -1148,7 +1153,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script>
 (function(){
 "use strict";
-var APP_VERSION = "0.2.11";
+var APP_VERSION = "0.2.13";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -5165,7 +5170,7 @@ function alSync(){
 }
 function alList(){
   if (!alOn() || ALS.listBusy) return; ALS.listBusy=true; ALS.listAt=Date.now();
-  alPost("/al/list",{}).then(function(d){ ALS.listBusy=false; if (!d.error) ALS.list=d.list; alRender(); }).catch(function(){ ALS.listBusy=false; });
+  alPost("/al/list",{}).then(function(d){ ALS.listBusy=false; if (!d.error) ALS.list=d.list; alRender(); if (sheetFor && sheetFor.kind==="world"){ lastSheet=""; renderSheet(); } }).catch(function(){ ALS.listBusy=false; });
 }
 // a public look at one alliance from the list: its stats and member roster
 var ALV={aid:null, data:null, busy:false, err:""};
@@ -5242,6 +5247,7 @@ function viewAllianceList(mineId){
   var d=ALS.d, h='<div class="section"><div class="shead"><h3>Alliances</h3><span class="dur">your honor '+fmt(d.honor||0)+'</span></div>'+
     (mineId?'<p class="hint">Every alliance, ranked. You can\u2019t apply while you are in one: leave yours first to join another.</p>':'<p class="hint">Join other players: chat, and soon help each other build, reinforce each other, research together and fight monsters as a group. Apply to an alliance below, or found your own. Honor is the prestige of enemy troops you kill in invasions (and alliance wars, later).</p>')+'</div>';
   if (!mineId && alBoxTot()>0) h+=alBoxHtml(0);
+  if (!mineId) h+='<div class="section"><div class="shead"><h3>Server map</h3><span class="badge">Preview</span></div><p class="hint">See where every alliance will sit on the shared map that’s coming to multiplayer.</p><div class="btnrow"><button class="btn small" data-act="wd-open">Look at the server map</button></div></div>';
   if (!mineId && d.myApps && d.myApps.length) h+='<div class="section"><h3>Your applications</h3>'+d.myApps.map(function(a){ return '<div class="bq"><span><b>'+esc(a.name)+'</b> ['+esc(a.tag)+'] <span class="dur">sent '+alAgo(a.at)+'</span></span><div class="mbtns"><button class="link" data-act="al-unapply" data-aid="'+esc(a.aid)+'">Withdraw</button></div></div>'; }).join("")+'</div>';
   var L=(ALS.list||[]).slice(), sk=ALS.sort, applied={}; (d.myApps||[]).forEach(function(a){ applied[a.aid]=1; });
   L.sort(function(a,b){ return (a.rank[sk]||0)-(b.rank[sk]||0); });
@@ -5262,7 +5268,7 @@ function viewAllianceList(mineId){
   return h;
 }
 // alliance pages in four groups: underlined group tabs, then the group's pages as chips (only when it has more than one)
-var AL_GROUPS=[["home","Overview",["home"]],["battle","Battle",["rally","reinf","map","war"]],["build","Build",["city","projects","bank","lend","bldg"]],["people","People",["members","about"]]]; // 0.2.11: Overview first (sub "home"; not called Home, which is already "troops at home" in every language); Map under Battle; Arena folded into Rallies; Applications and Ranks on Members; All alliances on Info // 0.1.237: the Chat page is gone (alliance chat lives in the chat dock); Battle › Rallies opens first
+var AL_GROUPS=[["home","Overview",["home"]],["battle","Battle",["rally","reinf","map","world","war"]],["build","Build",["city","projects","bank","lend","bldg"]],["people","People",["members","about"]]]; // 0.2.11: Overview first (sub "home"; not called Home, which is already "troops at home" in every language); Map under Battle; Arena folded into Rallies; Applications and Ranks on Members; All alliances on Info // 0.1.237: the Chat page is gone (alliance chat lives in the chat dock); Battle › Rallies opens first
 function alGroupOf(sub){ for (var i=0;i<AL_GROUPS.length;i++) if (AL_GROUPS[i][2].indexOf(sub)>=0) return AL_GROUPS[i]; return AL_GROUPS[0]; }
 function alNavHtml(tabs, sub, dot){ var have={}; tabs.forEach(function(t){ have[t[0]]=t[1]; }); var cur=alGroupOf(sub); ALS.lastIn=ALS.lastIn||{}; ALS.lastIn[cur[0]]=sub;
   var h='<nav class="altabs" role="tablist">'+AL_GROUPS.map(function(gp){ var first=(ALS.lastIn[gp[0]]&&have[ALS.lastIn[gp[0]]])?ALS.lastIn[gp[0]]:gp[2].filter(function(k){ return have[k]; })[0];
@@ -5297,7 +5303,7 @@ function viewMyAlliance(al){
   if (sub==="war" && !AW_ON) sub=ALS.sub="rally";
   if (sub==="univ"||sub==="trade"){ ALS.bk=sub; sub=ALS.sub="bldg"; } // 0.2.3: the University and Trading Post are building pages now
   var hp=ALS.d.help||{projects:[],canHelp:0}, need=alNeeds(al);
-  var tabs=[["home","Overview"],["rally","Rallies"+(ryLive().length||arLive().length?" \u2022":"")],["reinf","Reinforce"+((al.reinf&&al.reinf.here&&al.reinf.here.length)?" ("+al.reinf.here.length+")":"")],["map","Map"],["city","City"+(al.econ&&al.econ.bd?" \u2022":"")],["projects","Projects"+(hp.canHelp?" ("+hp.canHelp+")":"")],["members","Members ("+al.members.length+")"],["about","Info"]];
+  var tabs=[["home","Overview"],["rally","Rallies"+(ryLive().length||arLive().length?" \u2022":"")],["reinf","Reinforce"+((al.reinf&&al.reinf.here&&al.reinf.here.length)?" ("+al.reinf.here.length+")":"")],["map","Map"],["world","World"],["city","City"+(al.econ&&al.econ.bd?" \u2022":"")],["projects","Projects"+(hp.canHelp?" ("+hp.canHelp+")":"")],["members","Members ("+al.members.length+")"],["about","Info"]];
   if (AW_ON) tabs.splice(3,0,["war","War"+((AWS.d&&AWS.d.war&&AWS.d.war.status!=="settled"&&AWS.d.war.status!=="over")?" \u2022":AWS.d&&AWS.d.round?" (sign-ups)":"")]);
   // a slim header: name, tag, members, your rank and honor; tap it for Info
   var h='<button class="alhdr" data-act="al-sub" data-v="about"><b>'+esc(al.name)+'</b> <span class="dur">['+esc(al.tag)+'] \u00b7 '+al.members.length+' / '+al.cap+'</span><span class="alhdr2">'+esc(rk[my.rank].n)+' \u00b7 honor '+fmt(ALS.d.honor||0)+'</span></button>'+
@@ -5326,6 +5332,8 @@ function viewMyAlliance(al){
     h+=AW_ON?awHtml(al):'<div class="section"><h3>Alliance War</h3><p class="hint">Coming soon: alliance against alliance, with attackers, defenders and goalkeepers, a wall to break, and rewards for the whole alliance.</p><div class="btnrow"><button class="btn" disabled>Coming soon</button></div></div>';
   } else if (sub==="map"){
     h+=alMapHtml(al);
+  } else if (sub==="world"){
+    h+=worldHtml();
   } else if (sub==="members"){
     if (Date.now()-profAt>60000) profFetch(al.members.map(function(m){ return m.name; }));
     if (my.can.accept && apps.length) h+=alAppsHtml(al, apps); // 0.2.11: applications sit on top of Members for the ranks that can accept
@@ -6606,6 +6614,66 @@ function alGrassCss(){ if (document.getElementById("algrass")) return; var urls=
   st.textContent=urls.map(function(u,i){ return '.alt.alg'+i+'{background:url('+u+') 0 0/100% 100%;image-rendering:pixelated;border-color:#466a2e}'; }).join("")+'.algrid{background:#3c5a28;border-radius:6px}.alt.alg0.free,.alt.alg1.free,.alt.alg2.free,.alt.alg3.free{box-shadow:inset 0 0 0 2px var(--brass)}';
   document.head.appendChild(st); }
 function alSprImg(k){ var u=alSprUrl(k); return u?'<img class="albimg" src="'+u+'" alt="">':""; }
+/* 0.2.12: the server map, look only. One shared world: the Throne in the middle, eight capture buildings around it, fourteen alliance slots in a ring,
+   the Wilds outside. Nothing on it works yet; alliances sit in the slots by prestige until they can claim their own (server-map-design.md). */
+var WD_BLD=[["forge","War Forge","+5% troop attack"],["walls","Bulwark","+5% troop defense"],["book","Hall of Heroes","+10% hero experience"],["academy","Sage’s Observatory","+5% research speed"],["hammer","Mason’s Yard","+5% construction speed"],["plus","Healer’s Spring","More wounded saved"],["stable","Royal Stables","+10% march speed"],["gold","Treasury Vault","+10% gold"]];
+var WD_SLOTS=14, WDSEL="";
+var WD_CROWN='<path d="M3 18h18M4 18 3 7l5 4 4-7 4 7 5-4-1 11"/>';
+function wdList(){ return (ALS.list||[]).slice().sort(function(a,b){ return (b.prestige||0)-(a.prestige||0); }); }
+function wdMineId(){ var m=ALS.d&&alMine(); return m?m.id:null; }
+function wdPos(r, i, n){ var a=-Math.PI/2+i*2*Math.PI/n; return [300+r*Math.cos(a), 300+r*Math.sin(a)]; }
+function wdIco(k, x, y, sc, col){ return '<g transform="matrix('+sc+' 0 0 '+sc+' '+(x-12*sc).toFixed(1)+' '+(y-12*sc).toFixed(1)+')" style="color:'+col+'" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+(INNER[k]||k)+'</g>'; }
+function wdSvg(){ var L=wdList(), mine=wdMineId(), sel=WDSEL;
+  var h='<svg class="wdmap" viewBox="0 0 600 600" role="img" aria-label="Server map">'+
+    '<g data-act="wd-pick" data-v="w"><rect x="0" y="0" width="600" height="600" rx="14" fill="#33452c"/>';
+  // the Wilds: NPC kingdoms in the corners, monsters about (decoration until they spawn for real)
+  [[56,56],[544,56],[56,544],[544,544],[300,26],[300,574],[26,300],[574,300]].forEach(function(p,i){ h+=i<4?wdIco("townhall",p[0],p[1],1,"#a8ad9e"):'<circle cx="'+p[0]+'" cy="'+p[1]+'" r="5" fill="#c8414b" opacity=".85"/>'; });
+  [[120,40],[480,560],[40,470],[560,130],[150,575],[455,25]].forEach(function(p){ h+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="4" fill="#c8414b" opacity=".7"/>'; });
+  h+='</g><circle cx="300" cy="300" r="160" fill="#3d5233" pointer-events="none"/><circle cx="300" cy="300" r="228" fill="none" stroke="rgba(235,227,208,.16)" stroke-width="8" pointer-events="none"/><circle cx="300" cy="300" r="105" fill="none" stroke="rgba(235,227,208,.16)" stroke-width="6" pointer-events="none"/>';
+  for (var i=0;i<WD_SLOTS;i++){ var p=wdPos(228,i,WD_SLOTS), a=L[i], on=sel==="s"+i, x=p[0]-34, y=p[1]-34;
+    h+='<g data-act="wd-pick" data-v="s'+i+'" class="wdhit">';
+    if (!a) h+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="68" height="68" rx="8" fill="rgba(0,0,0,.12)" stroke="'+(on?'#ebe3d0':'#8d928a')+'" stroke-width="'+(on?3:2)+'" stroke-dasharray="6 5"/><text x="'+p[0].toFixed(1)+'" y="'+(p[1]+5).toFixed(1)+'" text-anchor="middle" class="wdsm" fill="#c9cdc0">Empty</text>';
+    else { var me=a.id===mine;
+      h+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="68" height="68" rx="8" fill="'+(me?'#6b5a2a':'#313834')+'" stroke="'+(on?'#ebe3d0':me?'#d7b058':'#8d928a')+'" stroke-width="'+(on||me?3:1.5)+'"/>'+
+        '<text x="'+p[0].toFixed(1)+'" y="'+(p[1]-2).toFixed(1)+'" text-anchor="middle" class="wdtag" fill="'+(me?'#f3dc9a':'#ebe3d0')+'" translate="no">'+esc(a.tag)+'</text>'+
+        '<text x="'+p[0].toFixed(1)+'" y="'+(p[1]+18).toFixed(1)+'" text-anchor="middle" class="wdsm" fill="#c9cdc0" translate="no">'+a.members+' / '+a.cap+'</text>'; }
+    h+='</g>'; }
+  WD_BLD.forEach(function(b,i){ var p=wdPos(105,i,WD_BLD.length), on=sel==="b"+i;
+    h+='<g data-act="wd-pick" data-v="b'+i+'" class="wdhit"><rect x="'+(p[0]-22).toFixed(1)+'" y="'+(p[1]-22).toFixed(1)+'" width="44" height="44" rx="8" fill="#3a423d" stroke="'+(on?'#ebe3d0':'#b4b9aa')+'" stroke-width="'+(on?3:1.5)+'"/>'+wdIco(b[0],p[0],p[1],1.1,"#ebe3d0")+'</g>'; });
+  var on=sel==="t";
+  h+='<g data-act="wd-pick" data-v="t" class="wdhit"><rect x="270" y="270" width="60" height="60" rx="10" fill="#6b5a2a" stroke="'+(on?'#ebe3d0':'#d7b058')+'" stroke-width="3"/>'+wdIco(WD_CROWN,300,300,1.5,"#f3dc9a")+'</g>';
+  return h+'</svg>'; }
+function wdInfo(){ var v=WDSEL, L=wdList(), mine=wdMineId();
+  if (!v) return '<p class="hint">Tap a square to see what’s there.</p>';
+  if (v==="t") return '<h4>The Throne</h4><p class="hint">Take it with a rally or alone, then reinforce it to hold on. Whoever holds it rules the server for the week, with buffs, a title and a frame. It goes back to its guards every week.</p>';
+  if (v==="w") return '<h4>The Wilds</h4><p class="hint">No shield out here. Lords without an alliance, NPC kingdoms to knock down and farm, and monsters for alliances to rally.</p>';
+  if (v[0]==="b"){ var b=WD_BLD[+v.slice(1)]; if (!b) return ''; return '<h4>'+esc(b[1])+'</h4><p><b>'+esc(b[2])+'</b> <span class="dur">for the whole alliance</span></p><p class="hint">Hold it for 4 hours and it’s yours for the week. An alliance can keep 3 at once, and share their buffs with every ally. All buildings go back to their guards every week.</p>'; }
+  var a=L[+v.slice(1)];
+  if (!a) return '<h4>Open slot</h4><p class="hint">Once the server map opens, alliances claim their own slot and can move once a week.</p>';
+  return '<h4>'+esc(a.name)+' <span class="dur" translate="no">['+esc(a.tag)+']</span>'+(a.id===mine?' <span class="badge">your alliance</span>':'')+'</h4>'+
+    '<div class="rgrid"><span>Members <b>'+a.members+'</b> <span class="dur">/ '+a.cap+'</span></span><span>Prestige <b>'+fmt(a.prestige)+'</b> <span class="dur">#'+a.rank.prestige+'</span></span><span>Cities <b>'+fmt(a.cities)+'</b></span><span>Honor <b>'+fmt(a.honor)+'</b></span></div>'+
+    (a.id!==mine?'<div class="btnrow" style="margin-top:6px"><button class="btn ghost small" data-act="al-view" data-aid="'+esc(a.id)+'">See the alliance</button></div>':''); }
+function worldHtml(){ if (!ALS.list && (!ALS.listAt || Date.now()-ALS.listAt>20000)) alList();
+  var L=wdList(), more=Math.max(0,L.length-WD_SLOTS);
+  return '<div class="section"><div class="shead"><h3>Server map</h3><span class="badge">Preview</span></div>'+
+    '<p class="hint">One shared map for every alliance, coming to multiplayer. Each square in the ring is an alliance’s map, shielded for its members. Capture buildings and the Throne sit in the middle; the Wilds outside belong to no one. Look only for now: alliances are placed by prestige until they can claim a slot.</p>'+
+    (ALS.list?'':'<p class="dur">Loading the alliances…</p>')+
+    '<div class="wdbox">'+wdSvg()+'</div>'+
+    '<div class="wdleg"><span><i style="background:#6b5a2a;border-color:#d7b058"></i>Your alliance</span><span><i style="background:#313834;border-color:#8d928a"></i>Alliance</span><span><i class="wdopen"></i>Open slot</span><span><i style="background:#3a423d;border-color:#b4b9aa"></i>Capture building</span><span><i style="background:#c8414b;border-radius:50%;border-color:#c8414b"></i>Monster</span></div>'+
+    (more>1?'<p class="dur">'+more+' more alliances not shown.</p>':more?'<p class="dur">1 more alliance not shown.</p>':'')+
+    '<div class="wdinfo" id="wdinfo">'+wdInfo()+'</div>'+
+    '<details class="det" data-det="wdhow"'+(DET.wdhow?' open':'')+' style="margin-top:8px"><summary><b>How it will work</b></summary><ul class="wdhow">'+WD_HOW.map(function(t){ return '<li>'+t+'</li>'; }).join("")+'</ul></details></div>'; }
+// 0.2.13: the plan as decided so far (server-map-design.md), for players to read while it's built
+var WD_HOW=["Your capital (the city with the highest Town Hall) is your kingdom on the server map. Only its troops can die and only its resources can be taken.",
+  "Stay on your alliance\u2019s map and you can\u2019t be attacked: the Shield Generator covers every member. Move out into the Wilds whenever you want to fight.",
+  "The shield runs on Mana Orbs. Every world monster drops one to everyone in the rally, and the shield burns 1 a day for each member.",
+  "New players are protected for 14 days, and anyone who leaves or is kicked from an alliance for 3 days.",
+  "Capture buildings and the Throne reset every Sunday at 6 pm US Eastern. Hold one for 4 straight hours and it\u2019s your alliance\u2019s for the week. An alliance can hold 3.",
+  "Whoever holds the Throne rules for the week: they name the server and pick a blessing for everyone.",
+  "Ally with other alliances and share your buildings\u2019 buffs with them.",
+  "Marches cross the map at troop speed, so March Speed-ups matter. Scouting is the only way to see a capital\u2019s troops, and a hero\u2019s Intelligence makes scouts hit harder.",
+  "Numbers and names may still change."];
+function worldSheet(){ return '<div class="head"><span class="ico">'+ICON.crest+'</span><div style="flex:1"><h2>Server map</h2><div class="sub">Preview</div></div><button class="btn ghost small" data-act="close" aria-label="Close">✕</button></div>'+worldHtml(); }
 function alMapHtml(al){
   var M=al.map; if (!M) return '<div class="section"><p class="hint">Loading the map\u2026</p></div>';
   var me=alMyTile(M), sel=ALS.sel, mv=ALS.moving, rk={}; al.members.forEach(function(m){ rk[m.name]=m; }); alGrassCss();
@@ -12625,6 +12693,8 @@ function renderSheetCore(){
     h=invBoardSheet();
   } else if (sheetFor.kind==="pvboard"){
     h=pvBoardSheet();
+  } else if (sheetFor.kind==="world"){
+    h=worldSheet();
   } else if (sheetFor.kind==="alview"){
     h=alViewSheet();
   } else if (sheetFor.kind==="shop"){
@@ -13012,6 +13082,8 @@ document.addEventListener("click",function(e){
   if (act==="open-link"){ e.preventDefault(); var lu=a.dataset.u||""; if (!/^https?:\/\//i.test(lu)) return; if (window.confirm("Open this link in your browser?\n\n"+linkHost(lu)+"\n\nOnly open links from players you trust.")) { try { window.open(lu,"_blank","noopener,noreferrer"); } catch(x){} } return; }
   if (act==="rx-sel"){ if (e.target.closest(".rxbar") || window.getSelection && String(window.getSelection())) return; var rk=a.dataset.ch+":"+a.dataset.id; RXSEL=RXSEL===rk?"":rk; rxRefresh(); return; }
   if (act==="rx-close"){ RXSEL=""; rxRefresh(); return; }
+  if (act==="wd-open"){ WDSEL=""; openSheet({kind:"world"}); return; }
+  if (act==="wd-pick"){ WDSEL=WDSEL===a.dataset.v?"":a.dataset.v; if (sheetFor && sheetFor.kind==="world"){ lastSheet=""; renderSheet(); } else { lastView=""; renderView(true); } return; }
   if (act==="map-fs"){ mapFs(!MAPFS.on); return; }
   if (act==="map-rot"){ mapRot(); return; }
   if (act==="ab-open"){ if (!cbOn()){ toast("Sign in to your cloud save first"); return; } openSheet({kind:"abuse", ch:a.dataset.ch, id:a.dataset.id, k:a.dataset.k||"", nm:a.dataset.nm||""}); return; }
