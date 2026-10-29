@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.8";
+window.IBORY_V="0.2.9";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1114,7 +1114,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script>
 (function(){
 "use strict";
-var APP_VERSION = "0.2.8";
+var APP_VERSION = "0.2.9";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -1277,7 +1277,7 @@ function giftCity(aid, allyId){
   miniDirty=true;
   return rep;
 }
-function cityCap(){ return hasHC(18) ? Math.max(1,Object.keys(HC_AT).length) : TITLES[S.title].cities+alFx("citycap"); }
+function cityCap(){ return TITLES[S.title].cities+alFx("citycap")+(hasHC(18)?4:0); } // 0.2.9: Atlantis adds 4 (it was one per historic city on the map)
 function capText(){ return cityCap()===Infinity ? "unlimited" : String(cityCap()); }
 
 /* ---------- battle simulator (Ibory engine, written from the behavioural spec in t/engine/SPEC.md) ---------- */
@@ -3337,7 +3337,7 @@ function captureCity(q, troops){
     CAP_FIELDS.forEach(function(t,i){ for (var k=0;k<3;k++) nc.fields[i*3+k]={type:t,level:L}; });
     capFill(nc, L); nc.cap={k:q.k, L:L};
   } else {
-    nc.fieldCap=L; nc.th=L; nc.wall=L; ["farm","sawmill","quarry","ironmine"].forEach(function(t,i){ nc.fields[i]={type:t,level:L}; }); // 0.1.204: and walls at its level too // a historic city: Town Hall and one field of each kind at its level, the rest empty (0.1.194: the Town Hall used to start at 1)
+    nc.fieldCap=L; nc.th=L; nc.wall=L; while (nc.inside.length<cityPlots(nc)) nc.inside.push(null); ["farm","sawmill","quarry","ironmine"].forEach(function(t,i){ nc.fields[i]={type:t,level:L}; }); // 0.1.204: and walls at its level too // a historic city: Town Hall and one field of each kind at its level, the rest empty (0.1.194: the Town Hall used to start at 1)
   }
   S.cities.push(nc); delete S.map.hit[q.id]; delete S.map.loy[q.id]; delete S.map.npc[q.id];
   if (nc.fieldCap===14 && S.map.monsters){ S.map.monsters.day=-1; }
@@ -4491,7 +4491,7 @@ function mapPop(){ var el=document.getElementById("mappop"); if (!el) return;
   var btns=[], seen={}; document.querySelectorAll('#tileinfo [data-act="march-open"], #tileinfo [data-act="city-go"], #tileinfo [data-act="npc-make"]').forEach(function(b){ var m=b.dataset.act==="city-go"?"city":b.dataset.act==="npc-make"?"npcmake":b.dataset.mission, key=m+(b.dataset.city||"");
     if (seen[key] || (m!=="city" && m!=="npcmake" && !MPOP_ACTS[m])) return; seen[key]=1; btns.push({o:m==="city"||m==="npcmake"?0:MPOP_ACTS[m], h:'<button class="btn'+(btns.length?' ghost':'')+'" data-act="'+b.dataset.act+'"'+(b.dataset.tile?' data-tile="'+b.dataset.tile+'"':'')+(b.dataset.mission?' data-mission="'+b.dataset.mission+'"':'')+(b.dataset.city?' data-city="'+b.dataset.city+'"':'')+(b.disabled?' disabled':'')+'>'+esc(b.textContent)+'</button>'}); });
   btns.sort(function(a,b){ return a.o-b.o; });
-  try { if (ryOn() && ryTargetOk(q) && !ryLocked(q.id) && ryMineN()<RY_MAX_MINE){ if (!ryWait(q.k)) btns.push({o:50, h:'<button class="btn ghost" data-act="ry-callopen" data-tile="'+q.id+'">\u2694 Call the alliance</button>'}); } } catch(e){} // only while this week's call is free
+  try { if (ryOn() && ryTargetOk(q) && !ryLocked(q.id) && ryMineN()<RY_MAX_MINE){ if (!ryWait(q.k)) btns.push({o:50, h:'<button class="btn ghost" data-act="ry-callopen" data-tile="'+q.id+'">\u2694 Call the alliance</button>'}); } } catch(e){} // only while the call is free (a historic city once a day; NPC 10s, wizards and monsters any time)
   if (q.k==="flat" && !S.map.owned[q.id] && (!C().fieldCap || hasHC(16))){ var tpn=S.items.teleport||0; // teleport this city onto an empty flat
     btns.push({o:99, h:'<button class="btn ghost" data-act="teleport" data-tile="'+q.id+'"'+(tpn?'':' disabled')+'>'+(armedTile==="tp"+q.id?'Tap again to teleport':'Teleport ('+tpn+')')+'</button>'}); }
   var bm=bmAt(q.id);
@@ -6025,7 +6025,7 @@ function arSend(){
     save(); toast("Marching to the Arena: arrives in "+fmtT(r.arrive-Date.now())); closeSheet(); lastView=""; refresh(); ALS.last=0; alSync(); })
     .catch(function(){ ALS.arSending=false; if (gb) gb.disabled=false; toast("Couldn’t reach the server. Check your connection."); });
 }
-/* ---------- Alliance rallies (0.1.131): call the alliance onto a level 10 NPC city (once a day, resets at midnight Eastern) or a historic city (once a week) on your map.
+/* ---------- Alliance rallies (0.1.131): call the alliance onto a level 10 NPC city (any time since 0.2.9) or a historic city (once a day since 0.2.9, resets at midnight Eastern) on your map.
    Members march from their kingdom square to yours and wait; at the hit time every march that made it hits in your order, and the
    server fights each wave against what the ones before it left. You get the garrison that's left; helpers get only the satisfaction. ---------- */
 var RYS={sending:false, mins:"60", time:"", from:null, sendToo:true}; // sendToo (0.1.237): open your own march to the rally right after calling it
@@ -6067,7 +6067,7 @@ function ryCard(){ var el=document.getElementById("tileinfo"); if (!el || !selTi
   var mine=ryMineN()>=RY_MAX_MINE, wait=ryWait(q.k), d=document.createElement("div"); d.className="btnrow"; d.style.marginTop="8px";
   d.innerHTML=ryLocked(q.id) ? '<span class="dur">Your alliance rally is on this target'+(q.k==="wiz"||isVamp(q)?'. Join it from the Alliance tab (Rallies).':': you can still hit it yourself, and time your waves to land right after the rally (Rallies tab).')+'</span><button class="btn ghost small" data-act="al-go-rally">Open Rallies</button>'
     : mine ? '<span class="dur">You have '+RY_MAX_MINE+' rallies running, the most at once.</span>' : wait ? '<span class="dur">'+ryRule(q.k)+': your next call is in '+fmtT(wait-Date.now())+'.</span>'
-    : '<button class="btn small" data-act="ry-callopen" data-tile="'+q.id+'">\u2694 Call the alliance</button><span class="dur">'+(q.k==="hc"?'Once a week':q.k==="wiz"||isVamp(q)?'Any time':'Once a day')+'. '+(q.k==="wiz"?'Everyone who gets there rolls the rewards.':isVamp(q)?'If it falls, everyone who gets there takes the spoils and the kill.':'Your alliance hits it in waves you order.')+'</span>';
+    : '<button class="btn small" data-act="ry-callopen" data-tile="'+q.id+'">\u2694 Call the alliance</button><span class="dur">'+(q.k==="hc"?'Once a day':'Any time')+'. '+(q.k==="wiz"?'Everyone who gets there rolls the rewards.':isVamp(q)?'If it falls, everyone who gets there takes the spoils and the kill.':'Your alliance hits it in waves you order.')+'</span>';
   sec.appendChild(d); }
 // travel from a city to the target for one troop of each type (real ms): the rally marches at the slowest type it ends up with
 // travel from city ci to the target per troop type, with a hero's pace (0.1.229: a rally moves at its caller's hero's speed: Intelligence, dragon gear, mounts)
@@ -6152,9 +6152,9 @@ function ryFold(key, sum, body){ return '<details class="section det rycard" dat
 function alRallyHtml(al){
   var Y=ryData(); if (!Y) return '<div class="section"><p class="hint">Loading rallies\u2026</p></div>';
   var now=Date.now(), live=ryLive(), mine=S.alRally||[], h='', keys=[], AF=arFightsHtml(al);
-  h+='<div class="section"><div class="shead"><h3>Rallies</h3><span class="dur">'+[["npc","NPC 10"],["hc","Historic"]].map(function(p){ var w=ryWait(p[0]); return p[1]+': '+(w?'in '+fmtT(w-now):'ready'); }).join(' \u00b7 ')+'</span></div>'+
+  h+='<div class="section"><div class="shead"><h3>Rallies</h3><span class="dur">'+[["hc","Historic"]].map(function(p){ var w=ryWait(p[0]); return p[1]+': '+(w?'in '+fmtT(w-now):'ready'); }).join(' \u00b7 ')+'</span></div>'+
     (((alMine()||{}).econ||{}).ars&&alMine().econ.ars.might?'<p class="dur" style="margin:0 0 4px">\u2692 The Warden rides with every wave: <b>+'+(alMine().econ.ars.might/10).toFixed(1)+'% attack</b>.</p>':'')+
-    '<details class="det" data-det="ryhelp"'+(DET.ryhelp?' open':'')+'><summary><b>How rallies work</b></summary><p class="hint">Any member can call the alliance onto a level 10 NPC city, a historic city or a wizard on their own map: a level 10 NPC city once a day (the call comes back at the daily reset, midnight Eastern), a historic city once a week, wizards any time. Tap the target on your Map and choose <b>Call the alliance</b>. Everyone marches from their kingdom square to the caller\u2019s and waits. At the leave time every march that made it sets off together from the caller\u2019s chosen city, at the slowest troop\u2019s pace; when they land they hit in the caller\u2019s order, each wave against what the ones before it left (a wizard is fought by everyone at once), then they ride back to that city and everyone\u2019s troops are home at once. Winning waves (and waves that hit it already empty) lower an NPC or historic city\u2019s loyalty; at 0 it goes to the caller. If it wipes the garrison, everyone who made it rolls the target\u2019s full drop table on their own, so each player gets different spoils. The caller also gets the garrison that\u2019s left and takes the city with their own march. Monsters summoned at the Arena show up here too. Tap a rally\u2019s header to fold it away.</p></details><!--ryfold--></div>';
+    '<details class="det" data-det="ryhelp"'+(DET.ryhelp?' open':'')+'><summary><b>How rallies work</b></summary><p class="hint">Any member can call the alliance onto a level 10 NPC city, a historic city or a wizard on their own map: a level 10 NPC city or a wizard any time, a historic city once a day (the call comes back at the daily reset, midnight Eastern). Tap the target on your Map and choose <b>Call the alliance</b>. Everyone marches from their kingdom square to the caller\u2019s and waits. At the leave time every march that made it sets off together from the caller\u2019s chosen city, at the slowest troop\u2019s pace; when they land they hit in the caller\u2019s order, each wave against what the ones before it left (a wizard is fought by everyone at once), then they ride back to that city and everyone\u2019s troops are home at once. Winning waves (and waves that hit it already empty) lower an NPC or historic city\u2019s loyalty; at 0 it goes to the caller. If it wipes the garrison, everyone who made it rolls the target\u2019s full drop table on their own, so each player gets different spoils. The caller also gets the garrison that\u2019s left and takes the city with their own march. Monsters summoned at the Arena show up here too. Tap a rally\u2019s header to fold it away.</p></details><!--ryfold--></div>';
   live.forEach(function(R){ var g=R.garrison||{t:[],f:[]}, ord={}; (R.order||[]).forEach(function(id,i){ ord[id]=i; });
     var ms=R.marches.slice().sort(function(a,b){ return (ord[a.id]!=null?ord[a.id]:1e6+a.arrive)-(ord[b.id]!=null?ord[b.id]:1e6+b.arrive); }), mineN=R.marches.filter(function(j){ return j.mine; }).length, total=0; ms.forEach(function(j){ total+=j.n; });
     var gone=now>=R.hitAt, wz=R.k==="wiz";
@@ -7938,6 +7938,7 @@ function migrate(s){
   if (s.v===47){ s.me=s.me||{img:"",frame:"",city:"",march:""}; s.frames=s.frames||[]; s.v=48; } // 0.1.50: character image + cosmetic frames (what you own is topped up below)
   if (s.v===48){ (s.cities||[]).forEach(function(c){ if (!c.autoMayor) return; ["mayor","trainer","researcher"].forEach(function(r){ var id=c[r]; if (!id) return; // 0.1.247: a seat auto-fill handed out (or one a hand-off bug turned into a lock) on a hero that an auto-farm preset names is let go
       var h=(c.heroes||[]).filter(function(x){ return x.id===id; })[0]; if (h && (h.autoSeat || (c.presets||[]).some(function(pr){ return pr.auto && pr.hero===id; }))){ c[r]=null; delete h.autoSeat; } }); }); s.v=49; }
+  (s.cities||[]).forEach(function(cc){ if (cc && cc.fieldCap && cc.inside) while (cc.inside.length<cityPlots(cc)) cc.inside.push(null); }); // 0.2.9: historic cities taken earlier get their extra rows
   if (!s.hc204){ s.hc204=1; // 0.1.204: historic cities now start with walls at the city's level; ones taken before this get them raised, and any wall upgrade at or below that level is refunded and dropped
     (s.cities||[]).forEach(function(cc){ var L=cc.fieldCap; if (!L || (cc.wall||0)>=L) return; cc.wall=L;
       cc.builds=(cc.builds||[]).filter(function(b){ if (!(b && b.where==="wall" && b.to<=L)) return true;
@@ -7964,6 +7965,8 @@ function migrate(s){
   return s;
 }
 var CITY_PLOTS=28; // 7 rows of 4
+// 0.2.9: a historic city gets one more row of 4 plots per tier: level 12 one, 14 two, 16 three, Atlantis (18) four
+function cityPlots(c){ return CITY_PLOTS + (c && c.fieldCap ? Math.max(0, Math.round((c.fieldCap-10)/2))*4 : 0); }
 var AUTO_ORDER=[9,11,10,5,8,7,6,4,3,2,1,0]; // default auto-train priority: siege, then archers, then the rest
 var CITY_KEYS = ["autoHeal","alAcad","alBld","tg","fg","autoFort","trainer","researcher","reserve","gate","goals","gorder","wounded","autoTrain","autoMayor","wallHero","builds","bq","rq","presets","mpresets","wall","forts","fortQ","name","res","pop","tax","th","inside","fields","build","research","troops","train","mayor","heroes","innOffers","innRefreshAt"];
 function C(){ return S.cities[S.cur]; }
@@ -8072,7 +8075,9 @@ function save(){ if (saveLocked) return; try { localStorage.setItem(SAVE_KEY, JS
 function saveIfDirty(){ if (S_DIRTY || Date.now()-saveAt>60000) save(); }
 
 function getSlot(w,i){ return w==="wall" ? {type:"walls",level:S.wall||0} : w==="th" ? {type:"townhall",level:S.th} : (w==="in" ? S.inside[i] : S.fields[i]); }
-function costFor(type,L){ var b=DEF[type].cost,o={}; for (var k in b) o[k]=Math.round(b[k]*Math.pow(2,L-1)); if (L===10) o.script=1; return o; } // the climb to level 10 also takes one Michelangelo’s Script
+// 0.2.9: Michelangelo's Scripts per upgrade: 1 to reach level 10, then doubling past it (historic cities): 11 takes 2, 12 takes 4 ... 18 takes 256
+function scriptsFor(L){ return L===10 ? 1 : L>10 ? Math.pow(2, L-10) : 0; }
+function costFor(type,L){ var b=DEF[type].cost,o={}; for (var k in b) o[k]=Math.round(b[k]*Math.pow(2,L-1)); var sc=scriptsFor(L); if (sc) o.script=sc; return o; } // the climb to level 10 also takes one Michelangelo’s Script
 function timeFor(type,L){ return DEF[type].t*Math.pow(2,L-1)*1000/(1+0.1*S.tech.construction)/(1+hs(bestFor("pol"),"pol")/200)/bBuild(); }
 function techCost(key,L){ var o={}, base=TECH[key].g==="Economy"?TECH_COST_ECO:TECH_COST; for (var k in base) o[k]=Math.round(base[k]*Math.pow(2,L-1)); return o; }
 function techTime(key,L){ return (TECH[key].t||TECH_T)*Math.pow(2,L-1)*1000/(1+0.1*(S.tech.scholarship||0))/(1+hs(bestFor("int"),"int")/200)/bResearch(); }
@@ -11636,14 +11641,14 @@ function powerHtml(){ var p=powerOf(); // the sheet redraws every tick; the 3-se
     '<p class="hint" style="margin-top:6px">Power is the army you could fight with right now: the prestige value of every troop you own (home, marching, reinforcing, at the Arena, in a rally, on an invasion or wounded in the Medic Camp). Unlike prestige it drops when troops die. Invasions and alliance wars pair players by power.</p>'; }
 function viewTitlesBody(t,nt,nr){
   var h='<div class="section"><div class="shead"><h3>'+t.name+(S.lord?' '+esc(S.lord):'')+'</h3><span class="dur">Rank: '+RANKS[S.rank].name+'</span></div>'+
-    '<div class="act" style="margin-top:6px"><div><div class="bigstat">'+fmt(S.prestige)+'</div><span class="dur">prestige</span></div><div style="text-align:right"><div class="bigstat">'+S.cities.length+' / '+fmt(cityCap())+'</div><span class="dur">cities allowed'+(hasHC(18)?' (Atlantis: one per historic city on the map)':'')+'</span></div></div>'+
+    '<div class="act" style="margin-top:6px"><div><div class="bigstat">'+fmt(S.prestige)+'</div><span class="dur">prestige</span></div><div style="text-align:right"><div class="bigstat">'+S.cities.length+' / '+fmt(cityCap())+'</div><span class="dur">cities allowed'+(hasHC(18)?' (Atlantis: +4)':'')+'</span></div></div>'+
     '<p class="hint" style="margin-top:8px">Prestige comes from every building level, research level and trained troop in all your cities, and never goes down. Found new cities on Flats from the Map.</p>'+powerHtml()+'</div>';
   h+='<div class="section"><h3>Medal case</h3><div class="medals">'+MEDALS.map(function(m,i){ return '<div class="medal">'+medalIcon(i)+'<b>'+(S.medals[m[0]]||0)+'</b><span>'+m[1]+'</span></div>'; }).join("")+'</div>'+
     '<p class="hint" style="margin-top:8px">Medals are rare: under 1% of victories drop one. Low valleys give Cross and Rose, mid valleys and low NPC cities give Lion, Honor and Courage, high valleys give Wisdom and Nation, level 5+ NPCs add Freedom, and Justice comes only from level 10 NPCs and historic cities. Valleys and AI lords never drop Freedom or Justice. Tap any target on the map to see what it drops. Level 5 to 9 NPC cities sometimes drop a Junior Medal Box instead, level 10s a Medium or Senior one, and historic cities a Senior one.</p></div>';
   h+='<div class="section"><h3>'+(nr?'Next rank: '+nr.name:'Highest rank reached')+'</h3>'+(nr?questCard(nr,false,"rankup","Promote to "+nr.name):'<p class="hint">You are a General. Only titles remain.</p>')+'</div>';
   h+='<div class="section"><h3>'+(nt?'Next title: '+nt.name:'Highest title reached')+'</h3>'+(nt?'<p class="hint">Allows '+nt.cities+' cities.</p>'+questCard(nt,true,"titleup","Run for "+nt.name):'<p class="hint">You are Prinzessin. Ten cities are yours to rule.</p>')+'</div>';
   h+='<details class="section"><summary>All titles</summary><div class="ladder">'+TITLES.map(function(x,i){ return '<span class="'+(i===S.title?'cur':'')+'">'+x.name+'</span><span class="dur">'+(i?fmt(x.prestige)+' prestige, '+fmt(x.gold)+' gold, '+MEDALS.filter(function(m){return x.m[m[0]];}).map(function(m){return x.m[m[0]]+' '+m[1];}).join(" + "):'Starting title')+'</span><span>'+x.cities+' '+(x.cities===1?'city':'cities')+'</span>'; }).join("")+'</div></details>';
-  var pw=[[12,"Place one NPC city of any level on any open flat or valley, once a day per level 12 you hold."],[14,"Monsters gather near your level 14s each day. Slay them for Dragon Scales, the material for Mythic gear."],[16,"Your historic cities can be teleported like any other city."],[18,"Atlantis raises your city cap to one per historic city on the map."]];
+  var pw=[[12,"Place one NPC city of any level on any open flat or valley, once a day per level 12 you hold."],[14,"Monsters gather near your level 14s each day. Slay them for Dragon Scales, the material for Mythic gear."],[16,"Your historic cities can be teleported like any other city."],[18,"Atlantis raises your city cap by 4."]];
   h+='<div class="section"><h3>Historic powers</h3><div class="gearlist">'+pw.map(function(x){ var on=hasHC(x[0]); return '<div class="gearrow'+(on?' t3':'')+'"><span class="gn">Level '+x[0]+'</span><span class="gb '+(on?'okc':'dur')+'">'+(on?'Active':'Locked')+'</span><span class="dur" style="grid-column:1/-1">'+x[1]+'</span></div>'; }).join("")+'</div>'+
     '<p class="hint" style="margin-top:6px">Historic cities also let their buildings, fields and research climb to the city\u2019s own level: 12 marches from a level 12 Rally Spot, cheaper troops from Barracks above 10, and new research at Academy 12, 14 and 16.</p></div>';
   return h;
@@ -12111,7 +12116,7 @@ var ITEM_INFO={
   mithril:"Crafts high-tier gear at the Workshop.",
   starmetal:"Crafts the rarest gear at the Workshop.",
   scale:"Dragon Scale: the material for Mythic gear.",
-  script:"The plans every great building needs. Each upgrade to level 10 uses up one, whatever the building. Level 5 to 10 NPC cities drop it, a little more often the tougher they are, and the Wheel of Fortune can land on it.",
+  script:"The plans every great building needs. Each upgrade to level 10 uses up one, whatever the building; in historic cities each level past 10 takes twice as many as the one before (2 for level 11, 4 for 12, up to 256 for 18). Level 5 to 10 NPC cities drop it, a little more often the tougher they are, and the Wheel of Fortune can land on it.",
   gemD:"Added to gear in the Forge to try for a star.",
   gemF:"Added to gear in the Forge for a much better chance at a star."
 };
@@ -12446,7 +12451,7 @@ function upgradeWhy(type,L){
   var rq=buildReqWhy(type,L+1); if (rq) return rq;
   if (type!=="townhall" && L+1>thAllows(type)) return "Needs Town Hall level "+(L+1-(TH_OVER[type]||0));
   if (!builderFree()) return (S.alBld ? "Your builders are busy or helping the alliance" : "Both builders are busy");
-  if (L+1===10 && !((S.items&&S.items.script)||0)) return "Needs a Michelangelo\u2019s Script";
+  var scN=scriptsFor(L+1), scHave=(S.items&&S.items.script)||0; if (scN && scHave<scN) return scN===1 ? "Needs a Michelangelo\u2019s Script" : "Needs "+scN+" Michelangelo\u2019s Scripts (you have "+scHave+")";
   if (!afford(costFor(type,L+1))) return "Not enough resources";
   return "";
 }
@@ -12745,7 +12750,7 @@ function startBuild(w,i,type,quiet){
   if (!builderFree() || buildOn(w,i) || !afford(c) || buildReqWhy(type,to)) return false;
   pay(c,1);
   if (!s){ var slot={type:type,level:0}; if (w==="in") S.inside[i]=slot; else S.fields[i]=slot; }
-  var tfb=timeFor(type,to); S.builds.push({where:w,idx:i,type:type,to:to,start:S.gt,end:S.gt+tfb,dur:tfb});
+  var tfb=timeFor(type,to); S.builds.push({where:w,idx:i,type:type,to:to,start:S.gt,end:S.gt+tfb,dur:tfb,sc:c.script||0}); // sc: the Scripts paid, given back on cancel
   if (!quiet) toast((to===1?"Started building a ":"Upgrading ")+DEF[type].name+(to===1?"":" to level "+to));
   return true;
 }
@@ -13315,7 +13320,7 @@ document.addEventListener("click",function(e){
   if (act==="rq-remove"){ S.rq.splice(+a.dataset.k,1); refresh(); return; }
   if (act==="upgrade"){ var uc=ctxPlot(), s=getSlot(uc.w,uc.i); if (s && !upgradeWhy(s.type,s.level)) startBuild(uc.w,uc.i,s.type); closeSheet(); refresh(); return; }
   if (act==="cancel-build" && S.builds[+a.dataset.slot]){
-    var bs=+a.dataset.slot, b=S.builds[bs]; pay(costFor(b.type,b.to),-1);
+    var bs=+a.dataset.slot, b=S.builds[bs], bc=costFor(b.type,b.to); bc.script = b.sc!=null ? b.sc : (b.to===10 ? 1 : 0); pay(bc,-1); // 0.2.9: give back the Scripts actually paid (builds started before 0.2.9 paid none past 10)
     if (b.to===1 && b.where!=="th" && b.where!=="wall"){ if (b.where==="in") S.inside[b.idx]=null; else S.fields[b.idx]=null; }
     S.builds.splice(bs,1); toast("Construction cancelled. Resources returned."); refresh(); return;
   }
