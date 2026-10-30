@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.21";
+window.IBORY_V="0.2.22";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1166,7 +1166,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.21";
+var APP_VERSION = "0.2.22";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -3142,7 +3142,7 @@ function holdTile(id, at, arr){
 function foldHolds(){ var m=S.map; if (!m.skip) return; var g=gameDay(); m.lag=m.lag||{};
   for (var id in m.skip){ var keep=[]; m.skip[id].forEach(function(d){ if (d<=g) m.lag[id]=((m.lag[id]||0)+1)%10; else keep.push(d); }); if (keep.length) m.skip[id]=keep; else delete m.skip[id]; if (!m.lag[id]) delete m.lag[id]; } }
 function dayLevel(q){ var L0=lvlFrom(hash3(q.x,q.y,S.map.seed^0x5bd1e995)); return ((L0-1+gameDay()-holdLag(q.id))%10+10)%10+1; }
-// 0.2.21: a valley or flat on any city's farm preset never levels up at the reset (Cody): each day it would have, it lags one more
+// 0.2.22: a valley or flat on any city’s farm preset never levels up at the reset (Cody): each day it would have, it lags one more
 function farmPresetTiles(){ var f={}; S.cities.forEach(function(c){ (c.presets||[]).forEach(function(pr){ (pr.farm||[]).forEach(function(id){ var q=TILE_BY[id]; if (q && VTYPES[q.k] && !S.map.owned[id]) f[id]=1; }); }); }); return f; }
 function farmHold(fromDay, toDay){ var dd=toDay-fromDay; if (!(dd>0) || dd>100000) return; var m=S.map, f=farmPresetTiles(); m.lag=m.lag||{};
   for (var id in f){ if (m.skip && m.skip[id]){ var kp=m.skip[id].filter(function(d){ return d>toDay; }); if (kp.length) m.skip[id]=kp; else delete m.skip[id]; } // the hold already covers those nights
@@ -8639,6 +8639,10 @@ try { if (loadRaw && !loadFail && S && !S.comp0214 && !localStorage.getItem("ibo
 // 0.2.18: another 8 hours, once, for the saving trouble that lasted past 0.2.14 (iPhones); the same marks, so it's taken once per game and device
 var COMP_0218=false;
 try { if (loadRaw && !loadFail && S && !S.comp0218 && !localStorage.getItem("ibory-comp-0218")){ S.comp0218=1; S.real-=8*HOUR; COMP_0218=true; localStorage.setItem("ibory-comp-0218","1"); } } catch(e){}
+// 0.2.22: 8 more hours, once, for the nights the catch-up stopped early (batch-size-1 training hit the runaway guard); same marks
+var COMP_0222=false;
+try { if (loadRaw && !loadFail && S && !S.comp0222 && !localStorage.getItem("ibory-comp-0222")){ S.comp0222=1; S.real-=8*HOUR; COMP_0222=true; localStorage.setItem("ibory-comp-0222","1"); } } catch(e){}
+var COMP_H=(COMP_0214?8:0)+(COMP_0218?8:0)+(COMP_0222?8:0); // what this open gave, all told
 installProxies(S);
 if (S.bf && S.bf.active) S.bf.last=Date.now(); // time with the app closed never counts
 S.cities.forEach(function(cc,ci){ withCity(ci,function(){
@@ -8892,8 +8896,12 @@ var CATCHUP_POLL_MS=5*60000; // 0.1.243: how often a long catch-up runs the queu
 function dayTurn(){ if (!TILES || gameDay()===S.map.day) return false; applyDailyLevels(false); if (S.alliance) allianceDaily();
   note("day","A new day dawns: unheld valleys and flats have gained a level (except ones on a farm preset or attacked in the last 5 hours), and historic garrisons have changed."); return true; }
 function catchupPoll(){ woundExpire(); dayTurn(); try { wizSpawn(); } catch(e){} try { vampSpawn(); } catch(e){} }
+/* 0.2.22: a long catch-up (the app was closed) is flagged while it runs, so auto-train and auto-forts can start batches of at least a game
+   minute's work: with batch size 1 on every goal line and 160 Barracks, a night was hundreds of thousands of events, and the runaway guard
+   (meant for a march that never moves) stopped the catch-up an hour or two in; the rest of the night passed with no training at all (Cody and Sax). */
+var CATCHUP={on:false};
 function advance(now){
-  var dtG = Math.max(0,(now - S.real))*S.speed; S.real = now;
+  var dtG = Math.max(0,(now - S.real))*S.speed; S.real = now; CATCHUP.on = dtG >= 10*60000;
   if (dtG>0) for (var aw=0; aw<S.cities.length; aw++) if (S.cities[aw].away) invHold(S.cities[aw], dtG);
   var target = S.gt + dtG, changed=false, viewing=S.cur;
   var pollAt=S.gt+CATCHUP_POLL_MS, evGuard=0, evCap=50000+Math.ceil(dtG/HOUR)*3000; // 0.2.18: room for every event of a long absence (busy farm presets ran out of 50,000 in about a week and skipped the rest)
@@ -8915,7 +8923,7 @@ function advance(now){
     // 0.2.18: on its own clock (it used to be "5 minutes after the last event", so a catch-up busy with farm marches never polled)
     if (pollAt <= next && pollAt <= target){ next=pollAt; ev={w:"poll"}; }
     if (next > target) break;
-    if (++evGuard > evCap){ // safety: a handler that never moves its own event forward would spin forever and freeze the page
+    if ((ev.w==="m" || ev.w==="ai" || ev.w==="al") && ++evGuard > evCap){ // safety: a handler that never moves its own event forward would spin forever and freeze the page (0.2.22: finished jobs always remove themselves, so they don't count)
       try { console.warn("advance: stopped after "+evCap+" events", ev && ev.w, ev && ev.m ? JSON.stringify({id:ev.m.id,mission:ev.m.mission,phase:ev.m.phase,tile:ev.m.tile,arr:ev.m.arr,ret:ev.m.ret,dep:ev.m.dep,gt:S.gt})
         : ev && ev.a ? JSON.stringify(ev.a) : ""); } catch(e){}
       if (ev && ev.w==="m" && ev.m){ if (ev.m.phase==="out") ev.m.arr=target+1000; else if (ev.m.phase==="wait") ev.m.dep=target+1000; else if (ev.m.phase==="back") ev.m.ret=target+1000; } // push the stuck march past now so the game carries on
@@ -8936,7 +8944,7 @@ function advance(now){
     } catch(err){ S.cur=viewing; evSkipBroken(ev, err, target); } // 0.1.234: one broken event used to throw every tick and freeze game time for good
     changed=true; S_DIRTY=true;
   }
-  accrueAll(target - S.gt); S.gt = target;
+  accrueAll(target - S.gt); S.gt = target; CATCHUP.on=false;
   syncDayClock(now); checkQueen(); reconcileHeroes();
   processAll();
   for (var cj=0; cj<S.cities.length; cj++){ S.cur=cj; if (innLv() && S.gt >= S.innRefreshAt){ rollInn(); if (cj===viewing) changed=true; } }
@@ -13502,7 +13510,8 @@ function autoFortStep(){
   var L=S.fg[li];
   for (var k=0;k<L.o.length;k++){ var i=L.o[k], d=(L.t[i]||0)-have[i]; if (d<=0 || GK.fg.cant(i)) continue;
     var mx=fortMaxAuto(i); if (mx<1) continue;
-    var room=Math.floor((fortCap()-fortUsed())/FORTS[i].space), cap=L.b>0?L.b:Math.max(1,Math.floor(AUTO_BATCH_MS*S.speed/fortTime(i))), want=Math.min(d,cap,room), n=Math.min(want,mx);
+    var room=Math.floor((fortCap()-fortUsed())/FORTS[i].space), cap=L.b>0?L.b:Math.max(1,Math.floor(AUTO_BATCH_MS*S.speed/fortTime(i))); if (CATCHUP.on) cap=Math.max(cap, Math.floor(CATCHUP_POLL_MS*S.speed/fortTime(i)));
+    var want=Math.min(d,cap,room), n=Math.min(want,mx);
     if (n<want && n<Math.max(1,Math.floor(want*0.2))) return; // wait for a worthwhile batch
     var fc={}; for (var fk in FORTS[i].cost) fc[fk]=FORTS[i].cost[fk]*n; pay(fc,1);
     S.fortQ={f:i,n:n,start:S.gt,end:S.gt+fortTime(i)*n}; return; }
@@ -13537,7 +13546,8 @@ function autoTrainStep(){
       if (pick>=0){ L=Lx; need=needx; break; }
     }
     if (pick<0) return;
-    var cap=L.b>0 ? L.b : Math.max(1, Math.floor(AUTO_BATCH_MS*S.speed/trainTime(pick))), want=Math.min(need(pick), cap), n=Math.min(want, maxTrainAuto(pick));
+    var cap=L.b>0 ? L.b : Math.max(1, Math.floor(AUTO_BATCH_MS*S.speed/trainTime(pick))); if (CATCHUP.on) cap=Math.max(cap, Math.floor(CATCHUP_POLL_MS*S.speed/trainTime(pick))); // catching up: at least a poll (5 game minutes) of work per batch
+    var want=Math.min(need(pick), cap), n=Math.min(want, maxTrainAuto(pick));
     // don't dribble out tiny batches as people trickle in: wait until a fifth of a batch can start, unless that finishes the goal
     if (n<want && n<Math.max(1, Math.floor(want*0.2))) return;
     startTrain(pick, n, slot);
@@ -14699,9 +14709,10 @@ refresh();
 function capFixToast(){ if (!S.capFixed || !S.capFixed.length) return; var cf=S.capFixed; delete S.capFixed; save();
   toast("Conquered cities fixed: "+cf.map(function(x){ return x.name+" got "+x.n+" building"+(x.n>1?"s":"")+" at level "+x.L; }).join("; ")+"."); }
 setTimeout(capFixToast, 1500);
-if (COMP_0218 && !COMP_0214){ save(); setTimeout(function compShow2(){ if (sheetFor){ setTimeout(compShow2, 3000); return; } openSheet({kind:"msg", title:"8 hours of make-up time", body:"Sorry for the saving trouble. Your game has just run 8 extra hours to make up for it: buildings, research, training and your farm presets all kept going. Saves now go to a much bigger store on your device, and to the cloud every 10 minutes if you have a cloud save."}); }, 2600); }
-if (COMP_0214 && COMP_0218){ save(); setTimeout(function compShow3(){ if (sheetFor){ setTimeout(compShow3, 3000); return; } openSheet({kind:"msg", title:"16 hours of make-up time", body:"Sorry for the saving trouble. Your game has just run 16 extra hours to make up for it: buildings, research, training and your farm presets all kept going. Saves now go to a much bigger store on your device, and to the cloud every 10 minutes if you have a cloud save."}); }, 2600); }
-else if (COMP_0214){ save(); setTimeout(function compShow(){ if (sheetFor){ setTimeout(compShow, 3000); return; } openSheet({kind:"msg", title:"8 hours of make-up time", body:"Sorry about last night: a full browser storage stopped the game from saving, and progress was lost. Your game has just run 8 extra hours to make up for it, and the storage problem is fixed."}); }, 2600); }
+if (COMP_H){ save(); setTimeout(function compShow(){ if (sheetFor){ setTimeout(compShow, 3000); return; }
+  var why=COMP_0222&&!COMP_0214&&!COMP_0218 ? "Sorry about the short nights: with small training batches, the catch-up on opening used to stop an hour or two into the night, and the rest of the night trained nothing. That\u2019s fixed, and your game has just run 8 extra hours to make up for it: buildings, research, training and your farm presets all kept going."
+    : "Sorry for the trouble. Your game has just run "+COMP_H+" extra hours to make up for it: buildings, research, training and your farm presets all kept going. Saving and the overnight catch-up are both fixed.";
+  openSheet({kind:"msg", title:COMP_H+" hours of make-up time", body:why}); }, 2600); }
 setTimeout(movedMaybe, 2500);
 if (S.repSeen0==null){ S.repSeen0=S.gt; save(); } // 0.2.4: reports from before the Reports hub count as read
 // 0.2.2: heroes owed by historic cities captured before 0.1.250
