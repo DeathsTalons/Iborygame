@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.18";
+window.IBORY_V="0.2.19";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -518,6 +518,7 @@ nav.tabs{display:block;margin:0}
 .wdtag{font-family:var(--display);font-weight:700}.wdsm{font-family:var(--body);font-weight:500}.wdzoom{flex-wrap:wrap;gap:6px}.wdzoom .btn{min-width:40px}
 .wdleg{display:flex;flex-wrap:wrap;gap:6px 12px;margin:8px 0 2px;font-size:13px;color:var(--muted)}.wdleg span{display:inline-flex;align-items:center;gap:5px}.wdleg i{display:inline-block;width:12px;height:12px;border-radius:3px;border:2px solid}.wdleg i.wdopen{border:2px dashed #8d928a}
 .wdhow{margin:6px 0 0;padding-left:20px}.wdhow li{margin:4px 0}
+.wdmon{display:flex;gap:10px;align-items:flex-start}.wdmimg{width:64px;height:64px;flex:none;image-rendering:pixelated;object-fit:contain;background:var(--panel2);border:1px solid var(--line);border-radius:8px}
 .wdinfo{margin-top:8px;padding:10px 12px;border-radius:10px;background:var(--panel2)}.wdinfo h4{margin:0 0 4px}.wdinfo p{margin:4px 0 0}
 .alsubs{display:flex;flex-wrap:wrap;gap:6px;margin:-2px 0 10px}.alsubs .chipbtn{flex:0 0 auto}
 nav.tabs .tabrow{display:flex;gap:2px;border-bottom:1px solid var(--line)}
@@ -1153,7 +1154,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.18";
+var APP_VERSION = "0.2.19";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -4679,6 +4680,7 @@ function openMarch(tile, mission, mid){
   marchDraft={tile:tile, mission:mission, t:[0,0,0,0,0,0,0,0,0,0,0,0], hero: friendly ? 0 : ((marchHeroes()[0]||{}).id||0), preview:"", cargo:{food:0,lumber:0,stone:0,iron:0,gold:0}};
   if (mission==="arena") marchDraft.mid=mid||0;
   if (mission==="rally") marchDraft.rid=mid||0;
+  if (mission==="wd") marchDraft.wd=mid||{kind:"rally"}; // 0.2.19: a world fight ({kind:"rally", mon, mins} or {kind:"join", rid})
   openSheet({kind:"march"});
 }
 function marchCap(t){ var cap=0; t.forEach(function(n,i){ cap+=n*LOAD[i]*loadMul(); }); return Math.floor(cap); }
@@ -4691,6 +4693,7 @@ function scoutWhy(d){ if (!(d.t[2]>0)) return "Send at least one scout"; if (d.t
 function marchWhy(){
   var d=marchDraft, n=d.t.reduce(function(a,b){return a+b;},0);
   if (d.mission==="arena") return arWhy(n);
+  if (d.mission==="wd") return wdWhy(n);
   if (d.mission==="rally") return ryWhy(n);
   if (ryBlocks(d.tile)) return "Your alliance rally is on this wizard: march through the Rallies tab";
   if (!rallyLv()) return "Build a Rally Spot first";
@@ -4719,6 +4722,7 @@ function marchWhy(){
 function updateMarchInfo(){
   var el=document.getElementById("marchinfo"), b=document.getElementById("marchgo"); if (!el) return;
   var q=TILE_BY[marchDraft.tile], tm=draftTravel(), cap=0;
+  if (marchDraft.mission==="wd"){ wdMarchInfo(el, b); return; }
   if (marchDraft.mission==="arena"){ var acur=arById(marchDraft.mid); el.textContent="Travel about "+fmtT(arTravelEst())+(soloArOn()?" from your city":" from your kingdom square")+" to the Arena"+(acur?"; the window closes in "+fmtT(Math.max(0,acur.ends-Date.now())):"")+". Army size "+fmt(sumT(marchDraft.t))+" of "+fmt(armyCap(marchDraft.ensign, marchDraft.hero?heroById(marchDraft.hero):null))+"."; var amh=marchDraft.hero?heroById(marchDraft.hero):null; if (amh) el.textContent+=" Led by "+amh.name+" (Attack "+hs(amh,"atk")+", Intelligence "+hs(amh,"int")+").";
     var awhy=marchWhy(); b.disabled=!!awhy||!!ALS.arSending; b.textContent=awhy||"March to the Arena"; return; }
   if (marchDraft.mission==="rally"){ var rcur=ryById(marchDraft.rid); el.textContent=(rcur&&rcur.mine?"Your own rally: no travel, they join it at once; the waves leave in "+fmtT(Math.max(0,rcur.hitAt-Date.now())):"Travel about "+fmtT(ryTravelEst(rcur))+" to "+(rcur?esc(rcur.host)+"\u2019s kingdom; the waves hit in "+fmtT(Math.max(0,rcur.hitAt-Date.now())):"the rally"))+". No rations, no loot. Army size "+fmt(sumT(marchDraft.t))+" of "+fmt(armyCap(marchDraft.ensign, marchDraft.hero?heroById(marchDraft.hero):null))+".";
@@ -4736,6 +4740,7 @@ function updateMarchInfo(){
 function marchSheet(){
   var d=marchDraft, q=TILE_BY[d.tile], h='<div class="head"><span class="ico">'+ICON.rally+'</span><div><h2>'+({hide:"Hide troops in the woods around ",station:"Station troops at ",occupy:"Occupy ",found:"Found a city at ",transport:"Send resources to ",reinforce:"Reinforce ",attack:"Attack ",conquer:"Conquer ",scout:"Scout ",allyguard:"Guard "}[d.mission])+esc(tileName(q))+'</h2><div class="sub">('+q.x+', '+q.y+'), '+(function(){ var k=TRAVEL_FROM; TRAVEL_FROM=d.from?campXY(d.from):null; var v=tdist(q).toFixed(1); TRAVEL_FROM=k; return v; })()+' tiles away'+(d.from?' from your camp':'')+'</div></div></div>';
   if (d.mission==="arena"){ var acM=arById(d.mid)||{}, acT=arT(acM.type); h='<div class="head"><span class="ico">'+ICON.rally+'</span><div><h2>Fight the level '+(acM.lv||"?")+' '+esc(acT.n)+'</h2><div class="sub">at the Monster Arena, from '+(soloArOn()?'your city':'your kingdom square')+'</div></div></div><p class="hint">'+arWeakTxt(acT)+' Losses come home wounded to '+esc(S.name)+'\u2019s Medic Camp. This march uses one of your '+arSlots()+' Arena slots, not the Rally Spot.</p>'; }
+  if (d.mission==="wd") h=wdMarchHead();
   if (d.mission==="rally"){ var rM=ryById(d.rid)||{}; h='<div class="head"><span class="ico">'+ICON.rally+'</span><div><h2>Join the rally on '+esc(rM.host||"?")+'\u2019s '+esc(rM.name||"target")+'</h2><div class="sub">from your kingdom square, waiting there for the hit</div></div></div><p class="hint">Your march waits at '+esc(rM.host||"the caller")+'\u2019s kingdom and hits in the order they set. No loot, no drops: just helping. Takes one of this city\u2019s Rally Spot slots until it\u2019s home: send from every city to stack up waves.</p>'; }
   var any=false, av=draftAvail(), camps=CAMP_MISSIONS[d.mission]?cityCamps().filter(function(c){ return c.tile!==d.tile; }):[];
   if (camps.length) h+='<div><label class="sub" for="marchfrom">March from</label><select id="marchfrom"><option value="">'+esc(S.name)+' (the city)</option>'+camps.map(function(c){ var cq=TILE_BY[c.tile]; return '<option value="'+c.tile+'"'+(d.from===c.tile?' selected':'')+'>Camp at '+esc(cq?tileName(cq):c.tile)+' ('+fmt(sumT(c.t))+' troops)</option>'; }).join("")+'</select></div>';
@@ -4763,7 +4768,7 @@ function marchSheet(){
   var ensOpts=["ensign","msize50","msize100"].filter(function(k){ return (S.items[k]||0)>0 || ensKey(d.ensign)===k; });
   if (d.mission!=="hide" && ensOpts.length) h+='<div><label class="sub" for="mensign">Bigger march (uses one)</label><select id="mensign"><option value="">No</option>'+ensOpts.map(function(k){ return '<option value="'+k+'"'+(ensKey(d.ensign)===k?' selected':'')+'>'+ITEMS[k].name+' (+'+Math.round((ENS_MULT[k]-1)*100)+'%, '+(S.items[k]||0)+' left)</option>'; }).join("")+'</select></div>';
   h+='<p class="sub" id="marchinfo"></p><div id="marchprev"></div>';
-  var friendlyM = d.mission==="transport" || d.mission==="reinforce" || d.mission==="scout" || d.mission==="allyguard" || d.mission==="hide" || d.mission==="arena" || d.mission==="rally";
+  var friendlyM = d.mission==="transport" || d.mission==="reinforce" || d.mission==="scout" || d.mission==="allyguard" || d.mission==="hide" || d.mission==="arena" || d.mission==="rally" || d.mission==="wd";
   if (d.mission==="allyguard") h=h.replace('<p class="sub" id="marchinfo">','<p class="hint">Your troops stay with your ally and fight beside them when a bully attacks, until you recall them.</p><p class="sub" id="marchinfo">');
   h+='<div class="act">'+(friendlyM||(q&&q.k==="wiz")?'<span></span>':'<button class="btn ghost" data-act="march-preview">Preview battle</button>')+'<button class="btn" data-act="march-go" id="marchgo">March</button></div><button class="closebtn" data-act="close">Cancel</button>';
   return h;
@@ -4797,6 +4802,7 @@ function launchMarch(tileId, mission, t, heroId, opt){
 }
 function sendMarch(){
   if (marchDraft.mission==="arena"){ arSend(); return; }
+  if (marchDraft.mission==="wd"){ wdSend(); return; }
   if (marchDraft.mission==="rally"){ rySend(); return; }
   if (marchWhy()) return;
   if (marchDraft.mission==="hide"){ var hd=marchDraft, hh=hd.hero?heroById(hd.hero):null;
@@ -5155,7 +5161,7 @@ function alSync(){
     else if (!aid && (S.alMember || S.cities.some(function(c){ return c.alAcad || c.alBld; }))){ S.alMember=false; S.alFx={}; S.cities.forEach(function(c){ c.alAcad=false; c.alBld=0; }); save(); lastView=""; } // left: bonuses and lending end
     if (aid!==ALS.aid){ ALS.aid=aid; ALS.chat=[]; ALS.top=0; ALS.d=d; if (aid){ ALS.last=0; } alRender(); if (aid) setTimeout(alSync,50); return; }
     if (firstChat) ALS.moreOld=(d.chat||[]).length>=60; // a full first page means there may be older messages
-    ALS.d=d; tpApply(d.al?d.al.trade:d.trade); rfApply(d.al&&d.al.reinf); if (d.help) alApplyHelps(d.help); if (d.al && d.al.econ && d.al.econ.mon) arResults(d.al.econ.mon); if (d.al && d.al.econ && d.al.econ.rally) ryResults(d.al.econ.rally);
+    ALS.d=d; tpApply(d.al?d.al.trade:d.trade); rfApply(d.al&&d.al.reinf); if (d.help) alApplyHelps(d.help); if (d.al && d.al.econ && d.al.econ.mon) arResults(d.al.econ.mon); if (d.al && d.al.econ && d.al.econ.rally) ryResults(d.al.econ.rally); if (d.al && d.al.wdry){ try { wdNoteNew(d.al.wdry); flushFinished(); } catch(e){} }
     ALS.resAt=Date.now(); // 0.1.234: the last sync that really answered (the "never heard back" fallbacks in arTick and ryTick wait for one after their grace period)
     (d.chat||[]).forEach(function(c){ var at=-1; for (var i=ALS.chat.length-1;i>=0;i--) if (ALS.chat[i].id===c.id){ at=i; break; } if (at>=0) ALS.chat[at]=c; else ALS.chat.push(c); if (c.id>ALS.top) ALS.top=c.id; });
     if (ALS.chat.length>1000) ALS.chat=ALS.chat.slice(-1000);
@@ -6112,7 +6118,8 @@ function arSend(){
    Members march from their kingdom square to yours and wait; at the hit time every march that made it hits in your order, and the
    server fights each wave against what the ones before it left. You get the garrison that's left; helpers get only the satisfaction. ---------- */
 var RYS={sending:false, mins:"60", time:"", from:null, sendToo:true}; // sendToo (0.1.237): open your own march to the rally right after calling it
-function ryChatBtn(t){ t=String(t||""); if (!/rally targeting/.test(t) || /is leaving now/.test(t)) return ''; /* 0.1.227: no Join on old "is leaving now" lines */ var arena=/Monster Arena/.test(t);
+function ryChatBtn(t){ t=String(t||""); if (!/rally targeting/.test(t) || /is leaving now/.test(t)) return '';
+  if (/on the server map/.test(t)) return wdRallies().some(function(r){ return r.st==="open" && !r.solo; }) ? ' <button class="link strong" data-act="al-go-rally">Join</button>' : ''; // 0.2.19 /* 0.1.227: no Join on old "is leaving now" lines */ var arena=/Monster Arena/.test(t);
   return (arena ? arLive().length : ryLive().length) ? ' <button class="link strong" data-act="al-go-rally"'+(arena?' data-to="arena"':'')+'>Join</button>' : ''; } // rally lines in alliance chat, while a rally is running
 function ryOn(){ return mpShown() && alOn() && !!alMine(); }
 function ryData(){ var al=alMine(); return al && al.econ && al.econ.rally; }
@@ -6250,7 +6257,7 @@ function ryBody(R){ var now=Date.now(), mine=S.alRally||[], h=''; var g=R.garris
       return '<div class="bq"><span><b>'+fmt(sumT(m.st==="back"?m.back:m.t))+' troops</b> from '+esc(ci>=0?S.cities[ci].name:"?")+(hh?' led by '+esc(hh.name):'')+'<br><span class="dur">'+ryStatus(m)+'</span></span></div>'; }).join("");
     return h; }
 function arCardHtml(cur, now){ var T=arT(cur.type), tot=0; cur.joins.forEach(function(j){ tot+=j.n; }); var mineN=(S.alArena||[]).filter(function(m){ return m.mid===cur.id; }).length;
-  return '<button class="rcard" data-act="ar-open" data-mid="'+cur.id+'"><span class="rcimg rcico">'+ICON.rally+'</span><span class="rcmain"><b class="rct">Arena: level '+cur.lv+' '+esc(T.n)+'</b>'+
+  return '<button class="rcard" data-act="ar-open" data-mid="'+cur.id+'">'+(AR_ART[T.k]?'<img class="rcimg" src="'+AR_ART[T.k]+'" alt="">':'<span class="rcimg rcico">'+ICON.rally+'</span>')+'<span class="rcmain"><b class="rct">Arena: level '+cur.lv+' '+esc(T.n)+'</b>'+
     '<span class="rcst"><span>Closes in <b class="arleft" data-ends="'+cur.ends+'">'+fmtT(Math.max(0,cur.ends-now))+'</b></span>'+(mineN?'<span class="badge">you: '+mineN+'</span>':'')+'</span>'+ryBar(cur.at||cur.ends-3600e3, cur.ends, now)+
     '<span class="rcn">Summoned by '+esc(cur.by)+' \u00b7 '+cur.joins.length+' march'+(cur.joins.length===1?'':'es')+' \u00b7 '+fmt(tot)+' troops</span></span></button>'; }
 function arDetailSheet(){ var cur=arLive().filter(function(c){ return c.id===sheetFor.mid; })[0], now=Date.now();
@@ -6269,7 +6276,7 @@ function alRallyHtml(al){
   h+='<div class="section"><div class="shead"><h3>Rallies</h3><span class="dur">'+[["hc","Historic"]].map(function(p){ var w=ryWait(p[0]); return p[1]+': '+(w?'in '+fmtT(w-now):'ready'); }).join(' \u00b7 ')+'</span></div>'+
     (((alMine()||{}).econ||{}).ars&&alMine().econ.ars.might?'<p class="dur" style="margin:0 0 4px">\u2692 The Warden rides with every wave: <b>+'+(alMine().econ.ars.might/10).toFixed(1)+'% attack</b>.</p>':'')+
     '<details class="det" data-det="ryhelp"'+(DET.ryhelp?' open':'')+'><summary><b>How rallies work</b></summary><p class="hint">Any member can call the alliance onto a level 10 NPC city, a historic city or a wizard on their own map: a level 10 NPC city or a wizard any time, a historic city once a day (the call comes back at the daily reset, midnight Eastern). Tap the target on your Map and choose <b>Call the alliance</b>. Everyone marches from their kingdom square to the caller\u2019s and waits. At the leave time every march that made it sets off together from the caller\u2019s chosen city, at the slowest troop\u2019s pace; when they land they hit in the caller\u2019s order, each wave against what the ones before it left (a wizard is fought by everyone at once), then they ride back to that city and everyone\u2019s troops are home at once. Winning waves (and waves that hit it already empty) lower an NPC or historic city\u2019s loyalty; at 0 it goes to the caller. If it wipes the garrison, everyone who made it rolls the target\u2019s full drop table on their own, so each player gets different spoils. The caller also gets the garrison that\u2019s left and takes the city with their own march. Monsters summoned at the Arena show up here too. Tap a rally\u2019s header to fold it away.</p></details></div>';
-  var cards=live.map(function(R){ return ryCardHtml(R, now); }).concat(arLive().map(function(c){ return arCardHtml(c, now); }));
+  var cards=live.map(function(R){ return ryCardHtml(R, now); }).concat(arLive().map(function(c){ return arCardHtml(c, now); })).concat(wdRallyCards(now));
   if (cards.length) h+='<div class="rcards">'+cards.join("")+'</div>';
   else h+='<div class="section"><p class="dur" style="margin:0">No rally is running and no monster is up at the Arena. Call one from a target on your Map.</p></div>';
   if ((((al||{}).econ||{}).mon||{}).live && al.econ.mon.live.some(function(c){ return now>=c.ends; })) h+='<div class="section"><p class="hint" style="margin:0">An Arena window has closed: that fight is being decided\u2026</p></div>';
@@ -6620,50 +6627,108 @@ function alSprImg(k){ var u=alSprUrl(k); return u?'<img class="albimg" src="'+u+
    Members sit on their alliance map; anyone can move their capital out into the Wilds, and members back home, for 1 City Teleport each way
    (the game spends the item when the server says yes). Founders and officers (the map permission) claim an open slot and move it once a week. */
 var WD_BLD=[["forge","War Forge","+5% troop attack","Sunday"],["walls","Bulwark","+5% troop defense","Sunday"],["book","Hall of Heroes","+10% hero experience","Wednesday"],["academy","Sage’s Observatory","+5% research speed","Tuesday"],["hammer","Mason’s Yard","+5% construction speed","Monday"],["plus","Healer’s Spring","More wounded saved","Thursday"],["stable","Royal Stables","+10% march speed","Friday"],["gold","Treasury Vault","+10% gold","Saturday"]];
-var WD_CROWN='<path d="M3 18h18M4 18 3 7l5 4 4-7 4 7 5-4-1 11"/>', WD_ZOOMS=[1,2,4,8];
+var WD_CROWN='<path d="M3 18h18M4 18 3 7l5 4 4-7 4 7 5-4-1 11"/>', WD_ZOOMS=[1,2,4,8,12];
 var WDS={d:null, at:0, busy:false, err:"", sel:null, z:0, cx:90, cy:90, armed:"", acting:false};
 function wdVisible(){ return (sheetFor && sheetFor.kind==="world") || (tab==="guild" && !sheetFor && !!alMine() && ALS.sub==="world"); }
+function wdWatch(){ return wdVisible() || (tab==="guild" && !!alMine() && ALS.sub==="rally" && !!S.wdOn); } // 0.2.19: the Rallies tab lists world rallies too
 function wdTele(){ return S.items.teleport||0; }
 // the capital the game wants: the server's pick while it's still one of the highest Town Hall cities, else the first of those
 function wdCapCity(){ var mx=maxTH(), sv=WDS.d&&WDS.d.me&&WDS.d.me.cap?WDS.d.me.cap.id:(S.wdCap||0), c=S.cities.filter(function(x){ return x.id===sv && (x.th||1)===mx; })[0];
   return c || S.cities.filter(function(x){ return (x.th||1)===mx; })[0] || S.cities[0]; }
 function wdCapBody(){ var c=wdCapCity(); return {cap:{id:c.id, name:c.name, th:c.th||1}, have:S.cities.map(function(x){ return x.id; })}; }
 function wdFetch(){ if (WDS.busy || !alOn()) return; WDS.busy=true; WDS.at=Date.now();
-  alPost("/wd/state", wdCapBody()).then(function(d){ WDS.busy=false; if (d.error){ WDS.err=d.error; wdPaint(); return; } WDS.err=""; WDS.d=d;
+  alPost("/wd/state", wdCapBody()).then(function(d){ WDS.busy=false; if (d.error){ WDS.err=d.error; wdPaint(); return; } WDS.err=""; WDS.d=d; try { wdResults(d); } catch(e){}
+    if (tab==="guild" && ALS.sub==="rally" && !sheetFor){ lastView=""; renderView(); }
     var on=!!d.me.on; if (!!S.wdOn!==on || (on && d.me.cap && d.me.cap.id && S.wdCap!==d.me.cap.id)){ S.wdOn=on; if (on && d.me.cap) S.wdCap=d.me.cap.id; save(); }
+    if (WDS.pendMon){ var pm=(d.mons||[]).filter(function(m){ return m.id===WDS.pendMon; })[0]; WDS.pendMon=0; if (pm){ WDS.sel={k:"mon", x:pm.x, y:pm.y, m:pm}; if (!WDS.z) WDS.z=4; WDS.cx=pm.x; WDS.cy=pm.y; } }
     if (WDS.z===0){ WDS.z=1; if (on && d.me.x!=null){ WDS.cx=d.me.x; WDS.cy=d.me.y; } else { WDS.cx=Math.floor(d.c); WDS.cy=Math.floor(d.c); } }
     wdPaint(); }).catch(function(){ WDS.busy=false; WDS.err="Couldn’t reach the server. Check your connection."; wdPaint(); });
 }
 setInterval(function(){ if (document.hidden || !alOn() || !mpShown() || WDS.busy) return; var age=Date.now()-WDS.at;
-  if (wdVisible() ? age>=20000 : (S.wdOn && age>=600000)) wdFetch(); }, 1000); // open: every 20 s; on the map but elsewhere: every 10 minutes keeps your capital current
+  if (wdWatch() ? age>=20000 : (S.wdOn && age>=600000)) wdFetch(); }, 1000); // open: every 20 s; on the map but elsewhere: every 10 minutes keeps your capital current
 function wdPaint(){ var w=document.getElementById("wdwrap"); if (w) w.innerHTML=worldInner(); else if (wdVisible()){ if (sheetFor){ lastSheet=""; renderSheet(); } else { lastView=""; renderView(true); } } }
 // the window on the world: zoom 1 shows all of it; each step halves the side, centred on (cx, cy)
 function wdWin(){ var d=WDS.d, N=d?d.n:180, z=WD_ZOOMS[Math.max(0,Math.min(WD_ZOOMS.length-1,(WDS.z||1)-1))], w=N/z, x=Math.max(0,Math.min(N-w,WDS.cx+0.5-w/2)), y=Math.max(0,Math.min(N-w,WDS.cy+0.5-w/2)); return {x:x, y:y, w:w, z:z, N:N}; }
 function wdMineAid(){ return WDS.d&&WDS.d.me?WDS.d.me.aid:null; }
-function wdSvg(){ var d=WDS.d, V=wdWin(), z=V.z, fs=function(n){ return (n/z).toFixed(2); }, sel=WDS.sel, mine=wdMineAid(), h='';
-  h+='<svg class="wdmap" id="wdsvg" viewBox="'+V.x.toFixed(2)+' '+V.y.toFixed(2)+' '+V.w.toFixed(2)+' '+V.w.toFixed(2)+'" role="img" aria-label="Server map" data-act="wd-tap">'+
-    '<rect x="0" y="0" width="'+V.N+'" height="'+V.N+'" fill="#33452c"/>';
-  if (z>=4){ var g=''; for (var gx=Math.ceil(V.x); gx<=V.x+V.w; gx++) g+='M'+gx+' '+V.y.toFixed(1)+'v'+V.w.toFixed(1); for (var gy=Math.ceil(V.y); gy<=V.y+V.w; gy++) g+='M'+V.x.toFixed(1)+' '+gy+'h'+V.w.toFixed(1); h+='<path d="'+g+'" stroke="rgba(0,0,0,.18)" stroke-width="'+fs(0.6)+'"/>'; }
-  h+='<circle cx="'+d.c+'" cy="'+d.c+'" r="'+d.heart+'" fill="#3d5233"/><circle cx="'+d.c+'" cy="'+d.c+'" r="'+d.heart+'" fill="none" stroke="rgba(235,227,208,.18)" stroke-width="'+fs(2)+'"/>';
+// 0.2.18: the close-up (x8 and x12, an alliance map fills the screen at x12): grass, every tile, alliance buildings and the Alliance City in their
+// own art, each capital as a castle (names at x12), and a dot on every Wilds tile you could move your capital to
+var WD_CLOSE=8;
+function wdGrassDefs(){ var u=[]; for (var v=0; v<4; v++){ var cv=document.createElement("canvas"); cv.width=cv.height=15; var g=cv.getContext("2d"), sd=v*977+13, rnd=function(){ sd=(sd*16807)%2147483647; return sd/2147483647; };
+    g.fillStyle="#557a35"; g.fillRect(0,0,15,15); for (var i=0;i<14;i++){ g.fillStyle=rnd()<0.5?"#3c5a28":"#6d9443"; g.fillRect(Math.floor(rnd()*15),Math.floor(rnd()*15),1,1); }
+    if (v===0){ g.fillStyle="#6d9443"; g.fillRect(3,4,1,2); g.fillRect(5,4,1,2); g.fillStyle="#3c5a28"; g.fillRect(4,5,1,2); }
+    if (v===3){ g.fillStyle="#6d9443"; g.fillRect(9,8,1,2); g.fillRect(11,8,1,2); g.fillStyle="#3c5a28"; g.fillRect(10,9,1,2); } // no flowers: repeated every 2 tiles they read as markers
+    u.push(cv.toDataURL()); }
+  return '<defs><pattern id="wdgr" width="2" height="2" patternUnits="userSpaceOnUse">'+u.map(function(x,i){ return '<image href="'+x+'" x="'+(i%2)+'" y="'+(i>>1)+'" width="1.02" height="1.02" preserveAspectRatio="none" style="image-rendering:pixelated"/>'; }).join("")+'</pattern></defs>'; }
+var WD_GRASS="";
+function wdCastle(x, y, col){ var w=col[0], dk=col[1], dr=col[2]; // a plain castle on one tile (the alliance map's shape)
+  return '<g transform="translate('+x+' '+y+') scale(0.0417)"><rect x="2.5" y="8" width="5" height="13" fill="'+dk+'"/><rect x="16.5" y="8" width="5" height="13" fill="'+dk+'"/><rect x="6" y="11" width="12" height="10" fill="'+w+'"/>'+
+    [2.5,5.1,16.5,19.1].map(function(q){ return '<rect x="'+q+'" y="6.5" width="1.5" height="1.5" fill="'+dk+'"/>'; }).join("")+[7,11.1,15.2].map(function(q){ return '<rect x="'+q+'" y="9.6" width="1.8" height="1.4" fill="'+w+'"/>'; }).join("")+
+    '<path d="M10 21v-3.5a2 2 0 0 1 4 0V21z" fill="'+dr+'"/></g>'; }
+// can a capital settle on this tile? (the server checks the same: inside the world, off the Throne grounds, outside every open slot, nobody there)
+function wdFree(x, y, occ){ var d=WDS.d; if (x<0||y<0||x>=d.n||y>=d.n) return false; if (Math.pow(x+0.5-d.c,2)+Math.pow(y+0.5-d.c,2)<d.heart*d.heart) return false;
+  for (var i=0;i<d.slots.length;i++){ var s=d.slots[i]; if (s.ring<d.open && x>=s.x && y>=s.y && x<s.x+d.sz && y<s.y+d.sz) return false; } return !occ[x+","+y]; }
+function wdSvg(){ var d=WDS.d, V=wdWin(), z=V.z, close=z>=WD_CLOSE, fs=function(n){ return (n/z).toFixed(2); }, sel=WDS.sel, mine=wdMineAid(), h='';
+  h+='<svg class="wdmap" id="wdsvg" viewBox="'+V.x.toFixed(2)+' '+V.y.toFixed(2)+' '+V.w.toFixed(2)+' '+V.w.toFixed(2)+'" role="img" aria-label="Server map" data-act="wd-tap">';
+  if (close){ if (!WD_GRASS) WD_GRASS=wdGrassDefs(); h+=WD_GRASS; }
+  h+='<rect x="0" y="0" width="'+V.N+'" height="'+V.N+'" fill="'+(close?'url(#wdgr)':'#33452c')+'"/>';
+  var x0=Math.floor(V.x), y0=Math.floor(V.y), x1=Math.ceil(V.x+V.w), y1=Math.ceil(V.y+V.w), inV=function(x,y,w){ return x+w>V.x && y+w>V.y && x<V.x+V.w && y<V.y+V.w; };
+  h+='<circle cx="'+d.c+'" cy="'+d.c+'" r="'+d.heart+'" fill="'+(close?'rgba(20,24,18,.38)':'#3d5233')+'"/><circle cx="'+d.c+'" cy="'+d.c+'" r="'+d.heart+'" fill="none" stroke="rgba(235,227,208,.25)" stroke-width="'+fs(2)+'"/>';
   d.slots.forEach(function(s){ var open=s.ring<d.open, on=sel&&sel.k==="slot"&&sel.i===s.i, me=s.aid&&s.aid===mine;
-    if (!open){ h+='<rect x="'+s.x+'" y="'+s.y+'" width="'+d.sz+'" height="'+d.sz+'" rx="1" fill="none" stroke="rgba(235,227,208,'+(on?'.7':'.16')+')" stroke-width="'+fs(on?2:1)+'" stroke-dasharray="'+fs(4)+' '+fs(4)+'"/>'; return; }
-    h+='<rect x="'+s.x+'" y="'+s.y+'" width="'+d.sz+'" height="'+d.sz+'" rx="1" fill="'+(me?'#6b5a2a':s.aid?'#313834':'rgba(0,0,0,.12)')+'" stroke="'+(on?'#ebe3d0':me?'#d7b058':'#8d928a')+'" stroke-width="'+fs(on||me?2.5:1.5)+'"'+(s.aid?'':' stroke-dasharray="'+fs(5)+' '+fs(4)+'"')+'/>';
+    if (!open){ h+='<rect x="'+s.x+'" y="'+s.y+'" width="'+d.sz+'" height="'+d.sz+'" rx="1" fill="none" stroke="rgba(235,227,208,'+(on?'.7':close?'.3':'.16')+')" stroke-width="'+fs(on?2:1)+'" stroke-dasharray="'+fs(4)+' '+fs(4)+'"/>'; return; }
+    if (close && !inV(s.x,s.y,d.sz)) return;
+    h+='<rect x="'+s.x+'" y="'+s.y+'" width="'+d.sz+'" height="'+d.sz+'" rx="'+(close?0:1)+'" fill="'+(close?(me?'rgba(215,176,88,.16)':s.aid?'rgba(20,24,22,.18)':'rgba(0,0,0,.22)'):(me?'#6b5a2a':s.aid?'#313834':'rgba(0,0,0,.12)'))+'" stroke="'+(on?'#ebe3d0':me?'#d7b058':'#8d928a')+'" stroke-width="'+fs(on||me?2.5:1.5)+'"'+(s.aid?'':' stroke-dasharray="'+fs(5)+' '+fs(4)+'"')+'/>';
+    if (close){ if (s.city){ var cu=alSprUrl("city"); h+=cu?'<image href="'+cu+'" x="'+s.city[0]+'" y="'+s.city[1]+'" width="'+s.city[2]+'" height="'+s.city[2]+'" preserveAspectRatio="none" style="image-rendering:pixelated"/>':'<rect x="'+s.city[0]+'" y="'+s.city[1]+'" width="'+s.city[2]+'" height="'+s.city[2]+'" fill="#a8894a"/>'; }
+      (s.b||[]).forEach(function(bb){ var bu=alSprUrl(bb.k), bs=d.bs||3; h+=bu?'<image href="'+bu+'" x="'+bb.x+'" y="'+bb.y+'" width="'+bs+'" height="'+bs+'" preserveAspectRatio="none" style="image-rendering:pixelated"/>':'<rect x="'+bb.x+'" y="'+bb.y+'" width="'+bs+'" height="'+bs+'" fill="#59605a"/>';
+        if (z>=12) h+='<text x="'+(bb.x+bs/2)+'" y="'+(bb.y+bs-0.15)+'" text-anchor="middle" font-size=".42" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".08" paint-order="stroke">'+esc(bb.n)+'</text>'; });
+      if (s.aid) h+='<text x="'+(s.x+0.3)+'" y="'+(s.y+0.75)+'" font-size=".6" class="wdtag" fill="'+(me?'#f3dc9a':'#ebe3d0')+'" stroke="#1f2421" stroke-width=".1" paint-order="stroke" translate="no">'+esc(s.tag)+'</text>';
+      else h+='<text x="'+(s.x+d.sz/2)+'" y="'+(s.y+d.sz/2)+'" text-anchor="middle" font-size=".8" class="wdsm" fill="#ebe3d0">Open slot</text>';
+      return; }
     if (s.city) h+='<rect x="'+s.city[0]+'" y="'+s.city[1]+'" width="'+s.city[2]+'" height="'+s.city[2]+'" fill="'+(me?'#a8894a':'#59605a')+'"/>';
     if (s.aid && z<4) h+='<text x="'+(s.x+d.sz/2)+'" y="'+(s.y+d.sz/2+(z<2?1.6:0.8))+'" text-anchor="middle" font-size="'+fs(z<2?5.2:6)+'" class="wdtag" fill="'+(me?'#f3dc9a':'#ebe3d0')+'" translate="no">'+esc(s.tag)+'</text>';
     else if (!s.aid && z<2) h+='<text x="'+(s.x+d.sz/2)+'" y="'+(s.y+d.sz/2+1.3)+'" text-anchor="middle" font-size="'+fs(4)+'" class="wdsm" fill="#c9cdc0">Open</text>'; });
+  if (z>=4){ var g=''; for (var gx=x0; gx<=x1; gx++) g+='M'+gx+' '+V.y.toFixed(1)+'v'+V.w.toFixed(1); for (var gy=y0; gy<=y1; gy++) g+='M'+V.x.toFixed(1)+' '+gy+'h'+V.w.toFixed(1); h+='<path d="'+g+'" stroke="rgba(0,0,0,'+(close?'.22':'.18')+')" stroke-width="'+fs(0.6)+'"/>'; }
+  // close up: a dot on every tile your capital could move to
+  if (close && d.me.on){ var occ={}; d.lords.forEach(function(l){ occ[l.x+","+l.y]=1; }); (d.mons||[]).forEach(function(m){ occ[m.x+","+m.y]=1; }); var dots='';
+    for (var ty=y0; ty<y1; ty++) for (var tx=x0; tx<x1; tx++) if (wdFree(tx,ty,occ)) dots+='M'+(tx+0.5)+' '+(ty+0.5)+'h0';
+    if (dots) h+='<path d="'+dots+'" stroke="rgba(243,220,154,.55)" stroke-width=".16" stroke-linecap="round"/>'; }
   d.bld.forEach(function(b,i){ var on=sel&&sel.k==="bld"&&sel.i===i; h+='<rect x="'+b.x+'" y="'+b.y+'" width="3" height="3" rx=".4" fill="#3a423d" stroke="'+(on?'#ebe3d0':'#b4b9aa')+'" stroke-width="'+fs(on?2.5:1.2)+'"/>';
-    if (z>=2) h+=wdIco(WD_BLD[i][0], b.x+1.5, b.y+1.5, 0.11, "#ebe3d0"); });
+    if (z>=2) h+=wdIco(WD_BLD[i][0], b.x+1.5, b.y+1.5, 0.11, "#ebe3d0");
+    if (z>=12) h+='<text x="'+(b.x+1.5)+'" y="'+(b.y+3.5)+'" text-anchor="middle" font-size=".42" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".08" paint-order="stroke">'+esc(WD_BLD[i][1])+'</text>'; });
   var on=sel&&sel.k==="throne"; h+='<rect x="'+d.throne.x+'" y="'+d.throne.y+'" width="3" height="3" rx=".5" fill="#6b5a2a" stroke="'+(on?'#ebe3d0':'#d7b058')+'" stroke-width="'+fs(on?3:2)+'"/>'+(z>=2?wdIco(WD_CROWN, d.throne.x+1.5, d.throne.y+1.5, 0.11, "#f3dc9a"):'');
-  // lords: one square per capital (drawn bigger when zoomed out so they can be seen)
-  var ls=Math.max(1, 2.4/z), lo=(ls-1)/2;
-  d.lords.forEach(function(l){ if (l.me) return; h+='<rect x="'+(l.x-lo).toFixed(2)+'" y="'+(l.y-lo).toFixed(2)+'" width="'+ls.toFixed(2)+'" height="'+ls.toFixed(2)+'" fill="'+(l.wild?'#e08a3c':'#c9cdc0')+'" stroke="'+(l.prot?'#7fb0e0':'#1f2421')+'" stroke-width="'+fs(l.prot?1.4:0.7)+'"/>'; });
-  d.lords.forEach(function(l){ if (!l.me) return; var s2=ls*1.4, o2=(s2-1)/2; h+='<rect x="'+(l.x-o2).toFixed(2)+'" y="'+(l.y-o2).toFixed(2)+'" width="'+s2.toFixed(2)+'" height="'+s2.toFixed(2)+'" fill="#f3dc9a" stroke="#1f2421" stroke-width="'+fs(1.2)+'"/>'; });
-  if (sel && (sel.k==="wild" || sel.k==="lord" || sel.k==="heart")) h+='<rect x="'+(sel.x-0.25)+'" y="'+(sel.y-0.25)+'" width="1.5" height="1.5" fill="none" stroke="#fff" stroke-width="'+fs(1.6)+'"/>';
+  // 0.2.19: monsters (their sprite close up, a coloured dot further out; a ring when your side has a rally on one) and every march on the map
+  var ryOn={}; (d.rallies||[]).forEach(function(r){ ryOn[r.mon]=1; });
+  (d.mons||[]).forEach(function(m){ if (!inV(m.x,m.y,1)) return;
+    if (close) h+='<image href="'+WD_MART[m.L]+'" x="'+(m.x-0.3)+'" y="'+(m.y-0.6)+'" width="1.6" height="1.6" preserveAspectRatio="xMidYMax meet" style="image-rendering:pixelated"/>'+(z>=12?'<text x="'+(m.x+0.5)+'" y="'+(m.y+1.3)+'" text-anchor="middle" font-size=".34" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".07" paint-order="stroke">Lv '+m.L+'</text>':'');
+    else { var mr=Math.max(0.5, 1.5/z)*(0.8+m.L*0.2); h+='<circle cx="'+(m.x+0.5)+'" cy="'+(m.y+0.5)+'" r="'+mr.toFixed(2)+'" fill="'+WD_MCOL[m.L]+'" stroke="#1f2421" stroke-width="'+fs(0.6)+'"/>'; }
+    if (ryOn[m.id]) h+='<circle cx="'+(m.x+0.5)+'" cy="'+(m.y+0.5)+'" r="'+(close?0.75:Math.max(1.1,3/z)).toFixed(2)+'" fill="none" stroke="#f3dc9a" stroke-width="'+fs(1.6)+'" stroke-dasharray="'+fs(3)+' '+fs(2)+'"/>'; });
+  var nowM=Date.now(), mk=Math.max(0.9, 3.2/z);
+  (d.marches||[]).forEach(function(mv){ var a=[mv.f[0]+0.5,mv.f[1]+0.5], b2=[mv.to[0]+0.5,mv.to[1]+0.5], pr=mv.s==="wait"?1:Math.max(0,Math.min(1,(nowM-mv.a)/Math.max(1,mv.b-mv.a))), px=a[0]+(b2[0]-a[0])*pr, py=a[1]+(b2[1]-a[1])*pr, col=mv.me?"#f3dc9a":"rgba(235,227,208,.75)";
+    if (mv.s!=="wait") h+='<line x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b2[0]+'" y2="'+b2[1]+'" stroke="'+col+'" stroke-width="'+fs(mv.me?1.4:1)+'" stroke-dasharray="'+fs(4)+' '+fs(3)+'" opacity=".8"/>';
+    var dx=b2[0]-a[0], dy=b2[1]-a[1], st=mv.cos&&COSM.march&&COSM.march[mv.cos]?mv.cos:"";
+    if (st){ var im=cosMarchImg(st, dx<0?-1:1, Math.atan2(dy,dx)); h+='<image href="'+im+'" x="'+(px-mk/2).toFixed(2)+'" y="'+(py-mk/2).toFixed(2)+'" width="'+mk.toFixed(2)+'" height="'+mk.toFixed(2)+'"/>'; }
+    else h+='<circle cx="'+px.toFixed(2)+'" cy="'+py.toFixed(2)+'" r="'+(mk/3).toFixed(2)+'" fill="'+(mv.me?'#f3dc9a':'#ebe3d0')+'" stroke="#1f2421" stroke-width="'+fs(0.8)+'"/>';
+    if (z>=12) h+='<text x="'+px.toFixed(2)+'" y="'+(py-mk/2-0.1).toFixed(2)+'" text-anchor="middle" font-size=".3" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".06" paint-order="stroke" translate="no">'+esc(mv.name)+'</text>'; });
+  // capitals: castles close up (names at x12), squares further out (bigger when zoomed out, so they can be seen)
+  if (close){ d.lords.forEach(function(l){ if (!inV(l.x,l.y,1)) return; var col=l.me?["#f3dc9a","#b8902f","#3a2a10"]:l.wild?["#f0b27a","#c0612a","#3a1f10"]:["#d9dcd3","#8d928a","#2a2f2c"];
+      if (l.prot) h+='<rect x="'+(l.x+0.04)+'" y="'+(l.y+0.04)+'" width=".92" height=".92" rx=".2" fill="rgba(127,176,224,.22)" stroke="#7fb0e0" stroke-width=".06"/>';
+      h+=wdCastle(l.x, l.y, col);
+      if (z>=12) h+='<text x="'+(l.x+0.5)+'" y="'+(l.y+1.32)+'" text-anchor="middle" font-size=".34" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".07" paint-order="stroke" translate="no">'+esc(l.name)+'</text>'; }); }
+  else { var ls=Math.max(1, 2.4/z), lo=(ls-1)/2;
+    d.lords.forEach(function(l){ if (l.me) return; h+='<rect x="'+(l.x-lo).toFixed(2)+'" y="'+(l.y-lo).toFixed(2)+'" width="'+ls.toFixed(2)+'" height="'+ls.toFixed(2)+'" fill="'+(l.wild?'#e08a3c':'#c9cdc0')+'" stroke="'+(l.prot?'#7fb0e0':'#1f2421')+'" stroke-width="'+fs(l.prot?1.4:0.7)+'"/>'; });
+    d.lords.forEach(function(l){ if (!l.me) return; var s2=ls*1.4, o2=(s2-1)/2; h+='<rect x="'+(l.x-o2).toFixed(2)+'" y="'+(l.y-o2).toFixed(2)+'" width="'+s2.toFixed(2)+'" height="'+s2.toFixed(2)+'" fill="#f3dc9a" stroke="#1f2421" stroke-width="'+fs(1.2)+'"/>'; }); }
+  if (sel && sel.x!=null && sel.k!=="slot") h+='<rect x="'+(close?sel.x:sel.x-0.25)+'" y="'+(close?sel.y:sel.y-0.25)+'" width="'+(close?1:1.5)+'" height="'+(close?1:1.5)+'" fill="none" stroke="#fff" stroke-width="'+fs(close?2.4:1.6)+'"/>';
   return h+'</svg>'; }
 function wdIco(k, x, y, sc, col){ return '<g transform="matrix('+sc+' 0 0 '+sc+' '+(x-12*sc).toFixed(2)+' '+(y-12*sc).toFixed(2)+')" style="color:'+col+'" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" pointer-events="none">'+(INNER[k]||k)+'</g>'; }
 // what's on a tile: a capital, a building, a slot, the Throne grounds or the Wilds (zoomed out, a tap near a capital picks it)
 function wdAt(x, y){ var d=WDS.d, z=wdWin().z, best=null, bd=Math.pow(Math.max(0.6, 3/z),2);
-  d.lords.forEach(function(l){ var q=(l.x-x)*(l.x-x)+(l.y-y)*(l.y-y); if (q<=bd){ bd=q; best=l; } }); if (best) return {k:"lord", x:best.x, y:best.y, l:best};
+  if (z>=WD_CLOSE){ var L=d.lords.filter(function(l){ return l.x===x && l.y===y; })[0]; if (L) return {k:"lord", x:x, y:y, l:L};
+    var Mn=(d.mons||[]).filter(function(m){ return m.x===x && m.y===y; })[0]; if (Mn) return {k:"mon", x:x, y:y, m:Mn};
+    for (var si=0; si<d.slots.length; si++){ var s0=d.slots[si]; if (s0.ring>=d.open || x<s0.x || y<s0.y || x>=s0.x+d.sz || y>=s0.y+d.sz) continue;
+      var bs=d.bs||3, bb=(s0.b||[]).filter(function(q){ return x>=q.x && y>=q.y && x<q.x+bs && y<q.y+bs; })[0];
+      var ct=s0.city && x>=s0.city[0] && y>=s0.city[1] && x<s0.city[0]+s0.city[2] && y<s0.city[1]+s0.city[2];
+      return {k:"slot", i:s0.i, x:x, y:y, b:bb||null, city:!!ct}; } }
+  var bm=null; d.lords.forEach(function(l){ var q=(l.x-x)*(l.x-x)+(l.y-y)*(l.y-y); if (q<=bd){ bd=q; best=l; } }); (d.mons||[]).forEach(function(m){ var q=(m.x-x)*(m.x-x)+(m.y-y)*(m.y-y); if (q<bd){ bd=q; bm=m; } });
+  if (bm) return {k:"mon", x:bm.x, y:bm.y, m:bm}; if (best) return {k:"lord", x:best.x, y:best.y, l:best};
   var inb=function(b,m){ return x>=b.x-m && y>=b.y-m && x<b.x+3+m && y<b.y+3+m; }, m=z<2?1:0;
   if (inb(d.throne,m)) return {k:"throne"};
   for (var i=0;i<d.bld.length;i++) if (inb(d.bld[i],m)) return {k:"bld", i:i};
@@ -6679,33 +6744,38 @@ function wdLong(ms){ return ms>=48*3600e3 ? Math.ceil(ms/864e5)+" days" : fmtT(m
 function wdProt(ms){ return ms>0 ? '<span class="badge">Protected '+wdLong(ms)+'</span>' : ''; }
 function wdInfo(){ var d=WDS.d, v=WDS.sel, me=d.me, mine=me.aid, tn=wdTele(), myS=me.slot!=null?d.slots[me.slot]:null;
   if (!v) return '<p class="hint">Tap the map to see what’s there. Zoom in to pick a single tile.</p>';
+  if (v.k==="mon"){ var mStill=(d.mons||[]).filter(function(m){ return m.id===v.m.id; })[0]; if (!mStill) return '<p class="hint">That monster is gone.</p>'; v.m=mStill; return wdMonInfo(v); }
   var tele=function(what){ return ' <span class="dur">(1 City Teleport, you have '+tn+')</span>'; };
   var trip='<p class="dur">To the Throne: about '+(v.x!=null?wdTrip(v.x,v.y):'')+' for Cavalry with no speed bonuses.</p>';
   if (v.k==="throne") return '<h4>The Throne</h4><p class="hint">Take it with a rally or alone, then reinforce it. Hold it 4 straight hours after its Sunday reset and you rule the server until the next one: buffs, a title, a frame, the server’s name and a blessing for everyone.</p><p class="dur">Opens in a later update.</p>';
   if (v.k==="bld"){ var b=WD_BLD[v.i]; return '<h4>'+esc(b[1])+'</h4><p><b>'+esc(b[2])+'</b> <span class="dur">for the whole alliance</span></p><p class="hint">Resets every '+b[3]+' at 6 pm US Eastern. Hold it 4 straight hours after that and it’s yours until the next reset. An alliance can keep 3 at once and share their buffs with every ally.</p><p class="dur">Opens in a later update.</p>'; }
   if (v.k==="heart") return '<h4>The Throne grounds</h4><p class="hint">The land around the Throne and its buildings. No one can settle here.</p>';
   if (v.k==="slot"){ var s=d.slots[v.i], c=Math.floor(s.x+d.sz/2), r=Math.floor(s.y+d.sz/2), h='';
+    // close up: the tile you tapped on this alliance's map first
+    var tile=v.x==null?'':v.b?'<p><b>'+esc(v.b.n)+'</b> <span class="dur">('+v.x+', '+v.y+')</span></p>':v.city?'<p><b>Alliance City</b> <span class="dur">('+v.x+', '+v.y+')</span></p>':
+      s.aid?'<p class="dur">A free square of this alliance’s map ('+v.x+', '+v.y+').'+(s.aid===mine?' Members move their kingdoms on the alliance map (Battle, Map).':'')+'</p>':'';
+    var closer=wdWin().z<WD_CLOSE?'<div class="btnrow" style="margin-top:6px"><button class="btn ghost small" data-act="wd-zoomslot" data-v="'+s.i+'">Look closer</button></div>':'';
     if (s.aid){ h='<h4>'+esc(s.name)+' <span class="dur" translate="no">['+esc(s.tag)+']</span>'+(s.aid===mine?' <span class="badge">your alliance</span>':'')+'</h4><p class="dur">'+(s.on===1?'1 member':s.on+' members')+' on the server map. Members here are shielded once the Shield Generator is in.</p>';
-      if (s.aid!==mine) h+='<div class="btnrow" style="margin-top:6px"><button class="btn ghost small" data-act="al-view" data-aid="'+esc(s.aid)+'">See the alliance</button></div>';
-      return h+'<p class="dur">To the Throne: about '+wdTrip(c,r)+' for Cavalry from the middle, with no speed bonuses.</p>'; }
+      h=tile+h; if (s.aid!==mine) h+='<div class="btnrow" style="margin-top:6px"><button class="btn ghost small" data-act="al-view" data-aid="'+esc(s.aid)+'">See the alliance</button></div>';
+      return h+closer+'<p class="dur">To the Throne: about '+wdTrip(c,r)+' for Cavalry from the middle, with no speed bonuses.</p>'; }
     h='<h4>Open slot</h4><p class="hint">'+(s.ring?'The outer ring. ':'')+'An alliance’s own map goes here, shielded for its members. First come, first served.</p>';
     if (mine && me.map){ var cl=WDS.armed==="slot"+s.i;
       if (!myS) h+='<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="wd-claim" data-v="'+s.i+'"'+(WDS.acting?' disabled':'')+'>'+(cl?'Tap again to claim it':'Claim this slot for your alliance')+'</button></div>';
       else if (me.moveIn>0) h+='<p class="dur">Your alliance can move again in '+wdLong(me.moveIn-(Date.now()-d.now))+'.</p>';
       else h+='<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="wd-claim" data-v="'+s.i+'"'+(WDS.acting?' disabled':'')+'>'+(cl?'Tap again: everyone moves':'Move your alliance here')+'</button></div><p class="dur">'+(me.moveIn===0&&myS?'Then it can move again in a week.':'')+'</p>';
     } else if (mine) h+='<p class="dur">Your founder or officers (Move things on the alliance map) can claim slots.</p>';
-    return h+'<p class="dur">To the Throne: about '+wdTrip(c,r)+' for Cavalry from the middle, with no speed bonuses.</p>'; }
+    return h+closer+'<p class="dur">To the Throne: about '+wdTrip(c,r)+' for Cavalry from the middle, with no speed bonuses.</p>'; }
   if (v.k==="lord"){ var l=v.l, h2='<h4>'+(l.me?'Your capital':plName(l.name)+(l.tag?' <span class="dur" translate="no">['+esc(l.tag)+']</span>':''))+'</h4>'+
       '<p><b translate="no">'+esc(l.cap||"")+'</b> <span class="dur">Town Hall '+l.th+' · ('+l.x+', '+l.y+')</span> '+(l.prot?'<span class="badge">Protected</span>':'')+'</p>'+
       '<p class="dur">'+(l.wild?'In the Wilds: no shield out here.':'On '+(l.me?'your':'their')+' alliance map.')+'</p>';
     if (l.me && l.wild && mine) h2+='<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="wd-home"'+(WDS.acting||!tn?' disabled':'')+'>'+(WDS.armed==="home"?'Tap again to go home':'Back to your alliance map')+'</button>'+tele()+'</div>';
     return h2+'<p class="dur">To the Throne: about '+wdTrip(l.x,l.y)+' for Cavalry with no speed bonuses.</p>'; }
   // the Wilds
-  var h3='<h4>The Wilds <span class="dur">('+v.x+', '+v.y+')</span></h4><p class="hint">'+(v.closed!=null?'Part of the outer ring, which opens once every slot of the inner ring is taken. Until then it’s Wilds. ':'')+'No shield out here. Lords without an alliance live here; NPC kingdoms and monsters come in a later update.</p>';
+  var h3='<h4>The Wilds <span class="dur">('+v.x+', '+v.y+')</span></h4><p class="hint">'+(v.closed!=null?'Part of the outer ring, which opens once every slot of the inner ring is taken. Until then it’s Wilds. ':'')+'No shield out here. Lords without an alliance live here, and monsters roam it: tap one to fight it.</p>';
   if (me.on){ var arm=WDS.armed==="tp"+v.x+","+v.y;
     h3+='<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="wd-tp" data-x="'+v.x+'" data-y="'+v.y+'"'+(WDS.acting||!tn?' disabled':'')+'>'+(arm?'Tap again to move here':'Move your capital here')+'</button>'+tele()+'</div>'+(!tn?'<p class="dur">You have no City Teleports.</p>':'');
   } else h3+='<p class="dur">Join the server map to settle here.</p>';
-  if (wdWin().z<WD_ZOOMS.length) h3+='<div class="btnrow" style="margin-top:6px"><button class="btn ghost small" data-act="wd-zoomhere">Zoom in here</button></div>';
+  if ((WDS.z||1)<WD_ZOOMS.length) h3+='<div class="btnrow" style="margin-top:6px"><button class="btn ghost small" data-act="wd-zoomhere">Zoom in here</button></div>';
   return h3+trip; }
 // your own place: join, capital, protection, leave
 function wdMeHtml(){ var d=WDS.d, me=d.me, h='';
@@ -6721,6 +6791,7 @@ function wdMeHtml(){ var d=WDS.d, me=d.me, h='';
       '<p class="dur">'+(pk>0?'You can pick another capital in '+wdLong(pk)+'.':'Your capital is one of your highest Town Hall cities. Switching waits a week after the last switch.')+'</p>'; }
   else h+='<p class="dur">Your capital is your highest Town Hall city. Only its troops and resources will be at risk here.</p>';
   if (me.aid && me.slot==null) h+='<p class="dur">Your alliance has no slot yet.'+(me.map?' Tap an open slot to claim one.':'')+'</p>';
+  if (d.orbs) h+='<p class="dur">'+(me.aid?'Shield Generator tank: <b>'+fmt(d.orbs.tank)+'</b> Mana Orb'+(d.orbs.tank===1?'':'s')+'. Every monster your alliance kills on the server map adds one for each player in the fight.':'Mana Orbs held: <b>'+fmt(d.orbs.mine)+'</b>. They go into your alliance\u2019s Shield Generator when you join one.')+'</p>';
   h+='<div class="btnrow" style="margin-top:6px"><button class="btn ghost small" data-act="wd-findme">Find my capital</button><button class="btn ghost small danger" data-act="wd-leave"'+(WDS.acting?' disabled':'')+'>'+(WDS.armed==="leave"?'Tap again: 24 hours before you can come back':'Leave the server map')+'</button></div>';
   return h; }
 var WD_HOW=["Joining is its own switch (here or in Settings). Your capital, the city with the highest Town Hall, is your kingdom on the server map. Only its troops and resources will be at risk.",
@@ -6730,7 +6801,8 @@ var WD_HOW=["Joining is its own switch (here or in Settings). Your capital, the 
   "New lords are protected for 14 days; anyone who leaves or is kicked from an alliance for 3. Leaving the server map means 24 hours before you can come back.",
   "Capture buildings and the Throne: the Throne, War Forge and Bulwark reset on Sundays at 6 pm US Eastern, the other six one each weekday. Hold one 4 straight hours after its reset and it’s yours until the next one.",
   "Whoever holds the Throne rules for the week: they name the server, pick a blessing for everyone and place every alliance’s slot.",
-  "Coming next: monsters and NPC kingdoms in the Wilds, Mana Orbs for the Shield Generator, scouting with heroes. Then the buildings and the Throne, allies, and attacks.",
+  "Monsters roam the Wilds: Skeletons, Flying Eyes and Mushrooms. Attack one alone or call your alliance onto it. Every kill puts a Mana Orb for each player in the fight into your alliance\u2019s Shield Generator.",
+  "Coming next: the capture buildings and the Throne, allies, then attacks on capitals (with scouting).",
   "Numbers and names may still change."];
 function worldInner(){ var d=WDS.d;
   if (!d) return '<p class="'+(WDS.err?'why':'dur')+'">'+esc(WDS.err||"Loading the server map…")+'</p>';
@@ -6739,7 +6811,7 @@ function worldInner(){ var d=WDS.d;
     '<div class="btnrow wdzoom" style="margin:8px 0 6px"><button class="btn ghost small" data-act="wd-zoom" data-v="-1"'+(z<=1?' disabled':'')+' aria-label="Zoom out">−</button><button class="btn ghost small" data-act="wd-zoom" data-v="1"'+(z>=WD_ZOOMS[WD_ZOOMS.length-1]?' disabled':'')+' aria-label="Zoom in">+</button>'+
     (z>1?['←:-1:0','↑:0:-1','↓:0:1','→:1:0'].map(function(p){ var q=p.split(":"); return '<button class="btn ghost small" data-act="wd-pan" data-x="'+q[1]+'" data-y="'+q[2]+'">'+q[0]+'</button>'; }).join(""):'')+'<span class="dur" style="align-self:center">'+(z>1?'×'+z:'Whole world')+'</span></div>'+
     '<div class="wdbox">'+wdSvg()+'</div>'+
-    '<div class="wdleg">'+legend.map(function(l){ return '<span><i style="background:'+l[0]+';border-color:'+l[1]+'"></i>'+l[2]+'</span>'; }).join("")+'<span><i style="background:transparent;border-color:#7fb0e0"></i>Protected</span><span><i class="wdopen"></i>Open slot</span></div>'+
+    '<div class="wdleg">'+legend.map(function(l){ return '<span><i style="background:'+l[0]+';border-color:'+l[1]+'"></i>'+l[2]+'</span>'; }).join("")+'<span><i style="background:transparent;border-color:#7fb0e0"></i>Protected</span><span><i class="wdopen"></i>Open slot</span>'+[1,2,3].map(function(L){ return '<span><i style="background:'+WD_MCOL[L]+';border-color:#1f2421;border-radius:50%"></i>Level '+L+' monster</span>'; }).join("")+(z>=WD_CLOSE&&d.me.on?'<span><i style="background:rgba(243,220,154,.7);border-color:transparent;border-radius:50%;width:6px;height:6px"></i>You can move here</span>':'')+'</div>'+
     '<div class="wdinfo" id="wdinfo">'+wdInfo()+'</div>'+
     (WDS.err?'<p class="why">'+esc(WDS.err)+'</p>':'')+
     '<details class="det" data-det="wdhow"'+(DET.wdhow?' open':'')+' style="margin-top:8px"><summary><b>How it works</b></summary><ul class="wdhow">'+WD_HOW.map(function(t){ return '<li>'+t+'</li>'; }).join("")+'</ul></details>'; }
@@ -6762,11 +6834,19 @@ function wdTeleport(body, msg){ if (WDS.acting) return; if (!(wdTele()>0)){ toas
 function wdAct(act, a, e){
   if (act==="wd-open"){ WDS.sel=null; openSheet({kind:"world"}); if (!WDS.busy) wdFetch(); return true; }
   if (act==="wd-tap"){ wdTapAt(e); return true; }
-  if (act==="wd-zoom"){ var zi=Math.max(1, Math.min(WD_ZOOMS.length, (WDS.z||1)+(+a.dataset.v))); if (zi>(WDS.z||1) && WDS.sel && WDS.sel.x!=null){ WDS.cx=WDS.sel.x; WDS.cy=WDS.sel.y; } WDS.z=zi; wdPaint(); return true; }
+  if (act==="wd-zoom"){ var zi=Math.max(1, Math.min(WD_ZOOMS.length, (WDS.z||1)+(+a.dataset.v))); if (zi>(WDS.z||1) && WDS.sel && WDS.sel.x!=null){ WDS.cx=WDS.sel.x; WDS.cy=WDS.sel.y; } else if (zi>(WDS.z||1) && WDS.sel && WDS.sel.k==="slot" && WDS.d){ var zsl=WDS.d.slots[WDS.sel.i]; WDS.cx=zsl.x+7; WDS.cy=zsl.y+7; } WDS.z=zi; wdPaint(); return true; }
   if (act==="wd-pan"){ var V=wdWin(), st=V.w/3; WDS.cx=Math.max(0,Math.min(V.N-1, Math.round(V.x+V.w/2+(+a.dataset.x)*st))); WDS.cy=Math.max(0,Math.min(V.N-1, Math.round(V.y+V.w/2+(+a.dataset.y)*st))); wdPaint(); return true; }
+  if (act==="wd-zoomslot"){ var zs=WDS.d&&WDS.d.slots[+a.dataset.v]; if (zs){ WDS.cx=zs.x+7; WDS.cy=zs.y+7; WDS.z=WD_ZOOMS.length; } wdPaint(); return true; } // a whole alliance map fills the screen at x12
   if (act==="wd-zoomhere"){ var sv=WDS.sel; if (sv && sv.x!=null){ WDS.cx=sv.x; WDS.cy=sv.y; WDS.z=WD_ZOOMS.length; } wdPaint(); return true; }
   if (act==="wd-findme"){ var me=WDS.d&&WDS.d.me; if (me && me.x!=null){ WDS.cx=me.x; WDS.cy=me.y; WDS.z=3; var L=WDS.d.lords.filter(function(l){ return l.me; })[0]; WDS.sel=L?{k:"lord",x:L.x,y:L.y,l:L}:null; } wdPaint(); return true; }
   if (act==="wd-join"){ wdJoin(); return true; }
+  if (act==="wd-matk" || act==="wd-mjoin"){ if (!WDS.d || !WDS.d.me.on){ toast("Join the server map first"); return true; }
+    var wci=wdCapIdx(); if (wci!==S.cur){ S.cur=wci; renderCityBar(); }
+    var wsel=document.getElementById("wdrymins"); if (wsel) WDS.mins=+wsel.value||15;
+    var wd=act==="wd-mjoin"?{kind:"join", rid:+a.dataset.rid}:{kind:"rally", mon:+a.dataset.v, mins:a.dataset.m==="call"?(WDS.mins||15):0};
+    openMarch(homeTileId(), "wd", wd); return true; }
+  if (act==="wd-rcard"){ var rmid=+a.dataset.mon, rm=WDS.d&&(WDS.d.mons||[]).filter(function(m){ return m.id===rmid; })[0];
+    WDS.cx=+a.dataset.x; WDS.cy=+a.dataset.y; WDS.z=4; WDS.sel=rm?{k:"mon", x:rm.x, y:rm.y, m:rm}:null; WDS.pendMon=rm?0:rmid; ALS.sub="world"; lastView=""; renderView(true); if (!rm){ WDS.at=0; wdFetch(); } return true; }
   if (act==="wd-leave"){ if (WDS.armed!=="leave"){ WDS.armed="leave"; wdPaint(); return true; } WDS.armed=""; wdLeave(false); return true; }
   if (act==="wd-claim"){ var si=+a.dataset.v; if (WDS.armed!=="slot"+si){ WDS.armed="slot"+si; wdPaint(); return true; } if (WDS.acting) return true; WDS.acting=true; wdPaint();
     alPost("/wd/claim",{slot:si}).then(function(d){ wdAfter(d, d.error?"":"Your alliance is on its new slot"); }).catch(function(){ WDS.acting=false; toast("Couldn’t reach the server. Check your connection."); wdPaint(); }); return true; }
@@ -6776,6 +6856,98 @@ function wdAct(act, a, e){
     if (S.wdOn) openSheet({kind:"wdleave"}); return true; }
   if (act==="wd-leave-ok"){ closeSheet(); wdLeave(false); return true; }
   return false; }
+/* 0.2.19: monsters in the Wilds and world rallies (server-map-design.md, step 3). The server spawns Skeletons, Flying Eyes and Mushrooms (levels
+   1-3) and runs every fight; the game sends marches from your capital and takes them home. Attack alone (a one-march rally that leaves at once)
+   or call your alliance with a leave time; members join from their capitals. A win: a Mana Orb into the alliance's Shield Generator tank (held
+   until you join one, without an alliance), Flawless Gems, speed-ups, chances at Rough Ore, Mithril and Star Metal, and hero experience for the
+   first hero you sent. No weakness hints, as with every monster: players find out what works. */
+var WD_MART={1:"art/mon-skeleton.png",2:"art/mon-eye.png",3:"art/mon-mushroom.png"}, WD_MCOL={1:"#d9534f",2:"#a66bd8",3:"#e3a33a"}, WD_MXP={1:20000,2:50000,3:100000};
+var AR_ART={goblin:"art/mon-goblin.png",ent:"art/mon-ent.png",golem:"art/mon-golem.png",titan:"art/mon-titan.png",dragon:"art/mon-dragon.png"}; // the Arena's monsters on their rally cards
+function wdMonName(L){ var D=WDS.d&&WDS.d.monDef&&WDS.d.monDef[L]; return D?D.n:["","Skeleton","Flying Eye","Mushroom"][L]||"Monster"; }
+function wdCapIdx(){ var id=WDS.d&&WDS.d.me&&WDS.d.me.cap&&WDS.d.me.cap.id, i=cityIndex(id); return i>=0?i:S.cur; }
+// the march's pace as the server wants it (tiles x 36,000 s / pace = the trip): the game's own travel maths, measured over 10 tiles
+function wdMult(t, hid){ var keep=TRAVEL_FROM; TRAVEL_FROM=[0,0]; var ms=0; try { ms=travelMs(t,{x:10,y:0},hid||0); } catch(e){ ms=0; } TRAVEL_FROM=keep; return ms>0 ? 10*36e6/ms : 0; }
+function wdTripMs(a, b, mult){ return Math.max(1, Math.hypot(a[0]-b[0], a[1]-b[1]))*36e6/Math.max(1,mult); }
+function wdRwTxt(L){ return 'Every player in a winning fight: a Mana Orb for the Shield Generator, '+({1:"1 Flawless Gem and a 1-hour speed-up",2:"2 Flawless Gems and two 1-hour speed-ups",3:"4 Flawless Gems and an 8-hour speed-up"})[L]+', a chance at Rough Ore, Mithril or Star Metal, and hero experience. Losses come home wounded.'; }
+function wdMonInfo(v){ var d=WDS.d, me=d.me, M=v.m, now=Date.now(), rys=(d.rallies||[]).filter(function(r){ return r.mon===M.id && r.st==="open"; });
+  var h='<div class="wdmon"><img src="'+WD_MART[M.L]+'" alt="" class="wdmimg"><div style="min-width:0"><h4>Level '+M.L+' '+esc(wdMonName(M.L))+' <span class="dur">('+M.x+', '+M.y+')</span></h4><p class="hint">'+wdRwTxt(M.L)+'</p></div></div>';
+  if (!me.on) return h+'<p class="dur">Join the server map to fight it.</p>';
+  if (me.x!=null) h+='<p class="dur">From your capital: about '+fmtT(wdTripMs([me.x,me.y],[M.x,M.y],1000))+' for Cavalry with no speed bonuses.</p>';
+  rys.forEach(function(r){ h+='<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="wd-mjoin" data-rid="'+r.id+'">Join '+esc(r.host)+'’s rally</button><span class="dur" style="align-self:center">leaves in <b class="arleft" data-ends="'+r.leave+'">'+fmtT(Math.max(0,r.leave-now))+'</b> · '+r.n+' march'+(r.n===1?'':'es')+'</span></div>'; });
+  h+='<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="wd-matk" data-v="'+M.id+'" data-m="0">Attack alone</button></div>';
+  if (me.aid) h+='<div class="farmadd" style="margin-top:6px"><label class="dur" for="wdrymins">Call your alliance, leaving in</label><select id="wdrymins">'+[[5,"5 minutes"],[15,"15 minutes"],[30,"30 minutes"],[60,"1 hour"],[120,"2 hours"]].map(function(o){ return '<option value="'+o[0]+'"'+(o[0]===(WDS.mins||15)?' selected':'')+'>'+o[1]+'</option>'; }).join("")+'</select><button class="btn ghost small" data-act="wd-matk" data-v="'+M.id+'" data-m="call">Call</button></div>'+
+    '<p class="dur">Members march from their capitals to yours; at the leave time every march that made it sets off together, at the pace of the slowest.</p>';
+  return h; }
+// the march screen for world fights: from your capital, troops and a hero as usual (a hero isn't required)
+function wdTarget(){ var d=marchDraft, W=d.wd||{}, D=WDS.d; if (!D) return null;
+  if (W.kind==="join"){ var r=(D.rallies||[]).filter(function(x){ return x.id===W.rid; })[0]; return r?{to:[r.hx,r.hy], r:r, L:r.L, mon:[r.x,r.y]}:null; }
+  var m=(D.mons||[]).filter(function(x){ return x.id===W.mon; })[0]; return m?{to:[m.x,m.y], m:m, L:m.L, mon:[m.x,m.y]}:null; }
+function wdWhy(n){ var d=marchDraft, D=WDS.d, tg=wdTarget(), hero=d.hero?heroById(d.hero):null;
+  if (!D || !D.me.on || D.me.x==null) return "Join the server map first";
+  if (!tg) return d.wd&&d.wd.kind==="join" ? "That rally has left" : "That monster is gone";
+  if (!n) return "Choose some troops";
+  if (n>armyCap(d.ensign, hero)) return "Army limit is "+fmt(armyCap(d.ensign, hero))+" troops";
+  var av=draftAvail(); for (var i=0;i<12;i++) if (d.t[i]>av[i]) return "Not enough "+U[i].name+"s";
+  if (d.wd.kind==="join" && !tg.r.mine && Date.now()+wdTripMs([D.me.x,D.me.y], tg.to, wdMult(d.t,d.hero))>tg.r.leave) return "Too far to make it before the rally leaves";
+  return ""; }
+function wdMarchInfo(el, b){ var d=marchDraft, D=WDS.d, tg=wdTarget(), mult=wdMult(d.t,d.hero), hero=d.hero?heroById(d.hero):null;
+  var txt=!tg||!D||D.me.x==null?"":d.wd.kind==="join" ? (tg.r.mine?"Your own rally: they join it at once. It leaves in "+fmtT(Math.max(0,tg.r.leave-Date.now()))+".":"Travel about "+fmtT(wdTripMs([D.me.x,D.me.y],tg.to,mult))+" to "+tg.r.host+"’s capital; the rally leaves in "+fmtT(Math.max(0,tg.r.leave-Date.now()))+".")
+    : d.wd.mins ? "Your march is the rally’s first. It leaves in "+d.wd.mins+" minutes, then about "+fmtT(wdTripMs([D.me.x,D.me.y],tg.to,mult))+" to the monster at your pace (slower marches slow it down)."
+    : "Travel about "+fmtT(wdTripMs([D.me.x,D.me.y],tg.to,mult))+" to the monster, and back the same way.";
+  el.textContent=txt+" From "+(S.cities[wdCapIdx()]||C()).name+", your capital. Army size "+fmt(sumT(d.t))+" of "+fmt(armyCap(d.ensign, hero))+"."+(hero?" Led by "+hero.name+".":" No hero (the first hero you send gets the experience).");
+  var why=wdWhy(sumT(d.t)); b.disabled=!!why||!!WDS.sending; b.textContent=why||(d.wd.kind==="join"?"March to the rally":d.wd.mins?"Call the rally":"Attack"); }
+function wdMarchHead(){ var d=marchDraft, tg=wdTarget(), L=tg?tg.L:1;
+  return '<div class="head"><span class="ico">'+ICON.rally+'</span><div><h2>'+(d.wd.kind==="join"?"Join the rally on the level "+L+" "+esc(wdMonName(L)):d.wd.mins?"Call your alliance onto the level "+L+" "+esc(wdMonName(L)):"Attack the level "+L+" "+esc(wdMonName(L)))+'</h2><div class="sub">on the server map, from your capital</div></div></div><p class="hint">'+wdRwTxt(L)+'</p>'; }
+function wdSend(){ var d=marchDraft; if (wdWhy(sumT(d.t)) || WDS.sending) return;
+  var W=d.wd, hero=d.hero?heroById(d.hero):null, cid=C().id, t=d.t.slice(), ens=ensKey(d.ensign), mult=wdMult(t,d.hero), ref="w"+cid+"-"+Date.now().toString(36)+Math.floor(Math.random()*1e6).toString(36), tg=wdTarget();
+  var body={ref:ref, t:t, side:mySide(hero), mult:mult, cos:myLook("march")||""}, path="/wd/rjoin";
+  if (W.kind==="join") body.rid=W.rid; else { body.mon=W.mon; body.mins=W.mins||0; path="/wd/rally"; }
+  WDS.sending=true; var gb=document.getElementById("marchgo"); if (gb) gb.disabled=true;
+  alPost(path, body).then(function(r){ WDS.sending=false;
+    if (r.error){ toast(r.error); if (gb) gb.disabled=false; return; }
+    var ci=cityIndex(cid); if (ci<0) return;
+    withCity(ci,function(){ for (var i=0;i<12;i++) S.troops[i]=Math.max(0,S.troops[i]-t[i]); if (ens && S.items[ens]>0) S.items[ens]--; }); // a March Size item is spent, as for any march
+    if (hero) hero.away=true;
+    S.wdM=S.wdM||[]; S.wdM.push({ref:ref, rid:r.rid||W.rid, city:cid, hero:hero?hero.id:0, t:t, dep:Date.now(), st:"out", L:tg?tg.L:0});
+    save(); toast(W.kind==="join"?"Marching to the rally":W.mins?"Rally called: it leaves in "+W.mins+" minutes":"Marching: it lands in "+fmtT(Math.max(0,(r.hit||Date.now())-Date.now())));
+    closeSheet(); WDS.at=0; wdFetch(); lastView=""; refresh(); })
+    .catch(function(){ WDS.sending=false; if (gb) gb.disabled=false; toast("Couldn’t reach the server. Check your connection."); }); }
+// results: each of my marches learns what came back; it's taken home when it gets there (troops, wounded to the Medic Camp, rewards)
+function wdResults(d){ var L=S.wdM||[], ch=false; (d.mine||[]).forEach(function(j){ var m=L.filter(function(x){ return x.ref===j.ref; })[0]; if (!m) return;
+    if (m.id!==j.id || m.L!==j.L){ m.id=j.id; m.L=j.L; ch=true; }
+    if (j.st==="back" && j.res && m.st!=="back"){ m.st="back"; m.res=j.res; m.reward=j.reward; m.home=j.home; m.host=j.host; ch=true; } });
+  if (ch) save(); }
+function wdHome(m){ var ci=cityIndex(m.city); if (ci<0) ci=S.cur; var c=S.cities[ci], r=m.res||{back:m.t, wounded:[]}, back=0, wd=0, wb=null, nm="level "+(m.L||"?")+" "+wdMonName(m.L);
+  withCity(ci,function(){ for (var i=0;i<12;i++){ var n=(r.back&&r.back[i])||0; S.troops[i]+=n; back+=n; } });
+  for (var j=0;j<12;j++){ var w=(r.wounded&&r.wounded[j])||0; if (w){ if (!wb) wb=woundBucket(c); wb.t[j]+=w; wd+=w; } }
+  var hh=m.hero?heroById(m.hero):null; if (hh) hh.away=false;
+  var tail=" Back in "+c.name+": "+fmt(back)+" troops"+(wd?", and "+fmt(wd)+" wounded in the Medic Camp (heal them within 24 hours)":"")+".";
+  if (m.reward){ var rw=m.reward, its=rw.items||{}; for (var k in its) S.items[k]=(S.items[k]||0)+its[k];
+    var xp=0; if (rw.xp && hh){ var full=WD_MXP[m.L]||0, ups=giveXp(hh, full); xp=Math.round(full*bHeroXp()); if (ups) note("heroes", hh.name+" reached level "+hh.level+" on the server map"); }
+    note("alliance","The "+nm+" fell on the server map! Your share: a Mana Orb for the Shield Generator"+(Object.keys(its).length?", "+arRewardList({items:its, res:{}}):"")+(xp?", and "+fmt(xp)+" experience for "+hh.name:"")+"."+tail); }
+  else if (r.gone) note("alliance","The "+nm+" was already gone when your rally got there."+tail);
+  else if (r.cancelled) note("alliance","The rally on the "+nm+" was called off."+tail);
+  else if (r.late) note("alliance","Your march didn’t reach the rally on the "+nm+" before it left, so it turned back."+tail);
+  else note("alliance","The "+nm+" survived the fight."+tail); }
+function wdHomeTick(){ var L=S.wdM; if (!L || !L.length) return; var now=Date.now(), acks=[];
+  for (var i=L.length-1;i>=0;i--){ var m=L[i]; if (m.st==="back" && now>=m.home){ wdHome(m); if (m.id) acks.push(m.id); L.splice(i,1); } }
+  if (acks.length){ reconcileHeroes(); save(); flushFinished(); refresh(); if (cbOn()) alPost("/wd/applied",{ids:acks}).catch(function(){}); } }
+setInterval(function(){ try { wdHomeTick(); } catch(e){} if ((S.wdM||[]).some(function(m){ return m.st==="out"; }) && !document.hidden && cbOn() && !WDS.busy && Date.now()-WDS.at>20000) wdFetch();
+  if (wdVisible() && WDS.d && (WDS.d.marches||[]).length && !document.hidden && Date.now()-(wdHomeTick.drawn||0)>=2000){ wdHomeTick.drawn=Date.now(); var sv=document.getElementById("wdsvg"); if (sv) sv.outerHTML=wdSvg(); } }, 1000);
+// the Rallies tab: your alliance's rallies on world monsters (and your own attacks)
+function wdRallies(){ var al=alMine(), by={}, out=[]; ((al&&al.wdry)||[]).concat((WDS.d&&WDS.d.rallies)||[]).forEach(function(r){ if (!by[r.id]){ by[r.id]=1; out.push(r); } }); return out; }
+// 0.2.19: a note (and, with the app in the background, the phone notification the server sends) when someone else calls a world rally
+var WD_NOTE_READY=false;
+function wdNoteNew(list){ var seen=S.wdSeen=S.wdSeen||{}, now=Date.now();
+  (list||[]).forEach(function(r){ var k="w"+r.id; if (seen[k]) return; seen[k]=now; if (!WD_NOTE_READY || r.mine || r.solo || r.st!=="open" || now>=r.leave) return;
+    note("rally","\u2694 "+r.host+" called a rally on a level "+r.L+" "+wdMonName(r.L)+" on the server map. It leaves in "+fmtT(r.leave-now)+": join from the Alliance tab."); });
+  for (var k2 in seen) if (seen[k2]<now-4*864e5) delete seen[k2];
+  WD_NOTE_READY=true; }
+function wdRallyCards(now){
+  return wdRallies().map(function(r){ var mineN=(S.wdM||[]).filter(function(m){ return m.rid===r.id; }).length, ends=r.st==="open"?r.leave:r.hit;
+    return '<button class="rcard" data-act="wd-rcard" data-rid="'+r.id+'" data-mon="'+r.mon+'" data-x="'+r.x+'" data-y="'+r.y+'"><img class="rcimg" src="'+WD_MART[r.L]+'" alt=""><span class="rcmain"><b class="rct">Server map: level '+r.L+' '+esc(wdMonName(r.L))+'</b>'+
+      '<span class="rcst"><span>'+(r.st==="open"?"Leaves":"Lands")+' in <b class="arleft" data-ends="'+ends+'">'+fmtT(Math.max(0,ends-now))+'</b></span>'+(mineN?'<span class="badge">you: '+mineN+'</span>':'')+'</span>'+
+      '<span class="rcn">Called by '+esc(r.host)+' · '+r.n+' march'+(r.n===1?'':'es')+' · ('+r.x+', '+r.y+')</span></span></button>'; }); }
 function wdLeaveSheet(){ return '<div class="head"><span class="ico">'+ICON.crest+'</span><div><h2>Leave the server map?</h2><div class="sub">Your capital comes off the shared world.</div></div></div>'+
   '<p>You can come back after <b>24 hours</b>. Your alliance and everything in your game stay as they are.</p>'+
   '<div class="upbtns" style="grid-template-columns:1fr 1fr"><button class="btn danger" data-act="wd-leave-ok">Leave</button><button class="btn ghost" data-act="close">Stay</button></div>'; }
@@ -7158,6 +7330,7 @@ function cityAwayAdd(c, t, withWounded){
   S.marches.forEach(function(m){ if (m.city===c.id) m.t.forEach(function(n,j){ t[j]+=n; }); });
   var rfd=rfData(); if (rfd) (rfd.mine||[]).forEach(function(x){ if (x.fromCity===c.id && x.st!=="home" && x.st!=="done") (x.t||[]).forEach(function(n,j){ t[j]+=n; }); }); // out reinforcing an ally
   (S.alArena||[]).forEach(function(m){ if (m.city!==c.id) return; if (m.st==="out") m.t.forEach(function(n,j){ t[j]+=n; }); else for (var j=0;j<12;j++) t[j]+=(m.back[j]||0)+(withWounded?(m.wounded[j]||0):0); });
+  (S.wdM||[]).forEach(function(m){ if (m.city!==c.id) return; var r=m.st==="back"&&m.res?m.res:null; for (var j=0;j<12;j++) t[j]+=r?((r.back&&r.back[j])||0)+(withWounded?((r.wounded&&r.wounded[j])||0):0):(m.t[j]||0); }); // 0.2.19: world marches
   if (c.away && c.away.t) c.away.t.forEach(function(n,j){ t[j]+=n||0; }); // out on an invasion
   (S.alRally||[]).forEach(function(m){ if (m.city===c.id) (m.st==="back"?(m.back||m.t):m.t).forEach(function(n,j){ t[j]+=n||0; }); }); // in an alliance rally
   return t; }
@@ -7949,7 +8122,7 @@ function respecHero(h){
   return n;
 }
 // a hero is "marching" only while one of your marches carries them: anything else (an old save, a march that ended oddly) is put right every tick
-function reconcileHeroes(){ var busy={}; S.marches.forEach(function(m){ if (m.hero) busy[m.hero]=1; }); (S.alArena||[]).forEach(function(m){ if (m.hero) busy[m.hero]=1; }); (S.alRally||[]).forEach(function(m){ if (m.hero) busy[m.hero]=1; }); for (var rk in (S.alRfHero||{})) busy[S.alRfHero[rk]]=1; // leading alliance reinforcements
+function reconcileHeroes(){ var busy={}; S.marches.forEach(function(m){ if (m.hero) busy[m.hero]=1; }); (S.alArena||[]).forEach(function(m){ if (m.hero) busy[m.hero]=1; }); (S.alRally||[]).forEach(function(m){ if (m.hero) busy[m.hero]=1; }); (S.wdM||[]).forEach(function(m){ if (m.hero) busy[m.hero]=1; }); for (var rk in (S.alRfHero||{})) busy[S.alRfHero[rk]]=1; // leading alliance reinforcements
   S.cities.forEach(function(c){ (c.heroes||[]).forEach(function(h){ var b=!!busy[h.id]; if (!!h.away!==b) h.away=b; }); });
   (S.waiting||[]).forEach(function(h){ if (h.away) h.away=false; }); }
 function heroById(id){ for (var c=0;c<S.cities.length;c++){ var hs=S.cities[c].heroes; for (var i=0;i<hs.length;i++) if (hs[i].id===id) return hs[i]; } return null; }
