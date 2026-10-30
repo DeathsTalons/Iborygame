@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.16";
+window.IBORY_V="0.2.18";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -515,7 +515,7 @@ nav.tabs{display:block;margin:0}
 .altabs{display:flex;border-bottom:1px solid var(--line);margin:4px 0 10px}.altabs button{flex:1 1 0;min-width:0;border:0;background:none;padding:10px 2px 11px;cursor:pointer;color:var(--muted);font:600 1rem var(--display);letter-spacing:.03em;border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap}
 .altabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--brass)}.aldot{color:var(--brass)}
 .wdbox{border-radius:12px;overflow:hidden;max-width:560px;margin:0 auto}.wdmap{display:block;width:100%;height:auto}.wdhit{cursor:pointer}
-.wdtag{font:700 15px var(--display)}.wdsm{font:500 12px var(--body)}
+.wdtag{font-family:var(--display);font-weight:700}.wdsm{font-family:var(--body);font-weight:500}.wdzoom{flex-wrap:wrap;gap:6px}.wdzoom .btn{min-width:40px}
 .wdleg{display:flex;flex-wrap:wrap;gap:6px 12px;margin:8px 0 2px;font-size:13px;color:var(--muted)}.wdleg span{display:inline-flex;align-items:center;gap:5px}.wdleg i{display:inline-block;width:12px;height:12px;border-radius:3px;border:2px solid}.wdleg i.wdopen{border:2px dashed #8d928a}
 .wdhow{margin:6px 0 0;padding-left:20px}.wdhow li{margin:4px 0}
 .wdinfo{margin-top:8px;padding:10px 12px;border-radius:10px;background:var(--panel2)}.wdinfo h4{margin:0 0 4px}.wdinfo p{margin:4px 0 0}
@@ -1150,10 +1150,10 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 </div></div>
 <div id="toast" role="status" aria-live="polite"></div>
 
-<script>
+<script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.16";
+var APP_VERSION = "0.2.18";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -5129,7 +5129,7 @@ function wcShown(){ return !S.mpLocked && S.wcOn!==false; }
 // The server says so ({locked:1}) and the phone switches those features off until the account is restored (the next score save clears it).
 function mpLock(){ if (S.mpLocked) return; S.mpLocked=1; S.cities.forEach(function(c){ c.alAcad=false; c.alBld=0; }); S.alAcad=false; S.alBld=0; if (S.pvp) { try { pvClear(); } catch(e){} } save(); lastSheet=""; lastView=""; try { renderDock(); refresh(); } catch(e){} toast("This account is locked to single player"); }
 function mpUnlock(){ if (!S.mpLocked) return; S.mpLocked=0; save(); lastSheet=""; lastView=""; try { renderDock(); refresh(); } catch(e){} toast("Multiplayer is available to this account again"); }
-var MP_ACTS={"al-create":"Founding an alliance", "al-apply":"Applying to an alliance", "iv-optin":"Joining invasions", "iv-find":"Launching an invasion", "pv-create":"Starting a PvP match", "pv-join":"Joining a PvP match"};
+var MP_ACTS={"wd-join":"Joining the server map", "al-create":"Founding an alliance", "al-apply":"Applying to an alliance", "iv-optin":"Joining invasions", "iv-find":"Launching an invasion", "pv-create":"Starting a PvP match", "pv-join":"Joining a PvP match"};
 var mpPending=null, mpGraceAsked=false;
 function mpGo(why){ if (!S.mp){ S.mp=true; S.mpWhy=why||"chose"; S.mpAt=Date.now(); save(); lbData={}; lbLastSync=0; mpListMe(); } mpTell(); }
 function mpListMe(){ // going multiplayer puts you on the multiplayer high scores (unless an admin removed you)
@@ -5247,7 +5247,7 @@ function viewAllianceList(mineId){
   var d=ALS.d, h='<div class="section"><div class="shead"><h3>Alliances</h3><span class="dur">your honor '+fmt(d.honor||0)+'</span></div>'+
     (mineId?'<p class="hint">Every alliance, ranked. You can\u2019t apply while you are in one: leave yours first to join another.</p>':'<p class="hint">Join other players: chat, and soon help each other build, reinforce each other, research together and fight monsters as a group. Apply to an alliance below, or found your own. Honor is the prestige of enemy troops you kill in invasions (and alliance wars, later).</p>')+'</div>';
   if (!mineId && alBoxTot()>0) h+=alBoxHtml(0);
-  if (!mineId) h+='<div class="section"><div class="shead"><h3>Server map</h3><span class="badge">Preview</span></div><p class="hint">See where every alliance will sit on the shared map that’s coming to multiplayer.</p><div class="btnrow"><button class="btn small" data-act="wd-open">Look at the server map</button></div></div>';
+  if (!mineId) h+='<div class="section"><div class="shead"><h3>Server map</h3>'+(S.wdOn?'<span class="badge">You\u2019re on it</span>':'')+'</div><p class="hint">One shared world for every multiplayer player: alliances in a ring around the Throne, the Wilds outside. With no alliance, your capital lives in the Wilds.</p><div class="btnrow"><button class="btn small" data-act="wd-open">Open the server map</button></div></div>';
   if (!mineId && d.myApps && d.myApps.length) h+='<div class="section"><h3>Your applications</h3>'+d.myApps.map(function(a){ return '<div class="bq"><span><b>'+esc(a.name)+'</b> ['+esc(a.tag)+'] <span class="dur">sent '+alAgo(a.at)+'</span></span><div class="mbtns"><button class="link" data-act="al-unapply" data-aid="'+esc(a.aid)+'">Withdraw</button></div></div>'; }).join("")+'</div>';
   var L=(ALS.list||[]).slice(), sk=ALS.sort, applied={}; (d.myApps||[]).forEach(function(a){ applied[a.aid]=1; });
   L.sort(function(a,b){ return (a.rank[sk]||0)-(b.rank[sk]||0); });
@@ -6614,66 +6614,174 @@ function alGrassCss(){ if (document.getElementById("algrass")) return; var urls=
   st.textContent=urls.map(function(u,i){ return '.alt.alg'+i+'{background:url('+u+') 0 0/100% 100%;image-rendering:pixelated;border-color:#466a2e}'; }).join("")+'.algrid{background:#3c5a28;border-radius:6px}.alt.alg0.free,.alt.alg1.free,.alt.alg2.free,.alt.alg3.free{box-shadow:inset 0 0 0 2px var(--brass)}';
   document.head.appendChild(st); }
 function alSprImg(k){ var u=alSprUrl(k); return u?'<img class="albimg" src="'+u+'" alt="">':""; }
-/* 0.2.12: the server map, look only. One shared world: the Throne in the middle, eight capture buildings around it, fourteen alliance slots in a ring,
-   the Wilds outside. Nothing on it works yet; alliances sit in the slots by prestige until they can claim their own (server-map-design.md). */
-var WD_BLD=[["forge","War Forge","+5% troop attack"],["walls","Bulwark","+5% troop defense"],["book","Hall of Heroes","+10% hero experience"],["academy","Sage’s Observatory","+5% research speed"],["hammer","Mason’s Yard","+5% construction speed"],["plus","Healer’s Spring","More wounded saved"],["stable","Royal Stables","+10% march speed"],["gold","Treasury Vault","+10% gold"]];
-var WD_SLOTS=14, WDSEL="";
-var WD_CROWN='<path d="M3 18h18M4 18 3 7l5 4 4-7 4 7 5-4-1 11"/>';
-function wdList(){ return (ALS.list||[]).slice().sort(function(a,b){ return (b.prestige||0)-(a.prestige||0); }); }
-function wdMineId(){ var m=ALS.d&&alMine(); return m?m.id:null; }
-function wdPos(r, i, n){ var a=-Math.PI/2+i*2*Math.PI/n; return [300+r*Math.cos(a), 300+r*Math.sin(a)]; }
-function wdIco(k, x, y, sc, col){ return '<g transform="matrix('+sc+' 0 0 '+sc+' '+(x-12*sc).toFixed(1)+' '+(y-12*sc).toFixed(1)+')" style="color:'+col+'" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+(INNER[k]||k)+'</g>'; }
-function wdSvg(){ var L=wdList(), mine=wdMineId(), sel=WDSEL;
-  var h='<svg class="wdmap" viewBox="0 0 600 600" role="img" aria-label="Server map">'+
-    '<g data-act="wd-pick" data-v="w"><rect x="0" y="0" width="600" height="600" rx="14" fill="#33452c"/>';
-  // the Wilds: NPC kingdoms in the corners, monsters about (decoration until they spawn for real)
-  [[56,56],[544,56],[56,544],[544,544],[300,26],[300,574],[26,300],[574,300]].forEach(function(p,i){ h+=i<4?wdIco("townhall",p[0],p[1],1,"#a8ad9e"):'<circle cx="'+p[0]+'" cy="'+p[1]+'" r="5" fill="#c8414b" opacity=".85"/>'; });
-  [[120,40],[480,560],[40,470],[560,130],[150,575],[455,25]].forEach(function(p){ h+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="4" fill="#c8414b" opacity=".7"/>'; });
-  h+='</g><circle cx="300" cy="300" r="160" fill="#3d5233" pointer-events="none"/><circle cx="300" cy="300" r="228" fill="none" stroke="rgba(235,227,208,.16)" stroke-width="8" pointer-events="none"/><circle cx="300" cy="300" r="105" fill="none" stroke="rgba(235,227,208,.16)" stroke-width="6" pointer-events="none"/>';
-  for (var i=0;i<WD_SLOTS;i++){ var p=wdPos(228,i,WD_SLOTS), a=L[i], on=sel==="s"+i, x=p[0]-34, y=p[1]-34;
-    h+='<g data-act="wd-pick" data-v="s'+i+'" class="wdhit">';
-    if (!a) h+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="68" height="68" rx="8" fill="rgba(0,0,0,.12)" stroke="'+(on?'#ebe3d0':'#8d928a')+'" stroke-width="'+(on?3:2)+'" stroke-dasharray="6 5"/><text x="'+p[0].toFixed(1)+'" y="'+(p[1]+5).toFixed(1)+'" text-anchor="middle" class="wdsm" fill="#c9cdc0">Empty</text>';
-    else { var me=a.id===mine;
-      h+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="68" height="68" rx="8" fill="'+(me?'#6b5a2a':'#313834')+'" stroke="'+(on?'#ebe3d0':me?'#d7b058':'#8d928a')+'" stroke-width="'+(on||me?3:1.5)+'"/>'+
-        '<text x="'+p[0].toFixed(1)+'" y="'+(p[1]-2).toFixed(1)+'" text-anchor="middle" class="wdtag" fill="'+(me?'#f3dc9a':'#ebe3d0')+'" translate="no">'+esc(a.tag)+'</text>'+
-        '<text x="'+p[0].toFixed(1)+'" y="'+(p[1]+18).toFixed(1)+'" text-anchor="middle" class="wdsm" fill="#c9cdc0" translate="no">'+a.members+' / '+a.cap+'</text>'; }
-    h+='</g>'; }
-  WD_BLD.forEach(function(b,i){ var p=wdPos(105,i,WD_BLD.length), on=sel==="b"+i;
-    h+='<g data-act="wd-pick" data-v="b'+i+'" class="wdhit"><rect x="'+(p[0]-22).toFixed(1)+'" y="'+(p[1]-22).toFixed(1)+'" width="44" height="44" rx="8" fill="#3a423d" stroke="'+(on?'#ebe3d0':'#b4b9aa')+'" stroke-width="'+(on?3:1.5)+'"/>'+wdIco(b[0],p[0],p[1],1.1,"#ebe3d0")+'</g>'; });
-  var on=sel==="t";
-  h+='<g data-act="wd-pick" data-v="t" class="wdhit"><rect x="270" y="270" width="60" height="60" rx="10" fill="#6b5a2a" stroke="'+(on?'#ebe3d0':'#d7b058')+'" stroke-width="3"/>'+wdIco(WD_CROWN,300,300,1.5,"#f3dc9a")+'</g>';
+/* 0.2.17: the server map, live (step 2 of server-map-design.md: placement). One shared world from the server (/wd/state): the Throne in the middle,
+   8 capture buildings around it (not live yet), a ring of 14 alliance slots (each is that alliance's own alliance map), a second ring of 20 that opens
+   once the first is full, the Wilds everywhere else. Joining is its own switch. Your kingdom on it is your capital (highest Town Hall city).
+   Members sit on their alliance map; anyone can move their capital out into the Wilds, and members back home, for 1 City Teleport each way
+   (the game spends the item when the server says yes). Founders and officers (the map permission) claim an open slot and move it once a week. */
+var WD_BLD=[["forge","War Forge","+5% troop attack","Sunday"],["walls","Bulwark","+5% troop defense","Sunday"],["book","Hall of Heroes","+10% hero experience","Wednesday"],["academy","Sage’s Observatory","+5% research speed","Tuesday"],["hammer","Mason’s Yard","+5% construction speed","Monday"],["plus","Healer’s Spring","More wounded saved","Thursday"],["stable","Royal Stables","+10% march speed","Friday"],["gold","Treasury Vault","+10% gold","Saturday"]];
+var WD_CROWN='<path d="M3 18h18M4 18 3 7l5 4 4-7 4 7 5-4-1 11"/>', WD_ZOOMS=[1,2,4,8];
+var WDS={d:null, at:0, busy:false, err:"", sel:null, z:0, cx:90, cy:90, armed:"", acting:false};
+function wdVisible(){ return (sheetFor && sheetFor.kind==="world") || (tab==="guild" && !sheetFor && !!alMine() && ALS.sub==="world"); }
+function wdTele(){ return S.items.teleport||0; }
+// the capital the game wants: the server's pick while it's still one of the highest Town Hall cities, else the first of those
+function wdCapCity(){ var mx=maxTH(), sv=WDS.d&&WDS.d.me&&WDS.d.me.cap?WDS.d.me.cap.id:(S.wdCap||0), c=S.cities.filter(function(x){ return x.id===sv && (x.th||1)===mx; })[0];
+  return c || S.cities.filter(function(x){ return (x.th||1)===mx; })[0] || S.cities[0]; }
+function wdCapBody(){ var c=wdCapCity(); return {cap:{id:c.id, name:c.name, th:c.th||1}, have:S.cities.map(function(x){ return x.id; })}; }
+function wdFetch(){ if (WDS.busy || !alOn()) return; WDS.busy=true; WDS.at=Date.now();
+  alPost("/wd/state", wdCapBody()).then(function(d){ WDS.busy=false; if (d.error){ WDS.err=d.error; wdPaint(); return; } WDS.err=""; WDS.d=d;
+    var on=!!d.me.on; if (!!S.wdOn!==on || (on && d.me.cap && d.me.cap.id && S.wdCap!==d.me.cap.id)){ S.wdOn=on; if (on && d.me.cap) S.wdCap=d.me.cap.id; save(); }
+    if (WDS.z===0){ WDS.z=1; if (on && d.me.x!=null){ WDS.cx=d.me.x; WDS.cy=d.me.y; } else { WDS.cx=Math.floor(d.c); WDS.cy=Math.floor(d.c); } }
+    wdPaint(); }).catch(function(){ WDS.busy=false; WDS.err="Couldn’t reach the server. Check your connection."; wdPaint(); });
+}
+setInterval(function(){ if (document.hidden || !alOn() || !mpShown() || WDS.busy) return; var age=Date.now()-WDS.at;
+  if (wdVisible() ? age>=20000 : (S.wdOn && age>=600000)) wdFetch(); }, 1000); // open: every 20 s; on the map but elsewhere: every 10 minutes keeps your capital current
+function wdPaint(){ var w=document.getElementById("wdwrap"); if (w) w.innerHTML=worldInner(); else if (wdVisible()){ if (sheetFor){ lastSheet=""; renderSheet(); } else { lastView=""; renderView(true); } } }
+// the window on the world: zoom 1 shows all of it; each step halves the side, centred on (cx, cy)
+function wdWin(){ var d=WDS.d, N=d?d.n:180, z=WD_ZOOMS[Math.max(0,Math.min(WD_ZOOMS.length-1,(WDS.z||1)-1))], w=N/z, x=Math.max(0,Math.min(N-w,WDS.cx+0.5-w/2)), y=Math.max(0,Math.min(N-w,WDS.cy+0.5-w/2)); return {x:x, y:y, w:w, z:z, N:N}; }
+function wdMineAid(){ return WDS.d&&WDS.d.me?WDS.d.me.aid:null; }
+function wdSvg(){ var d=WDS.d, V=wdWin(), z=V.z, fs=function(n){ return (n/z).toFixed(2); }, sel=WDS.sel, mine=wdMineAid(), h='';
+  h+='<svg class="wdmap" id="wdsvg" viewBox="'+V.x.toFixed(2)+' '+V.y.toFixed(2)+' '+V.w.toFixed(2)+' '+V.w.toFixed(2)+'" role="img" aria-label="Server map" data-act="wd-tap">'+
+    '<rect x="0" y="0" width="'+V.N+'" height="'+V.N+'" fill="#33452c"/>';
+  if (z>=4){ var g=''; for (var gx=Math.ceil(V.x); gx<=V.x+V.w; gx++) g+='M'+gx+' '+V.y.toFixed(1)+'v'+V.w.toFixed(1); for (var gy=Math.ceil(V.y); gy<=V.y+V.w; gy++) g+='M'+V.x.toFixed(1)+' '+gy+'h'+V.w.toFixed(1); h+='<path d="'+g+'" stroke="rgba(0,0,0,.18)" stroke-width="'+fs(0.6)+'"/>'; }
+  h+='<circle cx="'+d.c+'" cy="'+d.c+'" r="'+d.heart+'" fill="#3d5233"/><circle cx="'+d.c+'" cy="'+d.c+'" r="'+d.heart+'" fill="none" stroke="rgba(235,227,208,.18)" stroke-width="'+fs(2)+'"/>';
+  d.slots.forEach(function(s){ var open=s.ring<d.open, on=sel&&sel.k==="slot"&&sel.i===s.i, me=s.aid&&s.aid===mine;
+    if (!open){ h+='<rect x="'+s.x+'" y="'+s.y+'" width="'+d.sz+'" height="'+d.sz+'" rx="1" fill="none" stroke="rgba(235,227,208,'+(on?'.7':'.16')+')" stroke-width="'+fs(on?2:1)+'" stroke-dasharray="'+fs(4)+' '+fs(4)+'"/>'; return; }
+    h+='<rect x="'+s.x+'" y="'+s.y+'" width="'+d.sz+'" height="'+d.sz+'" rx="1" fill="'+(me?'#6b5a2a':s.aid?'#313834':'rgba(0,0,0,.12)')+'" stroke="'+(on?'#ebe3d0':me?'#d7b058':'#8d928a')+'" stroke-width="'+fs(on||me?2.5:1.5)+'"'+(s.aid?'':' stroke-dasharray="'+fs(5)+' '+fs(4)+'"')+'/>';
+    if (s.city) h+='<rect x="'+s.city[0]+'" y="'+s.city[1]+'" width="'+s.city[2]+'" height="'+s.city[2]+'" fill="'+(me?'#a8894a':'#59605a')+'"/>';
+    if (s.aid && z<4) h+='<text x="'+(s.x+d.sz/2)+'" y="'+(s.y+d.sz/2+(z<2?1.6:0.8))+'" text-anchor="middle" font-size="'+fs(z<2?5.2:6)+'" class="wdtag" fill="'+(me?'#f3dc9a':'#ebe3d0')+'" translate="no">'+esc(s.tag)+'</text>';
+    else if (!s.aid && z<2) h+='<text x="'+(s.x+d.sz/2)+'" y="'+(s.y+d.sz/2+1.3)+'" text-anchor="middle" font-size="'+fs(4)+'" class="wdsm" fill="#c9cdc0">Open</text>'; });
+  d.bld.forEach(function(b,i){ var on=sel&&sel.k==="bld"&&sel.i===i; h+='<rect x="'+b.x+'" y="'+b.y+'" width="3" height="3" rx=".4" fill="#3a423d" stroke="'+(on?'#ebe3d0':'#b4b9aa')+'" stroke-width="'+fs(on?2.5:1.2)+'"/>';
+    if (z>=2) h+=wdIco(WD_BLD[i][0], b.x+1.5, b.y+1.5, 0.11, "#ebe3d0"); });
+  var on=sel&&sel.k==="throne"; h+='<rect x="'+d.throne.x+'" y="'+d.throne.y+'" width="3" height="3" rx=".5" fill="#6b5a2a" stroke="'+(on?'#ebe3d0':'#d7b058')+'" stroke-width="'+fs(on?3:2)+'"/>'+(z>=2?wdIco(WD_CROWN, d.throne.x+1.5, d.throne.y+1.5, 0.11, "#f3dc9a"):'');
+  // lords: one square per capital (drawn bigger when zoomed out so they can be seen)
+  var ls=Math.max(1, 2.4/z), lo=(ls-1)/2;
+  d.lords.forEach(function(l){ if (l.me) return; h+='<rect x="'+(l.x-lo).toFixed(2)+'" y="'+(l.y-lo).toFixed(2)+'" width="'+ls.toFixed(2)+'" height="'+ls.toFixed(2)+'" fill="'+(l.wild?'#e08a3c':'#c9cdc0')+'" stroke="'+(l.prot?'#7fb0e0':'#1f2421')+'" stroke-width="'+fs(l.prot?1.4:0.7)+'"/>'; });
+  d.lords.forEach(function(l){ if (!l.me) return; var s2=ls*1.4, o2=(s2-1)/2; h+='<rect x="'+(l.x-o2).toFixed(2)+'" y="'+(l.y-o2).toFixed(2)+'" width="'+s2.toFixed(2)+'" height="'+s2.toFixed(2)+'" fill="#f3dc9a" stroke="#1f2421" stroke-width="'+fs(1.2)+'"/>'; });
+  if (sel && (sel.k==="wild" || sel.k==="lord" || sel.k==="heart")) h+='<rect x="'+(sel.x-0.25)+'" y="'+(sel.y-0.25)+'" width="1.5" height="1.5" fill="none" stroke="#fff" stroke-width="'+fs(1.6)+'"/>';
   return h+'</svg>'; }
-function wdInfo(){ var v=WDSEL, L=wdList(), mine=wdMineId();
-  if (!v) return '<p class="hint">Tap a square to see what’s there.</p>';
-  if (v==="t") return '<h4>The Throne</h4><p class="hint">Take it with a rally or alone, then reinforce it to hold on. Whoever holds it rules the server for the week, with buffs, a title and a frame. It goes back to its guards every week.</p>';
-  if (v==="w") return '<h4>The Wilds</h4><p class="hint">No shield out here. Lords without an alliance, NPC kingdoms to knock down and farm, and monsters for alliances to rally.</p>';
-  if (v[0]==="b"){ var b=WD_BLD[+v.slice(1)]; if (!b) return ''; return '<h4>'+esc(b[1])+'</h4><p><b>'+esc(b[2])+'</b> <span class="dur">for the whole alliance</span></p><p class="hint">Hold it for 4 hours and it’s yours for the week. An alliance can keep 3 at once, and share their buffs with every ally. All buildings go back to their guards every week.</p>'; }
-  var a=L[+v.slice(1)];
-  if (!a) return '<h4>Open slot</h4><p class="hint">Once the server map opens, alliances claim their own slot and can move once a week.</p>';
-  return '<h4>'+esc(a.name)+' <span class="dur" translate="no">['+esc(a.tag)+']</span>'+(a.id===mine?' <span class="badge">your alliance</span>':'')+'</h4>'+
-    '<div class="rgrid"><span>Members <b>'+a.members+'</b> <span class="dur">/ '+a.cap+'</span></span><span>Prestige <b>'+fmt(a.prestige)+'</b> <span class="dur">#'+a.rank.prestige+'</span></span><span>Cities <b>'+fmt(a.cities)+'</b></span><span>Honor <b>'+fmt(a.honor)+'</b></span></div>'+
-    (a.id!==mine?'<div class="btnrow" style="margin-top:6px"><button class="btn ghost small" data-act="al-view" data-aid="'+esc(a.id)+'">See the alliance</button></div>':''); }
-function worldHtml(){ if (!ALS.list && (!ALS.listAt || Date.now()-ALS.listAt>20000)) alList();
-  var L=wdList(), more=Math.max(0,L.length-WD_SLOTS);
-  return '<div class="section"><div class="shead"><h3>Server map</h3><span class="badge">Preview</span></div>'+
-    '<p class="hint">One shared map for every alliance, coming to multiplayer. Each square in the ring is an alliance’s map, shielded for its members. Capture buildings and the Throne sit in the middle; the Wilds outside belong to no one. Look only for now: alliances are placed by prestige until they can claim a slot.</p>'+
-    (ALS.list?'':'<p class="dur">Loading the alliances…</p>')+
-    '<div class="wdbox">'+wdSvg()+'</div>'+
-    '<div class="wdleg"><span><i style="background:#6b5a2a;border-color:#d7b058"></i>Your alliance</span><span><i style="background:#313834;border-color:#8d928a"></i>Alliance</span><span><i class="wdopen"></i>Open slot</span><span><i style="background:#3a423d;border-color:#b4b9aa"></i>Capture building</span><span><i style="background:#c8414b;border-radius:50%;border-color:#c8414b"></i>Monster</span></div>'+
-    (more>1?'<p class="dur">'+more+' more alliances not shown.</p>':more?'<p class="dur">1 more alliance not shown.</p>':'')+
-    '<div class="wdinfo" id="wdinfo">'+wdInfo()+'</div>'+
-    '<details class="det" data-det="wdhow"'+(DET.wdhow?' open':'')+' style="margin-top:8px"><summary><b>How it will work</b></summary><ul class="wdhow">'+WD_HOW.map(function(t){ return '<li>'+t+'</li>'; }).join("")+'</ul></details></div>'; }
-// 0.2.13: the plan as decided so far (server-map-design.md), for players to read while it's built
-var WD_HOW=["Your capital (the city with the highest Town Hall) is your kingdom on the server map. Only its troops can die and only its resources can be taken.",
-  "Stay on your alliance\u2019s map and you can\u2019t be attacked: the Shield Generator covers every member. Move out into the Wilds whenever you want to fight.",
-  "The shield runs on Mana Orbs. Every world monster drops one to everyone in the rally, and the shield burns 1 a day for each member.",
-  "New players are protected for 14 days, and anyone who leaves or is kicked from an alliance for 3 days.",
-  "Capture buildings and the Throne reset every Sunday at 6 pm US Eastern. Hold one for 4 straight hours and it\u2019s your alliance\u2019s for the week. An alliance can hold 3.",
-  "Whoever holds the Throne rules for the week: they name the server and pick a blessing for everyone.",
-  "Ally with other alliances and share your buildings\u2019 buffs with them.",
-  "Marches cross the map at troop speed, so March Speed-ups matter. Scouting is the only way to see a capital\u2019s troops, and a hero\u2019s Intelligence makes scouts hit harder.",
+function wdIco(k, x, y, sc, col){ return '<g transform="matrix('+sc+' 0 0 '+sc+' '+(x-12*sc).toFixed(2)+' '+(y-12*sc).toFixed(2)+')" style="color:'+col+'" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" pointer-events="none">'+(INNER[k]||k)+'</g>'; }
+// what's on a tile: a capital, a building, a slot, the Throne grounds or the Wilds (zoomed out, a tap near a capital picks it)
+function wdAt(x, y){ var d=WDS.d, z=wdWin().z, best=null, bd=Math.pow(Math.max(0.6, 3/z),2);
+  d.lords.forEach(function(l){ var q=(l.x-x)*(l.x-x)+(l.y-y)*(l.y-y); if (q<=bd){ bd=q; best=l; } }); if (best) return {k:"lord", x:best.x, y:best.y, l:best};
+  var inb=function(b,m){ return x>=b.x-m && y>=b.y-m && x<b.x+3+m && y<b.y+3+m; }, m=z<2?1:0;
+  if (inb(d.throne,m)) return {k:"throne"};
+  for (var i=0;i<d.bld.length;i++) if (inb(d.bld[i],m)) return {k:"bld", i:i};
+  for (var j=0;j<d.slots.length;j++){ var s=d.slots[j]; if (x>=s.x && y>=s.y && x<s.x+d.sz && y<s.y+d.sz){ if (s.ring<d.open) return {k:"slot", i:s.i}; return {k:"wild", x:x, y:y, closed:s.i}; } }
+  if (Math.pow(x+0.5-d.c,2)+Math.pow(y+0.5-d.c,2)<d.heart*d.heart) return {k:"heart", x:x, y:y};
+  if (x<0 || y<0 || x>=d.n || y>=d.n) return null;
+  return {k:"wild", x:x, y:y}; }
+function wdTapAt(e){ var sv=document.getElementById("wdsvg"); if (!sv || !WDS.d || !sv.getScreenCTM) return; var m=sv.getScreenCTM(); if (!m) return;
+  var p=sv.createSVGPoint(); p.x=e.clientX; p.y=e.clientY; var q=p.matrixTransform(m.inverse()), x=Math.floor(q.x), y=Math.floor(q.y);
+  WDS.sel=wdAt(x,y); WDS.armed=""; wdPaint(); }
+function wdTrip(x, y){ var d=WDS.d, c=Math.floor(d.c), dist=Math.max(1, Math.sqrt((x-c)*(x-c)+(y-c)*(y-c))); return fmtT(dist*36000/1000*1000); } // base Cavalry, no speed bonuses
+function wdLong(ms){ return ms>=48*3600e3 ? Math.ceil(ms/864e5)+" days" : fmtT(ms); } // a week reads as days, not 168h
+function wdProt(ms){ return ms>0 ? '<span class="badge">Protected '+wdLong(ms)+'</span>' : ''; }
+function wdInfo(){ var d=WDS.d, v=WDS.sel, me=d.me, mine=me.aid, tn=wdTele(), myS=me.slot!=null?d.slots[me.slot]:null;
+  if (!v) return '<p class="hint">Tap the map to see what’s there. Zoom in to pick a single tile.</p>';
+  var tele=function(what){ return ' <span class="dur">(1 City Teleport, you have '+tn+')</span>'; };
+  var trip='<p class="dur">To the Throne: about '+(v.x!=null?wdTrip(v.x,v.y):'')+' for Cavalry with no speed bonuses.</p>';
+  if (v.k==="throne") return '<h4>The Throne</h4><p class="hint">Take it with a rally or alone, then reinforce it. Hold it 4 straight hours after its Sunday reset and you rule the server until the next one: buffs, a title, a frame, the server’s name and a blessing for everyone.</p><p class="dur">Opens in a later update.</p>';
+  if (v.k==="bld"){ var b=WD_BLD[v.i]; return '<h4>'+esc(b[1])+'</h4><p><b>'+esc(b[2])+'</b> <span class="dur">for the whole alliance</span></p><p class="hint">Resets every '+b[3]+' at 6 pm US Eastern. Hold it 4 straight hours after that and it’s yours until the next reset. An alliance can keep 3 at once and share their buffs with every ally.</p><p class="dur">Opens in a later update.</p>'; }
+  if (v.k==="heart") return '<h4>The Throne grounds</h4><p class="hint">The land around the Throne and its buildings. No one can settle here.</p>';
+  if (v.k==="slot"){ var s=d.slots[v.i], c=Math.floor(s.x+d.sz/2), r=Math.floor(s.y+d.sz/2), h='';
+    if (s.aid){ h='<h4>'+esc(s.name)+' <span class="dur" translate="no">['+esc(s.tag)+']</span>'+(s.aid===mine?' <span class="badge">your alliance</span>':'')+'</h4><p class="dur">'+(s.on===1?'1 member':s.on+' members')+' on the server map. Members here are shielded once the Shield Generator is in.</p>';
+      if (s.aid!==mine) h+='<div class="btnrow" style="margin-top:6px"><button class="btn ghost small" data-act="al-view" data-aid="'+esc(s.aid)+'">See the alliance</button></div>';
+      return h+'<p class="dur">To the Throne: about '+wdTrip(c,r)+' for Cavalry from the middle, with no speed bonuses.</p>'; }
+    h='<h4>Open slot</h4><p class="hint">'+(s.ring?'The outer ring. ':'')+'An alliance’s own map goes here, shielded for its members. First come, first served.</p>';
+    if (mine && me.map){ var cl=WDS.armed==="slot"+s.i;
+      if (!myS) h+='<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="wd-claim" data-v="'+s.i+'"'+(WDS.acting?' disabled':'')+'>'+(cl?'Tap again to claim it':'Claim this slot for your alliance')+'</button></div>';
+      else if (me.moveIn>0) h+='<p class="dur">Your alliance can move again in '+wdLong(me.moveIn-(Date.now()-d.now))+'.</p>';
+      else h+='<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="wd-claim" data-v="'+s.i+'"'+(WDS.acting?' disabled':'')+'>'+(cl?'Tap again: everyone moves':'Move your alliance here')+'</button></div><p class="dur">'+(me.moveIn===0&&myS?'Then it can move again in a week.':'')+'</p>';
+    } else if (mine) h+='<p class="dur">Your founder or officers (Move things on the alliance map) can claim slots.</p>';
+    return h+'<p class="dur">To the Throne: about '+wdTrip(c,r)+' for Cavalry from the middle, with no speed bonuses.</p>'; }
+  if (v.k==="lord"){ var l=v.l, h2='<h4>'+(l.me?'Your capital':plName(l.name)+(l.tag?' <span class="dur" translate="no">['+esc(l.tag)+']</span>':''))+'</h4>'+
+      '<p><b translate="no">'+esc(l.cap||"")+'</b> <span class="dur">Town Hall '+l.th+' · ('+l.x+', '+l.y+')</span> '+(l.prot?'<span class="badge">Protected</span>':'')+'</p>'+
+      '<p class="dur">'+(l.wild?'In the Wilds: no shield out here.':'On '+(l.me?'your':'their')+' alliance map.')+'</p>';
+    if (l.me && l.wild && mine) h2+='<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="wd-home"'+(WDS.acting||!tn?' disabled':'')+'>'+(WDS.armed==="home"?'Tap again to go home':'Back to your alliance map')+'</button>'+tele()+'</div>';
+    return h2+'<p class="dur">To the Throne: about '+wdTrip(l.x,l.y)+' for Cavalry with no speed bonuses.</p>'; }
+  // the Wilds
+  var h3='<h4>The Wilds <span class="dur">('+v.x+', '+v.y+')</span></h4><p class="hint">'+(v.closed!=null?'Part of the outer ring, which opens once every slot of the inner ring is taken. Until then it’s Wilds. ':'')+'No shield out here. Lords without an alliance live here; NPC kingdoms and monsters come in a later update.</p>';
+  if (me.on){ var arm=WDS.armed==="tp"+v.x+","+v.y;
+    h3+='<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="wd-tp" data-x="'+v.x+'" data-y="'+v.y+'"'+(WDS.acting||!tn?' disabled':'')+'>'+(arm?'Tap again to move here':'Move your capital here')+'</button>'+tele()+'</div>'+(!tn?'<p class="dur">You have no City Teleports.</p>':'');
+  } else h3+='<p class="dur">Join the server map to settle here.</p>';
+  if (wdWin().z<WD_ZOOMS.length) h3+='<div class="btnrow" style="margin-top:6px"><button class="btn ghost small" data-act="wd-zoomhere">Zoom in here</button></div>';
+  return h3+trip; }
+// your own place: join, capital, protection, leave
+function wdMeHtml(){ var d=WDS.d, me=d.me, h='';
+  if (!me.on){
+    h+='<p class="hint">Put your capital on the server map: one shared world for every multiplayer player. '+(me.aid?(me.slot!=null?'You’ll sit on your alliance’s map, at your square on it.':'Your alliance gets the first open slot (it can move once, free).'):'With no alliance you start somewhere in the Wilds.')+' New lords are protected for 14 days.</p>'+
+      (me.rejoin>0?'<p class="dur">You left less than a day ago. You can come back in '+fmtT(me.rejoin-(Date.now()-d.now))+'.</p>':'<div class="btnrow"><button class="btn" data-act="wd-join"'+(WDS.acting?' disabled':'')+'>Join the server map</button></div>');
+    return h; }
+  var c=me.cap||{}, mx=maxTH(), tied=S.cities.filter(function(x){ return (x.th||1)===mx; });
+  h+='<div class="rgrid"><span>Capital <b translate="no">'+esc(c.name||"")+'</b> <span class="dur">Town Hall '+(c.th||0)+'</span></span><span>'+(me.wild?'In the Wilds':'On your alliance map')+' <span class="dur">('+me.x+', '+me.y+')</span></span></div>';
+  if (me.prot>0) h+='<p class="dur">'+wdProt(me.prot-(Date.now()-d.now))+' '+(me.protWhy==="new"?'New lords are protected for 14 days.':me.protWhy==="disband"?'Your alliance disbanded.':me.protWhy==="kicked"?'You were removed from your alliance.':'You left your alliance.')+'</p>';
+  if (tied.length>1){ var pk=c.pickIn-(Date.now()-d.now);
+    h+='<div class="farmadd"><label class="dur" for="wdcap">Capital</label><select id="wdcap"'+(pk>0?' disabled':'')+'>'+tied.map(function(x){ return '<option value="'+x.id+'"'+(x.id===c.id?' selected':'')+'>'+esc(x.name)+'</option>'; }).join("")+'</select></div>'+
+      '<p class="dur">'+(pk>0?'You can pick another capital in '+wdLong(pk)+'.':'Your capital is one of your highest Town Hall cities. Switching waits a week after the last switch.')+'</p>'; }
+  else h+='<p class="dur">Your capital is your highest Town Hall city. Only its troops and resources will be at risk here.</p>';
+  if (me.aid && me.slot==null) h+='<p class="dur">Your alliance has no slot yet.'+(me.map?' Tap an open slot to claim one.':'')+'</p>';
+  h+='<div class="btnrow" style="margin-top:6px"><button class="btn ghost small" data-act="wd-findme">Find my capital</button><button class="btn ghost small danger" data-act="wd-leave"'+(WDS.acting?' disabled':'')+'>'+(WDS.armed==="leave"?'Tap again: 24 hours before you can come back':'Leave the server map')+'</button></div>';
+  return h; }
+var WD_HOW=["Joining is its own switch (here or in Settings). Your capital, the city with the highest Town Hall, is your kingdom on the server map. Only its troops and resources will be at risk.",
+  "Each square in the ring is an alliance’s own map. Members sit on it at their square, shielded once the Shield Generator is in.",
+  "Founders and officers claim an open slot, first come, first served, and can move once a week. A second ring opens when the first is full.",
+  "Move your capital out into the Wilds, and back home, for 1 City Teleport each way. Lords without an alliance live in the Wilds.",
+  "New lords are protected for 14 days; anyone who leaves or is kicked from an alliance for 3. Leaving the server map means 24 hours before you can come back.",
+  "Capture buildings and the Throne: the Throne, War Forge and Bulwark reset on Sundays at 6 pm US Eastern, the other six one each weekday. Hold one 4 straight hours after its reset and it’s yours until the next one.",
+  "Whoever holds the Throne rules for the week: they name the server, pick a blessing for everyone and place every alliance’s slot.",
+  "Coming next: monsters and NPC kingdoms in the Wilds, Mana Orbs for the Shield Generator, scouting with heroes. Then the buildings and the Throne, allies, and attacks.",
   "Numbers and names may still change."];
-function worldSheet(){ return '<div class="head"><span class="ico">'+ICON.crest+'</span><div style="flex:1"><h2>Server map</h2><div class="sub">Preview</div></div><button class="btn ghost small" data-act="close" aria-label="Close">✕</button></div>'+worldHtml(); }
+function worldInner(){ var d=WDS.d;
+  if (!d) return '<p class="'+(WDS.err?'why':'dur')+'">'+esc(WDS.err||"Loading the server map…")+'</p>';
+  var z=wdWin().z, legend=[["#f3dc9a","#1f2421","Your capital"],["#6b5a2a","#d7b058","Your alliance"],["#313834","#8d928a","Alliance"],["#c9cdc0","#1f2421","Lord"],["#e08a3c","#1f2421","Lord in the Wilds"],["#3a423d","#b4b9aa","Capture building"]];
+  return wdMeHtml()+
+    '<div class="btnrow wdzoom" style="margin:8px 0 6px"><button class="btn ghost small" data-act="wd-zoom" data-v="-1"'+(z<=1?' disabled':'')+' aria-label="Zoom out">−</button><button class="btn ghost small" data-act="wd-zoom" data-v="1"'+(z>=WD_ZOOMS[WD_ZOOMS.length-1]?' disabled':'')+' aria-label="Zoom in">+</button>'+
+    (z>1?['←:-1:0','↑:0:-1','↓:0:1','→:1:0'].map(function(p){ var q=p.split(":"); return '<button class="btn ghost small" data-act="wd-pan" data-x="'+q[1]+'" data-y="'+q[2]+'">'+q[0]+'</button>'; }).join(""):'')+'<span class="dur" style="align-self:center">'+(z>1?'×'+z:'Whole world')+'</span></div>'+
+    '<div class="wdbox">'+wdSvg()+'</div>'+
+    '<div class="wdleg">'+legend.map(function(l){ return '<span><i style="background:'+l[0]+';border-color:'+l[1]+'"></i>'+l[2]+'</span>'; }).join("")+'<span><i style="background:transparent;border-color:#7fb0e0"></i>Protected</span><span><i class="wdopen"></i>Open slot</span></div>'+
+    '<div class="wdinfo" id="wdinfo">'+wdInfo()+'</div>'+
+    (WDS.err?'<p class="why">'+esc(WDS.err)+'</p>':'')+
+    '<details class="det" data-det="wdhow"'+(DET.wdhow?' open':'')+' style="margin-top:8px"><summary><b>How it works</b></summary><ul class="wdhow">'+WD_HOW.map(function(t){ return '<li>'+t+'</li>'; }).join("")+'</ul></details>'; }
+function worldHtml(){ if (!alOn()) return '<div class="section"><h3>Server map</h3><p class="hint">The server map is played with other people, so it needs a cloud save (Settings).</p></div>';
+  if (!WDS.d && !WDS.busy) wdFetch();
+  return '<div class="section"><div class="shead"><h3>Server map</h3>'+(WDS.d&&WDS.d.me.on?'<span class="badge">You’re on it</span>':'')+'</div><div id="wdwrap">'+worldInner()+'</div></div>'; }
+function worldSheet(){ return '<div class="head"><span class="ico">'+ICON.crest+'</span><div style="flex:1"><h2>Server map</h2><div class="sub">One world for every multiplayer player</div></div><button class="btn ghost small" data-act="close" aria-label="Close">✕</button></div>'+worldHtml(); }
+function wdAfter(d, ok){ WDS.acting=false; WDS.armed=""; if (d.error){ toast(d.error); wdPaint(); return; } if (ok) toast(ok); WDS.at=0; wdFetch(); }
+function wdJoin(){ if (WDS.acting) return; if (!cbOn()){ toast("Sign in to your cloud save first"); return; } WDS.acting=true; wdPaint();
+  var b=wdCapBody(); b.lid=lbOn()?S.lb.id:undefined; b.lt=lbOn()?S.lb.token:undefined;
+  alPost("/wd/join", b).then(function(d){ if (!d.error){ mpGo("world"); S.wdOn=true; S.wdCap=b.cap.id; save(); WDS.z=0; } wdAfter(d, d.error?"":"Your capital is on the server map"); })
+    .catch(function(){ WDS.acting=false; toast("Couldn’t reach the server. Check your connection."); wdPaint(); }); }
+function wdLeave(quiet){ if (WDS.acting) return; WDS.acting=true; wdPaint();
+  alPost("/wd/leave", {}).then(function(d){ if (!d.error){ S.wdOn=false; save(); } wdAfter(d, quiet?"Your capital left the server map":"You left the server map. You can come back in 24 hours."); lastSheet=""; if (sheetFor && sheetFor.kind==="settings") renderSheet(); })
+    .catch(function(){ WDS.acting=false; toast("Couldn’t reach the server. Check your connection."); wdPaint(); }); }
+function wdTeleport(body, msg){ if (WDS.acting) return; if (!(wdTele()>0)){ toast("You need a City Teleport"); return; } WDS.acting=true; wdPaint();
+  alPost("/wd/tp", body).then(function(d){ if (!d.error && d.used){ S.items.teleport=Math.max(0,wdTele()-d.used); save(); WDS.sel=null; } wdAfter(d, d.error?"":msg); })
+    .catch(function(){ WDS.acting=false; toast("Couldn’t reach the server. Check your connection."); wdPaint(); }); }
+// the tap handler's part (called from the click listener; true = handled)
+function wdAct(act, a, e){
+  if (act==="wd-open"){ WDS.sel=null; openSheet({kind:"world"}); if (!WDS.busy) wdFetch(); return true; }
+  if (act==="wd-tap"){ wdTapAt(e); return true; }
+  if (act==="wd-zoom"){ var zi=Math.max(1, Math.min(WD_ZOOMS.length, (WDS.z||1)+(+a.dataset.v))); if (zi>(WDS.z||1) && WDS.sel && WDS.sel.x!=null){ WDS.cx=WDS.sel.x; WDS.cy=WDS.sel.y; } WDS.z=zi; wdPaint(); return true; }
+  if (act==="wd-pan"){ var V=wdWin(), st=V.w/3; WDS.cx=Math.max(0,Math.min(V.N-1, Math.round(V.x+V.w/2+(+a.dataset.x)*st))); WDS.cy=Math.max(0,Math.min(V.N-1, Math.round(V.y+V.w/2+(+a.dataset.y)*st))); wdPaint(); return true; }
+  if (act==="wd-zoomhere"){ var sv=WDS.sel; if (sv && sv.x!=null){ WDS.cx=sv.x; WDS.cy=sv.y; WDS.z=WD_ZOOMS.length; } wdPaint(); return true; }
+  if (act==="wd-findme"){ var me=WDS.d&&WDS.d.me; if (me && me.x!=null){ WDS.cx=me.x; WDS.cy=me.y; WDS.z=3; var L=WDS.d.lords.filter(function(l){ return l.me; })[0]; WDS.sel=L?{k:"lord",x:L.x,y:L.y,l:L}:null; } wdPaint(); return true; }
+  if (act==="wd-join"){ wdJoin(); return true; }
+  if (act==="wd-leave"){ if (WDS.armed!=="leave"){ WDS.armed="leave"; wdPaint(); return true; } WDS.armed=""; wdLeave(false); return true; }
+  if (act==="wd-claim"){ var si=+a.dataset.v; if (WDS.armed!=="slot"+si){ WDS.armed="slot"+si; wdPaint(); return true; } if (WDS.acting) return true; WDS.acting=true; wdPaint();
+    alPost("/wd/claim",{slot:si}).then(function(d){ wdAfter(d, d.error?"":"Your alliance is on its new slot"); }).catch(function(){ WDS.acting=false; toast("Couldn’t reach the server. Check your connection."); wdPaint(); }); return true; }
+  if (act==="wd-tp"){ var tk="tp"+a.dataset.x+","+a.dataset.y; if (WDS.armed!==tk){ WDS.armed=tk; wdPaint(); return true; } wdTeleport({x:+a.dataset.x, y:+a.dataset.y}, "Your capital moved to ("+a.dataset.x+", "+a.dataset.y+")"); return true; }
+  if (act==="wd-home"){ if (WDS.armed!=="home"){ WDS.armed="home"; wdPaint(); return true; } wdTeleport({home:1}, "Your capital is back on your alliance map"); return true; }
+  if (act==="wd-set"){ if (a.dataset.v==="on"){ if (S.wdOn) return true; if (!S.mp){ mpPending=null; openSheet({kind:"mpwarn", act:"wd-join"}); return true; } wdJoin(); toast("Joining the server map…"); return true; }
+    if (S.wdOn) openSheet({kind:"wdleave"}); return true; }
+  if (act==="wd-leave-ok"){ closeSheet(); wdLeave(false); return true; }
+  return false; }
+function wdLeaveSheet(){ return '<div class="head"><span class="ico">'+ICON.crest+'</span><div><h2>Leave the server map?</h2><div class="sub">Your capital comes off the shared world.</div></div></div>'+
+  '<p>You can come back after <b>24 hours</b>. Your alliance and everything in your game stay as they are.</p>'+
+  '<div class="upbtns" style="grid-template-columns:1fr 1fr"><button class="btn danger" data-act="wd-leave-ok">Leave</button><button class="btn ghost" data-act="close">Stay</button></div>'; }
+document.addEventListener("change", function(e){ var t=e.target; if (!t || t.id!=="wdcap" || WDS.acting) return; var c=S.cities.filter(function(x){ return x.id===+t.value; })[0]; if (!c) return; WDS.acting=true;
+  alPost("/wd/cap",{cap:{id:c.id, name:c.name, th:c.th||1}, have:S.cities.map(function(x){ return x.id; }), pick:1}).then(function(d){ if (!d.error){ S.wdCap=c.id; save(); } wdAfter(d, d.error?"":c.name+" is your capital"); })
+    .catch(function(){ WDS.acting=false; toast("Couldn’t reach the server. Check your connection."); wdPaint(); }); });
 function alMapHtml(al){
   var M=al.map; if (!M) return '<div class="section"><p class="hint">Loading the map\u2026</p></div>';
   var me=alMyTile(M), sel=ALS.sel, mv=ALS.moving, rk={}; al.members.forEach(function(m){ rk[m.name]=m; }); alGrassCss();
@@ -7017,7 +7125,8 @@ function alOlder(){ // load the 60 messages before the oldest one shown
 }
 function alSend(id){ var i=document.getElementById(id||"alchatin"); if (!i) return; var t=i.value.trim(); if (!t) return; i.value=""; alPost("/al/chat",{text:t}).then(function(d){ if (d.error){ toast(d.error); i.value=t; } else { ALS.last=0; alSync(); } }).catch(function(){ toast("Couldn\u2019t reach the server"); i.value=t; }); }
 /* ---------- cloud backup: name + password, kept on the high-scores Worker ---------- */
-var CB={busy:false, msg:"", found:null, conflict:null}, CB_EVERY=HOUR; // the cloud copy is refreshed every hour while you play
+var CB={busy:false, msg:"", found:null, conflict:null}, CB_EVERY=HOUR; // 0.2.18: see cbEvery (CB_EVERY is still the stats and retry hour)
+function cbEvery(){ return saveErr ? 2*60000 : 10*60000; } // 0.2.18: the cloud copy every 10 minutes while you play; every 2 when this device can't save
 // this device's id (kept outside the save, which travels between devices), so the server can say which device saved last
 function cbDev(){ try { var d=localStorage.getItem("ibory-device"); if (!d){ d=lbHex(8); localStorage.setItem("ibory-device", d); } return d; } catch(e){ return CB.devMem||(CB.devMem=lbHex(8)); } }
 var CB_UNDO="ibory-pre-sync"; // this device's game as it was just before a newer one was loaded over it
@@ -7155,21 +7264,21 @@ function cbSignIn(name, pass){
 }
 function cbSave(auto, opt){
   opt=opt||{}; if (!cbOn() || CB.busy) return; CB.busy=true; if (!auto) cbUi("Backing up\u2026", true);
-  var cloud=S.cloud;
+  var cloud=S.cloud, withStats=!auto || Date.now()-(cloud.statsAt||0)>=55*60000; // 0.2.18: the cheat checks compare hourly snapshots, so stats ride along about once an hour
   cbPack(JSON.stringify(S)).then(function(pk){
     var hd={"Content-Type":"text/plain", "X-Name":encodeURIComponent(cloud.name), "X-Token":cloud.token, "X-Ver":APP_VERSION, "X-Enc":pk.enc, "X-Base":String(cloud.rev||0), "X-Dev":cbDev()};
     if (opt.force) hd["X-Force"]="1";
-    try { hd["X-Stats"]=encodeURIComponent(JSON.stringify(cbStats())); } catch(e){}
+    if (withStats) try { hd["X-Stats"]=encodeURIComponent(JSON.stringify(cbStats())); } catch(e){}
     return fetch(LB_URL+"/backup/save",{method:"POST", cache:"no-store", keepalive:!!opt.leaving && pk.body.length<60000, headers:hd, body:pk.body});
   }).then(function(r){ return r.json().then(function(d){ return {st:r.status, d:d}; }); }).then(function(o){
     CB.busy=false;
-    if (o.d && o.d.ok){ S.cloud.last=o.d.info.latest.at; S.cloud.rev=o.d.info.rev||0; S.cloud.info=o.d.info; if (o.d.info.display) S.cloud.display=o.d.info.display; nameOneNote(); setTimeout(nameOneMaybe, 1500); CB.found=null; CB.conflict=null; save(); if (!auto){ toast("Backed up to the cloud"); cbUi("Backed up.", true); } else cbUi(""); return; }
+    if (o.d && o.d.ok){ if (withStats) S.cloud.statsAt=Date.now(); S.cloud.last=o.d.info.latest.at; S.cloud.rev=o.d.info.rev||0; S.cloud.info=o.d.info; if (o.d.info.display) S.cloud.display=o.d.info.display; nameOneNote(); setTimeout(nameOneMaybe, 1500); CB.found=null; CB.conflict=null; save(); if (!auto){ toast("Backed up to the cloud"); cbUi("Backed up.", true); } else cbUi(""); return; }
     if (o.st===409 && o.d && o.d.conflict && o.d.info && o.d.info.dev && o.d.info.dev===cbDev() && !opt.again){ // 0.1.170: the newer save is this device's own (it saved while being put away and never heard back): catch up and save again
       S.cloud.rev=o.d.info.rev||0; save(); setTimeout(function(){ cbSave(auto, {force:true, again:true}); }, 300); return; }
     if (o.st===409 && o.d && o.d.conflict){ // another device saved since: don't overwrite it, ask which game to keep
       CB.conflict=o.d.info; cbUi(""); if (!sheetFor || onPage("settings")) openSheet({kind:"cbconflict"}); return; }
     if (o.st===403){ S.cloud.token=null; save(); toast("Signed out of your cloud save (from another device?). Sign in again in Settings."); }
-    if (o.st===429 && auto) S.cloud.last=Date.now()-CB_EVERY+HOUR; // try again in an hour
+    if (o.st===429 && auto) S.cloud.last=Date.now()-cbEvery()+HOUR; // try again in an hour
     if (!auto) cbUi((o.d&&o.d.error)||"Backup failed"); else cbUi("Last automatic backup failed: "+((o.d&&o.d.error)||"no connection"));
   }).catch(function(){ CB.busy=false; if (S.cloud) S.cloud.lastTry=Date.now(); if (!auto) cbUi("Couldn\u2019t reach the backup server. Check your connection."); });
 }
@@ -7212,10 +7321,11 @@ function bkRows(){
     return '<div class="bq"><span><b>'+lab+'</b> <span class="dur">'+cbWhen(m.at)+'</span></span><span class="dur" style="grid-column:1/-1">'+m.cities+' cit'+(m.cities===1?'y':'ies')+', prestige '+fmt(m.prestige)+', version '+esc(m.ver||"?")+'</span><div class="mbtns"><button class="link strong" data-act="bk-restore" data-v="'+e.k+'">'+(armed==="bkr-"+e.k?"Tap again to restore":"Restore this copy")+'</button></div></div>'; }).join("");
 }
 function recoverSheet(){
-  var why=loadFail&&loadFail.why, h='<div class="head"><span class="ico">'+ICON.crest+'</span><div style="flex:1"><h2>'+(saveLocked?'Your saved game couldn\u2019t be opened':'A saved game is waiting')+'</h2><div class="sub">'+(saveLocked?(why==="newer"?'It was saved by a newer version of Ibory than this one. Close the app and reopen it with an internet connection to update it.':'Something in it didn\u2019t load, so Ibory has left it untouched.'):'This device has safety copies of a game, but no current one.')+'</div></div></div>';
+  var why=loadFail&&loadFail.why, h='<div class="head"><span class="ico">'+ICON.crest+'</span><div style="flex:1"><h2>'+(saveLocked?'Your saved game couldn\u2019t be opened':'A saved game is waiting')+'</h2><div class="sub">'+(saveLocked?(why==="idb"?'Your newest game is in this device\u2019s game database, and it didn\u2019t open this time. Nothing has been changed. Close Ibory fully and open it again.':why==="newer"?'It was saved by a newer version of Ibory than this one. Close the app and reopen it with an internet connection to update it.':'Something in it didn\u2019t load, so Ibory has left it untouched.'):'This device has safety copies of a game, but no current one.')+'</div></div></div>';
   if (saveLocked) h+='<p class="hint">Nothing is being saved until you choose. The original is kept safe on this device either way.</p>';
   h+=bkRows();
   if (saveLocked){
+    if (why==="idb") h+='<div class="btnrow" style="margin-top:8px"><button class="btn" data-act="idb-reload">Try again</button></div>';
     h+='<div class="btnrow" style="margin-top:8px"><button class="btn ghost small" data-act="bk-rescue-copy">Copy the unopened save</button><button class="btn ghost small danger" data-act="bk-fresh">'+(armed==="bkfresh"?"Tap again: start a new city":"Start a new city instead")+'</button></div>';
   } else h+='<button class="closebtn" data-act="close">Not now</button>';
   return h;
@@ -7276,7 +7386,7 @@ function allCitiesSheet(){
 }
 function cbAskSheet(){
   return '<div class="head"><span class="ico">'+ICON.crest+'</span><div style="flex:1"><h2>Keep your game safe</h2><div class="sub">Turn on cloud saves</div></div></div>'+
-    '<p class="hint">Right now your whole game lives on this device. Lose the phone, clear the browser or reinstall the computer, and it\u2019s gone. A cloud save keeps it online: it saves every hour while you play, and you can pick it up on any device with a name and a password.</p>'+
+    '<p class="hint">Right now your whole game lives on this device. Lose the phone, clear the browser or reinstall the computer, and it\u2019s gone. A cloud save keeps it online: it saves every 10 minutes while you play, and you can pick it up on any device with a name and a password.</p>'+
     '<div class="btnrow"><button class="btn" data-act="cb-ask-yes">Set up a cloud save</button><button class="btn ghost" data-act="cb-ask-later">Not now</button></div>';
 }
 function cbWhen(t){ return t?new Date(t).toLocaleString(undefined,{weekday:"short", month:"short", day:"numeric", hour:"numeric", minute:"2-digit"}):"never"; }
@@ -7295,7 +7405,7 @@ function cbSection(){
         '<div class="btnrow"><button class="btn small" data-act="cb-restore" data-v="latest">'+(armed==="cbr-latest"?'Tap again to replace this game':'Restore that backup')+'</button><button class="btn ghost small" data-act="cb-force">'+(armed==="cbforce"?'Tap again to overwrite it':'Back up this game over it')+'</button></div>';
     } else {
       var un=cbUndoInfo();
-      h+='<p class="hint">Signed in as <b>'+esc(S.cloud.name)+'</b>'+(myName().toLowerCase()!==String(S.cloud.name).toLowerCase()?' (your name in the game is <b>'+esc(myName())+'</b>; change it under Your name below)':'')+'. Saving to the cloud every hour while the game is open, and when you switch away. Open the game on another device signed in with the same name and it picks up your newest save. Latest save: <b>'+cbWhen(inf.latest&&inf.latest.at)+'</b>'+(inf.older?'. Older copy: '+cbWhen(inf.older.at):'')+'.</p>'+
+      h+='<p class="hint">Signed in as <b>'+esc(S.cloud.name)+'</b>'+(myName().toLowerCase()!==String(S.cloud.name).toLowerCase()?' (your name in the game is <b>'+esc(myName())+'</b>; change it under Your name below)':'')+'. Saving to the cloud every 10 minutes while the game is open, and when you switch away. Open the game on another device signed in with the same name and it picks up your newest save. Latest save: <b>'+cbWhen(inf.latest&&inf.latest.at)+'</b>'+(inf.older?'. Older copy: '+cbWhen(inf.older.at):'')+'.</p>'+
         (CB.conflict?'<p class="why">Another device saved at '+cbWhen(CB.conflict.latest&&CB.conflict.latest.at)+' while this one was playing.</p><div class="btnrow"><button class="btn small" data-act="cb-pull">Load the other device\u2019s game</button><button class="btn ghost small" data-act="cb-force">'+(armed==="cbforce"?'Tap again to overwrite it':'Keep this device\u2019s game')+'</button></div>':'')+
         (un?'<p class="dur" style="margin:4px 0">A newer game was loaded over this device\u2019s game on '+cbWhen(un.at)+'.</p><div class="btnrow"><button class="btn ghost small" data-act="cb-undo">'+(armed==="cbundo"?'Tap again to bring it back':'Undo: bring back that game')+'</button></div>':'')+
         '<div class="btnrow"><button class="btn small" data-act="cb-save"'+(CB.busy?' disabled':'')+'>Back up now</button>'+
@@ -8172,8 +8282,16 @@ function bkSnapshot(why, force){
 function bkList(){ var out=[]; [BK_BEST].concat(BK_RING,BK_PRE).forEach(function(k){ var m=bkMeta(k); try { if (m && localStorage.getItem(k)) out.push({k:k,m:m}); } catch(e){} }); out.sort(function(a,b){ return b.m.at-a.m.at; }); return out; }
 var S;
 var loadRaw=null;
-try { loadRaw = localStorage.getItem(SAVE_KEY); if (loadRaw){ var p = JSON.parse(loadRaw); if (p && p.v>=1 && p.v<=SAVE_V) S = migrate(p); else loadFail={why:(p&&p.v>SAVE_V)?"newer":"bad"}; } } catch(e){ loadFail={why:"error", err:String(e&&e.message||e)}; }
-if (loadFail){ try { localStorage.setItem(BK_RESCUE, loadRaw); } catch(e){} saveLocked=true; } // a save that won't open is never written over
+// 0.2.18: two local copies, the game database (IndexedDB, IDB below) and localStorage. Each save stamps both (ibory-idbat / ibory-lsat in
+// localStorage); the newer one opens. A localStorage save with no stamp was written by an older version (or another tab of one), so it wins.
+var IDBL=window.__IBORY_IDB||{state:"none"}, loadFrom="ls";
+try { loadRaw = localStorage.getItem(SAVE_KEY); } catch(e){ loadRaw=null; }
+(function(){ var lsAt=0, idbAt=0; try { lsAt=+localStorage.getItem("ibory-lsat")||0; idbAt=+localStorage.getItem("ibory-idbat")||0; } catch(e){}
+  if (IDBL.state==="ok" && IDBL.json && (!loadRaw || (lsAt && IDBL.at>lsAt))){ loadRaw=IDBL.json; loadFrom="idb"; }
+  else if (IDBL.state!=="ok" && idbAt && (!loadRaw || (lsAt && idbAt>lsAt))) loadFail={why:"idb"}; // the newest copy is in a database that didn't open: touch nothing
+})();
+try { if (loadRaw && !loadFail){ var p = JSON.parse(loadRaw); if (p && p.v>=1 && p.v<=SAVE_V) S = migrate(p); else loadFail={why:(p&&p.v>SAVE_V)?"newer":"bad"}; } } catch(e){ loadFail={why:"error", err:String(e&&e.message||e)}; }
+if (loadFail){ try { if (loadRaw) localStorage.setItem(BK_RESCUE, loadRaw); } catch(e){} saveLocked=true; } // a save that won't open is never written over
 else if (!loadRaw){ var bkb=bkMeta(BK_BEST); if (bkb && bkb.score>=1000) recoverOffer=true; }
 if (!S) S = newState();
 S.speed=1; // real time
@@ -8181,6 +8299,9 @@ S.speed=1; // real time
 // run by the normal catch-up below. Marked in the save and on the device, so restoring an older copy or a cloud save can't take it twice.
 var COMP_0214=false;
 try { if (loadRaw && !loadFail && S && !S.comp0214 && !localStorage.getItem("ibory-comp-0214")){ S.comp0214=1; S.real-=8*HOUR; COMP_0214=true; localStorage.setItem("ibory-comp-0214","1"); } } catch(e){}
+// 0.2.18: another 8 hours, once, for the saving trouble that lasted past 0.2.14 (iPhones); the same marks, so it's taken once per game and device
+var COMP_0218=false;
+try { if (loadRaw && !loadFail && S && !S.comp0218 && !localStorage.getItem("ibory-comp-0218")){ S.comp0218=1; S.real-=8*HOUR; COMP_0218=true; localStorage.setItem("ibory-comp-0218","1"); } } catch(e){}
 installProxies(S);
 if (S.bf && S.bf.active) S.bf.last=Date.now(); // time with the app closed never counts
 S.cities.forEach(function(cc,ci){ withCity(ci,function(){
@@ -8199,11 +8320,13 @@ var storOk=true, storPersisted=null; // does this browser actually keep the save
 try { localStorage.setItem("ibory-probe","1"); storOk = localStorage.getItem("ibory-probe")==="1"; localStorage.removeItem("ibory-probe"); } catch(e){ storOk=false; }
 try { if (navigator.storage && navigator.storage.persist){ navigator.storage.persist().then(function(g){ storPersisted=!!g; var el=document.getElementById("storstat"); if (el) el.textContent=storageStatus(); }).catch(function(){}); } } catch(e){}
 function storageStatus(){
-  if (saveErr) return "Saving: the last save FAILED ("+saveErr+"): storage is full or blocked. Free some space, or export a save code now.";
+  if (saveErr) return cbOn() ? "Saving: this device can’t hold your game right now ("+saveErr+"), so it’s saved to the cloud every 2 minutes instead." : "Saving: the last save FAILED ("+saveErr+"): storage is full or blocked. Set up a cloud save in Settings so nothing is lost, or export a save code now.";
+  if (!IDB.bad && (IDB.ok || IDB.db)) return (storPersisted===true?"Saving: kept in this device’s game database, which the browser won’t clear on its own ✓":"Saving: kept in this device’s game database ✓")+" "+(cbOn()?"And in the cloud every 10 minutes.":"Set up a cloud save as a backup.");
   if (!storOk) return "Saving: this browser is NOT keeping your save (private browsing?). Set up a cloud save so you don\u2019t lose your progress.";
   if (storPersisted===true) return "Saving: this browser keeps your save and won\u2019t clear it on its own \u2713";
   return "Saving: kept on this phone. Some browsers clear it when you close them or run low on space, so set up a cloud save as a backup.";
 }
+function storageDb(){ return IDB.size&&!IDB.bad ? '<span>Game database: your game '+stMB(IDB.size*2)+'.</span> ' : ''; } // 0.2.18: shown before storageUse() in Settings
 function storageUse(){ var o=stBreak(); return "Space used on this device: your game "+stMB(o.game)+", safety copies "+stMB(o.copies)+", hero pictures "+stMB(o.pics)+", other "+stMB(o.other)+"."; }
 function offlineStatus(){
   if (!("serviceWorker" in navigator) || !/^https:/.test(location.protocol) || /claude\.ai|claudeusercontent/.test(location.hostname)) return "Offline play: available in the installed app.";
@@ -8232,13 +8355,31 @@ var stCap=0; try { stCap=+localStorage.getItem("ibory-stcap")||0; } catch(e){} /
 function stUsed(){ var n=0; try { for (var i=0;i<localStorage.length;i++){ var k=localStorage.key(i), v=localStorage.getItem(k); n+=k.length+(v?v.length:0); } } catch(e){} return n; }
 function stFreeOne(){ var order=[CB_UNDO].concat(BK_PRE, BK_RING.slice().sort(function(a,b){ var x=bkMeta(a), y=bkMeta(b); return (x?x.at:0)-(y?y.at:0); }), [BK_BEST]);
   for (var i=0;i<order.length;i++){ try { if (localStorage.getItem(order[i])!=null || localStorage.getItem(order[i]+"-m")!=null){ localStorage.removeItem(order[i]); localStorage.removeItem(order[i]+"-m"); return true; } } catch(e){} } return false; }
-function save(){ if (saveLocked) return; var json;
-  try { json=JSON.stringify(S); localStorage.setItem(SAVE_KEY, json); }
-  catch(e){ if (!json){ saveErrShow(e); return; } var cap=stUsed()+json.length; if (!stCap || cap<stCap) stCap=cap; var done=false;
+/* 0.2.18: the game database. Every save goes to IndexedDB (one write at a time; a newer save waiting replaces an older one) and to
+   localStorage while it fits. Once localStorage is full the database is the game's home: the small store's copy is removed (no trimming,
+   no error) and the safety copies get its room. Only if the database fails too does the 0.2.14/0.2.16 path (free copies, trim reports) run. */
+var IDB={db:IDBL.db||null, bad:IDBL.state!=="ok", ok:false, busy:false, pend:null, lsOff:false, size:IDBL.json?IDBL.json.length:0, at:IDBL.at||0, err:""};
+function idbFlush(){ if (IDB.busy || !IDB.pend || IDB.bad || !IDB.db) return; var p=IDB.pend; IDB.pend=null; IDB.busy=true;
+  var fail=function(e){ IDB.busy=false; IDB.err=String(e&&(e.name||e.message)||e||"error");
+    // iPhones drop the connection after a while in the background: open it again once and retry the same save before giving up
+    if (!IDB.retried){ IDB.retried=true; try { IDB.db.close(); } catch(x){} try { var rq=indexedDB.open("ibory",1); rq.onsuccess=function(){ IDB.db=rq.result; if (!IDB.pend) IDB.pend=p; idbFlush(); };
+      rq.onerror=rq.onblocked=function(){ fail(rq.error||"reopen"); }; return; } catch(x){} }
+    IDB.bad=true; IDB.ok=false; if (IDB.lsOff){ IDB.lsOff=false; save(); } }; // back to localStorage (and its fallbacks)
+  try { var tx=IDB.db.transaction("kv","readwrite"); tx.objectStore("kv").put({json:p.json, at:p.at, v:APP_VERSION}, "save");
+    tx.oncomplete=function(){ IDB.busy=false; IDB.ok=true; IDB.retried=false; IDB.size=p.json.length; IDB.at=p.at; try { localStorage.setItem("ibory-idbat", String(p.at)); } catch(e){} idbFlush(); };
+    tx.onerror=function(){ fail(tx.error); }; tx.onabort=function(){ fail(tx.error||"aborted"); };
+  } catch(e){ fail(e); } }
+function idbSave(json, at){ if (IDB.bad || !IDB.db) return false; IDB.pend={json:json, at:at}; idbFlush(); return true; }
+function save(){ if (saveLocked) return; var json, at=Date.now();
+  try { json=JSON.stringify(S); } catch(e){ saveErrShow(e); return; }
+  var inDb=idbSave(json, at);
+  try { if (IDB.lsOff) throw new Error("off"); localStorage.setItem(SAVE_KEY, json); try { localStorage.setItem("ibory-lsat", String(at)); } catch(e){} }
+  catch(e){ if (inDb){ if (!IDB.lsOff){ IDB.lsOff=true; try { localStorage.removeItem(SAVE_KEY); localStorage.removeItem("ibory-lsat"); } catch(x){} } }
+  else { var cap=stUsed()+json.length; if (!stCap || cap<stCap) stCap=cap; var done=false;
     while (!done && stFreeOne()){ try { localStorage.setItem(SAVE_KEY, json); done=true; } catch(e2){} }
     // 0.2.16: still too big (iPhones hold about half what other browsers do): trim old reports, a step at a time, until it fits
     for (var ts=0; !done && ts<4; ts++) if (stTrim(ts)){ try { json=JSON.stringify(S); localStorage.setItem(SAVE_KEY, json); done=true; if (!save.trimSaid){ save.trimSaid=1; setTimeout(function(){ try { toast("Storage on this device was full, so older reports were trimmed to keep your game saving."); } catch(x){} }, 50); } } catch(e3){} }
-    if (!done){ saveErrShow(e); return; } }
+    if (!done){ saveErrShow(e); return; } } }
   S_DIRTY=false; saveAt=Date.now(); if (saveErr){ saveErr=""; } if (stCap && save.capKept!==stCap){ try { localStorage.setItem("ibory-stcap", String(stCap)); save.capKept=stCap; } catch(e){} } }
 function stTrim(step){ var b, n=0;
   if (step===0){ S.reports.forEach(function(r,i){ if (i>=30 && !r.fav && r.ww){ delete r.ww; n++; } }); return n>0; } // War Wizard replays on all but the newest 30
@@ -8252,7 +8393,7 @@ function stBreak(){ var o={game:0, copies:0, pics:0, other:0}, cp={}; [CB_UNDO,B
     if (k===SAVE_KEY) o.game+=n; else if (cp[k]) o.copies+=n; else if (k.indexOf("ibory-himg:")===0) o.pics+=n; else o.other+=n; } } catch(e){}
   return o; }
 function stMB(n){ return (n/1048576).toFixed(n<1048576?2:1)+" MB"; }
-function saveErrShow(e){ var first=!saveErr; saveErr=String(e&&e.name||e); if (first || Date.now()-(saveErrShow.at||0)>10*60000){ saveErrShow.at=Date.now(); try { toast("Couldn\u2019t save the game: this browser\u2019s storage is full or blocked. Save to the cloud or export a save code in Settings."); } catch(x){} } }
+function saveErrShow(e){ var first=!saveErr; saveErr=String(e&&e.name||e); if (first || Date.now()-(saveErrShow.at||0)>10*60000){ saveErrShow.at=Date.now(); try { toast(cbOn()?"This device can\u2019t hold your game right now, so it\u2019s saving to the cloud every 2 minutes instead.":"Couldn\u2019t save the game: this browser\u2019s storage is full or blocked. Set up a cloud save in Settings, or export a save code."); } catch(x){} } if (cbOn()) setTimeout(cbAuto, 1000); }
 function saveIfDirty(){ if (S_DIRTY || Date.now()-saveAt>60000) save(); }
 
 function getSlot(w,i){ return w==="wall" ? {type:"walls",level:S.wall||0} : w==="th" ? {type:"townhall",level:S.th} : (w==="in" ? S.inside[i] : S.fields[i]); }
@@ -8408,11 +8549,17 @@ function evSkipBroken(ev, err, target){
   } catch(e2){}
 }
 var CATCHUP_POLL_MS=5*60000; // 0.1.243: how often a long catch-up runs the queues (game time)
+// 0.2.18: what the live tick does around the clock, done at its own time inside a catch-up instead of once at the end: wounded troops
+// expire in the Medic Camp (auto-heal gets its turn first, in the queues), wizards and vampires spawn hourly, and each daily reset
+// (valley and flat levels, the alliance's day) happens when its midnight passes. A few days away now gets every reset, in order.
+function dayTurn(){ if (!TILES || gameDay()===S.map.day) return false; applyDailyLevels(false); if (S.alliance) allianceDaily();
+  note("day","A new day dawns: unheld valleys and flats have gained a level (except ones you attacked in the last 5 hours), and historic garrisons have changed."); return true; }
+function catchupPoll(){ woundExpire(); dayTurn(); try { wizSpawn(); } catch(e){} try { vampSpawn(); } catch(e){} }
 function advance(now){
   var dtG = Math.max(0,(now - S.real))*S.speed; S.real = now;
   if (dtG>0) for (var aw=0; aw<S.cities.length; aw++) if (S.cities[aw].away) invHold(S.cities[aw], dtG);
   var target = S.gt + dtG, changed=false, viewing=S.cur;
-  var evGuard=0;
+  var pollAt=S.gt+CATCHUP_POLL_MS, evGuard=0, evCap=50000+Math.ceil(dtG/HOUR)*3000; // 0.2.18: room for every event of a long absence (busy farm presets ran out of 50,000 in about a week and skipped the rest)
   while (true){
     var next = Infinity, ev=null;
     for (var ci=0; ci<S.cities.length; ci++){
@@ -8428,17 +8575,18 @@ function advance(now){
     // 0.1.243: a long catch-up (the app was closed or asleep) also stops every 5 game minutes to run the queues, the way the live
     // half-second tick does. Before, auto-train, auto-forts, the build and research queues and auto-farm only got another look when some
     // other event happened, so a Barracks that went idle waiting for people or resources stayed idle until the app was opened again.
-    var poll=S.gt+CATCHUP_POLL_MS; if (poll < next && poll <= target){ next=poll; ev={w:"poll"}; }
+    // 0.2.18: on its own clock (it used to be "5 minutes after the last event", so a catch-up busy with farm marches never polled)
+    if (pollAt <= next && pollAt <= target){ next=pollAt; ev={w:"poll"}; }
     if (next > target) break;
-    if (++evGuard > 50000){ // safety: a handler that never moves its own event forward would spin forever and freeze the page
-      try { console.warn("advance: stopped after 50000 events", ev && ev.w, ev && ev.m ? JSON.stringify({id:ev.m.id,mission:ev.m.mission,phase:ev.m.phase,tile:ev.m.tile,arr:ev.m.arr,ret:ev.m.ret,dep:ev.m.dep,gt:S.gt})
+    if (++evGuard > evCap){ // safety: a handler that never moves its own event forward would spin forever and freeze the page
+      try { console.warn("advance: stopped after "+evCap+" events", ev && ev.w, ev && ev.m ? JSON.stringify({id:ev.m.id,mission:ev.m.mission,phase:ev.m.phase,tile:ev.m.tile,arr:ev.m.arr,ret:ev.m.ret,dep:ev.m.dep,gt:S.gt})
         : ev && ev.a ? JSON.stringify(ev.a) : ""); } catch(e){}
       if (ev && ev.w==="m" && ev.m){ if (ev.m.phase==="out") ev.m.arr=target+1000; else if (ev.m.phase==="wait") ev.m.dep=target+1000; else if (ev.m.phase==="back") ev.m.ret=target+1000; } // push the stuck march past now so the game carries on
       changed=true; break; }
     accrueAll(next - S.gt); S.gt = Math.max(S.gt,next);
     var before=finished.length;
     try {
-    if (ev.w==="poll"){ evGuard--; for (var pc=0; pc<S.cities.length; pc++){ S.cur=pc; var pb0=finished.length; processQueues(); if (typeof processAuto==="function") processAuto(); tagFinished(pb0, pc, viewing); } S.cur=viewing; } // polls always move the clock 5 minutes on, so they don't count toward the runaway guard
+    if (ev.w==="poll"){ evGuard--; pollAt=S.gt+CATCHUP_POLL_MS; catchupPoll(); for (var pc=0; pc<S.cities.length; pc++){ S.cur=pc; var pb0=finished.length; processQueues(); if (typeof processAuto==="function") processAuto(); tagFinished(pb0, pc, viewing); } S.cur=viewing; } // polls always move the clock 5 minutes on, so they don't count toward the runaway guard
     else if (ev.w==="al"){ handleAlliance(ev.e); }
     else if (ev.w==="ai"){ var aci=cityIndex(ev.a.city); handleAi(ev.a); tagFinished(before, aci, viewing); }
     else if (ev.w==="m"){ var mci=cityIndex(ev.m.city); handleMarch(ev.m); S.cur=mci; processQueues(); if (typeof processAuto==="function") processAuto(); S.cur=viewing; tagFinished(before, mci, viewing); }
@@ -8459,7 +8607,7 @@ function advance(now){
   if (TILES && S.map.monsters && S.map.monsters.day!==gameDay() && gameDay()===S.map.day) ensureMonsters();
   try { wizSpawn(); } catch(e){}
   try { vampSpawn(); } catch(e){}
-  if (TILES && gameDay()!==S.map.day){ applyDailyLevels(false); if (S.alliance) allianceDaily(); note("day","A new day dawns: unheld valleys and flats have gained a level (except ones you attacked in the last 5 hours), and historic garrisons have changed."); changed=true; }
+  if (dayTurn()) changed=true;
   return changed;
 }
 
@@ -11450,6 +11598,7 @@ function mpIntroSheet(){
   return '<div class="head"><span class="ico">'+ICON.crest+'</span><div><h2>How do you want to play?</h2><div class="sub">You can change this any time in Settings.</div></div></div>'+
     '<p>Ibory is a complete <b>single-player</b> game. Every building, hero, battle and quest works without anyone else.</p>'+
     '<p><b>Multiplayer</b> adds player alliances, invasions and PvP. There is no pay to win in it, and there never will be: the only things ever sold are cosmetics like picture frames.</p>'+
+    '<p>It also has the <b>server map</b>: one shared world where your capital sits with every other player\u2019s. It has its own switch, so you only go on it when you choose (Alliance tab or Settings).</p>'+
     '<p>The high scores are split in two. Everyone starts on the <b>single-player</b> boards. Founding, applying to or joining an alliance, invasions and PvP move you to the <b>multiplayer</b> boards for good (the game warns you first). Chatting never counts.</p>'+
     '<p class="hint">Switching multiplayer off only hides it. If you have ever done something multiplayer, your high scores stay on the multiplayer boards.</p>'+
     '<label class="chk"><input type="checkbox" id="mpiwc"'+(S.wcOn===false?' checked':'')+'> With single player, hide the world chat too</label>'+
@@ -12664,9 +12813,10 @@ function renderSheetCore(){
       '<div class="sub">Ibory version <b>'+APP_VERSION+'</b></div>'+
       '<div class="btnrow"><button class="btn ghost small" data-act="force-update">Update now</button></div><div class="hint">Gets the newest version of the game and reloads. Your save is not touched.</div>'+
       '<div class="sub" id="storstat">'+storageStatus()+'</div>'+
-      '<div class="sub dur">'+storageUse()+' <span translate="no">v'+APP_VERSION+'</span></div>'+
+      '<div class="sub dur">'+storageDb()+storageUse()+' <span translate="no">v'+APP_VERSION+'</span></div>'+
       '<div><div class="h3" style="margin-bottom:6px">Multiplayer</div><div class="speeds"><button data-act="mp-set" data-v="on" aria-pressed="'+mpShown()+'">On</button><button data-act="mp-set" data-v="off" aria-pressed="'+!mpShown()+'">Off: single player</button></div>'+
-        (S.mpLocked?'<div class="hint" style="color:var(--bad,#c0392b)">This account was removed from the high scores, so it is locked to single player: no alliances, invasions, PvP or world chat.</div>':'')+'<div class="hint">Off hides alliances, invasions and PvP. Your high scores: <b>'+(S.mp?'multiplayer boards (for good)':'single-player boards')+'</b>.</div></div>'+
+        (S.mpLocked?'<div class="hint" style="color:var(--bad,#c0392b)">This account was removed from the high scores, so it is locked to single player: no alliances, invasions, PvP or world chat.</div>':'')+'<div class="hint">Off hides alliances, invasions and PvP'+(S.wdOn?', and takes your capital off the server map (24 hours before it can come back)':'')+'. Your high scores: <b>'+(S.mp?'multiplayer boards (for good)':'single-player boards')+'</b>.</div></div>'+
+      (mpShown()&&alOn()?'<div><div class="h3" style="margin-bottom:6px">Server map</div><div class="speeds"><button data-act="wd-set" data-v="on" aria-pressed="'+!!S.wdOn+'">On</button><button data-act="wd-set" data-v="off" aria-pressed="'+!S.wdOn+'">Off</button></div><div class="hint">Puts your capital (your highest Town Hall city) on the shared world with every other multiplayer player. Leaving means 24 hours before you can come back. <button class="link" data-act="wd-open">Open the server map</button></div></div>':'')+
       (alMine()?'<div><div class="h3" style="margin-bottom:6px">Watchtower alerts</div>'+wtTypeBtns()+'</div>':'')+
       '<div><div class="h3" style="margin-bottom:6px">Map tiles</div><div class="speeds"><button data-act="pix-set" data-v="on" aria-pressed="'+pixTiles()+'">Pixel art</button><button data-act="pix-set" data-v="off" aria-pressed="'+!pixTiles()+'">Plain colours</button></div><div class="hint">How valleys, flats, NPC cities, AI lords and historic cities look on your map.</div></div>'+
       '<div><div class="h3" style="margin-bottom:6px">Level numbers on the map</div><div class="speeds"><button data-act="nums-set" data-v="on" aria-pressed="'+mapNums()+'">Shown</button><button data-act="nums-set" data-v="off" aria-pressed="'+!mapNums()+'">Hidden</button></div><div class="hint">Hidden keeps the map clean for decorating; tap a tile to see its level.</div></div>'+
@@ -12765,6 +12915,8 @@ function renderSheetCore(){
     h=meSheet();
   } else if (sheetFor.kind==="mpintro"){
     h=mpIntroSheet();
+  } else if (sheetFor.kind==="wdleave"){
+    h=wdLeaveSheet();
   } else if (sheetFor.kind==="mpwarn"){
     h=mpWarnSheet(sheetFor.act);
   } else if (sheetFor.kind==="mpgrace"){
@@ -13116,8 +13268,6 @@ document.addEventListener("click",function(e){
   if (act==="open-link"){ e.preventDefault(); var lu=a.dataset.u||""; if (!/^https?:\/\//i.test(lu)) return; if (window.confirm("Open this link in your browser?\n\n"+linkHost(lu)+"\n\nOnly open links from players you trust.")) { try { window.open(lu,"_blank","noopener,noreferrer"); } catch(x){} } return; }
   if (act==="rx-sel"){ if (e.target.closest(".rxbar") || window.getSelection && String(window.getSelection())) return; var rk=a.dataset.ch+":"+a.dataset.id; RXSEL=RXSEL===rk?"":rk; rxRefresh(); return; }
   if (act==="rx-close"){ RXSEL=""; rxRefresh(); return; }
-  if (act==="wd-open"){ WDSEL=""; openSheet({kind:"world"}); return; }
-  if (act==="wd-pick"){ WDSEL=WDSEL===a.dataset.v?"":a.dataset.v; if (sheetFor && sheetFor.kind==="world"){ lastSheet=""; renderSheet(); } else { lastView=""; renderView(true); } return; }
   if (act==="map-fs"){ mapFs(!MAPFS.on); return; }
   if (act==="map-rot"){ mapRot(); return; }
   if (act==="ab-open"){ if (!cbOn()){ toast("Sign in to your cloud save first"); return; } openSheet({kind:"abuse", ch:a.dataset.ch, id:a.dataset.id, k:a.dataset.k||"", nm:a.dataset.nm||""}); return; }
@@ -13176,11 +13326,12 @@ document.addEventListener("click",function(e){
   if (act==="rx-tog"){ var rch=a.dataset.ch, rid=a.dataset.id, re2=a.dataset.e, mineR=(RX[rch][rid]||[]).some(function(r){ return r[0]===re2 && r[2]; }); if (a.classList.contains("rxq")) RXSEL=""; rxSend(rch, rid, re2, !mineR); return; }
   if (act==="rx-any"){ var rin=document.getElementById("rxin"), one=rxOne(rin&&rin.value); if (!one){ toast("Type one emoji (switch to your emoji keyboard)"); return; } if (rin) rin.blur(); RXSEL=""; rxSend(a.dataset.ch, a.dataset.id, one, true); return; }
   if (MP_ACTS[act] && !S.mp){ mpPending=a; openSheet({kind:"mpwarn", act:act}); return; } // multiplayer actions move you to the multiplayer high scores: ask first
-  if (act==="mp-warn-ok"){ var mpa=mpPending, mpk=sheetFor&&sheetFor.act; mpPending=null; mpGo(MP_ACTS[mpk]||"chose"); closeSheet(); toast("You\u2019re on the multiplayer high scores now"); if (mpa && document.contains(mpa)) mpa.click(); return; }
+  if (act==="mp-warn-ok"){ var mpa=mpPending, mpk=sheetFor&&sheetFor.act; mpPending=null; mpGo(MP_ACTS[mpk]||"chose"); closeSheet(); toast("You\u2019re on the multiplayer high scores now"); if (mpa && document.contains(mpa)) mpa.click(); else if (mpk==="wd-join") wdJoin(); return; }
+  if (act.slice(0,3)==="wd-" && wdAct(act, a, e)) return; // 0.2.17: the server map
   if (act==="mp-intro"){ var mpwc=document.getElementById("mpiwc"); S.mpIntro=1; S.mpOn = a.dataset.v==="on"; if (!S.mpOn && mpwc) S.wcOn=!mpwc.checked; save(); closeSheet(); lastView=""; refresh(); renderDock();
     toast(S.mpOn?"Multiplayer is on. You can switch any time in Settings":"Single player it is. You can switch any time in Settings");
     if (mpNeedsGrace()) setTimeout(function(){ openSheet({kind:"mpgrace"}); },400); return; }
-  if (act==="mp-set"){ if (S.mpLocked){ toast("This account is locked to single player"); return; } S.mpOn = a.dataset.v==="on"; if (!S.mpOn) S.cities.forEach(function(c){ c.alAcad=false; c.alBld=0; }); save(); lastSheet=""; renderSheet(); lastView=""; refresh(); renderDock(); if (!S.mpOn && mpNeedsGrace()) openSheet({kind:"mpgrace"}); return; }
+  if (act==="mp-set"){ if (S.mpLocked){ toast("This account is locked to single player"); return; } S.mpOn = a.dataset.v==="on"; if (!S.mpOn && S.wdOn) wdLeave(true); /* 0.2.17: single player takes your capital off the server map */ if (!S.mpOn) S.cities.forEach(function(c){ c.alAcad=false; c.alBld=0; }); save(); lastSheet=""; renderSheet(); lastView=""; refresh(); renderDock(); if (!S.mpOn && mpNeedsGrace()) openSheet({kind:"mpgrace"}); return; }
   if (act==="wc-set"){ S.wcOn = a.dataset.v==="on"; save(); lastSheet=""; renderSheet(); renderDock(); return; }
   if (act==="mp-grace-go"){ S.mpGrace=1; mpGo("alliance"); closeSheet(); toast("You stay in your alliance, on the multiplayer high scores"); return; }
   if (act==="mp-grace-leave"){ var ga=alMine(); if (!ga){ ALS.last=0; toast("Checking your alliance\u2026 try again in a moment"); return; }
@@ -13210,6 +13361,7 @@ document.addEventListener("click",function(e){
     adoptMigrated(bns, function(){ saveLocked=false; loadFail=null; recoverOffer=false; }); toast("Safety copy restored. Welcome back, "+TITLES[S.title].name+"."); return; }
   if (act==="bk-rescue-copy"){ var rr=""; try { rr=localStorage.getItem(BK_RESCUE)||""; } catch(e){}
     try { navigator.clipboard.writeText(rr).then(function(){ toast("Copied. Send it to the developer."); },function(){ toast("This browser blocked copying."); }); } catch(e){ toast("This browser blocked copying."); } return; }
+  if (act==="idb-reload"){ location.reload(); return; }
   if (act==="bk-fresh"){ if (armed!=="bkfresh"){ armed="bkfresh"; lastSheet=""; renderSheet(); return; } armed=null; saveLocked=false; loadFail=null; save(); closeSheet(); toast("A new city begins. The unopened save is still kept on this device."); return; }
   if (advance(Date.now())) flushFinished(); markDirty();
   if (act==="tab" && a.dataset.tab==="guild"){ ALS.last=0; ALS.listAt=0; setTimeout(function(){ alTick(); },0); }
@@ -14209,7 +14361,9 @@ refresh();
 function capFixToast(){ if (!S.capFixed || !S.capFixed.length) return; var cf=S.capFixed; delete S.capFixed; save();
   toast("Conquered cities fixed: "+cf.map(function(x){ return x.name+" got "+x.n+" building"+(x.n>1?"s":"")+" at level "+x.L; }).join("; ")+"."); }
 setTimeout(capFixToast, 1500);
-if (COMP_0214){ save(); setTimeout(function compShow(){ if (sheetFor){ setTimeout(compShow, 3000); return; } openSheet({kind:"msg", title:"8 hours of make-up time", body:"Sorry about last night: a full browser storage stopped the game from saving, and progress was lost. Your game has just run 8 extra hours to make up for it, and the storage problem is fixed."}); }, 2600); }
+if (COMP_0218 && !COMP_0214){ save(); setTimeout(function compShow2(){ if (sheetFor){ setTimeout(compShow2, 3000); return; } openSheet({kind:"msg", title:"8 hours of make-up time", body:"Sorry for the saving trouble. Your game has just run 8 extra hours to make up for it: buildings, research, training and your farm presets all kept going. Saves now go to a much bigger store on your device, and to the cloud every 10 minutes if you have a cloud save."}); }, 2600); }
+if (COMP_0214 && COMP_0218){ save(); setTimeout(function compShow3(){ if (sheetFor){ setTimeout(compShow3, 3000); return; } openSheet({kind:"msg", title:"16 hours of make-up time", body:"Sorry for the saving trouble. Your game has just run 16 extra hours to make up for it: buildings, research, training and your farm presets all kept going. Saves now go to a much bigger store on your device, and to the cloud every 10 minutes if you have a cloud save."}); }, 2600); }
+else if (COMP_0214){ save(); setTimeout(function compShow(){ if (sheetFor){ setTimeout(compShow, 3000); return; } openSheet({kind:"msg", title:"8 hours of make-up time", body:"Sorry about last night: a full browser storage stopped the game from saving, and progress was lost. Your game has just run 8 extra hours to make up for it, and the storage problem is fixed."}); }, 2600); }
 setTimeout(movedMaybe, 2500);
 if (S.repSeen0==null){ S.repSeen0=S.gt; save(); } // 0.2.4: reports from before the Reports hub count as read
 // 0.2.2: heroes owed by historic cities captured before 0.1.250
@@ -14235,8 +14389,8 @@ setInterval(function(){
 },500);
 setTimeout(updateTabArrows,50);
 setTimeout(function(){ lbSync(true); },4000); setInterval(function(){ if (!document.hidden) lbSync(false); },60000); // 0.1.235: the hide handler already posts once on the way out
-// hourly cloud save; never before the opening check for a newer save has answered, and not while a conflict waits for a choice
-function cbAuto(){ if (cbOn() && !CB.busy && CB.checked && !CB.conflict && Date.now()-(S.cloud.last||0)>=CB_EVERY && !(S.cloud.lastTry && Date.now()-S.cloud.lastTry<15*60000)) cbSave(true); }
+// the cloud save (every 10 minutes, 0.2.18); never before the opening check for a newer save has answered, and not while a conflict waits for a choice
+function cbAuto(){ if (cbOn() && !CB.busy && CB.checked && !CB.conflict && Date.now()-(S.cloud.last||0)>=cbEvery() && !(S.cloud.lastTry && Date.now()-S.cloud.lastTry<15*60000)) cbSave(true); }
 setTimeout(function(){ CB.checked=false; cbCheck(); setTimeout(function(){ CB.checked=true; }, 6000); }, 1200); // on open: is there a newer game from another device?
 setTimeout(cbAuto, 8000); setInterval(function(){ if (!document.hidden) cbAuto(); }, 60000);
 // switching away saves to the cloud (so another device can pick up from here); coming back checks for a newer game
@@ -14269,6 +14423,29 @@ document.addEventListener("visibilitychange",function(){
   }
 });
 window.addEventListener("pagehide",function(){ advance(Date.now()); save(); });
+})();
+</script>
+<script id="ibory-boot">
+/* 0.2.18: the game lives in IndexedDB (the browser's database storage: hundreds of MB, where localStorage holds about 5 MB, or half that on
+   iPhones). It can only be read asynchronously, so the game script above waits as text: this reads the saved game first, leaves it in
+   window.__IBORY_IDB ({state:"ok"|"none"|"timeout"|"error", json, at, db}) and then starts the game. A database that never answers starts the
+   game after 3 s without it; the game then refuses to write over a newer copy it couldn't read. */
+(function(){
+  var started=false, R={state:"none"};
+  function go(){ if (started) return; started=true; window.__IBORY_IDB=R; var m=document.getElementById("ibory-main"), sc=document.createElement("script"); sc.textContent=m.textContent; document.body.appendChild(sc); }
+  var t=setTimeout(function(){ R={state:"timeout"}; go(); }, 3000);
+  try {
+    if (!window.indexedDB) { clearTimeout(t); go(); return; }
+    var rq=indexedDB.open("ibory", 1);
+    rq.onupgradeneeded=function(){ try { rq.result.createObjectStore("kv"); } catch(e){} };
+    rq.onerror=function(){ clearTimeout(t); R={state:"error"}; go(); };
+    rq.onblocked=function(){ clearTimeout(t); R={state:"error"}; go(); };
+    rq.onsuccess=function(){ var db=rq.result;
+      try { var g=db.transaction("kv","readonly").objectStore("kv").get("save");
+        g.onsuccess=function(){ if (started) return; clearTimeout(t); var v=g.result; R={state:"ok", db:db, json:v&&v.json||null, at:v&&v.at||0}; go(); };
+        g.onerror=function(){ clearTimeout(t); R={state:"error"}; go(); };
+      } catch(e){ clearTimeout(t); R={state:"error"}; go(); } };
+  } catch(e){ clearTimeout(t); R={state:"error"}; go(); }
 })();
 </script>
 <!-- Ibory: one file, no build step. The save format version is SAVE_V near the top of the script. -->
