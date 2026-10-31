@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.25";
+window.IBORY_V="0.2.26";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1306,8 +1306,8 @@ function techRaw(k){ if (!S.techG) S.techG={}; var L=Math.min(S.techG[k]||0, aca
 function hcLevels(){ return S.cities.filter(function(c){ return c.fieldCap; }).map(function(c){ return c.fieldCap; }); }
 function placeLeft(){ var n=hcLevels().filter(function(l){ return l===12; }).length; if (!n) return 0; var pl=S.map.placed||{day:-1,n:0}; return Math.max(0, n-(pl.day===gameDay()?pl.n:0)); }
 function hasHC(L){ return hcLevels().indexOf(L)>=0; }
-/* 0.2.24: the draft (Age 2, Cody). A historic city you hold conscripts troops out of the NPC cities around it, once a game day: a tenth of each
-   NPC city's biggest troop type as it stands (0.2.25; it was every type), straight into the historic city. The NPC cities lose them as if hit by an attack and
+/* 0.2.24: the draft (Age 2, Cody). A historic city you hold conscripts troops out of an NPC city around it, once a game day: a tenth of the
+   NPC city's biggest troop type as it stands (0.2.25; it was every type), straight into the historic city. Since 0.2.26 you pick the one NPC city (it was all of them). The NPC cities lose them as if hit by an attack and
    grow back within the hour. Range in tiles by the city's level (Age 2's distances scaled to this 396-tile map). */
 var DRAFT_RANGE={12:12, 14:16, 16:20, 18:28}, DRAFT_SHARE=0.1;
 function draftRange(c){ return DRAFT_RANGE[c.fieldCap]||0; }
@@ -1319,17 +1319,20 @@ function draftTargets(c){ var R=draftRange(c), out=[]; if (!R) return out;
 // 0.2.25 (Cody): a draft takes a tenth of an NPC city's biggest troop type only (40k Warriors from a level 10)
 function draftTake(cur){ var take=Z12(), bi=-1; for (var i=0;i<12;i++) if ((cur.t[i]||0)>0 && (bi<0 || cur.t[i]>cur.t[bi])) bi=i;
   if (bi>=0) take[bi]=Math.floor(cur.t[bi]*DRAFT_SHARE); return take; }
-function draftHaul(c){ var t=Z12(), qs=draftTargets(c); qs.forEach(function(q){ var tk=draftTake(current(q)); for (var i=0;i<12;i++) t[i]+=tk[i]; }); return {n:qs.length, t:t}; }
-function doDraft(ci){ var c=S.cities[ci]; if (!c || !draftReady(c)) return null;
-  var got=Z12(), qs=draftTargets(c), n=0;
-  qs.forEach(function(q){ var cur=current(q), take=draftTake(cur); if (!sumT(take)) return; n++;
-    TILE_BY[q.id]=q; S.map.hit[q.id]={t:cur.t.map(function(v,i){ return Math.max(0,(v||0)-take[i]); }), f:(cur.f||[0,0,0,0,0]).slice(), res:Object.assign({},cur.res), at:S.gt};
-    for (var i=0;i<12;i++) got[i]+=take[i]; });
-  withCity(ci, function(){ for (var i=0;i<12;i++) S.troops[i]+=got[i]; });
-  c.draftDay=gameDay(); miniDirty=true;
-  var list=U.map(function(u,i){ return got[i]?fmt(got[i])+" "+uname(i,got[i]):""; }).filter(Boolean);
-  note("march", (n===1 ? c.name+" drafted "+fmt(sumT(got))+" troops from 1 NPC city" : c.name+" drafted "+fmt(sumT(got))+" troops from "+n+" NPC cities")+(list.length?": "+list.join(", "):"")+".");
-  return {n:n, t:got}; }
+// 0.2.26 (Cody): a draft picks ONE NPC city in reach (as in Age 2): a tenth of its biggest troop type, once a day per historic city
+function draftOpts(c){ return draftTargets(c).map(function(q){ var tk=draftTake(current(q)); return {q:q, tk:tk, n:sumT(tk)}; }).filter(function(o){ return o.n>0; })
+  .sort(function(a,b){ return b.n-a.n || a.q.L-b.q.L; }); }
+var DRAFT_PICK={}; // historic city id -> the NPC tile picked in the Draft list
+function draftPick(c){ var os=draftOpts(c), id=DRAFT_PICK[c.id]; return os.filter(function(o){ return o.q.id===id; })[0] || os[0] || null; }
+function draftTakeText(tk){ return U.map(function(u,i){ return tk[i]?fmt(tk[i])+" "+uname(i,tk[i]):""; }).filter(Boolean).join(", "); }
+function doDraft(ci, tid){ var c=S.cities[ci]; if (!c || !draftReady(c)) return null;
+  var o=draftOpts(c).filter(function(x){ return x.q.id===tid; })[0]; if (!o) return null;
+  var q=o.q, cur=current(q), take=o.tk;
+  TILE_BY[q.id]=q; S.map.hit[q.id]={t:cur.t.map(function(v,i){ return Math.max(0,(v||0)-take[i]); }), f:(cur.f||[0,0,0,0,0]).slice(), res:Object.assign({},cur.res), at:S.gt};
+  withCity(ci, function(){ for (var i=0;i<12;i++) S.troops[i]+=take[i]; });
+  c.draftDay=gameDay(); miniDirty=true; delete DRAFT_PICK[c.id];
+  note("march", c.name+" drafted "+draftTakeText(take)+" from "+tileName(q)+".");
+  return {q:q, t:take}; }
 var GIFT_REP={12:10000, 14:15000, 16:22000, 18:30000}; // giving an ally a historic city: the biggest rep there is
 function giftWhy(c){
   if (!c || !c.fieldCap) return "Only historic cities can be given";
@@ -4632,6 +4635,9 @@ document.addEventListener("pointerdown", function(e){ var t=e.target; if (t && t
 document.addEventListener("change", function(e){ if (e.target===EDITING && e.target.tagName==="SELECT") EDITING=null; }, true);
 document.addEventListener("focusout", function(e){ if (e.target===EDITING) EDITING=null; });
 function editingIn(el){ return !!(el && EDITING && el.contains(EDITING)); }
+// 0.2.26: Draft from an NPC city's own panel, one button for each historic city of yours that can reach it today
+function draftTileBtns(q){ return S.cities.map(function(c,ci){ if (!draftReady(c)) return ''; var o=draftOpts(c).filter(function(x){ return x.q.id===q.id; })[0]; if (!o) return '';
+  return '<button class="btn ghost" data-act="hc-draft" data-ci="'+ci+'" data-tile="'+q.id+'">Draft '+fmt(o.n)+' into '+esc(c.name)+'</button>'; }).join(""); }
 function renderTileInfoBase(){
   var el=document.getElementById("tileinfo"); if (!el) return;
   if (!selTile){ el.innerHTML=''; return; }
@@ -4711,6 +4717,7 @@ function renderTileInfoBase(){
   h+='<div class="btnrow" style="margin-top:10px"><button class="btn" data-act="march-open" data-tile="'+q.id+'" data-mission="attack">Attack</button><button class="btn ghost" data-act="march-open" data-tile="'+q.id+'" data-mission="scout">Scout</button>'+
     (VTYPES[q.k] ? '<button class="btn ghost" data-act="march-open" data-tile="'+q.id+'" data-mission="occupy">Occupy</button>' : '')+
     (q.k==="flat" ? '<button class="btn ghost" data-act="march-open" data-tile="'+q.id+'" data-mission="found">Found city</button>' : '')+
+    (q.k==="npc" ? draftTileBtns(q) : '')+
     ((q.k==="npc"||q.k==="ai") ? '<button class="btn ghost danger" data-act="npc-demolish" data-tile="'+q.id+'">'+(armedTile===q.id?"Tap again to demolish":"Demolish")+'</button>' : '')+
     '<button class="btn ghost" data-act="map-sim" data-tile="'+q.id+'">Simulate</button><button class="btn ghost" data-act="waves-open" data-tile="'+q.id+'">Timed waves</button></div>'+
     '<div class="farmadd"><span class="dur">Add to farm list:</span><span class="farmgrid">'+S.presets.map(function(pr,pi){ var on=pr.farm.indexOf(q.id)>=0; return '<button class="chipbtn'+(on?' on':'')+'" data-act="farm-toggle" data-p="'+pi+'" data-tile="'+q.id+'" title="'+esc(pr.name)+'" aria-pressed="'+on+'">'+(pi+1)+'</button>'; }).join("")+'</span></div></div>';
@@ -6064,6 +6071,16 @@ function arReward(r, m, myM){
   if (rs){ S.stats=S.stats||{}; S.stats.loot=(S.stats.loot||0)+rs; }
   note("alliance","The "+nm+" fell at the Arena! Your share: "+arRewardList(rw)+".");
 }
+function wdRepHtml(r){ var pct0=r.hp0?Math.max(r.result===1?0:1, Math.round(r.hpLeft/r.hp0*100)):0, row=function(l,v){ return '<div class="merow"><span>'+l+'</span><b>'+v+'</b></div>'; }, x=(r.mine||[])[0];
+  var h=(WD_MART[r.lv]?'<div style="text-align:center"><img src="'+WD_MART[r.lv]+'" alt="" style="width:96px;height:96px;object-fit:contain;image-rendering:pixelated"></div>':'')+'<div class="mestats">'+row("Monster","Level "+r.lv+" "+esc(r.mname))+
+    row("Result",r.result===1?'<span class="okc">It fell</span>':'<span class="badc">It survived with '+pct0+'% of its health</span>')+(r.rounds?row("Rounds",fmt(r.rounds)):'')+(r.hp0?row("Health",fmt(r.hp0)):'')+
+    (r.dealt?row("Your damage",fmt(r.dealt)+(r.hp0?' ('+Math.max(r.dealt<r.hp0?0:100, Math.round(r.dealt/r.hp0*1000)/10)+'%)':'')):'')+
+    row("Who fought", r.solo?'You, alone':(r.marches===1?'1 march':fmt(r.marches)+' marches')+(r.host?' in '+esc(r.host)+'\u2019s rally':''))+
+    (r.reward?row("Your share",'a Mana Orb for the Shield Generator'+(arRewardList(r.reward)?', '+esc(arRewardList(r.reward)):'')):'')+'</div>';
+  if (x){ var rows=[]; for (var j=0;j<12;j++) if (x.sent[j]) rows.push('<tr><td>'+U[j].name+'</td><td>'+fmt(x.sent[j])+'</td><td>'+fmt(x.back[j]||0)+'</td><td>'+fmt(x.wounded[j]||0)+'</td></tr>');
+    h+='<div class="h3" style="margin-top:8px">Your march <span class="dur">from '+esc(x.city)+(x.hero?', led by '+esc(x.hero):'')+'</span></div><div class="tscroll"><table class="gt" style="min-width:0"><thead><tr><th>Troop</th><th>Sent</th><th>Unhurt</th><th>Wounded</th></tr></thead><tbody>'+rows.join("")+'</tbody></table></div>';
+    if (x.hero) h+='<p class="dur" style="margin:4px 0 0">'+esc(x.hero)+(r.result!==1?' earned no experience: monsters only give it when they die.':x.xp?' earned <b>'+fmt(x.xp)+'</b> experience.':' earned no experience: only the first hero you send does.')+'</p>'; }
+  return h+'<p class="hint">Nobody dies fighting a server-map monster: the wounded wait in their city\u2019s Medic Camp (heal them within 24 hours).</p>'; }
 // a proper report for every Arena fight you joined, under Reports > Arena
 function arReport(r, myM, T){
   var axRef=xpFirstRef(myM), axFull=r.win ? AR_XP_LV*(r.lv||1) : 0;
@@ -6081,6 +6098,7 @@ function arReport(r, myM, T){
   if (myM.some(function(m){ return m.keep; })) keepRep(id);
 }
 function arenaRepHtml(r){
+  if (r.wd) return wdRepHtml(r);
   var T=r.wiz?{n:r.mname||"Wizard"}:arT(r.type), pct0=r.hp0?Math.round(r.hpLeft/r.hp0*100):0, row=function(l,v){ return '<div class="merow"><span>'+l+'</span><b>'+v+'</b></div>'; };
   var h='<div class="mestats">'+row("Monster","Level "+r.lv+" "+esc(T.n))+row("Result",r.result===1?'<span class="okc">It fell</span>':'<span class="badc">It survived with '+pct0+'% of its strength</span>')+row("Rounds",fmt(r.rounds))+row("Strength",fmt(r.hp0))+
     row(r.solo?"Marches":"Who fought", r.solo?fmt(r.marches):fmt(r.marches)+' march'+(r.marches===1?'':'es')+' from '+esc((r.players||[]).join(", ")))+(r.reward?row("Your reward",esc(arRewardList(r.reward))):'')+'</div>';
@@ -7180,7 +7198,7 @@ function wdSend(){ var d=marchDraft; if (wdWhy(sumT(d.t)) || WDS.sending) return
 // results: each of my marches learns what came back; it's taken home when it gets there (troops, wounded to the Medic Camp, rewards)
 function wdResults(d){ var L=S.wdM||[], ch=false; (d.mine||[]).forEach(function(j){ var m=L.filter(function(x){ return x.ref===j.ref; })[0]; if (!m) return;
     if (m.id!==j.id || m.L!==j.L){ m.id=j.id; m.L=j.L; ch=true; }
-    if (j.st==="back" && j.res && m.st!=="back"){ m.st="back"; m.res=j.res; m.reward=j.reward; m.home=j.home; m.host=j.host; ch=true; }
+    if (j.st==="back" && j.res && m.st!=="back"){ m.st="back"; m.res=j.res; m.reward=j.reward; m.home=j.home; m.host=j.host; m.result=j.result||null; m.solo=j.solo; ch=true; }
     else if (j.st==="back" && m.st==="back" && j.home && j.home!==m.home){ m.home=j.home; ch=true; } }); // 0.2.23: sped up on the way home
   if (ch) save(); }
 function wdHome(m){ var ci=cityIndex(m.city); if (ci<0) ci=S.cur; var c=S.cities[ci], r=m.res||{back:m.t, wounded:[]}, back=0, wd=0, wb=null, nm="level "+(m.L||"?")+" "+wdMonName(m.L);
@@ -7191,11 +7209,21 @@ function wdHome(m){ var ci=cityIndex(m.city); if (ci<0) ci=S.cur; var c=S.cities
   if (m.reward){ var rw=m.reward, its=rw.items||{}; for (var k in its) S.items[k]=(S.items[k]||0)+its[k];
     var xp=0; if (rw.xp && hh){ var full=WD_MXP[m.L]||0, ups=giveXp(hh, full); xp=Math.round(full*bHeroXp()); if (ups) note("heroes", hh.name+" reached level "+hh.level+" on the server map"); }
     note("alliance","The "+nm+" fell on the server map! Your share: a Mana Orb for the Shield Generator"+(Object.keys(its).length?", "+arRewardList({items:its, res:{}}):"")+(xp?", and "+fmt(xp)+" experience for "+hh.name:"")+"."+tail); }
+  if (r.win!=null && !r.gone && !r.cancelled && !r.recalled && !r.late) wdReport(m, c, hh, xp||0);
   else if (r.gone) note("alliance","The "+nm+" was already gone when your rally got there."+tail);
   else if (r.cancelled) note("alliance","The rally on the "+nm+" was called off."+tail);
   else if (r.recalled) note("alliance","Your march on the "+nm+" was recalled."+tail);
   else if (r.late) note("alliance","Your march didn’t reach the rally on the "+nm+" before it left, so it turned back."+tail);
   else note("alliance","The "+nm+" survived the fight."+tail); }
+// 0.2.26 (Cody): a report for every server-map monster fight you were in, under Reports with the Arena's (picture, your damage, its health left, your losses, your share)
+function wdReport(m, c, hh, xp){ var r=m.res||{}, R=m.result||{}, L=m.L||1, win=!!(R.win!=null?R.win:r.win), id=S.nextMarchId++, mn=wdMonName(L), name="Server map: level "+L+" "+mn;
+  var mine=[{city:c.name, hero:hh?hh.name:"", sent:(m.t||Z12()).slice(), back:(r.back||m.t||Z12()).slice(), wounded:(r.wounded||Z12()).slice(), xp:xp, xpNo:0}];
+  if (hh) heroRec(hh, {won:win, killed:[], lost:mine[0].wounded, label:"a "+mn+" on the server map"});
+  var rw=win&&m.reward?{items:Object.assign({},m.reward.items||{}), res:{}}:null, g=[]; if (rw){ g.push("a Mana Orb"); for (var k in rw.items) g.push(fmt(rw.items[k])+" "+((ITEMS[k]&&ITEMS[k].name)||k)); }
+  var solo=!!m.solo, n=R.n||1;
+  S.reports.unshift({id:id, at:S.gt, arena:1, wd:1, mname:mn, name:name, result:win?1:2, type:"wd"+L, lv:L, rounds:R.rounds||0, hpLeft:R.hpLeft||0, hp0:R.hp0||0, dealt:r.dealt||0, reward:rw, orb:rw?1:0,
+    players:[], marches:n, host:m.host||"", mine:mine, solo:solo, xp:xp, hero:hh?hh.name:"", def:0, aww:null}); trimKeepFav(S.reports, FULL_CAP);
+  S.log.unshift({id:id, at:S.gt, sc:0, n:name, tile:null, r:win?1:2, d:0, l:0, k:0, lo:0, m:-1, g:g, h:null, f:null, o:0, c:c.name, ar:1, wd:sumT(mine[0].wounded), sent:sumT(mine[0].sent)}); trimKeepFav(S.log, LOG_CAP); }
 function wdHomeTick(){ var L=S.wdM; if (!L || !L.length) return; var now=Date.now(), acks=[];
   for (var i=L.length-1;i>=0;i--){ var m=L[i]; if (m.st==="back" && now>=m.home){ wdHome(m); if (m.id) acks.push(m.id); L.splice(i,1); } }
   if (acks.length){ reconcileHeroes(); save(); flushFinished(); refresh(); if (cbOn()) alPost("/wd/applied",{ids:acks}).catch(function(){}); } }
@@ -8743,6 +8771,7 @@ try { if (loadRaw && !loadFail && S && !S.comp0214 && !localStorage.getItem("ibo
 var COMP_0218=false;
 try { if (loadRaw && !loadFail && S && !S.comp0218 && !localStorage.getItem("ibory-comp-0218")){ S.comp0218=1; S.real-=8*HOUR; COMP_0218=true; localStorage.setItem("ibory-comp-0218","1"); } } catch(e){}
 // 0.2.22: 8 more hours, once, for the nights the catch-up stopped early (batch-size-1 training hit the runaway guard); same marks
+try { if (loadRaw && !loadFail && S && !S.draftR26){ S.draftR26=1; (S.cities||[]).forEach(function(c){ delete c.draftDay; }); } } catch(e){} // 0.2.26 (Cody): today's drafts (all NPC cities at once) start over
 var COMP_0222=false;
 try { if (loadRaw && !loadFail && S && !S.comp0222 && !localStorage.getItem("ibory-comp-0222")){ S.comp0222=1; S.real-=8*HOUR; COMP_0222=true; localStorage.setItem("ibory-comp-0222","1"); } } catch(e){}
 var COMP_H=(COMP_0214?8:0)+(COMP_0218?8:0)+(COMP_0222?8:0); // what this open gave, all told
@@ -12436,7 +12465,7 @@ function viewTitlesBody(t,nt,nr){
   h+='<div class="section"><h3>'+(nt?'Next title: '+nt.name:'Highest title reached')+'</h3>'+(nt?'<p class="hint">Allows '+nt.cities+' cities.</p>'+questCard(nt,true,"titleup","Run for "+nt.name):'<p class="hint">You are Prinzessin. Ten cities are yours to rule.</p>')+'</div>';
   h+='<details class="section"><summary>All titles</summary><div class="ladder">'+TITLES.map(function(x,i){ return '<span class="'+(i===S.title?'cur':'')+'">'+x.name+'</span><span class="dur">'+(i?fmt(x.prestige)+' prestige, '+fmt(x.gold)+' gold, '+MEDALS.filter(function(m){return x.m[m[0]];}).map(function(m){return x.m[m[0]]+' '+m[1];}).join(" + "):'Starting title')+'</span><span>'+x.cities+' '+(x.cities===1?'city':'cities')+'</span>'; }).join("")+'</div></details>';
   var pw=[[12,"Place one NPC city of any level on any open flat or valley, once a day per level 12 you hold."],[14,"Monsters gather near your level 14s each day. Slay them for Dragon Scales, the material for Mythic gear."],[16,"Your historic cities can be teleported like any other city."],[18,"Atlantis raises your city cap by 4."]];
-  pw.push([0,"Every historic city you hold can draft once a day: it takes a tenth of the biggest troop type in each NPC city within reach (12 tiles for a level 12, 16 for a 14, 20 for a 16, 28 for Atlantis) into its own army. The NPC cities grow back within the hour."]);
+  pw.push([0,"Every historic city you hold can draft once a day from one NPC city within reach (12 tiles for a level 12, 16 for a 14, 20 for a 16, 28 for Atlantis): it takes a tenth of that city\u2019s biggest troop type into its own army. Pick the NPC city below, or tap it on the map. It grows back within the hour."]);
   h+='<div class="section"><h3>Historic powers</h3><div class="gearlist">'+pw.map(function(x){ if (!x[0]){ var on0=hcLevels().length>0; return '<div class="gearrow'+(on0?' t3':'')+'"><span class="gn">Draft</span><span class="gb '+(on0?'okc':'dur')+'">'+(on0?'Active':'Locked')+'</span><span class="dur" style="grid-column:1/-1">'+x[1]+'</span></div>'; } var on=hasHC(x[0]); return '<div class="gearrow'+(on?' t3':'')+'"><span class="gn">Level '+x[0]+'</span><span class="gb '+(on?'okc':'dur')+'">'+(on?'Active':'Locked')+'</span><span class="dur" style="grid-column:1/-1">'+x[1]+'</span></div>'; }).join("")+'</div>'+
     draftListHtml()+
     '<p class="hint" style="margin-top:6px">Historic cities also let their buildings, fields and research climb to the city\u2019s own level: 12 marches from a level 12 Rally Spot, cheaper troops from Barracks above 10, and new research at Academy 12, 14 and 16.</p></div>';
@@ -12444,10 +12473,11 @@ function viewTitlesBody(t,nt,nr){
 }
 
 function draftListHtml(){ var hc=S.cities.map(function(c,ci){ return {c:c, ci:ci}; }).filter(function(o){ return o.c.fieldCap; }); if (!hc.length) return '';
-  return '<div class="h3" style="margin-top:10px">Draft</div><div class="gearlist">'+hc.map(function(o){ var c=o.c, hv=draftHaul(c), ready=draftReady(c), tot=sumT(hv.t);
-    return '<div class="gearrow'+(ready&&tot?' t3':'')+'"><span class="gn">'+esc(c.name)+' <span class="dur">(level '+c.fieldCap+', '+draftRange(c)+' tiles)</span></span><span class="gb">'+(ready?fmt(tot)+' troops':'Drafted today')+'</span>'+
-      '<span class="dur" style="grid-column:1/-1">'+(hv.n===1?'1 NPC city in reach':hv.n+' NPC cities in reach')+(ready?'':' \u00b7 next draft in '+fmtT(realMs(msToNewDay())))+'</span>'+
-      (ready?'<span class="btnrow" style="grid-column:1/-1;justify-content:flex-end"><button class="btn small" data-act="hc-draft" data-ci="'+o.ci+'"'+(tot?'':' disabled')+'>Draft now</button></span>':'')+'</div>'; }).join("")+'</div>'; }
+  return '<div class="h3" style="margin-top:10px">Draft</div><div class="gearlist">'+hc.map(function(o){ var c=o.c, ready=draftReady(c), os=ready?draftOpts(c):[], pk=ready?draftPick(c):null;
+    var sel=os.length?'<select class="draftsel" data-draftc="'+c.id+'" aria-label="NPC city to draft from" style="grid-column:1/-1;width:100%">'+os.map(function(x){ return '<option value="'+x.q.id+'"'+(pk&&x.q.id===pk.q.id?' selected':'')+'>'+esc(tileName(x.q))+' ('+x.q.x+','+x.q.y+'): '+esc(draftTakeText(x.tk))+'</option>'; }).join("")+'</select>':'';
+    return '<div class="gearrow'+(pk?' t3':'')+'"><span class="gn">'+esc(c.name)+' <span class="dur">(level '+c.fieldCap+', '+draftRange(c)+' tiles)</span></span><span class="gb">'+(ready?(pk?fmt(pk.n)+' troops':'Nothing in reach'):'Drafted today')+'</span>'+
+      (ready?'<span class="dur" style="grid-column:1/-1">'+(os.length===1?'1 NPC city in reach':os.length+' NPC cities in reach')+'</span>'+sel:'<span class="dur" style="grid-column:1/-1">Next draft in '+fmtT(realMs(msToNewDay()))+'</span>')+
+      (pk?'<span class="btnrow" style="grid-column:1/-1;justify-content:flex-end"><button class="btn small" data-act="hc-draft" data-ci="'+o.ci+'" data-tile="'+pk.q.id+'">Draft now</button></span>':'')+'</div>'; }).join("")+'</div>'; }
 function goalLinesHtml(k){
   var G=GK[k], have=G.have(), lines=gLines(k), act=gActive(k,have), auto=k==="fg"?S.autoFort:S.autoTrain, h='';
   if (!lines.length) h+='<p class="hint"><b>No lines yet.</b> Add one to start.</p>';
@@ -13794,7 +13824,7 @@ document.addEventListener("click",function(e){
   if (act==="mp-warn-ok"){ var mpa=mpPending, mpk=sheetFor&&sheetFor.act; mpPending=null; mpGo(MP_ACTS[mpk]||"chose"); closeSheet(); toast("You\u2019re on the multiplayer high scores now"); if (mpa && document.contains(mpa)) mpa.click(); else if (mpk==="wd-join") wdJoin(); return; }
   if (WDFS.on && act.slice(0,3)!=="wd-" && a.closest && a.closest("#wdview")) wdFs(false); // 0.2.21: a button that opens something else leaves full screen
   if (act.slice(0,3)==="wd-" && wdAct(act, a, e)) return; // 0.2.17: the server map
-  if (act==="hc-draft"){ var dr=doDraft(+a.dataset.ci); if (dr){ flushFinished(); save(); lastView=""; refresh(); } return; } // 0.2.24
+  if (act==="hc-draft"){ var dr=doDraft(+a.dataset.ci, a.dataset.tile); if (dr){ flushFinished(); save(); lastView=""; refresh(); } return; } // 0.2.24; 0.2.26 one picked NPC city
   if (act==="mp-intro"){ var mpwc=document.getElementById("mpiwc"); S.mpIntro=1; S.mpOn = a.dataset.v==="on"; if (!S.mpOn && mpwc) S.wcOn=!mpwc.checked; save(); closeSheet(); lastView=""; refresh(); renderDock();
     toast(S.mpOn?"Multiplayer is on. You can switch any time in Settings":"Single player it is. You can switch any time in Settings");
     if (mpNeedsGrace()) setTimeout(function(){ openSheet({kind:"mpgrace"}); },400); return; }
@@ -14670,6 +14700,7 @@ document.addEventListener("input",function(e){ markDirty();
   if (e.target.id==="bqamt"){ BQD.n=e.target.value; bqRefresh(); return; }
   if (e.target.dataset && e.target.dataset.hms){ hmsPick(e.target); return; }
   if (invInput(e)) return;
+  if (e.target.dataset && e.target.dataset.draftc){ DRAFT_PICK[e.target.dataset.draftc]=e.target.value; lastView=""; refresh(); return; } // 0.2.26: the NPC city to draft from
   if (e.target.id && /^aw-[gaw]\d+$/.test(e.target.id)){ awChange(e); return; }
   if (e.target.id==="decoq"){ DECO_Q=e.target.value; decoFilter(); return; }
   if (e.target.id==="dtq"){ DT.q=e.target.value; var dl=document.getElementById("dtlist"); if (dl){ dl.innerHTML=dtListHtml(); wireDetails(dl); } return; }
