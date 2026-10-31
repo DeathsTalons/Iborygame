@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.23";
+window.IBORY_V="0.2.25";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -530,7 +530,7 @@ nav.tabs{display:block;margin:0}
 .wdview.fs .wdfsbar{display:flex;position:absolute;top:calc(8px + env(safe-area-inset-top,0px));right:8px;gap:6px;z-index:7}
 .wdview.fs.rot .wdfsbar{top:8px}.wdview.fs .wdmvbar{bottom:calc(10px + env(safe-area-inset-bottom,0px))}
 .wdfsbar .btn{min-width:40px;box-shadow:0 2px 8px rgba(0,0,0,.35)}
-body.wdfs{overflow:hidden}.wdmap{display:block;width:100%;height:auto;touch-action:none;user-select:none;-webkit-user-select:none}.wdhit{cursor:pointer}
+body.wdfs{overflow:hidden}.wdmap{display:block;width:100%;height:auto;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none}.wdhit{cursor:pointer}
 .wdtag{font-family:var(--display);font-weight:700}.wdsm{font-family:var(--body);font-weight:500}.wdzoom{flex-wrap:wrap;gap:6px}.wdzoom .btn{min-width:40px}
 .wdleg{display:flex;flex-wrap:wrap;gap:6px 12px;margin:8px 0 2px;font-size:13px;color:var(--muted)}.wdleg span{display:inline-flex;align-items:center;gap:5px}.wdleg i{display:inline-block;width:12px;height:12px;border-radius:3px;border:2px solid}.wdleg i.wdopen{border:2px dashed #8d928a}
 .wdhow{margin:6px 0 0;padding-left:20px}.wdhow li{margin:4px 0}
@@ -1170,7 +1170,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.23";
+var APP_VERSION = "0.2.24";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -1306,6 +1306,30 @@ function techRaw(k){ if (!S.techG) S.techG={}; var L=Math.min(S.techG[k]||0, aca
 function hcLevels(){ return S.cities.filter(function(c){ return c.fieldCap; }).map(function(c){ return c.fieldCap; }); }
 function placeLeft(){ var n=hcLevels().filter(function(l){ return l===12; }).length; if (!n) return 0; var pl=S.map.placed||{day:-1,n:0}; return Math.max(0, n-(pl.day===gameDay()?pl.n:0)); }
 function hasHC(L){ return hcLevels().indexOf(L)>=0; }
+/* 0.2.24: the draft (Age 2, Cody). A historic city you hold conscripts troops out of the NPC cities around it, once a game day: a tenth of each
+   NPC city's biggest troop type as it stands (0.2.25; it was every type), straight into the historic city. The NPC cities lose them as if hit by an attack and
+   grow back within the hour. Range in tiles by the city's level (Age 2's distances scaled to this 396-tile map). */
+var DRAFT_RANGE={12:12, 14:16, 16:20, 18:28}, DRAFT_SHARE=0.1;
+function draftRange(c){ return DRAFT_RANGE[c.fieldCap]||0; }
+function draftReady(c){ return !!c.fieldCap && c.draftDay!==gameDay(); }
+function draftTargets(c){ var R=draftRange(c), out=[]; if (!R) return out;
+  for (var y=Math.max(0,c.y-R); y<=Math.min(MAPH-1,c.y+R); y++) for (var x=Math.max(0,c.x-R); x<=Math.min(MAPW-1,c.x+R); x++){
+    var dx=x-c.x, dy=y-c.y; if (dx*dx+dy*dy>R*R) continue; var q=tileAt(x,y); if (q && q.k==="npc" && !S.map.owned[q.id]) out.push(q); }
+  return out; }
+// 0.2.25 (Cody): a draft takes a tenth of an NPC city's biggest troop type only (40k Warriors from a level 10)
+function draftTake(cur){ var take=Z12(), bi=-1; for (var i=0;i<12;i++) if ((cur.t[i]||0)>0 && (bi<0 || cur.t[i]>cur.t[bi])) bi=i;
+  if (bi>=0) take[bi]=Math.floor(cur.t[bi]*DRAFT_SHARE); return take; }
+function draftHaul(c){ var t=Z12(), qs=draftTargets(c); qs.forEach(function(q){ var tk=draftTake(current(q)); for (var i=0;i<12;i++) t[i]+=tk[i]; }); return {n:qs.length, t:t}; }
+function doDraft(ci){ var c=S.cities[ci]; if (!c || !draftReady(c)) return null;
+  var got=Z12(), qs=draftTargets(c), n=0;
+  qs.forEach(function(q){ var cur=current(q), take=draftTake(cur); if (!sumT(take)) return; n++;
+    TILE_BY[q.id]=q; S.map.hit[q.id]={t:cur.t.map(function(v,i){ return Math.max(0,(v||0)-take[i]); }), f:(cur.f||[0,0,0,0,0]).slice(), res:Object.assign({},cur.res), at:S.gt};
+    for (var i=0;i<12;i++) got[i]+=take[i]; });
+  withCity(ci, function(){ for (var i=0;i<12;i++) S.troops[i]+=got[i]; });
+  c.draftDay=gameDay(); miniDirty=true;
+  var list=U.map(function(u,i){ return got[i]?fmt(got[i])+" "+uname(i,got[i]):""; }).filter(Boolean);
+  note("march", (n===1 ? c.name+" drafted "+fmt(sumT(got))+" troops from 1 NPC city" : c.name+" drafted "+fmt(sumT(got))+" troops from "+n+" NPC cities")+(list.length?": "+list.join(", "):"")+".");
+  return {n:n, t:got}; }
 var GIFT_REP={12:10000, 14:15000, 16:22000, 18:30000}; // giving an ally a historic city: the biggest rep there is
 function giftWhy(c){
   if (!c || !c.fieldCap) return "Only historic cities can be given";
@@ -3407,21 +3431,28 @@ function captureCity(q, troops){
 }
 function needScout(q){ return q && (q.k==="ai"||q.k==="hc"||q.k==="monster"||q.k==="bully"||q.k==="war"||q.k==="chal"); }
 function intelOf(q){ var it=S.map.intel&&S.map.intel[q.id]; return it||null; }
+/* 0.2.24: heroes with scouts. A hero's Intelligence makes scouts count 0.5% more a point (on top of Informatics, like Age 2 Attack at /200).
+   The defender's hero counts the same way for their scouts: a player's wall hero, a target's own garrison hero. A hero who gets through earns
+   a little experience (50 a target level, at least 50). */
+var SCOUT_HERO_DIV=200;
+function scoutHeroMul(intel){ return 1+Math.max(0, intel||0)/SCOUT_HERO_DIV; }
 function scoutArrive(m){
-  var q=TILE_BY[m.tile], cur=current(q), inf=S.tech.informatics||0;
+  var q=TILE_BY[m.tile], cur=current(q), inf=S.tech.informatics||0, sh=m.hero?heroById(m.hero):null;
   var dInf = q.k==="ai" ? q.ai.tech : q.k==="npc" ? q.L : q.k==="hc" ? 10 :
              q.k==="bully" ? ((S.alliance&&S.alliance.bully&&S.alliance.bully.tech)||0) :
              q.k==="war" ? ((W()&&W().enemies[q.eid]&&W().enemies[q.eid].tech)||0) :
              q.k==="chal" ? ((chalById(q.cid)||{}).tech||0) : 0;
-  var ds=cur.t[2]||0, as=m.t[2]||0, aE=as*(1+0.1*inf), dE=ds*(1+0.1*dInf), ok=aE>dE;
-  var aLost = ok ? Math.min(as, Math.ceil(dE/(1+0.1*inf))) : as;
+  var aMul=(1+0.1*inf)*scoutHeroMul(sh?hs(sh,"int"):0), dMul=(1+0.1*dInf)*scoutHeroMul(cur.hint||0);
+  var ds=cur.t[2]||0, as=m.t[2]||0, aE=as*aMul, dE=ds*dMul, ok=aE>dE;
+  var aLost = ok ? Math.min(as, Math.ceil(dE/aMul)) : as;
+  var sxp=0; if (ok && sh){ sxp=50*Math.max(1, q.L||1); var sup=giveXp(sh, sxp); if (sup) note("heroes", sh.name+" reached level "+sh.level); sxp=Math.round(sxp*bHeroXp()); }
   var snap=null;
   if (ok) qbump("scouts");
   if (ok){ snap={at:S.gt, inf:inf, t:scoutHide(q, cur.t).slice(), f:(cur.f||[0,0,0,0,0]).slice(), wall:cur.wall||0, res:Object.assign({},cur.res), r:Object.assign({},cur.r||{}), am:cur.am||1, hint:cur.hint||0, fb:cur.fb||1};
     S.map.intel=S.map.intel||{}; S.map.intel[q.id]=snap; }
   var sent=m.t.slice(), left=m.t.slice(); left[2]=as-aLost;
   addReport({id:S.nextMarchId++, at:S.gt, scout:true, name:tileName(q), tile:q.id, result:ok?1:2, rounds:0, sent:sent, left:left, had:cur.t.slice(), eleft:cur.t.slice(), forts:[0,0,0,0,0], fleft:[0,0,0,0,0],
-    loot:{food:0,lumber:0,stone:0,iron:0,gold:0}, medal:-1, drops:[], lost:aLost, hero:null, xp:0, intel:snap});
+    loot:{food:0,lumber:0,stone:0,iron:0,gold:0}, medal:-1, drops:[], lost:aLost, hero:sh?sh.name:null, xp:sxp, intel:snap});
   note("march",ok ? "Scouts report back from "+tileName(q)+(aLost?" ("+fmt(aLost)+" lost)":"")+"." : "Your scouts were caught at "+tileName(q)+". Send more, or research Informatics.");
   if (left[2]<=0) return false;
   m.t=left; m.loot={}; m.phase="back"; m.bs=S.gt; m.ret=S.gt+m.travel; return true;
@@ -4553,6 +4584,7 @@ function mapPopInfo(q){ var bits=['('+q.x+', '+q.y+')'], cur;
   return bits.join(' \u00b7 '); }
 function mapPop(){ var el=document.getElementById("mappop"); if (!el) return;
   if (!selTile || MPOP.hide){ el.hidden=true; return; }
+  if (editingIn(el) && !el.hidden) return; // 0.2.24: a dropdown in the popup stays open
   var q=TILE_BY[selTile]; if (!q){ el.hidden=true; return; }
   var btns=[], seen={}; document.querySelectorAll('#tileinfo [data-act="march-open"], #tileinfo [data-act="city-go"], #tileinfo [data-act="npc-make"]').forEach(function(b){ var m=b.dataset.act==="city-go"?"city":b.dataset.act==="npc-make"?"npcmake":b.dataset.mission, key=m+(b.dataset.city||"");
     if (seen[key] || (m!=="city" && m!=="npcmake" && !MPOP_ACTS[m])) return; seen[key]=1; btns.push({o:m==="city"||m==="npcmake"?0:MPOP_ACTS[m], h:'<button class="btn'+(btns.length?' ghost':'')+'" data-act="'+b.dataset.act+'"'+(b.dataset.tile?' data-tile="'+b.dataset.tile+'"':'')+(b.dataset.mission?' data-mission="'+b.dataset.mission+'"':'')+(b.dataset.city?' data-city="'+b.dataset.city+'"':'')+(b.disabled?' disabled':'')+'>'+esc(b.textContent)+'</button>'}); });
@@ -4593,9 +4625,18 @@ function tileGlance(){ var el=document.getElementById("mapglance"); if (!el) ret
     } catch(e){}
     h+='<button class="link" data-act="mpop-more">All details \u2193</button>'; }
   if (el._h!==h){ el.innerHTML=h; el._h=h; } }
+// 0.2.24: a dropdown or box in use inside a panel that redraws every tick (the place-an-NPC level, the ally to give a city to) closed as you opened it
+var EDITING=null; // the dropdown or box being used right now: a dropdown from opening until a choice is made, a box until it loses focus
+document.addEventListener("focusin", function(e){ var t=e.target; if (t && /^(SELECT|INPUT|TEXTAREA)$/.test(t.tagName)) EDITING=t; });
+document.addEventListener("pointerdown", function(e){ var t=e.target; if (t && t.tagName==="SELECT") EDITING=t; }, true);
+document.addEventListener("change", function(e){ if (e.target===EDITING && e.target.tagName==="SELECT") EDITING=null; }, true);
+document.addEventListener("focusout", function(e){ if (e.target===EDITING) EDITING=null; });
+function editingIn(el){ return !!(el && EDITING && el.contains(EDITING)); }
 function renderTileInfoBase(){
   var el=document.getElementById("tileinfo"); if (!el) return;
   if (!selTile){ el.innerHTML=''; return; }
+  if (editingIn(el) && el.dataset.tile===selTile) return; // wait until they're done with it
+  el.dataset.tile=selTile;
   var q=TILE_BY[selTile], h='<div class="section"><div class="shead"><h3>'+esc(tileName(q))+'</h3><span class="dur">('+q.x+', '+q.y+')'+(q.k!=="home"?', '+tdist(q).toFixed(1)+' tiles away':'')+'</span></div>';
   if (q.k==="home"){
     var hc=S.cities[cityIndex(q.city)], canAb = S.cities.length>1 && !hc.fieldCap, abBtn = canAb ? '<button class="btn ghost danger" data-act="city-abandon" data-city="'+hc.id+'">'+(armedTile==="ab"+hc.id?"Tap again to abandon "+esc(hc.name):"Abandon city")+'</button>' : '';
@@ -4759,7 +4800,7 @@ function updateMarchInfo(){
   if (tm && marchDraft.mission!=="hide"){ var fd=marchFood(marchDraft.t,marchDraft.mission,tm); if (fd) el.textContent+=" Rations: "+fmt(fd)+" food."; }
   el.textContent+=" Army size "+fmt(marchDraft.t.reduce(function(x,y){return x+y;},0))+" of "+fmt(armyCap(marchDraft.ensign, marchDraft.hero?heroById(marchDraft.hero):null))+".";
   if (hs(marchDraft.hero?heroById(marchDraft.hero):null,"int")) el.textContent+=" Your hero\u2019s Intelligence speeds the march "+hs(heroById(marchDraft.hero),"int")+"%.";
-  if (marchDraft.mission!=="transport" && marchDraft.mission!=="scout" && marchDraft.mission!=="hide"){ var mhd=marchDraft.hero?heroById(marchDraft.hero):null; el.textContent+=" "+(mhd?"Led by "+mhd.name+" (Attack "+hs(mhd,"atk")+", Intelligence "+hs(mhd,"int")+").":"No hero leading."); }
+  if (marchDraft.mission!=="transport" && marchDraft.mission!=="hide"){ var mhd=marchDraft.hero?heroById(marchDraft.hero):null; el.textContent+=" "+(mhd?(marchDraft.mission==="scout"?"Led by "+mhd.name+": Intelligence "+hs(mhd,"int")+" makes your scouts count "+scoutHeroMul(hs(mhd,"int")).toFixed(2)+"\u00d7.":"Led by "+mhd.name+" (Attack "+hs(mhd,"atk")+", Intelligence "+hs(mhd,"int")+")."):"No hero leading."); }
   var why=marchWhy(); b.disabled=!!why; b.textContent= why || (marchDraft.mission==="hide"?"Hide them":marchDraft.mission==="allyguard"?"Send guards":marchDraft.mission==="scout"?"Send scouts":marchDraft.mission==="conquer"?"March to conquer":marchDraft.mission==="transport"?"Send resources":marchDraft.mission==="reinforce"?"Send reinforcements":marchDraft.mission==="occupy"?"March to occupy":marchDraft.mission==="found"?"March to found city (10k each)":"March to attack");
   var pv=document.getElementById("marchprev"); if (pv) pv.innerHTML=marchDraft.preview;
 }
@@ -4771,7 +4812,7 @@ function marchSheet(){
   var any=false, av=draftAvail(), camps=CAMP_MISSIONS[d.mission]?cityCamps().filter(function(c){ return c.tile!==d.tile; }):[];
   if (camps.length) h+='<div><label class="sub" for="marchfrom">March from</label><select id="marchfrom"><option value="">'+esc(S.name)+' (the city)</option>'+camps.map(function(c){ var cq=TILE_BY[c.tile]; return '<option value="'+c.tile+'"'+(d.from===c.tile?' selected':'')+'>Camp at '+esc(cq?tileName(cq):c.tile)+' ('+fmt(sumT(c.t))+' troops)</option>'; }).join("")+'</select></div>';
   if (d.mission==="hide") h+='<p class="hint">They slip out into the woods around the city: attackers won\u2019t find them, and Recall brings them back instantly. They hunt for their own food. Each group takes a Rally Spot slot, like any march.</p>';
-  if (d.mission==="scout") h+='<p class="hint">Only scouts go. They win if your scouts outnumber the defender\u2019s (each Informatics level counts for 10% more on either side). Success shows its army, fortifications and stockpile: rough counts below Informatics 3, exact from 3, plus research and hero from 6. Many targets keep no scouts at all.</p>';
+  if (d.mission==="scout") h+='<p class="hint">Only scouts go, with a hero if you like. They win if your scouts outnumber the defender\u2019s (each Informatics level counts for 10% more on either side, and each point of a leading hero\u2019s Intelligence 0.5% more; the defender\u2019s own hero counts the same way for them). Success shows its army, fortifications and stockpile: rough counts below Informatics 3, exact from 3, plus research and hero from 6. Many targets keep no scouts at all.</p>';
   if (d.mission!=="transport" && d.mission!=="scout") h+=[["March",1],["Farm",0]].map(function(kd){ return '<div class="farmadd"><span class="dur">'+kd[0]+' preset:</span>'+presetsOf(kd[1]).map(function(pr,pi){ return '<button class="chipbtn" data-act="march-preset"'+(kd[1]?' data-m="1"':'')+' data-p="'+pi+'" title="'+esc(pr.name)+'"'+(presetTotal(pr)?'':' disabled')+'>'+(pi+1)+'</button>'; }).join("")+'</div>'; }).join("");
   h+='<div class="btnrow" style="justify-content:flex-end;margin:0"><button class="btn ghost small" data-act="march-clear">Clear all</button></div>'; // 0.1.210
   h+='<div class="tscroll"><table class="gt wrap1" style="min-width:0"><tbody>';
@@ -4785,7 +4826,7 @@ function marchSheet(){
     h+='</tbody></table></div>';
   }
   var dc=draftCamp(), fh=dc ? (dc.hero&&heroById(dc.hero)?[heroById(dc.hero)]:[]) : marchHeroes();
-  if (d.mission!=="transport" && d.mission!=="scout") h+='<div><label class="sub" for="marchhero">'+(d.mission==="reinforce"?"Hero to move there (needs room in its Feasting Hall)":"Leading hero")+'</label><select id="marchhero"><option value="0">No hero</option>'+fh.map(function(x){ return '<option value="'+x.id+'"'+(x.id===d.hero?' selected':'')+'>'+esc(x.name)+', Lv '+x.level+', Atk '+hs(x,"atk")+'</option>'; }).join("")+'</select>'+
+  if (d.mission!=="transport") h+='<div><label class="sub" for="marchhero">'+(d.mission==="reinforce"?"Hero to move there (needs room in its Feasting Hall)":d.mission==="scout"?"Hero leading the scouts (Intelligence counts)":"Leading hero")+'</label><select id="marchhero"><option value="0">No hero</option>'+fh.map(function(x){ return '<option value="'+x.id+'"'+(x.id===d.hero?' selected':'')+'>'+esc(x.name)+', Lv '+x.level+', '+(d.mission==="scout"?'Int '+hs(x,"int"):'Atk '+hs(x,"atk"))+'</option>'; }).join("")+'</select>'+
     (S.mayor||S.trainer||S.researcher||S.wallHero?'<p class="hint" style="margin-top:4px">Your mayor, trainer, researcher and wall hero stay home to do their jobs.</p>':'')+'</div>';
   if (d.mission==="transport") h=h.replace('<select id="marchhero">','<select id="marchhero" hidden>');
   if ((d.mission==="attack"||d.mission==="conquer") && !d.from) h+='<label class="chk"><input type="checkbox" id="mrep"'+(d.rep?' checked':'')+'> Repeat this march: it goes out again with the same hero as soon as it’s home, sending whatever of the army survived. It keeps going through losses, but stops as soon as any troop type it was sent with has run out at home, if the attack fails, or if it can’t be fed or crewed.</label>'+(d.rep?'<label class="chk"><input type="checkbox" id="mrepl"'+(d.repl?' checked':'')+'> Stop repeating if it loses any troops</label>':'');
@@ -6830,8 +6871,8 @@ function wdDragFrom(cx, cy){ var L=wdLoc(cx,cy), V=wdWin(); WDG.x0=L?L.x:0; WDG.
 document.addEventListener("pointerdown", function(e){ var sv=e.target && e.target.closest && e.target.closest("#wdsvg"); if (!sv) return;
   if (e.pointerType==="mouse" && e.button!==0) return; WDS.dragAt=0; // a fresh touch: its click is a tap unless it moves
   WDG.pts[e.pointerId]={x:e.clientX, y:e.clientY}; WDG.n=Object.keys(WDG.pts).length;
-  if (WDG.n===1){ WDG.moved=false; wdDragFrom(e.clientX, e.clientY); }
-  else { WDG.moved=true; wdGestOn(); wdPinchStart(); }
+  if (WDG.n===1){ WDG.moved=false; WDG.tap=true; wdDragFrom(e.clientX, e.clientY); }
+  else { WDG.moved=true; WDG.tap=false; wdGestOn(); wdPinchStart(); }
 });
 document.addEventListener("pointermove", function(e){ var p=WDG.pts[e.pointerId]; if (!p) return; p.x=e.clientX; p.y=e.clientY;
   if (!document.getElementById("wdsvg")) return;
@@ -6842,10 +6883,17 @@ document.addEventListener("pointermove", function(e){ var p=WDG.pts[e.pointerId]
   WDG.moved=true; wdGestOn(); var V1=wdWin(), k=V1.w/L1.w;
   WDS.cx=WDG.cx0-dx*k; WDS.cy=WDG.cy0-dy*k; wdClampC(); wdView(); e.preventDefault();
 }, {passive:false});
+/* 0.2.25: a tap on the map is read here, from the finger lifting, not from the click that follows it. iPhones don't send that click
+   to the page for a tap on a plain drawing, so on iOS the map ignored every tap. The click that does come right after (same spot, within 0.7 s) is skipped (wdGhost). */
 function wdPtUp(e){ if (!WDG.pts[e.pointerId]) return; delete WDG.pts[e.pointerId]; WDG.n=Object.keys(WDG.pts).length;
   if (WDG.moved) WDS.dragAt=Date.now();
+  else if (!WDG.n && WDG.tap && e.type==="pointerup" && document.getElementById("wdsvg")){ WDG.tap=false; WDS.tapAt={at:Date.now(), x:e.clientX, y:e.clientY}; wdTapAt(e); return; }
+  if (!WDG.n) WDG.tap=false;
   if (WDG.n===1){ var a=wdPtList()[0]; wdDragFrom(a.x, a.y); } // one finger lifted: keep dragging with the other
   else if (!WDG.n && WDS.gest) wdGestEnd(); }
+document.addEventListener("click", function(e){ // the click after a map tap must not land on the popup that tap just opened
+  if (wdGhost(e) && e.target && e.target.closest && e.target.closest(".wdpop")){ e.stopPropagation(); e.preventDefault(); } }, true);
+function wdGhost(e){ var t=WDS.tapAt; return !!(t && Date.now()-t.at<700 && Math.abs(e.clientX-t.x)<12 && Math.abs(e.clientY-t.y)<12); } // the click a tap just made
 document.addEventListener("pointerup", wdPtUp); document.addEventListener("pointercancel", wdPtUp);
 document.addEventListener("wheel", function(e){ var sv=e.target && e.target.closest && e.target.closest("#wdsvg"); if (!sv) return; e.preventDefault();
   wdGestOn(); wdZoomAt(wdWin().z*Math.exp(-e.deltaY*0.0018), e.clientX, e.clientY); clearTimeout(WDG.wt); WDG.wt=setTimeout(wdGestEnd, 250); }, {passive:false});
@@ -7038,7 +7086,7 @@ function wdTeleport(body, msg){ if (WDS.acting) return; if (!(wdTele()>0)){ toas
 // the tap handler's part (called from the click listener; true = handled)
 function wdAct(act, a, e){
   if (act==="wd-open"){ WDS.sel=null; openSheet({kind:"world"}); if (!WDS.busy) wdFetch(); return true; }
-  if (act==="wd-tap"){ if (!WDS.dragAt) wdTapAt(e); return true; }
+  if (act==="wd-tap"){ if (!WDS.dragAt && !wdGhost(e)) wdTapAt(e); return true; }
   if (act==="wd-popx"){ WDS.sel=null; WDS.armed=""; wdPaint(); return true; }
   if (act==="wd-mltog"){ WDS.mlOpen=WDS.mlOpen===false; wdPaint(); return true; }
   if (act==="wd-mrecall"){ wdMarchAct("/wd/recall", +a.dataset.id, "March recalled: it\u2019s heading home"); return true; }
@@ -9038,7 +9086,7 @@ function troopList(t){ var p=[]; for (var i=0;i<12;i++) if (t[i]>0) p.push(fmt(t
 function marchHeroName(m){ if (!m.hero) return ""; var c=S.cities[cityIndex(m.city)], hs=(c&&c.heroes)||[]; for (var i=0;i<hs.length;i++) if (hs[i].id===m.hero) return hs[i].name; var h=heroById(m.hero); return h?h.name:""; }
 function marchSummary(m){
   var bits=[], hn=marchHeroName(m), carry={}; // the leading hero comes first, so marches are easy to tell apart at a glance
-  if (hn) bits.push("Led by "+hn); else if (m.mission!=="transport" && m.mission!=="scout" && m.mission!=="reinforce" && m.mission!=="allyguard" && m.mission!=="hide") bits.push("No hero");
+  if (hn) bits.push("Led by "+hn); else if (m.mission!=="transport" && m.mission!=="reinforce" && m.mission!=="allyguard" && m.mission!=="hide") bits.push("No hero");
   bits.push(fmt(sumT(m.t))+" troops: "+troopList(m.t)); if (m.rep) bits.push("repeating");
   RES.forEach(function(k){ var n=((m.cargo&&m.cargo[k])||0)+((m.loot&&m.loot[k])||0); if (n>0) carry[k]=n; });
   var cs=RES.filter(function(k){ return carry[k]; }).map(function(k){ return fmt(carry[k])+" "+RNAME[k].toLowerCase(); });
@@ -10451,13 +10499,14 @@ function bfScoutArrive(m){
   var bf=BF(), p=bf.p[m.p], snap, ds, key;
   if (m.tp!=null){ var o=bf.p[m.tp]; ds=o.reserve[2]||0; key="p"+m.tp; snap={t:o.reserve.slice()}; }
   else { var B=bf.b[m.b], g=B.owner<0?(B.neutral||Z12()):bfGar(B); ds=g[2]||0; key="b"+m.b; snap={t:g.slice(), f:B.forts.slice(), wall:B.wall, owner:B.owner}; }
-  var inf=p.inf||0, dInf=10, as=m.t[2]||0, aE=as*(1+0.1*inf), dE=ds*(1+0.1*dInf), ok=aE>dE, aLost=ok?Math.min(as, Math.ceil(dE/(1+0.1*inf))):as;
+  var dHint=m.tp!=null?(bf.p[m.tp].hint||0):0, aMul=(1+0.1*(p.inf||0))*scoutHeroMul(m.h?bfHeroSnap(m.h).int:0), dMul=(1+0.1*10)*scoutHeroMul(dHint); // 0.2.24: heroes with scouts
+  var as=m.t[2]||0, aE=as*aMul, dE=ds*dMul, ok=aE>dE, aLost=ok?Math.min(as, Math.ceil(dE/aMul)):as;
   if (ok){ snap.at=bf.t; bf.intel=bf.intel||{}; bf.intel[key]=snap; }
   bfLog(ok ? "Your scouts report from "+bfTgtName(m)+(aLost?" ("+fmt(aLost)+" lost)":"")+"." : "Your scouts were caught at "+bfTgtName(m)+": they had "+(ds?"more scouts":"scouts")+" than you sent.");
   if (m.p===0) toast(ok?"Scouts report from "+bfTgtName(m):"Scouts caught at "+bfTgtName(m));
   var left=as-aLost; if (left<=0) return;
-  var back={id:++bf.mid, p:m.p, b:m.b, t:Z12(), dep:bf.t, back:true, scout:true, h:0}; back.t[2]=left; if (m.tp!=null) back.tp=m.tp;
-  back.arr=bf.t+bfTravel(m.p, m.b, back.t, null, m.tp); bf.m.push(back);
+  var back={id:++bf.mid, p:m.p, b:m.b, t:Z12(), dep:bf.t, back:true, scout:true, h:m.h||0}; back.t[2]=left; if (m.tp!=null) back.tp=m.tp;
+  back.arr=bf.t+bfTravel(m.p, m.b, back.t, m.h?bfHeroSnap(m.h).int:null, m.tp); bf.m.push(back);
 }
 function bfRecall(pi, bi){ // pull your troops out of a building you hold
   var bf=BF(), B=bf.b[bi], t=B.gar[pi]; if (!t || !sumT(t)) return false;
@@ -10866,7 +10915,8 @@ function bfSendSheet(){
   var h='<div class="head"><span class="ico">'+ICON[scout?"beacon":"rally"]+'</span><div><h2>'+verb+esc(name)+'</h2><div class="sub">Up to '+fmt(cap)+' per march'+(bf.b[0].owner===0?' (War Banner +25%)':'')+', arriving in about '+bfMin(bfTravel(0,Math.max(0,bi),tot?d:[0,1,0,0,0,0,0,0,0,0,0,0],scout?null:hs0.int,tp))+'</div></div></div>';
   if (tp==null && !own) h+='<div class="lbtabs" style="position:static;margin:4px 0"><button class="chipbtn'+(!scout?' on':'')+'" style="padding:0 12px" data-act="bf-mode" data-v="troops">Attack</button><button class="chipbtn'+(scout?' on':'')+'" style="padding:0 12px" data-act="bf-mode" data-v="scout">Scout</button></div>';
   h+=bfIntelLine(tp!=null?"p"+tp:"b"+bi);
-  if (scout) h+='<p class="hint">Scouts fight scouts: yours get through if they outnumber the defenders\u2019 scouts (Informatics adds 10% a level on each side; '+(bf.pvp?'your opponent brings their own':'the rivals have level 10')+'). Survivors bring back exact troops'+(tp==null?', walls and forts':'')+'. Scouts travel twice as fast.</p>';
+  if (scout) h+='<div class="farmadd"><label for="bfhero" class="dur">Hero</label><select id="bfhero"><option value="0">No hero</option>'+heroes.map(function(x){ return '<option value="'+x.id+'"'+(x.id===bfDraftHero?' selected':'')+'>'+esc(x.name)+' (Int '+x.int+': scouts \u00d7'+scoutHeroMul(x.int).toFixed(2)+')</option>'; }).join("")+'</select></div>';
+  if (scout) h+='<p class="hint">Scouts fight scouts: yours get through if they outnumber the defenders\u2019 scouts (Informatics adds 10% a level on each side, and a leading hero\u2019s Intelligence 0.5% a point; '+(bf.pvp?'your opponent brings their own':'the rivals have level 10')+'). Survivors bring back exact troops'+(tp==null?', walls and forts':'')+'. Scouts travel twice as fast.</p>';
   else h+='<div class="farmadd"><label for="bfhero" class="dur">Hero</label><select id="bfhero"><option value="0">No hero</option>'+heroes.map(function(x){ return '<option value="'+x.id+'"'+(x.id===bfDraftHero?' selected':'')+'>'+esc(x.name)+' (Atk '+x.atk+', Int '+x.int+(x.life>1?', set \u00d7'+x.life:'')+')</option>'; }).join("")+'</select></div>'+
     ((me.heroes||[]).length>heroes.length?'<p class="dur" style="margin:0">'+((me.heroes||[]).length-heroes.length)+' of your heroes are out leading marches.</p>':'');
   h+='<table class="gt wct"><tbody>'+U.map(function(u,i){ if (!me.reserve[i] || i===0 || i===6 || (scout && i!==2)) return '';
@@ -11176,8 +11226,8 @@ function invScoutInv(v, t){
     return '<div class="gearrow'+(picked?' t3':'')+'"><span class="gn">'+esc(it.name)+' ('+it.x+', '+it.y+')</span><span class="gb">'+(picked?'Target':'')+'</span><span class="dur" style="grid-column:1/-1">'+invIntelText(it)+'</span>'+
       (v.pick?'':'<span class="btnrow" style="grid-column:1/-1;justify-content:flex-end"><button class="btn small" data-act="iv-pick" data-x="'+it.x+'" data-y="'+it.y+'">Pick as target</button></span>')+'</div>'; }).join("")+'</div>';
   var sn=IV.scoutN||Math.min(v.scouts,1000);
-  h+='<div class="farmadd" style="margin-top:6px"><label for="ivscn" class="dur">Scouts per trip</label><input id="ivscn" type="number" inputmode="numeric" min="1" value="'+sn+'"></div>'+
-    '<p class="hint">Scouts fight the defenders’ scouts when they arrive (Informatics adds 10% a level on each side). A city is only found if yours outnumber theirs, and the lords you’ll see on the map include real AI lords, so most tiles are not players.</p>'+
+  h+='<div class="farmadd" style="margin-top:6px"><label for="ivscn" class="dur">Scouts per trip</label><input id="ivscn" type="number" inputmode="numeric" min="1" value="'+sn+'"></div>'+ivScoutHeroSel(((v.city&&v.city.heroes)||[]))+
+    '<p class="hint">Scouts fight the defenders’ scouts when they arrive (Informatics adds 10% a level on each side, a leading hero\u2019s Intelligence 0.5% a point, and a city\u2019s wall hero counts for its own scouts). A city is only found if yours outnumber theirs, and the lords you’ll see on the map include real AI lords, so most tiles are not players.</p>'+
     '<div class="btnrow"><button class="btn ghost small" data-act="iv-look"'+(IV.mapBusy?' disabled':'')+'>'+(IV.map?'Refresh the map around the camp':'Look around the camp')+'</button></div>';
   if (IV.map){
     var near=IV.map.slice(0,30);
@@ -11190,11 +11240,15 @@ function invScoutInv(v, t){
     '<div class="btnrow"><button class="btn ghost danger" data-act="iv-abort">'+(IV.armed==="abort"?'Tap again: call it off':'Call off the invasion')+'</button></div>';
   return h;
 }
+// 0.2.24: a hero to lead the next scouting party (busy ones are out with another party)
+function ivScoutHeroSel(heroes, groups){ var opt=function(x){ return '<option value="'+x.id+'"'+(x.id===IV.scHero?' selected':'')+(x.out?' disabled':'')+'>'+esc(x.name)+' (Int '+x.int+': scouts \u00d7'+scoutHeroMul(x.int).toFixed(2)+')'+(x.out?' \u00b7 out':'')+'</option>'; };
+  var body=groups ? groups.map(function(g){ return g.heroes.length?'<optgroup label="'+esc(g.name)+'">'+g.heroes.map(opt).join("")+'</optgroup>':''; }).join("") : heroes.map(opt).join("");
+  return '<div class="farmadd"><label for="ivschero" class="dur">Hero with the scouts</label><select id="ivschero"><option value="0">No hero</option>'+body+'</select></div>'; }
 function invScoutDef(v, t){
   var h='<p class="hint"><b>'+esc(v.camp.name)+'</b> has landed a camp at ('+v.camp.x+', '+v.camp.y+'). '+(v.pick?'They picked <b>'+esc(v.pick.name)+'</b> as the target. ':'They haven’t picked a target yet. ')+'The fighting starts in '+invMin(v.fightAt-t)+'. Your scouts can find out what the camp has.</p>';
   if (v.intel) h+='<p class="hint">'+invIntelText(v.intel)+'</p>';
   var sn=IV.scoutN||100;
-  h+='<div class="farmadd"><label for="ivscn" class="dur">Scouts per trip</label><input id="ivscn" type="number" inputmode="numeric" min="1" value="'+sn+'"></div><div class="gearlist">'+v.cities.map(function(c){
+  h+='<div class="farmadd"><label for="ivscn" class="dur">Scouts per trip</label><input id="ivscn" type="number" inputmode="numeric" min="1" value="'+sn+'"></div>'+ivScoutHeroSel(null, v.cities.map(function(c){ return {name:c.name, heroes:c.heroes||[]}; }))+'<p class="dur" style="margin:0">A hero goes with scouts from their own city. Their Intelligence counts 0.5% a point.</p><div class="gearlist">'+v.cities.map(function(c){
     return '<div class="gearrow'+(v.pick&&v.pick.cid===c.id?' t3':'')+'"><span class="gn">'+esc(c.name)+'</span><span class="gb">'+Math.round(c.dist)+' tiles from the camp</span><span class="dur" style="grid-column:1/-1">'+fmt(c.scouts)+' scouts available</span>'+
       '<span class="btnrow" style="grid-column:1/-1;justify-content:flex-end"><button class="btn ghost small" data-act="iv-dscout" data-cid="'+c.id+'"'+(c.scouts>0?'':' disabled')+'>Scout the camp</button></span></div>'; }).join("")+'</div>';
   if (v.ds&&v.ds.length) h+='<div class="gearlist">'+v.ds.map(function(s){ return '<div class="gearrow"><span class="gn">'+fmt(s.n)+' scouts '+(s.back?'coming home':'to the camp')+'</span><span class="gb">'+invMin(Math.max(0,s.arr-t))+'</span></div>'; }).join("")+'</div>';
@@ -11260,17 +11314,17 @@ function invAct(act, a){
   if (act==="iv-scout"){
     var x=a.dataset.x!=null?+a.dataset.x:+IV.tx, y=a.dataset.y!=null?+a.dataset.y:+IV.ty;
     if (a.dataset.x==null && (IV.tx===""||IV.ty==="")){ toast("Type the tile’s x and y first"); return true; }
-    invOrder({type:"scout", x:x, y:y, n:IV.scoutN||Math.min(v.scouts,1000)}, "Scouts sent to ("+x+", "+y+")"); return true; }
+    invOrder({type:"scout", x:x, y:y, n:IV.scoutN||Math.min(v.scouts,1000), hero:IV.scHero||0}, "Scouts sent to ("+x+", "+y+")"); IV.scHero=0; return true; }
   if (act==="iv-tele"){ if (IV.tx===""||IV.ty===""){ toast("Type the tile’s x and y first"); return true; }
     if (IV.armed!=="tele"){ fresh(); IV.armed="tele"; toast("Tap again to spend a Teleport"); return true; } fresh(); invOrder({type:"teleport", x:+IV.tx, y:+IV.ty}, "The camp has moved"); IV.map=null; return true; }
   if (act==="iv-pick"){ invOrder({type:"pick", x:+a.dataset.x, y:+a.dataset.y}, "Target picked"); return true; }
   if (act==="iv-abort"){ if (IV.armed!=="abort"){ fresh(); IV.armed="abort"; lastView=""; renderView(true); return true; } fresh(); invOrder({type:"abort"}, "Invasion called off"); return true; }
-  if (act==="iv-dscout"){ invOrder({type:"dscout", cid:+a.dataset.cid, n:IV.scoutN||100}, "Scouts sent to the camp"); return true; }
+  if (act==="iv-dscout"){ invOrder({type:"dscout", cid:+a.dataset.cid, n:IV.scoutN||100, hero:IV.scHero||0}, "Scouts sent to the camp"); IV.scHero=0; return true; }
   if (act==="iv-all"){ var u=+a.dataset.unit; IV.draft[u]=Math.min(me.reserve[u], Math.max(0, me.cap-(sumT(IV.draft)-IV.draft[u]))); lastView=""; renderView(true); return true; }
   if (act==="iv-fill"){ var left=me.cap; IV.draft=Z12(); for (var i=0;i<12;i++){ if (i===0||i===6||i===2) continue; var n=Math.min(me.reserve[i], left); IV.draft[i]=n; left-=n; } lastView=""; renderView(true); return true; }
   if (act==="iv-clear"){ IV.draft=Z12(); lastView=""; renderView(true); return true; }
   if (act==="iv-send"){ invOrder({type:"send", t:IV.draft.slice(), hero:IV.hero||0}, "March sent"); IV.draft=Z12(); return true; }
-  if (act==="iv-sendscout"){ var sc=Z12(); sc[2]=Math.min(me.reserve[2], IV.draft[2]||me.reserve[2]); invOrder({type:"send", scout:true, t:sc}, "Scouts sent"); return true; }
+  if (act==="iv-sendscout"){ var sc=Z12(); sc[2]=Math.min(me.reserve[2], IV.draft[2]||me.reserve[2]); invOrder({type:"send", scout:true, t:sc, hero:IV.hero||0}, "Scouts sent"); return true; } // 0.2.24: the chosen hero leads scouts too
   if (act==="iv-recall"){ invOrder({type:"recall", id:+a.dataset.id}, "March turned back"); return true; }
   if (act==="iv-hasten"){ invOrder({type:"hasten", id:+a.dataset.id}, "Half the remaining time"); return true; }
   if (act==="iv-gate"){ invOrder({type:"gate", closed:me.gate!=="closed"}, me.gate==="closed"?"Gate opened":"Gate closed"); return true; }
@@ -11281,6 +11335,7 @@ function invInput(e){
   var el=e.target;
   if (el.dataset && el.dataset.ivn!=null){ IV.draft[+el.dataset.ivn]=Math.max(0,Math.floor(+el.value||0)); return true; }
   if (el.id==="ivscn"){ IV.scoutN=Math.max(0,Math.floor(+el.value||0)); return true; }
+  if (el.id==="ivschero"){ IV.scHero=+el.value||0; return true; }
   if (el.id==="ivtx"){ IV.tx=el.value; return true; } if (el.id==="ivty"){ IV.ty=el.value; return true; }
   return false;
 }
@@ -11369,6 +11424,7 @@ function pvSnap(ci){
     snap={name:lbAutoName(), city:S.name, troops:cp, research:simResearch(), mt:S.tech.militarytradition||0, inf:S.tech.informatics||0,
       rally:Math.max(1,bLevel("rally")), beacon:bLevel("beacon"), buffA:bAttack(), buffD:bDefend(),
       heroes:(S.heroes||[]).map(function(h){ return {id:h.id, name:h.name, atk:hsB(h,"atk"), int:hsB(h,"int"), life:setLife(h)}; }),
+      wint:hsB(wallHero(),"int",1), // 0.2.24: the wall hero's Intelligence counts for the camp's scouts
       items:{marchsp:S.items.marchsp||0}, prestige:Math.floor((S.prestige||0)*totalTH())};
   });
   return snap;
@@ -12380,11 +12436,18 @@ function viewTitlesBody(t,nt,nr){
   h+='<div class="section"><h3>'+(nt?'Next title: '+nt.name:'Highest title reached')+'</h3>'+(nt?'<p class="hint">Allows '+nt.cities+' cities.</p>'+questCard(nt,true,"titleup","Run for "+nt.name):'<p class="hint">You are Prinzessin. Ten cities are yours to rule.</p>')+'</div>';
   h+='<details class="section"><summary>All titles</summary><div class="ladder">'+TITLES.map(function(x,i){ return '<span class="'+(i===S.title?'cur':'')+'">'+x.name+'</span><span class="dur">'+(i?fmt(x.prestige)+' prestige, '+fmt(x.gold)+' gold, '+MEDALS.filter(function(m){return x.m[m[0]];}).map(function(m){return x.m[m[0]]+' '+m[1];}).join(" + "):'Starting title')+'</span><span>'+x.cities+' '+(x.cities===1?'city':'cities')+'</span>'; }).join("")+'</div></details>';
   var pw=[[12,"Place one NPC city of any level on any open flat or valley, once a day per level 12 you hold."],[14,"Monsters gather near your level 14s each day. Slay them for Dragon Scales, the material for Mythic gear."],[16,"Your historic cities can be teleported like any other city."],[18,"Atlantis raises your city cap by 4."]];
-  h+='<div class="section"><h3>Historic powers</h3><div class="gearlist">'+pw.map(function(x){ var on=hasHC(x[0]); return '<div class="gearrow'+(on?' t3':'')+'"><span class="gn">Level '+x[0]+'</span><span class="gb '+(on?'okc':'dur')+'">'+(on?'Active':'Locked')+'</span><span class="dur" style="grid-column:1/-1">'+x[1]+'</span></div>'; }).join("")+'</div>'+
+  pw.push([0,"Every historic city you hold can draft once a day: it takes a tenth of the biggest troop type in each NPC city within reach (12 tiles for a level 12, 16 for a 14, 20 for a 16, 28 for Atlantis) into its own army. The NPC cities grow back within the hour."]);
+  h+='<div class="section"><h3>Historic powers</h3><div class="gearlist">'+pw.map(function(x){ if (!x[0]){ var on0=hcLevels().length>0; return '<div class="gearrow'+(on0?' t3':'')+'"><span class="gn">Draft</span><span class="gb '+(on0?'okc':'dur')+'">'+(on0?'Active':'Locked')+'</span><span class="dur" style="grid-column:1/-1">'+x[1]+'</span></div>'; } var on=hasHC(x[0]); return '<div class="gearrow'+(on?' t3':'')+'"><span class="gn">Level '+x[0]+'</span><span class="gb '+(on?'okc':'dur')+'">'+(on?'Active':'Locked')+'</span><span class="dur" style="grid-column:1/-1">'+x[1]+'</span></div>'; }).join("")+'</div>'+
+    draftListHtml()+
     '<p class="hint" style="margin-top:6px">Historic cities also let their buildings, fields and research climb to the city\u2019s own level: 12 marches from a level 12 Rally Spot, cheaper troops from Barracks above 10, and new research at Academy 12, 14 and 16.</p></div>';
   return h;
 }
 
+function draftListHtml(){ var hc=S.cities.map(function(c,ci){ return {c:c, ci:ci}; }).filter(function(o){ return o.c.fieldCap; }); if (!hc.length) return '';
+  return '<div class="h3" style="margin-top:10px">Draft</div><div class="gearlist">'+hc.map(function(o){ var c=o.c, hv=draftHaul(c), ready=draftReady(c), tot=sumT(hv.t);
+    return '<div class="gearrow'+(ready&&tot?' t3':'')+'"><span class="gn">'+esc(c.name)+' <span class="dur">(level '+c.fieldCap+', '+draftRange(c)+' tiles)</span></span><span class="gb">'+(ready?fmt(tot)+' troops':'Drafted today')+'</span>'+
+      '<span class="dur" style="grid-column:1/-1">'+(hv.n===1?'1 NPC city in reach':hv.n+' NPC cities in reach')+(ready?'':' \u00b7 next draft in '+fmtT(realMs(msToNewDay())))+'</span>'+
+      (ready?'<span class="btnrow" style="grid-column:1/-1;justify-content:flex-end"><button class="btn small" data-act="hc-draft" data-ci="'+o.ci+'"'+(tot?'':' disabled')+'>Draft now</button></span>':'')+'</div>'; }).join("")+'</div>'; }
 function goalLinesHtml(k){
   var G=GK[k], have=G.have(), lines=gLines(k), act=gActive(k,have), auto=k==="fg"?S.autoFort:S.autoTrain, h='';
   if (!lines.length) h+='<p class="hint"><b>No lines yet.</b> Add one to start.</p>';
@@ -13731,6 +13794,7 @@ document.addEventListener("click",function(e){
   if (act==="mp-warn-ok"){ var mpa=mpPending, mpk=sheetFor&&sheetFor.act; mpPending=null; mpGo(MP_ACTS[mpk]||"chose"); closeSheet(); toast("You\u2019re on the multiplayer high scores now"); if (mpa && document.contains(mpa)) mpa.click(); else if (mpk==="wd-join") wdJoin(); return; }
   if (WDFS.on && act.slice(0,3)!=="wd-" && a.closest && a.closest("#wdview")) wdFs(false); // 0.2.21: a button that opens something else leaves full screen
   if (act.slice(0,3)==="wd-" && wdAct(act, a, e)) return; // 0.2.17: the server map
+  if (act==="hc-draft"){ var dr=doDraft(+a.dataset.ci); if (dr){ flushFinished(); save(); lastView=""; refresh(); } return; } // 0.2.24
   if (act==="mp-intro"){ var mpwc=document.getElementById("mpiwc"); S.mpIntro=1; S.mpOn = a.dataset.v==="on"; if (!S.mpOn && mpwc) S.wcOn=!mpwc.checked; save(); closeSheet(); lastView=""; refresh(); renderDock();
     toast(S.mpOn?"Multiplayer is on. You can switch any time in Settings":"Single player it is. You can switch any time in Settings");
     if (mpNeedsGrace()) setTimeout(function(){ openSheet({kind:"mpgrace"}); },400); return; }
@@ -14370,8 +14434,8 @@ document.addEventListener("click",function(e){
   if (act==="pv-ww"){ var pwr=PV.v&&PV.v.reports&&PV.v.reports[+a.dataset.i]; if (!pwr || !pwr.cap) return; rpStop(); rpOpenCap(pwr.cap, {sub:"PvP \u00b7 "+pwr.name+" at "+bfMin(pwr.t), mine:pwr.attacker?"A":"D", back:null}); return; }
   if (act==="pv-collect"){ pvCollect(); refresh(); return; }
   if (act==="bf-go"){ var gscout=sheetFor.tp!=null||bfMode==="scout", gd=(bfDraft||Z12()).slice(); if (gscout) gd=gd.map(function(n,i){ return i===2?n:0; });
-    if (pvOn()){ var pvt=sheetFor.tp!=null; pvOrder(gscout?{type:"send", scout:true, b:pvt?0:sheetFor.b, tp:pvt?1-PV.v.me:undefined, t:gd}:{type:"send", b:sheetFor.b, t:gd, hero:bfDraftHero||0}, gscout?"Scouts sent":"March sent", function(){ closeSheet(); bfDraft=null; bfDraftHero=null; }); return; }
-    if (bfSend(0, sheetFor.tp!=null?0:sheetFor.b, gd, false, gscout?{scout:true, tp:sheetFor.tp}:{hero:bfDraftHero||0})){ toast(gscout?"Scouts sent":"March sent"); closeSheet(); bfDraft=null; bfDraftHero=null; lastView=""; refresh(); }
+    if (pvOn()){ var pvt=sheetFor.tp!=null; pvOrder(gscout?{type:"send", scout:true, b:pvt?0:sheetFor.b, tp:pvt?1-PV.v.me:undefined, t:gd, hero:bfDraftHero||0}:{type:"send", b:sheetFor.b, t:gd, hero:bfDraftHero||0}, gscout?"Scouts sent":"March sent", function(){ closeSheet(); bfDraft=null; bfDraftHero=null; }); return; }
+    if (bfSend(0, sheetFor.tp!=null?0:sheetFor.b, gd, false, gscout?{scout:true, tp:sheetFor.tp, hero:bfDraftHero||0}:{hero:bfDraftHero||0})){ toast(gscout?"Scouts sent":"March sent"); closeSheet(); bfDraft=null; bfDraftHero=null; lastView=""; refresh(); }
     else toast("Couldn\u2019t send that march"); return; }
   if (act==="chal-go"){ var pick=document.getElementById("chalpick"), rid=pick?+pick.value:null; if (rid==null || chalWhy(rid)) return;
     if (!chalArmed){ chalArmed=true; lastView=""; renderView(true); var pk=document.getElementById("chalpick"); if (pk) pk.value=String(rid); return; }
