@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.26";
+window.IBORY_V="0.2.27";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1170,7 +1170,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.26";
+var APP_VERSION = "0.2.27";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -1309,25 +1309,34 @@ function hasHC(L){ return hcLevels().indexOf(L)>=0; }
 /* 0.2.24: the draft (Age 2, Cody). A historic city you hold conscripts troops out of an NPC city around it, once a game day: a tenth of the
    NPC city's biggest troop type as it stands (0.2.25; it was every type), straight into the historic city. Since 0.2.26 you pick the one NPC city (it was all of them). The NPC cities lose them as if hit by an attack and
    grow back within the hour. Range in tiles by the city's level (Age 2's distances scaled to this 396-tile map). */
-var DRAFT_RANGE={12:12, 14:16, 16:20, 18:28}, DRAFT_SHARE=0.1;
-function draftRange(c){ return DRAFT_RANGE[c.fieldCap]||0; }
+/* 0.2.27 (Cody): historic cities also draft from LOWER historic cities, and reach by level: a 12 NPC cities within 12 tiles; a 14 within
+   24 tiles (the three or four 12s around it); a 16 its quarter of the map; Atlantis the whole map. */
+var DRAFT_SHARE=0.1, DRAFT_R={12:12, 14:24}, DRAFT_HALF={16:99};
+function draftReachText(c){ var L=c.fieldCap; return L===18?"the whole map":L===16?"its quarter of the map":(DRAFT_R[L]||0)+" tiles"; }
+function draftIn(c, x, y){ var L=c.fieldCap, dx=x-c.x, dy=y-c.y; if (!L || (!dx && !dy)) return false; if (L===18) return true;
+  if (DRAFT_HALF[L]) return Math.max(Math.abs(dx),Math.abs(dy))<=DRAFT_HALF[L]; var R=DRAFT_R[L]||0; return dx*dx+dy*dy<=R*R; }
+function draftOk(c, q){ return !!(q && draftIn(c,q.x,q.y) && !S.map.owned[q.id] && (q.k==="npc" || (q.k==="hc" && q.L<c.fieldCap))); }
 function draftReady(c){ return !!c.fieldCap && c.draftDay!==gameDay(); }
-function draftTargets(c){ var R=draftRange(c), out=[]; if (!R) return out;
-  for (var y=Math.max(0,c.y-R); y<=Math.min(MAPH-1,c.y+R); y++) for (var x=Math.max(0,c.x-R); x<=Math.min(MAPW-1,c.x+R); x++){
-    var dx=x-c.x, dy=y-c.y; if (dx*dx+dy*dy>R*R) continue; var q=tileAt(x,y); if (q && q.k==="npc" && !S.map.owned[q.id]) out.push(q); }
-  return out; }
+// every NPC and historic city on the map, found once (a whole-map scan takes a quarter second) and found again when the map changes
+var DRAFT_ALL=null;
+function draftAll(){ var key=Object.keys(S.map.owned).length+"|"+Object.keys(S.map.npc||{}).length+"|"+Object.keys(S.map.flat||{}).length+"|"+S.cities.length;
+  if (DRAFT_ALL && DRAFT_ALL.key===key) return DRAFT_ALL.xy;
+  var xy=[]; for (var y=0;y<MAPH;y++) for (var x=0;x<MAPW;x++){ var q=tileAt(x,y); if (q && (q.k==="npc" || q.k==="hc")) xy.push([x,y]); }
+  DRAFT_ALL={key:key, xy:xy}; return xy; }
+function draftTargets(c){ if (!c.fieldCap) return []; var out=[];
+  draftAll().forEach(function(p){ if (!draftIn(c,p[0],p[1])) return; var q=tileAt(p[0],p[1]); if (draftOk(c,q)) out.push(q); }); return out; }
 // 0.2.25 (Cody): a draft takes a tenth of an NPC city's biggest troop type only (40k Warriors from a level 10)
 function draftTake(cur){ var take=Z12(), bi=-1; for (var i=0;i<12;i++) if ((cur.t[i]||0)>0 && (bi<0 || cur.t[i]>cur.t[bi])) bi=i;
   if (bi>=0) take[bi]=Math.floor(cur.t[bi]*DRAFT_SHARE); return take; }
 // 0.2.26 (Cody): a draft picks ONE NPC city in reach (as in Age 2): a tenth of its biggest troop type, once a day per historic city
 function draftOpts(c){ return draftTargets(c).map(function(q){ var tk=draftTake(current(q)); return {q:q, tk:tk, n:sumT(tk)}; }).filter(function(o){ return o.n>0; })
   .sort(function(a,b){ return b.n-a.n || a.q.L-b.q.L; }); }
-var DRAFT_PICK={}; // historic city id -> the NPC tile picked in the Draft list
+var DRAFT_SHOW=40, DRAFT_PICK={}; // historic city id -> the NPC tile picked in the Draft list
 function draftPick(c){ var os=draftOpts(c), id=DRAFT_PICK[c.id]; return os.filter(function(o){ return o.q.id===id; })[0] || os[0] || null; }
 function draftTakeText(tk){ return U.map(function(u,i){ return tk[i]?fmt(tk[i])+" "+uname(i,tk[i]):""; }).filter(Boolean).join(", "); }
 function doDraft(ci, tid){ var c=S.cities[ci]; if (!c || !draftReady(c)) return null;
-  var o=draftOpts(c).filter(function(x){ return x.q.id===tid; })[0]; if (!o) return null;
-  var q=o.q, cur=current(q), take=o.tk;
+  var xy=String(tid||"").split(","), q=xy.length===2?tileAt(+xy[0],+xy[1]):null; if (!draftOk(c,q)) return null;
+  var cur=current(q), take=draftTake(cur); if (!sumT(take)) return null;
   TILE_BY[q.id]=q; S.map.hit[q.id]={t:cur.t.map(function(v,i){ return Math.max(0,(v||0)-take[i]); }), f:(cur.f||[0,0,0,0,0]).slice(), res:Object.assign({},cur.res), at:S.gt};
   withCity(ci, function(){ for (var i=0;i<12;i++) S.troops[i]+=take[i]; });
   c.draftDay=gameDay(); miniDirty=true; delete DRAFT_PICK[c.id];
@@ -4636,8 +4645,8 @@ document.addEventListener("change", function(e){ if (e.target===EDITING && e.tar
 document.addEventListener("focusout", function(e){ if (e.target===EDITING) EDITING=null; });
 function editingIn(el){ return !!(el && EDITING && el.contains(EDITING)); }
 // 0.2.26: Draft from an NPC city's own panel, one button for each historic city of yours that can reach it today
-function draftTileBtns(q){ return S.cities.map(function(c,ci){ if (!draftReady(c)) return ''; var o=draftOpts(c).filter(function(x){ return x.q.id===q.id; })[0]; if (!o) return '';
-  return '<button class="btn ghost" data-act="hc-draft" data-ci="'+ci+'" data-tile="'+q.id+'">Draft '+fmt(o.n)+' into '+esc(c.name)+'</button>'; }).join(""); }
+function draftTileBtns(q){ var n=sumT(draftTake(current(q))); if (!n) return ''; return S.cities.map(function(c,ci){ if (!draftReady(c) || !draftOk(c,q)) return '';
+  return '<button class="btn ghost" data-act="hc-draft" data-ci="'+ci+'" data-tile="'+q.id+'">Draft '+fmt(n)+' into '+esc(c.name)+'</button>'; }).join(""); }
 function renderTileInfoBase(){
   var el=document.getElementById("tileinfo"); if (!el) return;
   if (!selTile){ el.innerHTML=''; return; }
@@ -4717,7 +4726,7 @@ function renderTileInfoBase(){
   h+='<div class="btnrow" style="margin-top:10px"><button class="btn" data-act="march-open" data-tile="'+q.id+'" data-mission="attack">Attack</button><button class="btn ghost" data-act="march-open" data-tile="'+q.id+'" data-mission="scout">Scout</button>'+
     (VTYPES[q.k] ? '<button class="btn ghost" data-act="march-open" data-tile="'+q.id+'" data-mission="occupy">Occupy</button>' : '')+
     (q.k==="flat" ? '<button class="btn ghost" data-act="march-open" data-tile="'+q.id+'" data-mission="found">Found city</button>' : '')+
-    (q.k==="npc" ? draftTileBtns(q) : '')+
+    ((q.k==="npc"||q.k==="hc") ? draftTileBtns(q) : '')+
     ((q.k==="npc"||q.k==="ai") ? '<button class="btn ghost danger" data-act="npc-demolish" data-tile="'+q.id+'">'+(armedTile===q.id?"Tap again to demolish":"Demolish")+'</button>' : '')+
     '<button class="btn ghost" data-act="map-sim" data-tile="'+q.id+'">Simulate</button><button class="btn ghost" data-act="waves-open" data-tile="'+q.id+'">Timed waves</button></div>'+
     '<div class="farmadd"><span class="dur">Add to farm list:</span><span class="farmgrid">'+S.presets.map(function(pr,pi){ var on=pr.farm.indexOf(q.id)>=0; return '<button class="chipbtn'+(on?' on':'')+'" data-act="farm-toggle" data-p="'+pi+'" data-tile="'+q.id+'" title="'+esc(pr.name)+'" aria-pressed="'+on+'">'+(pi+1)+'</button>'; }).join("")+'</span></div></div>';
@@ -12465,7 +12474,7 @@ function viewTitlesBody(t,nt,nr){
   h+='<div class="section"><h3>'+(nt?'Next title: '+nt.name:'Highest title reached')+'</h3>'+(nt?'<p class="hint">Allows '+nt.cities+' cities.</p>'+questCard(nt,true,"titleup","Run for "+nt.name):'<p class="hint">You are Prinzessin. Ten cities are yours to rule.</p>')+'</div>';
   h+='<details class="section"><summary>All titles</summary><div class="ladder">'+TITLES.map(function(x,i){ return '<span class="'+(i===S.title?'cur':'')+'">'+x.name+'</span><span class="dur">'+(i?fmt(x.prestige)+' prestige, '+fmt(x.gold)+' gold, '+MEDALS.filter(function(m){return x.m[m[0]];}).map(function(m){return x.m[m[0]]+' '+m[1];}).join(" + "):'Starting title')+'</span><span>'+x.cities+' '+(x.cities===1?'city':'cities')+'</span>'; }).join("")+'</div></details>';
   var pw=[[12,"Place one NPC city of any level on any open flat or valley, once a day per level 12 you hold."],[14,"Monsters gather near your level 14s each day. Slay them for Dragon Scales, the material for Mythic gear."],[16,"Your historic cities can be teleported like any other city."],[18,"Atlantis raises your city cap by 4."]];
-  pw.push([0,"Every historic city you hold can draft once a day from one NPC city within reach (12 tiles for a level 12, 16 for a 14, 20 for a 16, 28 for Atlantis): it takes a tenth of that city\u2019s biggest troop type into its own army. Pick the NPC city below, or tap it on the map. It grows back within the hour."]);
+  pw.push([0,"Every historic city you hold can draft once a day from one NPC city, or lower-level historic city, within reach (a level 12: NPC cities within 12 tiles; a 14: 24 tiles, with the 12s around it; a 16: its quarter of the map; Atlantis: the whole map). It takes a tenth of that city\u2019s biggest troop type into its own army. Pick the city below, or tap it on the map. It grows back within the hour."]);
   h+='<div class="section"><h3>Historic powers</h3><div class="gearlist">'+pw.map(function(x){ if (!x[0]){ var on0=hcLevels().length>0; return '<div class="gearrow'+(on0?' t3':'')+'"><span class="gn">Draft</span><span class="gb '+(on0?'okc':'dur')+'">'+(on0?'Active':'Locked')+'</span><span class="dur" style="grid-column:1/-1">'+x[1]+'</span></div>'; } var on=hasHC(x[0]); return '<div class="gearrow'+(on?' t3':'')+'"><span class="gn">Level '+x[0]+'</span><span class="gb '+(on?'okc':'dur')+'">'+(on?'Active':'Locked')+'</span><span class="dur" style="grid-column:1/-1">'+x[1]+'</span></div>'; }).join("")+'</div>'+
     draftListHtml()+
     '<p class="hint" style="margin-top:6px">Historic cities also let their buildings, fields and research climb to the city\u2019s own level: 12 marches from a level 12 Rally Spot, cheaper troops from Barracks above 10, and new research at Academy 12, 14 and 16.</p></div>';
@@ -12474,9 +12483,10 @@ function viewTitlesBody(t,nt,nr){
 
 function draftListHtml(){ var hc=S.cities.map(function(c,ci){ return {c:c, ci:ci}; }).filter(function(o){ return o.c.fieldCap; }); if (!hc.length) return '';
   return '<div class="h3" style="margin-top:10px">Draft</div><div class="gearlist">'+hc.map(function(o){ var c=o.c, ready=draftReady(c), os=ready?draftOpts(c):[], pk=ready?draftPick(c):null;
-    var sel=os.length?'<select class="draftsel" data-draftc="'+c.id+'" aria-label="NPC city to draft from" style="grid-column:1/-1;width:100%">'+os.map(function(x){ return '<option value="'+x.q.id+'"'+(pk&&x.q.id===pk.q.id?' selected':'')+'>'+esc(tileName(x.q))+' ('+x.q.x+','+x.q.y+'): '+esc(draftTakeText(x.tk))+'</option>'; }).join("")+'</select>':'';
-    return '<div class="gearrow'+(pk?' t3':'')+'"><span class="gn">'+esc(c.name)+' <span class="dur">(level '+c.fieldCap+', '+draftRange(c)+' tiles)</span></span><span class="gb">'+(ready?(pk?fmt(pk.n)+' troops':'Nothing in reach'):'Drafted today')+'</span>'+
-      (ready?'<span class="dur" style="grid-column:1/-1">'+(os.length===1?'1 NPC city in reach':os.length+' NPC cities in reach')+'</span>'+sel:'<span class="dur" style="grid-column:1/-1">Next draft in '+fmtT(realMs(msToNewDay()))+'</span>')+
+    var shown=os.slice(0,DRAFT_SHOW); if (pk && shown.indexOf(pk)<0) shown.push(pk);
+    var sel=os.length?'<select class="draftsel" data-draftc="'+c.id+'" aria-label="City to draft from" style="grid-column:1/-1;width:100%">'+shown.map(function(x){ return '<option value="'+x.q.id+'"'+(pk&&x.q.id===pk.q.id?' selected':'')+'>'+esc(tileName(x.q))+(x.q.k==="hc"?' (historic, level '+x.q.L+')':'')+' ('+x.q.x+','+x.q.y+'): '+esc(draftTakeText(x.tk))+'</option>'; }).join("")+'</select>':'';
+    return '<div class="gearrow'+(pk?' t3':'')+'"><span class="gn">'+esc(c.name)+' <span class="dur">(level '+c.fieldCap+', reach: '+draftReachText(c)+')</span></span><span class="gb">'+(ready?(pk?fmt(pk.n)+' troops':'Nothing in reach'):'Drafted today')+'</span>'+
+      (ready?'<span class="dur" style="grid-column:1/-1">'+(os.length===1?'1 city in reach':fmt(os.length)+' cities in reach')+(os.length>DRAFT_SHOW?', the '+DRAFT_SHOW+' that give the most listed (tap any other on the map)':'')+'</span>'+sel:'<span class="dur" style="grid-column:1/-1">Next draft in '+fmtT(realMs(msToNewDay()))+'</span>')+
       (pk?'<span class="btnrow" style="grid-column:1/-1;justify-content:flex-end"><button class="btn small" data-act="hc-draft" data-ci="'+o.ci+'" data-tile="'+pk.q.id+'">Draft now</button></span>':'')+'</div>'; }).join("")+'</div>'; }
 function goalLinesHtml(k){
   var G=GK[k], have=G.have(), lines=gLines(k), act=gActive(k,have), auto=k==="fg"?S.autoFort:S.autoTrain, h='';
