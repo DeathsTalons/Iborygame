@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.22";
+window.IBORY_V="0.2.23";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -519,6 +519,10 @@ nav.tabs{display:block;margin:0}
 .wdmvbar{position:absolute;left:6px;right:6px;bottom:6px;z-index:6;display:flex;gap:8px;align-items:center;background:var(--panel);border:1px solid var(--brass);border-radius:10px;padding:6px 8px;font-size:.86rem;box-shadow:0 4px 12px rgba(0,0,0,.3)}.wdmvbar span{flex:1}
 .wdview.gest .wdpop{visibility:hidden!important}
 .wdfsbar{display:none}
+.wdml{position:absolute;left:6px;top:6px;z-index:6;max-width:62%;max-height:45%;overflow:auto;background:rgba(24,28,24,.86);color:#ebe3d0;border:1px solid rgba(215,176,88,.6);border-radius:10px;padding:4px 8px 6px;font-size:.8rem;line-height:1.3;box-shadow:0 3px 10px rgba(0,0,0,.35)}
+.wdml .dur{color:#c9cdc0}.wdmlh{background:none;border:0;color:#f3dc9a;font:700 .82rem var(--display);padding:2px 0;cursor:pointer}.wdmlr{border-top:1px solid rgba(235,227,208,.15);padding:4px 0 0;margin-top:4px}.wdmlw{font-weight:600}
+.wdmlb{display:flex;gap:10px;margin-top:2px}.wdml .link{color:#f3dc9a;font-size:.8rem}.wdml .link[disabled]{opacity:.45}
+.wdview.fs .wdml{top:calc(8px + env(safe-area-inset-top,0px))}
 .wdview.fs{position:fixed;top:0;left:0;right:0;bottom:0;max-width:none;margin:0;z-index:1500;background:#22301f}
 .wdview.fs .wdbox{max-width:none;width:100%;height:100%;border-radius:0}.wdview.fs .wdmap{width:100%;height:100%}
 .wdview.fs.rot{right:auto;bottom:auto;width:100vh;height:100vw;transform-origin:0 0;transform:translateX(100vw) rotate(90deg)}
@@ -1166,7 +1170,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.22";
+var APP_VERSION = "0.2.23";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -3751,8 +3755,8 @@ function mySide(hero){ return {research:simResearch(), hero:{intel:hsB(hero,"int
 function myAttacker(t, hero){ var A={troops:t}, sd=mySide(hero); for (var k in sd) A[k]=sd[k]; return A; }
 function farmAttacker(pr){ return myAttacker(pr.t.slice(), presetHero(pr)); }
 // what a fresh level-L NPC is worth to this preset: experience and plunder per visit, or ok:false if it can't win (cleanly, when the preset pauses on losses)
-function farmLevelStats(pr, L){
-  var A=farmAttacker(pr), b=baseOf({k:"npc",L:L,id:"0,0",x:0,y:0}), TR=5, xp=0, loot=0, tot=0, i, k;
+function farmLevelStats(pr, L, kind){ kind=kind||"npc";
+  var A=farmAttacker(pr), b=baseOf({k:kind,L:L,id:"0,0",x:0,y:0}), TR=5, xp=0, loot=0, tot=0, i, k, xm=VTYPES[kind]?VXP_MULT:1; // 0.2.23: a valley or flat pays half the experience
   var load=loadMul()*(1+0.05*(S.tech.privateering||0));
   RES.forEach(function(r){ tot+=b.res[r]; });
   for (k=0;k<TR;k++){
@@ -3762,34 +3766,38 @@ function farmLevelStats(pr, L){
     for (i=0;i<12;i++){ lost+=A.troops[i]-r.attacker[i]; cap+=r.attacker[i]*LOAD[i]*load; x+=(b.t[i]-r.defender[i])*KILLXP[i]; }
     for (i=0;i<5;i++) x+=(b.f[i]-r.forts[i])*FORTXP[i];
     if (lost>0 && pr.stopOnLoss) return {ok:false, lossy:true};
-    xp+=x; loot+=Math.min(cap,tot);
+    xp+=x*xm; loot+=Math.min(cap,tot);
   }
   return {ok:true, xp:xp/TR, loot:loot/TR};
 }
 function farmRadius(pr, mode){ var hid=presetHero(pr)?presetHero(pr).id:0, hx=S.map.home[0], hy=S.map.home[1], per=travelMs(pr.t,{x:hx+1,y:hy},hid);
   return per ? Math.min(Math.max(MAPW,MAPH), Math.floor(FARM_MODES[mode].ms/(2*per))+1) : 0; }
-function farmPool(R){ // every NPC city within R tiles of this city
+function farmPool(R){ // every NPC city, and (0.2.23) every unheld valley and flat, within R tiles of this city
   var hx=S.map.home[0], hy=S.map.home[1], out=[], x, y;
   for (x=Math.max(0,hx-R); x<=Math.min(MAPW-1,hx+R); x++) for (y=Math.max(0,hy-R); y<=Math.min(MAPH-1,hy+R); y++){
     var dx=x-hx, dy=y-hy; if (dx*dx+dy*dy>R*R) continue;
-    var q=tileAt(x,y); if (q.k==="npc") out.push(q);
+    var q=tileAt(x,y); if (q.k==="npc" || (VTYPES[q.k] && !S.map.owned[q.id])) out.push(q);
   }
   return out;
 }
+// 0.2.23: what a preset farms (pr.farmKind): NPC cities (the default) or valleys and flats
+function farmKindOf(pr){ return pr.farmKind==="val"?"val":"npc"; }
+function farmNoun(pr, n){ return farmKindOf(pr)==="val" ? (n===1?"valley or flat":"valleys and flats") : (n===1?"NPC":"NPCs"); }
 function farmPlan(pr, mode, pool, taken){
-  var m=FARM_MODES[mode], hero=presetHero(pr), hid=hero?hero.id:0, out={ids:[], rot:0, levels:{}, short:false, why:"", mode:mode};
+  var m=FARM_MODES[mode], hero=presetHero(pr), hid=hero?hero.id:0, out={ids:[], rot:0, levels:{}, short:false, why:"", mode:mode}, kind=farmKindOf(pr);
   if (!rallyLv()){ out.why="Build a Rally Spot first"; return out; }
   if (!presetTotal(pr)){ out.why="Set this preset’s troops first"; return out; }
   if (presetTotal(pr)>armyCap()){ out.why="Over the "+fmt(armyCap())+"-troop march limit"; return out; }
   var cache={}, cands=[];
   pool.forEach(function(q){
     if (taken[q.id] || (S.alliance && S.alliance.farms && S.alliance.farms[q.id])) return;
+    if ((kind==="val") !== !!VTYPES[q.k]) return;
     if (pr.farmLevel && q.L!==pr.farmLevel) return;
     var trip=2*travelMs(pr.t,q,hid); if (!trip || trip>m.ms) return;
-    var st=cache[q.L]; if (!st) st=cache[q.L]=farmLevelStats(pr,q.L); if (!st.ok) return;
+    var ck=q.k+":"+q.L, st=cache[ck]; if (!st) st=cache[ck]=farmLevelStats(pr,q.L,q.k); if (!st.ok) return;
     cands.push({id:q.id, L:q.L, trip:trip, score:(mode==="training"?st.xp:st.loot)/trip});
   });
-  if (!cands.length){ out.why="No unclaimed "+(pr.farmLevel?"level "+pr.farmLevel+" ":"")+"NPC in range that this army beats"+(pr.stopOnLoss?" without losses":""); return out; }
+  if (!cands.length){ out.why="No unclaimed "+(pr.farmLevel?"level "+pr.farmLevel+" ":"")+farmNoun(pr,1)+" in range that this army beats"+(pr.stopOnLoss?" without losses":""); return out; }
   cands.sort(function(a,b){ return a.trip-b.trip || b.score-a.score; }); // nearest first, so each rotation holds as many stops as it can
   var total=0;
   while (cands.length && total<m.ms){
@@ -3807,7 +3815,7 @@ function farmRebuild(pis){ // rebuild these presets' lists in order; an NPC neve
     var pr=S.presets[pi], plan=farmPlan(pr,pr.farmMode,pool,taken); res[pi]=plan;
     if (plan.why){ farmMsg[C().id+":"+pi]={bad:true, t:plan.why}; return; }
     pr.farm=plan.ids.slice(); pr.idx=0; plan.ids.forEach(function(id){ taken[id]=1; });
-    farmMsg[C().id+":"+pi]={bad:false, t:"Added "+plan.ids.length+" NPC"+(plan.ids.length===1?"":"s")+" ("+farmLevelsText(plan.levels)+"), "+fmtT(realMs(plan.rot))+" round trip."+(plan.short?" That is short of "+FARM_MODES[pr.farmMode].hours+" hour"+(FARM_MODES[pr.farmMode].hours>1?"s":"")+": no more unclaimed NPCs in range that this army beats"+(pr.stopOnLoss?" without losses":"")+".":"")};
+    farmMsg[C().id+":"+pi]={bad:false, t:"Added "+plan.ids.length+" "+farmNoun(pr,plan.ids.length)+" ("+farmLevelsText(plan.levels)+"), "+fmtT(realMs(plan.rot))+" round trip."+(plan.short?" That is short of "+FARM_MODES[pr.farmMode].hours+" hour"+(FARM_MODES[pr.farmMode].hours>1?"s":"")+": no more unclaimed "+farmNoun(pr,2)+" in range that this army beats"+(pr.stopOnLoss?" without losses":"")+".":"")};
   });
   return res;
 }
@@ -3820,7 +3828,8 @@ function farmCardHtml(pr,pi){
     var h='<div class="unit"><h4>'+esc(pr.name)+'</h4><span class="own" style="font-size:.85rem">'+(pr.auto?'<span class="badge">Auto-farming</span>':'')+'</span>'+
       '<div class="us"><span>'+presetSummary(pr)+'</span><span>Hero <b>'+(pr.hero===HERO_BEST?'Best attack':pr.hero===HERO_FAST?'Fastest':pr.hero===HERO_ANY?'Any free':hh?esc(hh.name):"none")+'</b>'+(presetAutoHero(pr.hero)?' <span class="dur">('+(hh?'now '+esc(hh.name):'nobody free')+')</span>':'')+'</span></div>'+
       '<div class="us"><span>Farm list <b>'+pr.farm.length+'</b></span>'+(rot?'<span>Round trip <b>'+fmtT(realMs(rot))+'</b>'+(m?' of '+m.hours+' h':'')+'</span>':'')+(pr.farm.length?'<span>'+farmLevelsText(lv)+'</span>':'')+'</div>'+
-      '<div class="trainrow"><label class="dur" for="fl'+pi+'">NPC level</label><select id="fl'+pi+'" data-farmlvl="'+pi+'" style="width:auto">'+['<option value="0">Any</option>'].concat([1,2,3,4,5,6,7,8,9,10].map(function(n){ return '<option value="'+n+'"'+(pr.farmLevel===n?' selected':'')+'>Level '+n+'</option>'; })).join("")+'</select></div>'+
+      '<div class="trainrow"><label class="dur" for="fk'+pi+'">Targets</label><select id="fk'+pi+'" data-farmkind="'+pi+'" style="width:auto"><option value="npc"'+(farmKindOf(pr)==="npc"?' selected':'')+'>NPC cities</option><option value="val"'+(farmKindOf(pr)==="val"?' selected':'')+'>Valleys and flats</option></select>'+
+        '<label class="dur" for="fl'+pi+'">Level</label><select id="fl'+pi+'" data-farmlvl="'+pi+'" style="width:auto">'+['<option value="0">Any</option>'].concat([1,2,3,4,5,6,7,8,9,10].map(function(n){ return '<option value="'+n+'"'+(pr.farmLevel===n?' selected':'')+'>Level '+n+'</option>'; })).join("")+'</select></div>'+
       '<div class="trainrow">'+[["off","Off"],["training","Training"],["resources","Resources"]].map(function(x){ var on=(x[0]==="off")?!pr.farmMode:pr.farmMode===x[0];
         return '<button class="chipbtn wide'+(on?' on':'')+'" data-act="farm-mode" data-p="'+pi+'" data-m="'+x[0]+'" aria-pressed="'+on+'">'+x[1]+'</button>'; }).join("")+'</div>'+
       '<div class="trainrow"><button class="btn ghost small" data-act="preset-edit" data-p="'+pi+'">Edit army</button><button class="btn ghost small" data-act="preset-copy" data-p="'+pi+'"'+(presetTotal(pr)?'':' disabled')+'>Copy</button>'+(presetClip?'<button class="btn ghost small" data-act="preset-paste" data-p="'+pi+'">Paste</button>':'')+
@@ -3836,7 +3845,7 @@ function farmTileHtml(pr,pi){ var tot=presetTotal(pr), m=pr.farmMode?FARM_MODES[
   else if (pr.farm.length) st='Ready \u00b7 not running';
   else st=m?'Goal set \u00b7 list empty':'No farm list';
   return '<button class="reptile fmtile'+cls+'" data-act="farm-page" data-p="'+pi+'"><span class="rtop"><span class="nm">'+esc(pr.name)+'</span><span class="n">'+(pr.farm.length?pr.farm.length:'')+'</span></span>'+
-    '<span class="ln">'+st+'</span><span class="ln">'+(m?esc(pr.farmMode.charAt(0).toUpperCase()+pr.farmMode.slice(1))+(pr.farmLevel?' \u00b7 level '+pr.farmLevel:''):'No goal')+(tot?' \u00b7 '+fmt(tot)+' troops':'')+'</span>'+
+    '<span class="ln">'+st+'</span><span class="ln">'+(m?esc(pr.farmMode.charAt(0).toUpperCase()+pr.farmMode.slice(1))+(farmKindOf(pr)==="val"?' \u00b7 valleys':'')+(pr.farmLevel?' \u00b7 level '+pr.farmLevel:''):'No goal')+(tot?' \u00b7 '+fmt(tot)+' troops':'')+'</span>'+
     (d.n?'<span class="ln">24 h: <b>'+d.w+'</b> won'+(d.n>d.w?', <span class="badc">'+(d.n-d.w)+' lost</span>':'')+' \u00b7 '+fmt(d.loot)+' loot</span>':'')+'</button>'; }
 function viewFarms(){
   if (FARMV>=0 && S.presets[FARMV]){ var pr=S.presets[FARMV], pi=FARMV, n=S.presets.length;
@@ -6561,7 +6570,10 @@ function alCs(M){ return M.cs||1; }
 function alInCity(M, x, y){ var c=alCs(M); return x>=M.city[0] && y>=M.city[1] && x<M.city[0]+c && y<M.city[1]+c; }
 function alCityMid(M){ var c=alCs(M); return {x:M.city[0]+(c-1)/2, y:M.city[1]+(c-1)/2}; }
 function alBldgAt(M, x, y){ var sz=M.bs||3; for (var i=0;i<(M.b||[]).length;i++){ var b=M.b[i]; if (x>=b.x && y>=b.y && x<b.x+sz && y<b.y+sz) return b; } return null; }
-function alMapAt(M, x, y){ if (alInCity(M,x,y)) return {city:true}; var bb=alBldgAt(M,x,y); if (bb) return {b:bb}; for (var i=0;i<M.k.length;i++) if (M.k[i].x===x && M.k[i].y===y) return {k:M.k[i]}; return null; }
+function alMapAt(M, x, y){ if (alInCity(M,x,y)) return {city:true}; var bb=alBldgAt(M,x,y); if (bb) return {b:bb}; var ks=M.ks||1; for (var i=0;i<M.k.length;i++) if (x>=M.k[i].x && y>=M.k[i].y && x<M.k[i].x+ks && y<M.k[i].y+ks) return {k:M.k[i]}; return null; } // 0.2.23: a kingdom is M.ks x M.ks
+// can a kingdom block start here on the alliance's land? (who: the one moving, whose own block doesn't count)
+function alKFits(M, x, y, who){ var ks=M.ks||1; if (x<0||y<0||x+ks>M.n||y+ks>M.n) return false; for (var j=0;j<ks;j++) for (var i=0;i<ks;i++){ var t=alMapAt(M,x+i,y+j); if (t && !(t.k && who && t.k.name===who)) return false; } return true; }
+function alKAnchor(M, x, y, who){ var c=[[x,y],[x-1,y],[x,y-1],[x-1,y-1]].slice(0,(M.ks||1)>1?4:1); for (var i=0;i<c.length;i++) if (alKFits(M,c[i][0],c[i][1],who)) return c[i]; return null; }
 function alMyTile(M){ for (var i=0;i<M.k.length;i++) if (isMe(M.k[i].name)) return M.k[i]; return null; }
 function alDist(a, b){ return a&&b ? Math.round(Math.hypot(a.x-b.x, a.y-b.y)*10)/10 : 0; }
 function alInitials(n){ var p=String(n).trim().split(/\s+/); return (p.length>1 ? p[0][0]+p[1][0] : String(n).slice(0,2)).toUpperCase(); }
@@ -6643,7 +6655,8 @@ function alSprImg(k){ var u=alSprUrl(k); return u?'<img class="albimg" src="'+u+
    Members sit on their alliance map; anyone can move their capital out into the Wilds, and members back home, for 1 City Teleport each way
    (the game spends the item when the server says yes). Founders and officers (the map permission) claim an open slot and move it once a week. */
 var WD_BLD=[["forge","War Forge","+5% troop attack","Sunday"],["walls","Bulwark","+5% troop defense","Sunday"],["book","Hall of Heroes","+10% hero experience","Wednesday"],["academy","Sage’s Observatory","+5% research speed","Tuesday"],["hammer","Mason’s Yard","+5% construction speed","Monday"],["plus","Healer’s Spring","More wounded saved","Thursday"],["stable","Royal Stables","+10% march speed","Friday"],["gold","Treasury Vault","+10% gold","Saturday"]];
-var WD_CROWN='<path d="M3 18h18M4 18 3 7l5 4 4-7 4 7 5-4-1 11"/>', WD_ZOOMS=[1,2,4,8,12];
+var WD_CROWN='<path d="M3 18h18M4 18 3 7l5 4 4-7 4 7 5-4-1 11"/>', WD_ZOOMS=[1,2,4,8,12,18,24]; // 0.2.23: two closer steps (x18, x24)
+function wdZi(z){ return WD_ZOOMS.indexOf(z)+1; }
 var WDS={d:null, at:0, busy:false, err:"", sel:null, _z:0, zf:0, cx:90, cy:90, armed:"", acting:false};
 Object.defineProperty(WDS, "z", {get:function(){ return this._z; }, set:function(v){ this._z=v; this.zf=0; }, enumerable:true}); // 0.2.19: a step (buttons) clears a pinched zoom
 function wdVisible(){ return (sheetFor && sheetFor.kind==="world") || (tab==="guild" && !sheetFor && !!alMine() && ALS.sub==="world"); }
@@ -6670,6 +6683,14 @@ function wdAsp(){ if (!WDFS.on) return 1; var W=window.innerWidth||1, H=window.i
 function wdWin(){ var d=WDS.d, N=d?d.n:180, z=WDS.zf||WD_ZOOMS[Math.max(0,Math.min(WD_ZOOMS.length-1,(WDS.z||1)-1))], w=N/z, h=w*wdAsp(),
   x=Math.max(0,Math.min(N-w,WDS.cx+0.5-w/2)), y=h>=N ? (N-h)/2 : Math.max(0,Math.min(N-h,WDS.cy+0.5-h/2)); return {x:x, y:y, w:w, h:h, z:z, N:N}; }
 function wdMineAid(){ return WDS.d&&WDS.d.me?WDS.d.me.aid:null; }
+/* 0.2.23: a capital takes 2 x 2 tiles (d.ls; its x, y is the top-left), in the Wilds and on an alliance's land (M.ks) */
+function wdLS(){ return (WDS.d&&WDS.d.ls)||1; }
+function wdLordAt(x, y){ var LS=wdLS(); return WDS.d.lords.filter(function(l){ return x>=l.x && y>=l.y && x<l.x+LS && y<l.y+LS; })[0]||null; }
+function wdOccMap(skipMe){ var d=WDS.d, LS=wdLS(), occ={}; d.lords.forEach(function(l){ if (skipMe && l.me) return; for (var j=0;j<LS;j++) for (var i=0;i<LS;i++) occ[(l.x+i)+","+(l.y+j)]=1; }); (d.mons||[]).forEach(function(m){ occ[m.x+","+m.y]=1; }); return occ; }
+// the top-left of a free capital block covering this tile (the tile itself first), or null
+function wdAnchor(x, y, occ){ var LS=wdLS(), c=[[x,y],[x-1,y],[x,y-1],[x-1,y-1]].slice(0, LS>1?4:1); for (var i=0;i<c.length;i++) if (wdFree(c[i][0], c[i][1], occ)) return c[i]; return null; }
+// where a point of a march sits: the middle of a capital's block, else the middle of the tile (a monster)
+function wdPt(x, y, caps){ var o=caps[x+","+y]?wdLS()/2:0.5; return [x+o, y+o]; }
 /* 0.2.21: the alliance map screen is gone: your alliance's slot on the server map is that map. Its buttons (buildings, the city, members,
    moving things, Move my kingdom here) are in the popup there, and the alliance's own marches (Arena trips, reinforcements) are drawn on it. */
 function wdMyMap(){ var d=WDS.d, al=alMine(); if (!d || !al || !al.map || d.me.slot==null) return null; var s=d.slots[d.me.slot]; if (!s || s.aid!==d.me.aid) return null; return {al:al, M:al.map, s:s}; }
@@ -6678,8 +6699,9 @@ function wdInMine(x, y, mm){ return mm && x>=mm.s.x && y>=mm.s.y && x<mm.s.x+mm.
 function wdAway(mm){ var d=WDS.d, here={}; d.lords.forEach(function(l){ if (!l.wild) here[l.name.toLowerCase()]=1; }); return (mm.M.k||[]).filter(function(k){ return !here[String(k.name).toLowerCase()]; }); }
 function wdAlMarches(mm, V, z){ var M=mm.M, L=M.mv||[]; if (!L.length) return ""; var o=mm.s, kt={}, h="", now=Date.now()+(ALS.skew||0), fs=function(n){ return (n/z).toFixed(2); }, mk=Math.max(0.9, 3.2/z);
   (M.k||[]).forEach(function(k){ kt[k.name]=k; }); var ab=(M.b||[]).filter(function(b){ return b.k==="arena"; })[0], bs=M.bs||3;
-  L.forEach(function(m){ var fk=kt[m.f]; if (!fk) return; var a=[o.x+fk.x+0.5, o.y+fk.y+0.5], b;
-    if (m.k==="arena"){ if (!ab) return; b=[o.x+ab.x+bs/2, o.y+ab.y+bs/2]; } else { var tk=kt[m.to]; if (!tk) return; b=[o.x+tk.x+0.5, o.y+tk.y+0.5]; }
+  var kh=(M.ks||1)/2;
+  L.forEach(function(m){ var fk=kt[m.f]; if (!fk) return; var a=[o.x+fk.x+kh, o.y+fk.y+kh], b;
+    if (m.k==="arena"){ if (!ab) return; b=[o.x+ab.x+bs/2, o.y+ab.y+bs/2]; } else { var tk=kt[m.to]; if (!tk) return; b=[o.x+tk.x+kh, o.y+tk.y+kh]; }
     var still=m.s==="wait"||m.s==="stay", p0=m.s==="back"?b:a, p1=m.s==="back"?a:b, col=isMe(m.f)?"#f3dc9a":(m.k==="arena"||m.k==="rally")?"#e0705a":"#8fd18a";
     h+='<line x1="'+p0[0]+'" y1="'+p0[1]+'" x2="'+p1[0]+'" y2="'+p1[1]+'" stroke="'+col+'" stroke-width="'+fs(1.3)+'"'+(still?' stroke-dasharray="'+fs(4)+' '+fs(3)+'"':'')+' opacity=".85"/>';
     if (still) return; var f=m.b>m.a?Math.max(0,Math.min(1,(now-m.a)/(m.b-m.a))):1, px=p0[0]+(p1[0]-p0[0])*f, py=p0[1]+(p1[1]-p0[1])*f, st=alMarchLook(m.f);
@@ -6696,13 +6718,15 @@ function wdGrassDefs(){ var u=[]; for (var v=0; v<4; v++){ var cv=document.creat
     u.push(cv.toDataURL()); }
   return '<defs><pattern id="wdgr" width="2" height="2" patternUnits="userSpaceOnUse">'+u.map(function(x,i){ return '<image href="'+x+'" x="'+(i%2)+'" y="'+(i>>1)+'" width="1.02" height="1.02" preserveAspectRatio="none" style="image-rendering:pixelated"/>'; }).join("")+'</pattern></defs>'; }
 var WD_GRASS="";
-function wdCastle(x, y, col){ var w=col[0], dk=col[1], dr=col[2]; // a plain castle on one tile (the alliance map's shape)
-  return '<g transform="translate('+x+' '+y+') scale(0.0417)"><rect x="2.5" y="8" width="5" height="13" fill="'+dk+'"/><rect x="16.5" y="8" width="5" height="13" fill="'+dk+'"/><rect x="6" y="11" width="12" height="10" fill="'+w+'"/>'+
+function wdCastle(x, y, col, sz, look){ var w=col[0], dk=col[1], dr=col[2]; sz=sz||1; // a plain castle on sz x sz tiles (the alliance map's shape)
+  if (look && CPAL[look]){ var cs=cosCastleSvg(look); if (cs) return '<rect x="'+x+'" y="'+y+'" width="'+sz+'" height="'+sz+'" rx="'+(sz*0.12)+'" fill="'+CPAL[look].bg+'" stroke="'+CPAL[look].a+'" stroke-width="'+(sz*0.04)+'" opacity=".9"/>'+cs.replace('<svg ','<svg x="'+x+'" y="'+y+'" width="'+sz+'" height="'+sz+'" '); } // 0.2.23: the city decoration they picked
+  return '<g transform="translate('+x+' '+y+') scale('+(0.0417*sz)+')"><rect x="2.5" y="8" width="5" height="13" fill="'+dk+'"/><rect x="16.5" y="8" width="5" height="13" fill="'+dk+'"/><rect x="6" y="11" width="12" height="10" fill="'+w+'"/>'+
     [2.5,5.1,16.5,19.1].map(function(q){ return '<rect x="'+q+'" y="6.5" width="1.5" height="1.5" fill="'+dk+'"/>'; }).join("")+[7,11.1,15.2].map(function(q){ return '<rect x="'+q+'" y="9.6" width="1.8" height="1.4" fill="'+w+'"/>'; }).join("")+
     '<path d="M10 21v-3.5a2 2 0 0 1 4 0V21z" fill="'+dr+'"/></g>'; }
 // can a capital settle on this tile? (the server checks the same: inside the world, off the Throne grounds, outside every open slot, nobody there)
-function wdFree(x, y, occ){ var d=WDS.d; if (x<0||y<0||x>=d.n||y>=d.n) return false; if (Math.pow(x+0.5-d.c,2)+Math.pow(y+0.5-d.c,2)<d.heart*d.heart) return false;
+function wdFree1(x, y, occ){ var d=WDS.d; if (x<0||y<0||x>=d.n||y>=d.n) return false; if (Math.pow(x+0.5-d.c,2)+Math.pow(y+0.5-d.c,2)<d.heart*d.heart) return false;
   for (var i=0;i<d.slots.length;i++){ var s=d.slots[i]; if (s.ring<d.open && x>=s.x && y>=s.y && x<s.x+d.sz && y<s.y+d.sz) return false; } return !occ[x+","+y]; }
+function wdFree(x, y, occ){ var LS=wdLS(); for (var j=0;j<LS;j++) for (var i=0;i<LS;i++) if (!wdFree1(x+i, y+j, occ)) return false; return true; } // 0.2.23: a whole 2 x 2 block
 function wdSvg(){ var d=WDS.d, V=wdWin(), z=V.z, close=z>=WD_CLOSE, fs=function(n){ return (n/z).toFixed(2); }, sel=WDS.sel, mine=wdMineAid(), h='';
   h+='<svg class="wdmap" id="wdsvg" viewBox="'+V.x.toFixed(2)+' '+V.y.toFixed(2)+' '+V.w.toFixed(2)+' '+V.h.toFixed(2)+'" role="img" aria-label="Server map" data-act="wd-tap">';
   if (close){ if (!WD_GRASS) WD_GRASS=wdGrassDefs(); h+=WD_GRASS; }
@@ -6724,7 +6748,7 @@ function wdSvg(){ var d=WDS.d, V=wdWin(), z=V.z, close=z>=WD_CLOSE, fs=function(
     else if (!s.aid && z<2) h+='<text x="'+(s.x+d.sz/2)+'" y="'+(s.y+d.sz/2+1.3)+'" text-anchor="middle" font-size="'+fs(4)+'" class="wdsm" fill="#c9cdc0">Open</text>'; });
   if (z>=4){ var g=''; for (var gx=x0; gx<=x1; gx++) g+='M'+gx+' '+V.y.toFixed(1)+'v'+V.h.toFixed(1); for (var gy=y0; gy<=y1; gy++) g+='M'+V.x.toFixed(1)+' '+gy+'h'+V.w.toFixed(1); h+='<path d="'+g+'" stroke="rgba(0,0,0,'+(close?'.22':'.18')+')" stroke-width="'+fs(0.6)+'"/>'; }
   // close up: a dot on every tile your capital could move to
-  if (close && d.me.on){ var occ={}; d.lords.forEach(function(l){ occ[l.x+","+l.y]=1; }); (d.mons||[]).forEach(function(m){ occ[m.x+","+m.y]=1; }); var dots='';
+  if (close && d.me.on){ var occ=wdOccMap(), dots='';
     for (var ty=y0; ty<y1; ty++) for (var tx=x0; tx<x1; tx++) if (ty>=0 && wdFree(tx,ty,occ)) dots+='M'+(tx+0.5)+' '+(ty+0.5)+'h0';
     if (dots) h+='<path d="'+dots+'" stroke="rgba(243,220,154,.55)" stroke-width=".16" stroke-linecap="round"/>'; }
   d.bld.forEach(function(b,i){ var on=sel&&sel.k==="bld"&&sel.i===i; h+='<rect x="'+b.x+'" y="'+b.y+'" width="3" height="3" rx=".4" fill="#3a423d" stroke="'+(on?'#ebe3d0':'#b4b9aa')+'" stroke-width="'+fs(on?2.5:1.2)+'"/>';
@@ -6733,44 +6757,47 @@ function wdSvg(){ var d=WDS.d, V=wdWin(), z=V.z, close=z>=WD_CLOSE, fs=function(
   var on=sel&&sel.k==="throne"; h+='<rect x="'+d.throne.x+'" y="'+d.throne.y+'" width="3" height="3" rx=".5" fill="#6b5a2a" stroke="'+(on?'#ebe3d0':'#d7b058')+'" stroke-width="'+fs(on?3:2)+'"/>'+(z>=2?wdIco(WD_CROWN, d.throne.x+1.5, d.throne.y+1.5, 0.11, "#f3dc9a"):'');
   // 0.2.19: monsters (their sprite close up, a coloured dot further out; a ring when your side has a rally on one) and every march on the map
   var ryOn={}; (d.rallies||[]).forEach(function(r){ ryOn[r.mon]=1; });
-  (d.mons||[]).forEach(function(m){ if (!inV(m.x,m.y,1)) return;
+  (d.mons||[]).forEach(function(m){ if (!close || !inV(m.x,m.y,1)) return; // 0.2.23: monsters only show close up: zoom in and look around to find them
     if (close) h+='<image href="'+WD_MART[m.L]+'" x="'+(m.x-0.3)+'" y="'+(m.y-0.6)+'" width="1.6" height="1.6" preserveAspectRatio="xMidYMax meet" style="image-rendering:pixelated"/>'+(z>=12?'<text x="'+(m.x+0.5)+'" y="'+(m.y+1.3)+'" text-anchor="middle" font-size=".34" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".07" paint-order="stroke">Lv '+m.L+'</text>':'');
     else { var mr=Math.max(0.5, 1.5/z)*(0.8+m.L*0.2); h+='<circle cx="'+(m.x+0.5)+'" cy="'+(m.y+0.5)+'" r="'+mr.toFixed(2)+'" fill="'+WD_MCOL[m.L]+'" stroke="#1f2421" stroke-width="'+fs(0.6)+'"/>'; }
     if (ryOn[m.id]) h+='<circle cx="'+(m.x+0.5)+'" cy="'+(m.y+0.5)+'" r="'+(close?0.75:Math.max(1.1,3/z)).toFixed(2)+'" fill="none" stroke="#f3dc9a" stroke-width="'+fs(1.6)+'" stroke-dasharray="'+fs(3)+' '+fs(2)+'"/>'; });
-  var nowM=Date.now(), mk=Math.max(0.9, 3.2/z);
-  (d.marches||[]).forEach(function(mv){ var a=[mv.f[0]+0.5,mv.f[1]+0.5], b2=[mv.to[0]+0.5,mv.to[1]+0.5], pr=mv.s==="wait"?1:Math.max(0,Math.min(1,(nowM-mv.a)/Math.max(1,mv.b-mv.a))), px=a[0]+(b2[0]-a[0])*pr, py=a[1]+(b2[1]-a[1])*pr, col=mv.me?"#f3dc9a":"rgba(235,227,208,.75)";
+  var nowM=Date.now(), mk=Math.max(0.9, 3.2/z), caps={}; d.lords.forEach(function(l){ caps[l.x+","+l.y]=1; });
+  (d.marches||[]).forEach(function(mv){ var a=wdPt(mv.f[0],mv.f[1],caps), b2=wdPt(mv.to[0],mv.to[1],caps), pr=mv.s==="wait"?1:Math.max(0,Math.min(1,(nowM-mv.a)/Math.max(1,mv.b-mv.a))), px=a[0]+(b2[0]-a[0])*pr, py=a[1]+(b2[1]-a[1])*pr, col=mv.me?"#f3dc9a":"rgba(235,227,208,.75)";
     if (mv.s!=="wait") h+='<line x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b2[0]+'" y2="'+b2[1]+'" stroke="'+col+'" stroke-width="'+fs(mv.me?1.4:1)+'" stroke-dasharray="'+fs(4)+' '+fs(3)+'" opacity=".8"/>';
     var dx=b2[0]-a[0], dy=b2[1]-a[1], st=mv.cos&&COSM.march&&COSM.march[mv.cos]?mv.cos:"";
     if (st){ var im=cosMarchImg(st, dx<0?-1:1, Math.atan2(dy,dx)); h+='<image href="'+im+'" x="'+(px-mk/2).toFixed(2)+'" y="'+(py-mk/2).toFixed(2)+'" width="'+mk.toFixed(2)+'" height="'+mk.toFixed(2)+'"/>'; }
     else h+='<circle cx="'+px.toFixed(2)+'" cy="'+py.toFixed(2)+'" r="'+(mk/3).toFixed(2)+'" fill="'+(mv.me?'#f3dc9a':'#ebe3d0')+'" stroke="#1f2421" stroke-width="'+fs(0.8)+'"/>';
     if (z>=12) h+='<text x="'+px.toFixed(2)+'" y="'+(py-mk/2-0.1).toFixed(2)+'" text-anchor="middle" font-size=".3" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".06" paint-order="stroke" translate="no">'+esc(mv.name)+'</text>'; });
   // capitals: castles close up (names at x12), squares further out (bigger when zoomed out, so they can be seen)
-  if (close){ d.lords.forEach(function(l){ if (!inV(l.x,l.y,1)) return; var col=l.me?["#f3dc9a","#b8902f","#3a2a10"]:l.wild?["#f0b27a","#c0612a","#3a1f10"]:["#d9dcd3","#8d928a","#2a2f2c"];
-      if (l.prot) h+='<rect x="'+(l.x+0.04)+'" y="'+(l.y+0.04)+'" width=".92" height=".92" rx=".2" fill="rgba(127,176,224,.22)" stroke="#7fb0e0" stroke-width=".06"/>';
-      h+=wdCastle(l.x, l.y, col);
-      if (z>=12) h+='<text x="'+(l.x+0.5)+'" y="'+(l.y+1.32)+'" text-anchor="middle" font-size=".34" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".07" paint-order="stroke" translate="no">'+esc(l.name)+'</text>'; }); }
-  else { var ls=Math.max(1, 2.4/z), lo=(ls-1)/2;
+  var LS=wdLS();
+  if (close){ d.lords.forEach(function(l){ if (!inV(l.x,l.y,LS)) return; var col=l.me?["#f3dc9a","#b8902f","#3a2a10"]:l.wild?["#f0b27a","#c0612a","#3a1f10"]:["#d9dcd3","#8d928a","#2a2f2c"], look=l.me?myLook("city"):l.look;
+      h+=wdCastle(l.x, l.y, col, LS, look);
+      if (l.prot) h+='<rect x="'+(l.x+0.05)+'" y="'+(l.y+0.05)+'" width="'+(LS-0.1)+'" height="'+(LS-0.1)+'" rx="'+(LS*0.2)+'" fill="rgba(127,176,224,.14)" stroke="#7fb0e0" stroke-width=".07"/>';
+      if (l.me) h+='<rect x="'+l.x+'" y="'+l.y+'" width="'+LS+'" height="'+LS+'" fill="none" stroke="#f3dc9a" stroke-width=".08"/>';
+      if (z>=12) h+='<text x="'+(l.x+LS/2)+'" y="'+(l.y+LS+0.34)+'" text-anchor="middle" font-size=".36" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".07" paint-order="stroke" translate="no">'+esc(l.name)+'</text>'; }); }
+  else { var ls=Math.max(LS, 2.4/z), lo=(ls-LS)/2;
     d.lords.forEach(function(l){ if (l.me) return; h+='<rect x="'+(l.x-lo).toFixed(2)+'" y="'+(l.y-lo).toFixed(2)+'" width="'+ls.toFixed(2)+'" height="'+ls.toFixed(2)+'" fill="'+(l.wild?'#e08a3c':'#c9cdc0')+'" stroke="'+(l.prot?'#7fb0e0':'#1f2421')+'" stroke-width="'+fs(l.prot?1.4:0.7)+'"/>'; });
-    d.lords.forEach(function(l){ if (!l.me) return; var s2=ls*1.4, o2=(s2-1)/2; h+='<rect x="'+(l.x-o2).toFixed(2)+'" y="'+(l.y-o2).toFixed(2)+'" width="'+s2.toFixed(2)+'" height="'+s2.toFixed(2)+'" fill="#f3dc9a" stroke="#1f2421" stroke-width="'+fs(1.2)+'"/>'; }); }
+    d.lords.forEach(function(l){ if (!l.me) return; var s2=ls*1.4, o2=(s2-LS)/2; h+='<rect x="'+(l.x-o2).toFixed(2)+'" y="'+(l.y-o2).toFixed(2)+'" width="'+s2.toFixed(2)+'" height="'+s2.toFixed(2)+'" fill="#f3dc9a" stroke="#1f2421" stroke-width="'+fs(1.2)+'"/>'; }); }
   var mm=wdMyMap();
-  if (mm && close && inV(mm.s.x, mm.s.y, mm.M.n)) wdAway(mm).forEach(function(k){ var kx=mm.s.x+k.x, ky=mm.s.y+k.y; h+='<g opacity=".45">'+wdCastle(kx, ky, ["#d9dcd3","#8d928a","#2a2f2c"])+'</g>';
-    if (z>=12) h+='<text x="'+(kx+0.5)+'" y="'+(ky+1.32)+'" text-anchor="middle" font-size=".34" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".07" paint-order="stroke" translate="no" opacity=".7">'+esc(k.name)+'</text>'; });
+  if (mm && close && inV(mm.s.x, mm.s.y, mm.M.n)) wdAway(mm).forEach(function(k){ var kx=mm.s.x+k.x, ky=mm.s.y+k.y, kz=mm.M.ks||1; h+='<g opacity=".45">'+wdCastle(kx, ky, ["#d9dcd3","#8d928a","#2a2f2c"], kz)+'</g>';
+    if (z>=12) h+='<text x="'+(kx+kz/2)+'" y="'+(ky+kz+0.32)+'" text-anchor="middle" font-size=".34" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".07" paint-order="stroke" translate="no" opacity=".7">'+esc(k.name)+'</text>'; });
   if (mm) h+=wdAlMarches(mm, V, z);
   if (ALS.moving && mm) h+='<rect x="'+mm.s.x+'" y="'+mm.s.y+'" width="'+mm.M.n+'" height="'+mm.M.n+'" fill="none" stroke="#f3dc9a" stroke-width="'+fs(3)+'" stroke-dasharray="'+fs(6)+' '+fs(4)+'"/>';
-  if (sel && sel.x!=null && (sel.k!=="slot" || close)) h+='<rect x="'+(close?sel.x:sel.x-0.25)+'" y="'+(close?sel.y:sel.y-0.25)+'" width="'+(close?1:1.5)+'" height="'+(close?1:1.5)+'" fill="none" stroke="#fff" stroke-width="'+fs(close?2.4:1.6)+'"/>';
+  if (sel && sel.x!=null && (sel.k!=="slot" || close)){ var sz=sel.k==="lord"||sel.mem?LS:1; h+='<rect x="'+(close?sel.x:sel.x-0.25)+'" y="'+(close?sel.y:sel.y-0.25)+'" width="'+(close?sz:sz+0.5)+'" height="'+(close?sz:sz+0.5)+'" fill="none" stroke="#fff" stroke-width="'+fs(close?2.4:1.6)+'"/>'; }
   return h+'</svg>'; }
 function wdIco(k, x, y, sc, col){ return '<g transform="matrix('+sc+' 0 0 '+sc+' '+(x-12*sc).toFixed(2)+' '+(y-12*sc).toFixed(2)+')" style="color:'+col+'" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" pointer-events="none">'+(INNER[k]||k)+'</g>'; }
 // what's on a tile: a capital, a building, a slot, the Throne grounds or the Wilds (zoomed out, a tap near a capital picks it)
 function wdAt(x, y){ var d=WDS.d, z=wdWin().z, best=null, bd=Math.pow(Math.max(0.6, 3/z),2);
-  if (z>=WD_CLOSE){ var L=d.lords.filter(function(l){ return l.x===x && l.y===y; })[0]; if (L) return {k:"lord", x:x, y:y, l:L};
+  if (z>=WD_CLOSE){ var L=wdLordAt(x, y); if (L) return {k:"lord", x:L.x, y:L.y, l:L};
     var Mn=(d.mons||[]).filter(function(m){ return m.x===x && m.y===y; })[0]; if (Mn) return {k:"mon", x:x, y:y, m:Mn};
     for (var si=0; si<d.slots.length; si++){ var s0=d.slots[si]; if (s0.ring>=d.open || x<s0.x || y<s0.y || x>=s0.x+d.sz || y>=s0.y+d.sz) continue;
       var bs=d.bs||3, bb=(s0.b||[]).filter(function(q){ return x>=q.x && y>=q.y && x<q.x+bs && y<q.y+bs; })[0];
       var ct=s0.city && x>=s0.city[0] && y>=s0.city[1] && x<s0.city[0]+s0.city[2] && y<s0.city[1]+s0.city[2];
-      var mm0=wdMyMap(), aw=null; if (mm0 && mm0.s.i===s0.i && !bb && !ct) aw=wdAway(mm0).filter(function(k){ return mm0.s.x+k.x===x && mm0.s.y+k.y===y; })[0]||null;
+      var mm0=wdMyMap(), aw=null; if (mm0 && mm0.s.i===s0.i && !bb && !ct) aw=wdAway(mm0).filter(function(k){ var kz=mm0.M.ks||1; return x>=mm0.s.x+k.x && y>=mm0.s.y+k.y && x<mm0.s.x+k.x+kz && y<mm0.s.y+k.y+kz; })[0]||null;
+      if (aw){ x=mm0.s.x+aw.x; y=mm0.s.y+aw.y; }
       return {k:"slot", i:s0.i, x:x, y:y, b:bb||null, city:!!ct, mem:aw?aw.name:null}; } }
-  var bm=null; d.lords.forEach(function(l){ var q=(l.x-x)*(l.x-x)+(l.y-y)*(l.y-y); if (q<=bd){ bd=q; best=l; } }); (d.mons||[]).forEach(function(m){ var q=(m.x-x)*(m.x-x)+(m.y-y)*(m.y-y); if (q<bd){ bd=q; bm=m; } });
-  if (bm) return {k:"mon", x:bm.x, y:bm.y, m:bm}; if (best) return {k:"lord", x:best.x, y:best.y, l:best};
+  var LSa=wdLS(); d.lords.forEach(function(l){ var q=Math.pow(l.x+LSa/2-0.5-x,2)+Math.pow(l.y+LSa/2-0.5-y,2); if (q<=bd){ bd=q; best=l; } }); 
+  if (best) return {k:"lord", x:best.x, y:best.y, l:best};
   var inb=function(b,m){ return x>=b.x-m && y>=b.y-m && x<b.x+3+m && y<b.y+3+m; }, m=z<2?1:0;
   if (inb(d.throne,m)) return {k:"throne"};
   for (var i=0;i<d.bld.length;i++) if (inb(d.bld[i],m)) return {k:"bld", i:i};
@@ -6893,8 +6920,9 @@ function wdInfo(){ var d=WDS.d, v=WDS.sel, me=d.me, mine=me.aid, tn=wdTele(), my
     return h2+'<p class="dur">To the Throne: about '+wdTrip(l.x,l.y)+' for Cavalry with no speed bonuses.</p>'; }
   // the Wilds
   var h3='<h4>The Wilds <span class="dur">('+v.x+', '+v.y+')</span></h4><p class="hint">'+(v.closed!=null?'Part of the outer ring, which opens once every slot of the inner ring is taken. Until then it’s Wilds. ':'')+'No shield out here. Lords without an alliance live here, and monsters roam it: tap one to fight it.</p>';
-  if (me.on){ var arm=WDS.armed==="tp"+v.x+","+v.y;
-    h3+='<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="wd-tp" data-x="'+v.x+'" data-y="'+v.y+'"'+(WDS.acting||!tn?' disabled':'')+'>'+(arm?'Tap again to move here':'Move your capital here')+'</button>'+tele()+'</div>'+(!tn?'<p class="dur">You have no City Teleports.</p>':'');
+  if (me.on){ var an=wdAnchor(v.x, v.y, wdOccMap(true)), arm=an&&WDS.armed==="tp"+an[0]+","+an[1]; // 0.2.23: a capital needs a free 2 x 2 block; the one covering this tile
+    if (an) h3+='<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="wd-tp" data-x="'+an[0]+'" data-y="'+an[1]+'"'+(WDS.acting||!tn?' disabled':'')+'>'+(arm?'Tap again to move here':'Move your capital here')+'</button>'+tele()+'</div>'+(!tn?'<p class="dur">You have no City Teleports.</p>':'');
+    else h3+='<p class="dur">No room here: a capital takes 2 \u00d7 2 free tiles.</p>';
   } else h3+='<p class="dur">Join the server map to settle here.</p>';
   if (wdWin().z<WD_ZOOMS[WD_ZOOMS.length-1]-0.01) h3+='<div class="btnrow" style="margin-top:6px"><button class="btn ghost small" data-act="wd-zoomhere">Zoom in here</button></div>';
   return h3+trip; }
@@ -6917,18 +6945,40 @@ function wdMineInfo(v, mm){ var al=mm.al, M=mm.M, my=al.my||{can:{}}, lx=v.x-mm.
   else if (v.mem){ var mi=(al.members||[]).filter(function(m){ return m.name===v.mem; })[0]||{};
     h='<h4>'+esc(v.mem)+'</h4><p class="dur">'+(mi.rank!=null&&al.ranks&&al.ranks[mi.rank]?esc(al.ranks[mi.rank].n)+' \u00b7 ':'')+fmt(mi.prestige||0)+' prestige \u00b7 '+(mi.cities||0)+' cities'+dist({x:lx,y:ly})+'</p><p class="dur">Their kingdom’s square. Their capital isn’t here right now.</p>';
     return h+wdMemBtns(v.mem, mm); }
-  else { h='<h4>Free square <span class="dur">('+lx+', '+ly+')</span></h4><p class="hint">Your alliance’s land. Every member has one square for their kingdom; distance here sets how long reinforcements and Arena trips take.'+(WDS.d.me.wild?' Your capital is out in the Wilds, so only your square moves.':'')+'</p>';
-    b.push('<button class="btn small" data-act="wd-almove" data-x="'+lx+'" data-y="'+ly+'">Move my kingdom here</button>'); }
+  else { var ka=alKAnchor(M, lx, ly, (alMyTile(M)||{}).name);
+    h='<h4>Free square <span class="dur">('+lx+', '+ly+')</span></h4><p class="hint">Your alliance’s land. Every member has a 2 \u00d7 2 block for their kingdom; distance here sets how long reinforcements and Arena trips take.'+(WDS.d.me.wild?' Your capital is out in the Wilds, so only your block moves.':'')+'</p>';
+    if (ka) b.push('<button class="btn small" data-act="wd-almove" data-x="'+ka[0]+'" data-y="'+ka[1]+'">Move my kingdom here</button>'); else h+='<p class="dur">No room here for a 2 \u00d7 2 kingdom.</p>'; }
   return h+'<div class="mpb">'+b.join("")+'</div>'; }
 // moving something on your alliance's land: the tap after Move (same rules as the old alliance map)
 function wdMoveTap(x, y){ var mm=wdMyMap(), mv=ALS.moving; if (!mm){ ALS.moving=null; wdPaint(); return false; }
   if (!wdInMine(x, y, mm)){ toast("Tap a square on your alliance’s land"); return true; }
   var M=mm.M, tx=x-mm.s.x, ty=y-mm.s.y, big=mv.what==="city"||mv.what==="b";
-  if (!big && alMapAt(M,tx,ty)){ toast("That square is taken"); return true; }
+  if (!big){ var who=mv.what==="me"?(alMyTile(M)||{}).name:mv.who, an=alKAnchor(M, tx, ty, who); if (!an){ toast("No room there: a kingdom takes 2 \u00d7 2 squares"); return true; } tx=an[0]; ty=an[1]; } // 0.2.23
   var bsz=mv.what==="b"?(M.bs||3):alCs(M), half=Math.floor(bsz/2), mx=big?Math.max(0,Math.min(M.n-bsz,tx-half)):tx, my2=big?Math.max(0,Math.min(M.n-bsz,ty-half)):ty;
   ALS.moving=null; WDS.sel=null; wdPaint();
   alDo("/al/move", mv.what==="b"?{what:"b", key:mv.who, x:mx, y:my2}:{what:mv.what, who:mv.who, x:mx, y:my2}, "Moved", function(){ WDS.at=0; wdFetch(); });
   return true; }
+/* 0.2.23: your marches on the server map, top left of the map: what each is doing, time left, who leads it; Speed up (a March Speed item,
+   half the time left on its leg) and Recall (on its way to a rally or waiting there, or a solo attack on its way). The server rules both. */
+function wdMyMarches(){ var mine={}; ((WDS.d&&WDS.d.mine)||[]).forEach(function(j){ mine[j.ref]=j; }); var now=Date.now();
+  return (S.wdM||[]).map(function(m){ var j=mine[m.ref], L=(j&&j.L)||m.L||1, nm="level "+L+" "+wdMonName(L), r={m:m, j:j, nm:nm, end:0, what:"", hasten:false, recall:false};
+    if (!j){ r.what=m.st==="back"?"Heading home":"Sending\u2026"; r.end=m.st==="back"?m.home:0; return r; }
+    if (j.st==="go" && now<j.arrive){ r.what=j.solo?"Attacking the "+nm:"To "+j.host+"\u2019s rally"; r.end=j.arrive; r.hasten=true; r.recall=true; }
+    else if (j.st==="go"){ r.what=j.solo?"Setting off for the "+nm:"Waiting for "+j.host+"\u2019s rally"; r.end=j.leave; r.recall=true; }
+    else if (j.st==="out"){ r.what="Attacking the "+nm; r.end=j.hit; r.hasten=!!(j.solo||j.caller); r.recall=!!j.solo; }
+    else { r.what="Heading home"; r.end=j.home; r.hasten=j.home>now; }
+    return r; }); }
+function wdMarchListHtml(){ var L=wdMyMarches(); if (!L.length) return ''; var open=WDS.mlOpen!==false, sp=S.items.marchsp||0;
+  var h='<div class="wdml"><button class="wdmlh" data-act="wd-mltog" aria-expanded="'+open+'">'+(open?'\u25be':'\u25b8')+' Marches ('+L.length+')</button>';
+  if (open) h+=L.map(function(r){ var hh=r.m.hero?heroById(r.m.hero):null, id=r.j&&r.j.id;
+    return '<div class="wdmlr"><div class="wdmlw">'+esc(r.what)+'</div><div class="dur">'+(hh?esc(hh.name):'No hero')+' \u00b7 '+fmt(sumT(r.m.t))+' troops'+(r.end?' \u00b7 <b data-wdend="'+r.end+'">'+fmtT(Math.max(0,r.end-Date.now()))+'</b>':'')+'</div>'+
+      (id&&(r.hasten||r.recall)?'<div class="wdmlb">'+(r.hasten?'<button class="link strong" data-act="wd-mhasten" data-id="'+id+'"'+(sp?'':' disabled')+'>Speed up'+(sp?' ('+sp+')':'')+'</button>':'')+(r.recall?'<button class="link" data-act="wd-mrecall" data-id="'+id+'">Recall</button>':'')+'</div>':'')+'</div>'; }).join("");
+  return h+'</div>'; }
+function wdMarchTick(){ var els=document.querySelectorAll("[data-wdend]"), now=Date.now(); for (var i=0;i<els.length;i++){ var t=fmtT(Math.max(0,+els[i].dataset.wdend-now)); if (els[i].textContent!==t) els[i].textContent=t; } }
+setInterval(wdMarchTick, 1000);
+function wdMarchAct(path, id, ok){ if (WDS.acting) return; WDS.acting=true;
+  alPost(path, {id:id}).then(function(d){ if (!d.error && d.used){ S.items.marchsp=Math.max(0,(S.items.marchsp||0)-d.used); save(); } wdAfter(d, d.error?"":ok); })
+    .catch(function(){ WDS.acting=false; toast("Couldn\u2019t reach the server. Check your connection."); wdPaint(); }); }
 // your own place: join, capital, protection, leave
 function wdMeHtml(){ var d=WDS.d, me=d.me, h='';
   if (!me.on){ // 0.2.21: multiplayer puts you on it; this shows while that happens (or why it couldn't)
@@ -6953,7 +7003,7 @@ var WD_HOW=["With multiplayer on, you’re on the server map. Your capital, the 
   "New lords are protected for 14 days; anyone who leaves or is kicked from an alliance for 3.",
   "Capture buildings and the Throne: the Throne, War Forge and Bulwark reset on Sundays at 6 pm US Eastern, the other six one each weekday. Hold one 4 straight hours after its reset and it’s yours until the next one.",
   "Whoever holds the Throne rules for the week: they name the server, pick a blessing for everyone and place every alliance’s slot.",
-  "Monsters roam the Wilds: Skeletons, Flying Eyes and Mushrooms. Attack one alone or call your alliance onto it. Every kill puts a Mana Orb for each player in the fight into your alliance\u2019s Shield Generator.",
+  "Monsters roam the Wilds: Skeletons, Flying Eyes and Mushrooms. They only show when you zoom in close, so look around for them. Attack one alone or call your alliance onto it. Every kill puts a Mana Orb for each player in the fight into your alliance\u2019s Shield Generator.",
   "Coming next: the capture buildings and the Throne, allies, then attacks on capitals (with scouting).",
   "Numbers and names may still change."];
 function worldInner(){ var d=WDS.d;
@@ -6962,12 +7012,12 @@ function worldInner(){ var d=WDS.d;
   return wdMeHtml()+
     '<div class="btnrow wdzoom" style="margin:8px 0 6px"><button class="btn ghost small" data-act="wd-zoom" data-v="-1"'+(z<=1.01?' disabled':'')+' aria-label="Zoom out">−</button><button class="btn ghost small" data-act="wd-zoom" data-v="1"'+(z>=WD_ZOOMS[WD_ZOOMS.length-1]-0.01?' disabled':'')+' aria-label="Zoom in">+</button>'+
     (z>1.05?['←:-1:0','↑:0:-1','↓:0:1','→:1:0'].map(function(p){ var q=p.split(":"); return '<button class="btn ghost small" data-act="wd-pan" data-x="'+q[1]+'" data-y="'+q[2]+'">'+q[0]+'</button>'; }).join(""):'')+'<span class="dur" style="align-self:center">'+(z>1.05?'×'+(Math.round(z*10)/10):'Whole world')+'</span><button class="btn ghost small" data-act="wd-fs" title="Full screen" aria-label="Full screen" style="margin-left:auto">\u26f6</button></div>'+
-    '<div class="wdview'+(WDFS.on?' fs'+(WDFS.rot?' rot':''):'')+'" id="wdview"><div class="wdbox" id="wdbox">'+wdSvg()+
+    '<div class="wdview'+(WDFS.on?' fs'+(WDFS.rot?' rot':''):'')+'" id="wdview"><div class="wdbox" id="wdbox">'+wdSvg()+wdMarchListHtml()+
       (WDS.sel && !ALS.moving?'<div class="mpop wdpop" id="wdpop" style="visibility:hidden"><button class="mpx wdpx" data-act="wd-popx" aria-label="Close">\u00d7</button><div class="wdinfo" id="wdinfo">'+wdInfo()+'</div></div>':'')+
-      (ALS.moving?'<div class="wdmvbar"><span>Tap '+(ALS.moving.what==="city"?'where the middle of the Alliance City should go':ALS.moving.what==="b"?'where the building should go':'a free square')+' on your alliance’s land'+(ALS.moving.what==="member"?' for '+esc(ALS.moving.who):'')+'.</span><button class="btn small ghost" data-act="wd-mvx">Cancel</button></div>':'')+
+      (ALS.moving?'<div class="wdmvbar"><span>Tap '+(ALS.moving.what==="city"?'where the middle of the Alliance City should go':ALS.moving.what==="b"?'where the building should go':'a free 2 \u00d7 2 spot')+' on your alliance’s land'+(ALS.moving.what==="member"?' for '+esc(ALS.moving.who):'')+'.</span><button class="btn small ghost" data-act="wd-mvx">Cancel</button></div>':'')+
       '</div><div class="wdfsbar"><button class="btn small" data-act="wd-zoom" data-v="1" aria-label="Zoom in">+</button><button class="btn small" data-act="wd-zoom" data-v="-1" aria-label="Zoom out">\u2212</button><button class="btn small" data-act="wd-findme" aria-label="Find my capital">\u2316</button><button class="btn small" data-act="wd-rot" aria-label="Turn sideways">\u27f3</button><button class="btn small" data-act="wd-fs" aria-label="Leave full screen">\u2715</button></div></div>'+
     (WDS.sel?'':'<p class="hint" style="margin:6px 0 0">Tap the map to see what’s there. Drag to move around; pinch or use + to zoom in and pick a single tile.</p>')+
-    '<div class="wdleg">'+legend.map(function(l){ return '<span><i style="background:'+l[0]+';border-color:'+l[1]+'"></i>'+l[2]+'</span>'; }).join("")+'<span><i style="background:transparent;border-color:#7fb0e0"></i>Protected</span><span><i class="wdopen"></i>Open slot</span>'+[1,2,3].map(function(L){ return '<span><i style="background:'+WD_MCOL[L]+';border-color:#1f2421;border-radius:50%"></i>Level '+L+' monster</span>'; }).join("")+(z>=WD_CLOSE&&d.me.on?'<span><i style="background:rgba(243,220,154,.7);border-color:transparent;border-radius:50%;width:6px;height:6px"></i>You can move here</span>':'')+'</div>'+
+    '<div class="wdleg">'+legend.map(function(l){ return '<span><i style="background:'+l[0]+';border-color:'+l[1]+'"></i>'+l[2]+'</span>'; }).join("")+'<span><i style="background:transparent;border-color:#7fb0e0"></i>Protected</span><span><i class="wdopen"></i>Open slot</span>'+(z>=WD_CLOSE&&d.me.on?'<span><i style="background:rgba(243,220,154,.7);border-color:transparent;border-radius:50%;width:6px;height:6px"></i>You can move here</span>':'')+'</div>'+
     (WDS.err?'<p class="why">'+esc(WDS.err)+'</p>':'')+
     '<details class="det" data-det="wdhow"'+(DET.wdhow?' open':'')+' style="margin-top:8px"><summary><b>How it works</b></summary><ul class="wdhow">'+WD_HOW.map(function(t){ return '<li>'+t+'</li>'; }).join("")+'</ul></details>'; }
 function worldHtml(){ if (!alOn()) return '<div class="section"><h3>Server map</h3><p class="hint">The server map is played with other people, so it needs a cloud save (Settings).</p></div>';
@@ -6990,6 +7040,9 @@ function wdAct(act, a, e){
   if (act==="wd-open"){ WDS.sel=null; openSheet({kind:"world"}); if (!WDS.busy) wdFetch(); return true; }
   if (act==="wd-tap"){ if (!WDS.dragAt) wdTapAt(e); return true; }
   if (act==="wd-popx"){ WDS.sel=null; WDS.armed=""; wdPaint(); return true; }
+  if (act==="wd-mltog"){ WDS.mlOpen=WDS.mlOpen===false; wdPaint(); return true; }
+  if (act==="wd-mrecall"){ wdMarchAct("/wd/recall", +a.dataset.id, "March recalled: it\u2019s heading home"); return true; }
+  if (act==="wd-mhasten"){ if (!(S.items.marchsp>0)){ toast("You have no March Speed items"); return true; } wdMarchAct("/wd/hasten", +a.dataset.id, "March sped up: half the time left"); return true; }
   if (act==="wd-fs"){ wdFs(!WDFS.on); return true; }
   if (act==="wd-rot"){ wdRot(); return true; }
   if (act==="wd-mv"){ var mmv=wdMyMap(); ALS.moving={what:a.dataset.what, who:a.dataset.who}; WDS.sel=null; if (mmv){ WDS.cx=mmv.s.x+7; WDS.cy=mmv.s.y+7; WDS.z=WD_ZOOMS.indexOf(WD_CLOSE)+1; } /* the whole land, with room around it for the bar */ wdPaint(); return true; }
@@ -7000,8 +7053,8 @@ function wdAct(act, a, e){
     lastView=""; renderView(true); window.scrollTo({top:0}); ALS.last=0; alSync(); return true; } // not the click that ends a drag or pinch
   if (act==="wd-zoom"){ var zc=wdWin().z, zi=+a.dataset.v>0 ? WD_ZOOMS.filter(function(q){ return q<=zc+0.01; }).length+1 : WD_ZOOMS.filter(function(q){ return q<zc-0.01; }).length; zi=Math.max(1, Math.min(WD_ZOOMS.length, zi)); if (zi>(WDS.z||1) && WDS.sel && WDS.sel.x!=null){ WDS.cx=WDS.sel.x; WDS.cy=WDS.sel.y; } else if (zi>(WDS.z||1) && WDS.sel && WDS.sel.k==="slot" && WDS.d){ var zsl=WDS.d.slots[WDS.sel.i]; WDS.cx=zsl.x+7; WDS.cy=zsl.y+7; } WDS.z=zi; wdPaint(); return true; }
   if (act==="wd-pan"){ var V=wdWin(), st=V.w/3; WDS.cx=Math.max(0,Math.min(V.N-1, Math.round(V.x+V.w/2+(+a.dataset.x)*st))); WDS.cy=Math.max(0,Math.min(V.N-1, Math.round(V.y+V.h/2+(+a.dataset.y)*st))); wdPaint(); return true; }
-  if (act==="wd-zoomslot"){ var zs=WDS.d&&WDS.d.slots[+a.dataset.v]; if (zs){ WDS.cx=zs.x+7; WDS.cy=zs.y+7; WDS.z=WD_ZOOMS.length; } wdPaint(); return true; } // a whole alliance map fills the screen at x12
-  if (act==="wd-zoomhere"){ var sv=WDS.sel; if (sv && sv.x!=null){ WDS.cx=sv.x; WDS.cy=sv.y; WDS.z=WD_ZOOMS.length; } wdPaint(); return true; }
+  if (act==="wd-zoomslot"){ var zs=WDS.d&&WDS.d.slots[+a.dataset.v]; if (zs){ WDS.cx=zs.x+7; WDS.cy=zs.y+7; WDS.z=wdZi(12); } wdPaint(); return true; } // a whole alliance map fills the screen at x12
+  if (act==="wd-zoomhere"){ var sv=WDS.sel; if (sv && sv.x!=null){ WDS.cx=sv.x; WDS.cy=sv.y; WDS.z=wdZi(18); } wdPaint(); return true; }
   if (act==="wd-findme"){ var me=WDS.d&&WDS.d.me; if (me && me.x!=null){ WDS.cx=me.x; WDS.cy=me.y; WDS.z=3; var L=WDS.d.lords.filter(function(l){ return l.me; })[0]; WDS.sel=L?{k:"lord",x:L.x,y:L.y,l:L}:null; } wdPaint(); return true; }
   if (act==="wd-join"){ wdJoin(); return true; }
   if (act==="wd-matk" || act==="wd-mjoin"){ if (!WDS.d || !WDS.d.me.on){ toast("Join the server map first"); return true; }
@@ -7079,7 +7132,8 @@ function wdSend(){ var d=marchDraft; if (wdWhy(sumT(d.t)) || WDS.sending) return
 // results: each of my marches learns what came back; it's taken home when it gets there (troops, wounded to the Medic Camp, rewards)
 function wdResults(d){ var L=S.wdM||[], ch=false; (d.mine||[]).forEach(function(j){ var m=L.filter(function(x){ return x.ref===j.ref; })[0]; if (!m) return;
     if (m.id!==j.id || m.L!==j.L){ m.id=j.id; m.L=j.L; ch=true; }
-    if (j.st==="back" && j.res && m.st!=="back"){ m.st="back"; m.res=j.res; m.reward=j.reward; m.home=j.home; m.host=j.host; ch=true; } });
+    if (j.st==="back" && j.res && m.st!=="back"){ m.st="back"; m.res=j.res; m.reward=j.reward; m.home=j.home; m.host=j.host; ch=true; }
+    else if (j.st==="back" && m.st==="back" && j.home && j.home!==m.home){ m.home=j.home; ch=true; } }); // 0.2.23: sped up on the way home
   if (ch) save(); }
 function wdHome(m){ var ci=cityIndex(m.city); if (ci<0) ci=S.cur; var c=S.cities[ci], r=m.res||{back:m.t, wounded:[]}, back=0, wd=0, wb=null, nm="level "+(m.L||"?")+" "+wdMonName(m.L);
   withCity(ci,function(){ for (var i=0;i<12;i++){ var n=(r.back&&r.back[i])||0; S.troops[i]+=n; back+=n; } });
@@ -7091,6 +7145,7 @@ function wdHome(m){ var ci=cityIndex(m.city); if (ci<0) ci=S.cur; var c=S.cities
     note("alliance","The "+nm+" fell on the server map! Your share: a Mana Orb for the Shield Generator"+(Object.keys(its).length?", "+arRewardList({items:its, res:{}}):"")+(xp?", and "+fmt(xp)+" experience for "+hh.name:"")+"."+tail); }
   else if (r.gone) note("alliance","The "+nm+" was already gone when your rally got there."+tail);
   else if (r.cancelled) note("alliance","The rally on the "+nm+" was called off."+tail);
+  else if (r.recalled) note("alliance","Your march on the "+nm+" was recalled."+tail);
   else if (r.late) note("alliance","Your march didn’t reach the rally on the "+nm+" before it left, so it turned back."+tail);
   else note("alliance","The "+nm+" survived the fight."+tail); }
 function wdHomeTick(){ var L=S.wdM; if (!L || !L.length) return; var now=Date.now(), acks=[];
@@ -14650,6 +14705,7 @@ document.addEventListener("change",function(e){ markDirty();
   if (e.target.id==="autoheal"){ S.autoHeal=e.target.checked; if (S.autoHeal) autoHealStep(); save(); processQueues(); lastView=""; refresh(); }
   if (e.target.id==="autofort"){ S.autoFort=e.target.checked; save(); processQueues(); lastView=""; refresh(); }
   if (e.target.id==="automayor"){ S.autoMayor=e.target.checked; autoOffices(); save(); lastView=""; refresh(); }
+  if (e.target.dataset.farmkind!=null){ var fkp=+e.target.dataset.farmkind, fkr=S.presets[fkp]; fkr.farmKind=e.target.value==="val"?"val":null; if (fkr.farmMode){ farmRebuild([fkp]); var fkm=farmMsg[C().id+":"+fkp]; if (fkm) toast(fkr.name+": "+fkm.t); } lastView=""; refresh(); return; } // 0.2.23
   if (e.target.dataset.farmlvl!=null){ var flp=+e.target.dataset.farmlvl, flr=S.presets[flp]; flr.farmLevel=+e.target.value||null; if (flr.farmMode){ farmRebuild([flp]); var flm=farmMsg[C().id+":"+flp]; if (flm) toast(flr.name+": "+flm.t); } lastView=""; refresh(); return; }
   if (e.target.id==="phero"){ sheetPreset().hero=+e.target.value; save(); }
   if (e.target.id==="pstop"){ S.presets[sheetFor.p].stopOnLoss=e.target.checked; save(); }
