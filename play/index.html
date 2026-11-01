@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.27";
+window.IBORY_V="0.2.28";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1170,7 +1170,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.27";
+var APP_VERSION = "0.2.28";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -4576,7 +4576,9 @@ function bmCard(){ var el=document.getElementById("tileinfo"); if (!el || !selTi
   wrap.innerHTML=b ? '<button class="btn ghost small" data-act="bm-del" data-tile="'+selTile+'">\u2605 Bookmarked</button><input type="text" id="bm-label" maxlength="40" value="'+esc(b.n||"")+'" placeholder="Label (optional)" aria-label="Bookmark label" style="flex:1;min-width:0">'
     : '<button class="btn ghost small" data-act="bm-add" data-tile="'+selTile+'">\u2606 Bookmark</button>';
   hd.style.flexWrap="wrap"; hd.appendChild(wrap); }
-function renderTileInfo(){ renderTileInfoBase(); try { tileGlance(); } catch(e){} try { var td=document.getElementById("tidet"), ts=document.getElementById("tisum"); if (td){ td.hidden=!selTile; if (ts){ var tq=selTile&&TILE_BY[selTile]; ts.textContent=tq?tileName(tq)+" ("+tq.x+", "+tq.y+")":""; } } } catch(e){} try { bmCard(); } catch(e){} try { ryCard(); } catch(e){} try { mapPop(); } catch(e){} }
+/* 0.2.28: while a dropdown in the panel is open nothing in the panel changes. 0.2.24 held the panel's body, but the Bookmark button was still
+   added on every tick (a growing pile of them), and on Android the moving content closed the level picker as it opened. */
+function renderTileInfo(){ if (renderTileInfoBase()===false){ try { mapPop(); } catch(e){} return; } try { tileGlance(); } catch(e){} try { var td=document.getElementById("tidet"), ts=document.getElementById("tisum"); if (td){ td.hidden=!selTile; if (ts){ var tq=selTile&&TILE_BY[selTile]; ts.textContent=tq?tileName(tq)+" ("+tq.x+", "+tq.y+")":""; } } } catch(e){} try { bmCard(); } catch(e){} try { ryCard(); } catch(e){} try { mapPop(); } catch(e){} }
 /* ---------- map popup (0.1.135): tap a tile and its basics and main buttons open right on the map ---------- */
 var MPOP={hide:false};
 var MPOP_ACTS={attack:1, scout:2, occupy:3, conquer:4, found:5, transport:6, reinforce:7, allyguard:8, station:9};
@@ -4643,6 +4645,7 @@ document.addEventListener("focusin", function(e){ var t=e.target; if (t && /^(SE
 document.addEventListener("pointerdown", function(e){ var t=e.target; if (t && t.tagName==="SELECT") EDITING=t; }, true);
 document.addEventListener("change", function(e){ if (e.target===EDITING && e.target.tagName==="SELECT") EDITING=null; }, true);
 document.addEventListener("focusout", function(e){ if (e.target===EDITING) EDITING=null; });
+document.addEventListener("pointerdown", function(e){ if (EDITING && EDITING.tagName==="SELECT" && e.target!==EDITING) EDITING=null; }); // a dropdown closed without a change (same choice, or dismissed): a tap anywhere else lets the panel update again
 function editingIn(el){ return !!(el && EDITING && el.contains(EDITING)); }
 // 0.2.26: Draft from an NPC city's own panel, one button for each historic city of yours that can reach it today
 function draftTileBtns(q){ var n=sumT(draftTake(current(q))); if (!n) return ''; return S.cities.map(function(c,ci){ if (!draftReady(c) || !draftOk(c,q)) return '';
@@ -4650,7 +4653,7 @@ function draftTileBtns(q){ var n=sumT(draftTake(current(q))); if (!n) return '';
 function renderTileInfoBase(){
   var el=document.getElementById("tileinfo"); if (!el) return;
   if (!selTile){ el.innerHTML=''; return; }
-  if (editingIn(el) && el.dataset.tile===selTile) return; // wait until they're done with it
+  if (editingIn(el) && el.dataset.tile===selTile) return false; // wait until they're done with it (false: nothing else may touch the panel either)
   el.dataset.tile=selTile;
   var q=TILE_BY[selTile], h='<div class="section"><div class="shead"><h3>'+esc(tileName(q))+'</h3><span class="dur">('+q.x+', '+q.y+')'+(q.k!=="home"?', '+tdist(q).toFixed(1)+' tiles away':'')+'</span></div>';
   if (q.k==="home"){
