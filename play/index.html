@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.28";
+window.IBORY_V="0.2.29";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1170,7 +1170,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.28";
+var APP_VERSION = "0.2.29";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -3490,14 +3490,20 @@ function allyTransportArrive(m){
    or {w:{n:weight}}. */
 function lootB(base){ return base ? {items:1, mats:0, gear:0} : {items:bItems(), mats:bMats(), gear:achLv("gear")}; }
 function lootCity(q){ return q.k==="npc"||q.k==="ai"||q.k==="hc"; }
+/* 0.2.29 (Cody): Mithril from NPC cities 1% at level 7 up to 1.5% at 10 (was 0.15%, 0.1% at 10 where Star Metal takes the first slice).
+   The group is one draw against rising thresholds, so the Mithril, Fine Ingot and Rough Ore thresholds all move up by the same amount: Ingot
+   and Ore keep their odds. AI lords and historic cities keep the old Mithril rate. */
+var MITH_NPC={7:0.01, 8:0.0117, 9:0.0133, 10:0.015};
+function mithUp(q,L,b){ if (q.k!=="npc" || L<7) return 0; var st=L>=10?0.0005+0.0001*b.gear:0; return st+MITH_NPC[Math.min(10,L)]-0.0015; }
+var JUSTICE_NPC10=0.01; // 0.2.29 (Cody): its own 1% roll on every full-garrison win over a level 10 NPC city, on top of the medal roll
 var DROP_RULES=[
   {k:"gemD", ok:function(q,L){ return !VTYPES[q.k]; }, p:function(q,L,b){ return 0.35+b.mats; }, n:function(q,L){ return [1,1+Math.floor(L/3)]; }},
   {k:"gemF", ok:function(q,L){ return !VTYPES[q.k] && L>=5; }, p:function(q,L,b){ return 0.04+0.01*(L-5)+b.mats; }, n:function(){ return {w:{1:0.7, 2:0.3}}; }},
   {one:"Gear materials", ok:function(q){ return q.k!=="monster" && !VTYPES[q.k]; }, of:[ // better ones only from tougher targets
     {k:"starmetal", ok:function(q,L){ return L>=10; }, t:function(q,L,b){ return 0.0005+0.0001*b.gear; }},
-    {k:"mithril", ok:function(q,L){ return L>=7; }, t:function(q,L,b){ var a=0.0001*b.gear; return 0.0015+(L>=10?a:0)+(L>=7?a:0); }},
-    {k:"ingot", ok:function(q,L){ return L>=4; }, t:function(q,L,b){ var a=0.0001*b.gear, g=0.001*b.gear; return 0.004+(L>=10?a:0)+(L>=7?a:0)+(L>=4?g:0); }},
-    {k:"ore", ok:function(){ return true; }, t:function(q,L,b){ var a=0.0001*b.gear, g=0.001*b.gear; return 0.008+(L>=10?a:0)+(L>=7?a:0)+(L>=4?g:0)+g; }}]},
+    {k:"mithril", ok:function(q,L){ return L>=7; }, t:function(q,L,b){ var a=0.0001*b.gear; return 0.0015+mithUp(q,L,b)+(L>=10?a:0)+(L>=7?a:0); }},
+    {k:"ingot", ok:function(q,L){ return L>=4; }, t:function(q,L,b){ var a=0.0001*b.gear, g=0.001*b.gear; return 0.004+mithUp(q,L,b)+(L>=10?a:0)+(L>=7?a:0)+(L>=4?g:0); }},
+    {k:"ore", ok:function(){ return true; }, t:function(q,L,b){ var a=0.0001*b.gear, g=0.001*b.gear; return 0.008+mithUp(q,L,b)+(L>=10?a:0)+(L>=7?a:0)+(L>=4?g:0)+g; }}]},
   {one:"Hero books", ok:function(){ return true; }, of:[
     {k:"annals", ok:function(q,L){ return L>=10; }, t:function(q,L,b){ return 0.0005*b.items; }},
     {k:"codex", ok:function(q,L){ return L>=7; }, t:function(q,L,b){ return 0.002*b.items; }},
@@ -3549,6 +3555,7 @@ function winDrops(q){
   var boxKey = rollMedalBox(q), drops=[], medal=-1;
   if (boxKey){ S.items[boxKey]=(S.items[boxKey]||0)+1; drops.push("a "+ITEMS[boxKey].name); }
   else if (Math.random()<MEDAL_RATE){ medal=rollMedalFor(q); if (medal>=0){ S.medals[MEDALS[medal][0]]++; achMedal(MEDALS[medal][0]); } }
+  if (q.k==="npc" && (q.L||0)>=10 && Math.random()<JUSTICE_NPC10){ S.medals.justice=(S.medals.justice||0)+1; achMedal("justice"); drops.push("a Justice medal"); }
   if (q.k!=="home"){
     lootRoll(q, drops);
     if (q.k==="monster" && q.ev){ decoDrops(q, drops); if (VAMP_K[q.mon]) VAMP_FX.push({x:q.x, y:q.y, L:VAMP_K[q.mon], t0:Date.now()});
@@ -4928,7 +4935,7 @@ function posOf(g){ if (g.at) return g.at; for (var i=0;i<GEAR_POS.length;i++) if
 function posInfo(k){ for (var i=0;i<GEAR_POS.length;i++) if (GEAR_POS[i].k===k) return GEAR_POS[i]; return GEAR_POS[0]; }
 function wornAt(h,k){ return S.gear.filter(function(x){ return x.on===h.id && posOf(x)===k; })[0]; }
 function mountSpd(h){ if (!h || !S.gear) return 0; var g=wornAt(h,"mount"); return g ? MOUNT_SPD[g.tier] : 0; }
-var GEAR_TIERS=["common","rare","epic","legendary","mythic"], GEAR_BASE=[3,6,10,16,24], GEAR_MAX=[9,12,14,15,15], GEAR_SCRAP=[2,5,10,20,40];
+var GEAR_TIERS=["common","rare","epic","legendary","mythic"], GEAR_BASE=[3,5,7,9,12], /* 0.2.29 (Cody): flatter tiers, was 3/6/10/16/24 (a 15-star Mythic 96 -> 48) */ GEAR_MAX=[9,12,14,15,15], GEAR_SCRAP=[2,5,10,20,40];
 // success % with FOUR gems, indexed by the current star count (anchors: Flawless 95 at 0, 90 at 5, 50 at 11; Delicate 70 at 4, 65 at 5, 60 at 6; the rest continues the same drop per star).
 // Each gem fewer than four takes off one step (Flawless 15 points, Delicate 25/3), never below 1%: one Flawless is 45% at 5 stars, one Delicate 40%.
 var GEM_4={D:[90,85,80,75,70,65,60,55,50,45,40,35,30,25,20], F:[95,94,93,92,91,90,83,77,70,63,57,50,43,37,30]}, GEM_STEP={D:25/3,F:15};
@@ -11892,7 +11899,9 @@ function dtQ(n){ return typeof n==="string" ? n : qtyTxt(n); }
 function dtT(k,L){ return {k:k, L:L, x:0, y:0, id:"dt"}; }
 function dtFight(q, b, extra){ var rows=[], bx=boxRates(q);
   bx.list.forEach(function(r){ if (r.p>0) rows.push({k:r.k, p:r.p, n:1}); });
-  medalRates(q).forEach(function(m){ rows.push({k:"m:"+MEDALS[m.i][0], p:m.p, n:1}); });
+  var jx=(q.k==="npc" && q.L>=10)?JUSTICE_NPC10:0, jr=null;
+  medalRates(q).forEach(function(m){ var r={k:"m:"+MEDALS[m.i][0], p:m.p, n:1}; if (MEDALS[m.i][0]==="justice"){ r.p=1-(1-r.p)*(1-jx); jr=r; } rows.push(r); });
+  if (jx && !jr) rows.push({k:"m:justice", p:jx, n:1});
   lootRates(q, b).forEach(function(r){ rows.push({k:r.k, p:r.p, n:r.n, note:r.grp?"at most one "+r.grp.toLowerCase().replace(/s$/,"")+" a win":""}); });
   return rows.concat(extra||[]); }
 function dtRange(a,b){ var o=[]; for (var i=a;i<=b;i++) o.push(i); return o; }
