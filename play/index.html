@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.30";
+window.IBORY_V="0.2.31";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1170,7 +1170,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.30";
+var APP_VERSION = "0.2.31";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -5194,8 +5194,8 @@ function lbStats(){
   return {prestige:Math.floor(S.prestige||0), deaths:Math.floor((S.stats&&S.stats.lostT)||0), killsBy:achStore().kills.map(function(x){ return Math.floor(x||0); }),
     hero:hero, heroName:heroName, heroId:heroId, heroStats:heroStats, heroes:lbHeroes(), stars:bestGearSet(), gearEv:gev, college:wcStars(), cities:S.cities.length, rep:Math.floor((S.alliance&&S.alliance.rep)||0), hc:hc, power:powerOf(true).total, ev:evLbStat()};
 }
-// 0.2.30: the hero board lists heroes: the 10 best of every player (level, ties by Attack), gear included
-var LB_HPER=10, lbHSort="lv", LB_HSORTS=[["lv","Level"],["atk","Attack"],["int","Intelligence"],["pol","Politics"]];
+// 0.2.30: the hero board lists heroes: every player's heroes (0.2.31: all of them, it was the 10 best; 500 is a safety cap), gear included
+var LB_HPER=500, lbHSort="lv", LB_HSORTS=[["lv","Level"],["atk","Attack"],["int","Intelligence"],["pol","Politics"]];
 function lbHeroes(){ var all=[]; S.cities.forEach(function(c){ (c.heroes||[]).forEach(function(h){ all.push(h); }); }); (S.waiting||[]).forEach(function(h){ all.push(h); });
   return all.map(function(h){ return {id:h.id||0, nm:h.name||"", lv:h.level||0, p:Math.floor(hs(h,"pol")||0), a:Math.floor(hs(h,"atk")||0), i:Math.floor(hs(h,"int")||0)}; })
     .filter(function(x){ return x.lv>0; }).sort(function(x,y){ return (y.lv-x.lv)||(y.a-x.a); }).slice(0,LB_HPER); }
@@ -7923,7 +7923,7 @@ function lbSheet(){
   var listed=lbOn();
   if (S.lb && S.lb.removed) h+='<p class="hint">This save was removed from the high scores, so it isn\u2019t listed. You can still browse the boards.</p>';
   else if (!listed || (S.lb&&S.lb.needAcct&&!cbOn())){
-    h+='<details class="det" data-det="lbjoin"'+(DET.lbjoin||!cbOn()?' open':'')+'><summary><b>'+(S.lb&&S.lb.optedOut&&!listed?'You left the high scores':'You\u2019re not on the boards')+'</b> <span class="dur">tap to '+(S.lb&&S.lb.optedOut?'rejoin':'join')+'</span></summary>'+'<p class="hint">'+(S.lb&&S.lb.optedOut?'You left the high scores. Rejoin any time.':'Join to put your realm on the boards.')+' Ibory sends your name and these numbers only: prestige, kills by troop type, troops lost, your 10 best heroes (name, level and stats), best star set, cities, kingdom reputation, and which levels of historic city you\u2019ve taken. They update when you open the game and every few minutes while you play.</p>'+
+    h+='<details class="det" data-det="lbjoin"'+(DET.lbjoin||!cbOn()?' open':'')+'><summary><b>'+(S.lb&&S.lb.optedOut&&!listed?'You left the high scores':'You\u2019re not on the boards')+'</b> <span class="dur">tap to '+(S.lb&&S.lb.optedOut?'rejoin':'join')+'</span></summary>'+'<p class="hint">'+(S.lb&&S.lb.optedOut?'You left the high scores. Rejoin any time.':'Join to put your realm on the boards.')+' Ibory sends your name and these numbers only: prestige, kills by troop type, troops lost, your heroes (name, level and stats), best star set, cities, kingdom reputation, and which levels of historic city you\u2019ve taken. They update when you open the game and every few minutes while you play.</p>'+
       (cbOn()?'<p class="hint">You\u2019ll be listed as <b>'+esc(myName())+'</b>, your account name (change it in Settings).</p><div class="upbtns"><button class="btn" data-act="lb-join">'+(S.lb&&S.lb.optedOut?'Rejoin the high scores':'Join the high scores')+'</button></div>'
         :'<p class="hint">The high scores use your account name, so you need an account first. It\u2019s a username and a password, and it also keeps your game safe in the cloud.</p><div class="upbtns"><button class="btn" data-act="cb-ask-yes">Set up an account</button></div>')+'</details>';
   }
@@ -7935,7 +7935,7 @@ function lbSheet(){
   if (!d) h+='<p class="hint">'+(lbBusy?'Loading\u2026':'')+'</p>';
   else {
     if (d.cat==="hero") h+='<div class="lbtabs" style="position:static;margin:0 0 6px">'+LB_HSORTS.map(function(o){ return '<button class="chipbtn'+(o[0]===lbHSort?' on':'')+'" data-act="lb-hsort" data-v="'+o[0]+'">'+o[1]+'</button>'; }).join("")+'</div>';
-    h+='<p class="dur">'+(d.first?'The first '+d.first+' to do it, in order. ':d.cat==="hero"&&d.heroes!=null?'Top '+d.rows.length+' of '+fmt(d.heroes)+' heroes from '+fmt(d.players)+' players (each player\u2019s '+(d.perPlayer||LB_HPER)+' best). ':'Top '+d.rows.length+' of '+fmt(d.players)+' players. ')+(lbBusy?'Refreshing\u2026':'')+'</p>';
+    h+='<p class="dur">'+(d.first?'The first '+d.first+' to do it, in order. ':d.cat==="hero"&&d.heroes!=null?'Top '+d.rows.length+' of '+fmt(d.heroes)+' heroes from '+fmt(d.players)+' players. ':'Top '+d.rows.length+' of '+fmt(d.players)+' players. ')+(lbBusy?'Refreshing\u2026':'')+'</p>';
     if (!d.rows.length) h+='<p class="hint">Nobody yet. Be the first.</p>';
     else if (d.cat==="hero" && d.heroes!=null) h+='<div class="tscroll"><table class="gt lbt"><tbody>'+d.rows.map(lbHeroRow).join("")+'</tbody></table></div>';
     else h+='<div class="tscroll"><table class="gt lbt"><tbody>'+d.rows.map(function(r){ return '<tr'+(r.me?' class="me"':'')+'><td>'+r.rank+'</td><td><span class="lbn" data-act="pl-open" role="button" data-k="'+esc(r.ck||"")+'" data-pid="'+(r.pid||0)+'"'+(r.me?' data-me="1"':'')+' data-nm="'+esc(r.name)+'">'+lbAvatar(r)+'<span>'+(r.tag?'<span class="lbtag">['+esc(r.tag)+']</span>':'')+esc(r.name)+(r.me?' (you)':'')+(d.cat==="hero"&&r.hero?'<span class="hnm">'+(r.hid&&r.hu&&r.hk?heroPortrait({id:r.hid, name:r.hero, tier:"legendary"},28,{k:r.hk, hu:r.hu})+' ':'')+esc(r.hero)+'</span>'+lbHeroSt(r):'')+'</span></span></td>'+'<td>'+lbVal(d.cat,r.value)+'</td></tr>'; }).join("")+'</tbody></table></div>';
