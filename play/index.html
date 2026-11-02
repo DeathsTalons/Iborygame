@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.29";
+window.IBORY_V="0.2.30";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1170,7 +1170,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.29";
+var APP_VERSION = "0.2.30";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -5168,12 +5168,12 @@ function grantBeta(){
 /* ---------- high scores (Cloudflare Worker) ---------- */
 var LB_URL = "https://ibory-scores.ibory-reports.workers.dev"; // the Worker address, e.g. "https://ibory-scores.yourname.workers.dev" (empty hides syncing)
 var LB_HC=[12,14,16,18], lbData={}, lbCat="prestige", lbBusy=false, lbErr="", lbLastSync=0;
-var LB_CATS=[["prestige","Prestige"],["power","Power"],["kills","Troops killed"],["deaths","Troops lost"],["hero","Top hero"],["stars","Star set"],["cities","Cities"],["rep","Kingdom rep"],["college","War College"]]
+var LB_CATS=[["prestige","Prestige"],["power","Power"],["kills","Troops killed"],["deaths","Troops lost"],["hero","Top heroes"],["stars","Star set"],["cities","Cities"],["rep","Kingdom rep"],["college","War College"]]
   .concat(LB_HC.map(function(L){ return ["hc"+L,"First L"+L+" historic"]; }));
 var lbMpSel=null; // which boards are open: null follows this save (single until it does something multiplayer)
 function lbMp(){ return lbMpSel==null ? (S.mp?1:0) : lbMpSel; }
 function lbCats(){ return lbMp() ? LB_CATS.concat([["honor","Invasion honor"]]) : LB_CATS; }
-function lbKey(){ return lbCat+"|"+lbMp(); }
+function lbKey(){ return lbCat+"|"+lbMp()+(lbCat==="hero"?"|"+lbHSort:""); }
 function lbHex(n){ var a=new Uint8Array(n); (window.crypto||window.msCrypto).getRandomValues(a); return [].map.call(a,function(b){ return ("0"+b.toString(16)).slice(-2); }).join(""); }
 function lbOn(){ return !!(LB_URL && S.lb && S.lb.on && !S.lb.removed); }
 // everyone is on the high scores unless they leave: the name follows the lord's name (or first city) until they pick their own
@@ -5192,11 +5192,20 @@ function lbStats(){
   var hc={}; LB_HC.forEach(function(L){ if (S.hcSeen[L]) hc[L]=true; });
   var gev=(S.starLog||[]).filter(function(e){ return e.at>Date.now()-3500000; }).map(function(e){ return {at:e.at, st:e.st, nm:e.nm}; }); // every 11+ star hit of the last hour, for the world chat
   return {prestige:Math.floor(S.prestige||0), deaths:Math.floor((S.stats&&S.stats.lostT)||0), killsBy:achStore().kills.map(function(x){ return Math.floor(x||0); }),
-    hero:hero, heroName:heroName, heroId:heroId, heroStats:heroStats, stars:bestGearSet(), gearEv:gev, college:wcStars(), cities:S.cities.length, rep:Math.floor((S.alliance&&S.alliance.rep)||0), hc:hc, power:powerOf(true).total, ev:evLbStat()};
+    hero:hero, heroName:heroName, heroId:heroId, heroStats:heroStats, heroes:lbHeroes(), stars:bestGearSet(), gearEv:gev, college:wcStars(), cities:S.cities.length, rep:Math.floor((S.alliance&&S.alliance.rep)||0), hc:hc, power:powerOf(true).total, ev:evLbStat()};
 }
+// 0.2.30: the hero board lists heroes: the 10 best of every player (level, ties by Attack), gear included
+var LB_HPER=10, lbHSort="lv", LB_HSORTS=[["lv","Level"],["atk","Attack"],["int","Intelligence"],["pol","Politics"]];
+function lbHeroes(){ var all=[]; S.cities.forEach(function(c){ (c.heroes||[]).forEach(function(h){ all.push(h); }); }); (S.waiting||[]).forEach(function(h){ all.push(h); });
+  return all.map(function(h){ return {id:h.id||0, nm:h.name||"", lv:h.level||0, p:Math.floor(hs(h,"pol")||0), a:Math.floor(hs(h,"atk")||0), i:Math.floor(hs(h,"int")||0)}; })
+    .filter(function(x){ return x.lv>0; }).sort(function(x,y){ return (y.lv-x.lv)||(y.a-x.a); }).slice(0,LB_HPER); }
 function lbHeroSt(r){ // the top hero's stats under its name: yours from the save, others as sent to the server
-  var a = r.me ? lbStats().heroStats : String(r.hst||"").split(",").map(Number); if (!a || a.length<3 || a.some(function(x){ return !isFinite(x); })) return "";
+  var a = r.me && r.lv==null ? lbStats().heroStats : String(r.hst||"").split(",").map(Number); if (!a || a.length<3 || a.some(function(x){ return !isFinite(x); })) return "";
   return '<span class="hst">Atk '+fmt(a[1])+' \u00b7 Int '+fmt(a[2])+' \u00b7 Pol '+fmt(a[0])+'</span>'; }
+// a hero board line: the hero first (picture, name, stats), then whose it is
+function lbHeroRow(r){ return '<tr'+(r.me?' class="me"':'')+'><td>'+r.rank+'</td><td><span class="lbn" data-act="pl-open" role="button" data-k="'+esc(r.ck||"")+'" data-pid="'+(r.pid||0)+'"'+(r.me?' data-me="1"':'')+' data-nm="'+esc(r.name)+'">'+
+  (r.hid&&r.hu&&r.hk?heroPortrait({id:r.hid, name:r.hero, tier:"legendary"},28,{k:r.hk, hu:r.hu}):lbAvatar(r))+'<span><b>'+esc(r.hero||"?")+'</b>'+(lbHSort!=="lv"?' <span class="dur">Level '+fmt(r.lv||0)+'</span>':'')+
+  '<span class="hnm">'+(r.tag?'<span class="lbtag">['+esc(r.tag)+']</span>':'')+esc(r.name)+(r.me?' (you)':'')+'</span>'+lbHeroSt(r)+'</span></span></td><td>'+lbVal("hero",r.value)+'</td></tr>'; }
 function lbAvatar(r){ // a small picture for each high scores row: yours straight from the save, others loaded one at a time from the server (the browser keeps them)
   var pf = r.me ? S.me : (r.pu||r.fr) ? {img: r.pu ? LB_URL+"/me/img?k="+encodeURIComponent(r.ck)+"&v="+r.pu : "", frame:r.fr} : {};
   return avatarHtml(pf||{}, r.name, true);
@@ -5210,7 +5219,7 @@ function lbSync(force){
 function lbFetch(cat){
   if (!LB_URL) return; lbCat=cat||lbCat; lbBusy=true; lbErr=""; lastSheet=""; renderSheet();
   if (!lbCats().some(function(c){ return c[0]===lbCat; })) lbCat="prestige"; var lbk=lbKey();
-  fetch(LB_URL+"/board?cat="+encodeURIComponent(lbCat)+"&mp="+lbMp()+(lbOn()&&S.lb.id?"&id="+S.lb.id:""),{cache:"no-store"})
+  fetch(LB_URL+"/board?cat="+encodeURIComponent(lbCat)+"&mp="+lbMp()+(lbCat==="hero"?"&sort="+lbHSort:"")+(lbOn()&&S.lb.id?"&id="+S.lb.id:""),{cache:"no-store"})
     .then(function(r){ return r.json(); }).then(function(d){ lbBusy=false; if (d && d.rows){ lbData[lbk]=d; } else lbErr=(d&&d.error)||"Couldn\u2019t load the high scores"; lastSheet=""; renderSheet(); })
     .catch(function(){ lbBusy=false; lbErr="Couldn\u2019t reach the high scores. Check your connection."; lastSheet=""; renderSheet(); });
 }
@@ -7907,14 +7916,14 @@ function cbSection(){
   if (CB.msg) h+='<p class="'+(CB.good?'dur':'why')+'" style="margin:6px 0 0">'+esc(CB.msg)+'</p>';
   return h+'</details>';
 }
-function lbVal(cat,v){ if (/^hc/.test(cat)) return v?new Date(v).toLocaleDateString(undefined,{month:"short",day:"numeric"})+" "+new Date(v).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"}):"\u2014"; if (cat==="stars") return v+"\u2605"; if (cat==="hero") return "Level "+v; return fmt(v||0); }
+function lbVal(cat,v){ if (/^hc/.test(cat)) return v?new Date(v).toLocaleDateString(undefined,{month:"short",day:"numeric"})+" "+new Date(v).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"}):"\u2014"; if (cat==="stars") return v+"\u2605"; if (cat==="hero") return lbHSort==="lv" ? "Level "+v : fmt(v||0)+" "+({atk:"Atk",int:"Int",pol:"Pol"}[lbHSort]); return fmt(v||0); }
 function lbSheet(){
   var h='<div class="head lbhead"><span class="ico">'+ICON.crest+'</span><div style="flex:1"><h2>High scores</h2><div class="sub">Every Ibory player. Swipe or tap a tab to change boards.</div></div><button class="btn ghost small" data-act="close" aria-label="Close">\u2715</button></div>';
   if (!LB_URL) return h+'<p class="hint">High scores aren\u2019t switched on in this version yet.</p><button class="closebtn" data-act="close">Close</button>';
   var listed=lbOn();
   if (S.lb && S.lb.removed) h+='<p class="hint">This save was removed from the high scores, so it isn\u2019t listed. You can still browse the boards.</p>';
   else if (!listed || (S.lb&&S.lb.needAcct&&!cbOn())){
-    h+='<details class="det" data-det="lbjoin"'+(DET.lbjoin||!cbOn()?' open':'')+'><summary><b>'+(S.lb&&S.lb.optedOut&&!listed?'You left the high scores':'You\u2019re not on the boards')+'</b> <span class="dur">tap to '+(S.lb&&S.lb.optedOut?'rejoin':'join')+'</span></summary>'+'<p class="hint">'+(S.lb&&S.lb.optedOut?'You left the high scores. Rejoin any time.':'Join to put your realm on the boards.')+' Ibory sends your name and these numbers only: prestige, kills by troop type, troops lost, your highest hero level, best star set, cities, kingdom reputation, and which levels of historic city you\u2019ve taken. They update when you open the game and every few minutes while you play.</p>'+
+    h+='<details class="det" data-det="lbjoin"'+(DET.lbjoin||!cbOn()?' open':'')+'><summary><b>'+(S.lb&&S.lb.optedOut&&!listed?'You left the high scores':'You\u2019re not on the boards')+'</b> <span class="dur">tap to '+(S.lb&&S.lb.optedOut?'rejoin':'join')+'</span></summary>'+'<p class="hint">'+(S.lb&&S.lb.optedOut?'You left the high scores. Rejoin any time.':'Join to put your realm on the boards.')+' Ibory sends your name and these numbers only: prestige, kills by troop type, troops lost, your 10 best heroes (name, level and stats), best star set, cities, kingdom reputation, and which levels of historic city you\u2019ve taken. They update when you open the game and every few minutes while you play.</p>'+
       (cbOn()?'<p class="hint">You\u2019ll be listed as <b>'+esc(myName())+'</b>, your account name (change it in Settings).</p><div class="upbtns"><button class="btn" data-act="lb-join">'+(S.lb&&S.lb.optedOut?'Rejoin the high scores':'Join the high scores')+'</button></div>'
         :'<p class="hint">The high scores use your account name, so you need an account first. It\u2019s a username and a password, and it also keeps your game safe in the cloud.</p><div class="upbtns"><button class="btn" data-act="cb-ask-yes">Set up an account</button></div>')+'</details>';
   }
@@ -7925,10 +7934,13 @@ function lbSheet(){
   if (lbErr) h+='<p class="why">'+esc(lbErr)+'</p>';
   if (!d) h+='<p class="hint">'+(lbBusy?'Loading\u2026':'')+'</p>';
   else {
-    h+='<p class="dur">'+(d.first?'The first '+d.first+' to do it, in order. ':'Top '+d.rows.length+' of '+fmt(d.players)+' players. ')+(lbBusy?'Refreshing\u2026':'')+'</p>';
+    if (d.cat==="hero") h+='<div class="lbtabs" style="position:static;margin:0 0 6px">'+LB_HSORTS.map(function(o){ return '<button class="chipbtn'+(o[0]===lbHSort?' on':'')+'" data-act="lb-hsort" data-v="'+o[0]+'">'+o[1]+'</button>'; }).join("")+'</div>';
+    h+='<p class="dur">'+(d.first?'The first '+d.first+' to do it, in order. ':d.cat==="hero"&&d.heroes!=null?'Top '+d.rows.length+' of '+fmt(d.heroes)+' heroes from '+fmt(d.players)+' players (each player\u2019s '+(d.perPlayer||LB_HPER)+' best). ':'Top '+d.rows.length+' of '+fmt(d.players)+' players. ')+(lbBusy?'Refreshing\u2026':'')+'</p>';
     if (!d.rows.length) h+='<p class="hint">Nobody yet. Be the first.</p>';
+    else if (d.cat==="hero" && d.heroes!=null) h+='<div class="tscroll"><table class="gt lbt"><tbody>'+d.rows.map(lbHeroRow).join("")+'</tbody></table></div>';
     else h+='<div class="tscroll"><table class="gt lbt"><tbody>'+d.rows.map(function(r){ return '<tr'+(r.me?' class="me"':'')+'><td>'+r.rank+'</td><td><span class="lbn" data-act="pl-open" role="button" data-k="'+esc(r.ck||"")+'" data-pid="'+(r.pid||0)+'"'+(r.me?' data-me="1"':'')+' data-nm="'+esc(r.name)+'">'+lbAvatar(r)+'<span>'+(r.tag?'<span class="lbtag">['+esc(r.tag)+']</span>':'')+esc(r.name)+(r.me?' (you)':'')+(d.cat==="hero"&&r.hero?'<span class="hnm">'+(r.hid&&r.hu&&r.hk?heroPortrait({id:r.hid, name:r.hero, tier:"legendary"},28,{k:r.hk, hu:r.hu})+' ':'')+esc(r.hero)+'</span>'+lbHeroSt(r):'')+'</span></span></td>'+'<td>'+lbVal(d.cat,r.value)+'</td></tr>'; }).join("")+'</tbody></table></div>';
-    if (d.me) h+='<p class="effect">You: '+(d.me.outside?'#'+d.me.rank+', just outside the first '+d.first:'#'+d.me.rank)+' with '+lbVal(d.cat,d.me.value)+'.</p>';
+    if (d.me && d.cat==="hero" && d.me.hero!=null) h+='<p class="effect">Your best: '+esc(d.me.hero)+', #'+d.me.rank+' with '+lbVal(d.cat,d.me.value)+'.</p>';
+    else if (d.me) h+='<p class="effect">You: '+(d.me.outside?'#'+d.me.rank+', just outside the first '+d.first:'#'+d.me.rank)+' with '+lbVal(d.cat,d.me.value)+'.</p>';
   }
   if (!listed || (S.lb&&S.lb.needAcct&&!cbOn())){ h+='<div class="upbtns"><button class="btn ghost small" data-act="lb-refresh">Refresh</button></div>'; return h+'<button class="closebtn" data-act="close">Close</button>'; }
   h+='<div class="upbtns" style="grid-template-columns:1fr 1fr"><button class="btn ghost small" data-act="lb-refresh">Refresh</button><button class="btn ghost small" data-act="lb-sync">Send my scores now</button></div>';
@@ -13926,6 +13938,7 @@ document.addEventListener("click",function(e){
   if (act==="wc-run"){ var wx=wcById(sheetFor&&sheetFor.id); if (!wx) return; if (wx.kind==="tech") tpRun(wx); else wcRun(wx); sheetBody.scrollTop=0; return; }
   if (act==="tp-step"){ var tpx=wcById(sheetFor&&sheetFor.id); if (!tpx || tpx.kind!=="tech") return; var tpd=tpDraftOf(tpx), tk=a.dataset.k; tpd[tk]=Math.max(0,Math.min(10,(tpd[tk]||0)+(+a.dataset.d))); lastSheet=""; renderSheet(); return; }
   if (act==="lb-cat"){ lbFetch(a.dataset.cat); return; }
+  if (act==="lb-hsort"){ lbHSort=a.dataset.v||"lv"; if (lbData[lbKey()]){ lastSheet=""; renderSheet(); } lbFetch("hero"); return; } // 0.2.30
   if (act==="lb-mp"){ lbMpSel=+a.dataset.v; lbFetch(); return; }
   if (act==="lb-sync"){ lbSync(true); toast("Scores sent"); setTimeout(function(){ lbFetch(); },1500); return; }
   if (act==="lb-join"){ if (!cbOn()){ closeSheet(); DET.cloud=true; goPage("settings"); toast("Set up your account first"); return; } var jn=myName();
