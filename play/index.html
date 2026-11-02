@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.32";
+window.IBORY_V="0.2.33";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1170,7 +1170,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.32";
+var APP_VERSION = "0.2.33";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -4846,7 +4846,7 @@ function marchSheet(){
   if (camps.length) h+='<div><label class="sub" for="marchfrom">March from</label><select id="marchfrom"><option value="">'+esc(S.name)+' (the city)</option>'+camps.map(function(c){ var cq=TILE_BY[c.tile]; return '<option value="'+c.tile+'"'+(d.from===c.tile?' selected':'')+'>Camp at '+esc(cq?tileName(cq):c.tile)+' ('+fmt(sumT(c.t))+' troops)</option>'; }).join("")+'</select></div>';
   if (d.mission==="hide") h+='<p class="hint">They slip out into the woods around the city: attackers won\u2019t find them, and Recall brings them back instantly. They hunt for their own food. Each group takes a Rally Spot slot, like any march.</p>';
   if (d.mission==="scout") h+='<p class="hint">Only scouts go, with a hero if you like. They win if your scouts outnumber the defender\u2019s (each Informatics level counts for 10% more on either side, and each point of a leading hero\u2019s Intelligence 0.5% more; the defender\u2019s own hero counts the same way for them). Success shows its army, fortifications and stockpile: rough counts below Informatics 3, exact from 3, plus research and hero from 6. Many targets keep no scouts at all.</p>';
-  if (d.mission!=="transport" && d.mission!=="scout") h+=[["March",1],["Farm",0]].map(function(kd){ return '<div class="farmadd"><span class="dur">'+kd[0]+' preset:</span>'+presetsOf(kd[1]).map(function(pr,pi){ return '<button class="chipbtn" data-act="march-preset"'+(kd[1]?' data-m="1"':'')+' data-p="'+pi+'" title="'+esc(pr.name)+'"'+(presetTotal(pr)?'':' disabled')+'>'+(pi+1)+'</button>'; }).join("")+'</div>'; }).join("");
+  if (d.mission!=="transport" && d.mission!=="scout") h+=[["March",1],["Farm",0]].map(function(kd){ return '<div class="farmadd"><span class="dur">'+kd[0]+' preset:</span>'+presetsOf(kd[1]).map(function(pr,pi){ var on=d.pk===(kd[1]?"m":"f")+pi; return '<button class="chipbtn'+(on?' on':'')+'" aria-pressed="'+on+'" data-act="march-preset"'+(kd[1]?' data-m="1"':'')+' data-p="'+pi+'" title="'+esc(pr.name)+'"'+(presetTotal(pr)?'':' disabled')+'>'+(pi+1)+'</button>'; }).join("")+'</div>'; }).join(""); // 0.2.33: the preset you loaded stays lit
   h+='<div class="btnrow" style="justify-content:flex-end;margin:0"><button class="btn ghost small" data-act="march-clear">Clear all</button></div>'; // 0.1.210
   h+='<div class="tscroll"><table class="gt wrap1" style="min-width:0"><tbody>';
   U.forEach(function(u,i){ if (d.mission==="scout" && i!==2) return; if (!av[i] && (d.from || missing(u.req).length) && !(d.mission==="scout")) return; if (av[i]) any=true;
@@ -13918,7 +13918,7 @@ document.addEventListener("click",function(e){
   if (act==="wc-tier"){ WCV=a.dataset.v||""; lastView=""; renderView(true); window.scrollTo({top:0}); return; }
   if (act==="wc-addwave"){ var wa=wcById(sheetFor&&sheetFor.id); if (!wa) return; var wd=wcDraftOf(wa); if (wd.waves.length<wa.waves) wd.waves.push({t:[0,0,0,0,0,0,0,0,0,0,0,0], hero:0}); lastSheet=""; renderSheet(); return; }
   if (act==="wc-clearwave"){ var wcr=wcById(sheetFor&&sheetFor.id); if (!wcr) return; var wcd=wcDraftOf(wcr), wcw=wcd.waves[+a.dataset.wave]; if (wcw) wcw.t=Z12(); lastSheet=""; renderSheet(); return; }
-  if (act==="march-clear"){ marchDraft.t=Z12(); if (marchDraft.cargo) for (var ck in marchDraft.cargo) marchDraft.cargo[ck]=0; lastSheet=""; renderSheet(); return; }
+  if (act==="march-clear"){ marchDraft.t=Z12(); delete marchDraft.pk; if (marchDraft.cargo) for (var ck in marchDraft.cargo) marchDraft.cargo[ck]=0; lastSheet=""; renderSheet(); return; }
   if (act==="preset-clear"){ var pcl=presetsOf(a.dataset.m)[+a.dataset.p]; if (pcl){ pcl.t=Z12(); save(); } lastSheet=""; renderSheet(); return; }
   if (act==="rf-clear"){ RF.t={}; lastView=""; renderView(true); lastSheet=""; renderSheet(); return; }
   if (act==="wc-delwave"){ var wr=wcById(sheetFor&&sheetFor.id); if (!wr) return; var wd2=wcDraftOf(wr); if (wd2.waves.length>1) wd2.waves.splice(+a.dataset.wave,1); lastSheet=""; renderSheet(); return; }
@@ -14557,7 +14557,7 @@ document.addEventListener("click",function(e){
   if (act==="farm-clear-all"){ if (!farmArmed){ farmArmed=true; lastView=""; renderView(true); return; }
     farmArmed=false; S.presets.forEach(function(pr,pi){ pr.farm=[]; pr.idx=0; pr.auto=false; delete farmMsg[C().id+":"+pi]; }); toast("Every farm list in "+S.name+" is cleared"); lastView=""; refresh(); return; }
   if (act==="farm-clear"){ var fc2=S.presets[+a.dataset.p]; fc2.farm=[]; fc2.idx=0; fc2.auto=false; lastSheet=""; renderSheet(); save(); return; }
-  if (act==="march-preset"){ var mp=presetsOf(a.dataset.m)[+a.dataset.p], mav=draftAvail(); marchDraft.t=mp.t.map(function(n,i){ return Math.min(n,mav[i]); });
+  if (act==="march-preset"){ var mp=presetsOf(a.dataset.m)[+a.dataset.p], mav=draftAvail(); marchDraft.t=mp.t.map(function(n,i){ return Math.min(n,mav[i]); }); marchDraft.pk=(a.dataset.m?"m":"f")+a.dataset.p; // 0.2.33 (Cody): light the preset you picked
     var mh=presetHero(mp); marchDraft.hero = marchDraft.from ? marchDraft.hero : (mh && !mh.away && !seatLocked(mh) ? mh.id : 0); marchDraft.preview=""; lastSheet=""; renderSheet(); return; }
   if (act==="waves-mode"){ waveDraft.mode=a.dataset.v; lastSheet=""; renderSheet(); return; }
   if (act==="waves-fill"){ var wpl=wavePlan(), ws=document.getElementById("wstart"), we=document.getElementById("wevery"); waveDraft.start=ws?ws.value:waveDraft.start; waveDraft.every=Math.max(0,Math.floor(+(we?we.value:waveDraft.every)||0));
