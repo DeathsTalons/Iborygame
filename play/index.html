@@ -4788,6 +4788,8 @@ function tileGlance(){ var el=document.getElementById("mapglance"); if (!el) ret
     h+='<button class="link" data-act="mpop-more">All details \u2193</button>'; }
   if (el._h!==h){ el.innerHTML=h; el._h=h; } }
 // 0.2.24: a dropdown or box in use inside a panel that redraws every tick (the place-an-NPC level, the ally to give a city to) closed as you opened it
+var PLACE_LV=10; // 0.2.36: the level picked in "Place an NPC city here" (the panel redraws every second and used to draw the dropdown back at 10 the moment a pick was made)
+document.addEventListener("change", function(e){ if (e.target && e.target.id==="placelvl") PLACE_LV=Math.max(1, Math.min(10, +e.target.value||10)); }, true);
 var EDITING=null; // the dropdown or box being used right now: a dropdown from opening until a choice is made, a box until it loses focus
 document.addEventListener("focusin", function(e){ var t=e.target; if (t && /^(SELECT|INPUT|TEXTAREA)$/.test(t.tagName)) EDITING=t; });
 document.addEventListener("pointerdown", function(e){ var t=e.target; if (t && t.tagName==="SELECT") EDITING=t; }, true);
@@ -4859,7 +4861,7 @@ function renderTileInfoBase(){
     (q.k==="ai"?' A conquered lord\u2019s city comes with its buildings and fields at Town Hall level, plus its research.':q.k==="hc"?' A conquered historic city starts empty inside, with one of each resource field at level '+q.L+' (and room to build them that high).':' A conquered NPC city comes with one of every building, its walls and twelve fields at level '+q.L+'.')+'</p>';
   if (q.k==="monster" && q.ev) h+='<p class="hint">A '+esc(evNow()?evNow().name:"holiday")+' monster. It stays until it\u2019s slain or the event ends, and counts toward the event track. Slay it for '+vampSpoils(VAMP_K[q.mon]||q.L).replace(/^A /,"a ")+', and the first one of each level unlocks it as a decoration for good (place it as often as you like).</p>';
   else if (q.k==="monster") h+='<p class="hint">Drawn to your level 14 historic city, it leaves at the end of the day. Slay it for Flawless Gems and a '+Math.round(lootChance(q,"scale")*100)+'% chance at a Dragon Scale, the material for Mythic gear (the tier above Legendary).</p>';
-  if (VTYPES[q.k] && !S.map.owned[q.id] && placeLeft()>0) h+='<div class="farmadd"><span class="dur">Place an NPC city here ('+placeLeft()+' left today):</span><select id="placelvl">'+[1,2,3,4,5,6,7,8,9,10].map(function(n){ return '<option value="'+n+'"'+(n===10?' selected':'')+'>Level '+n+'</option>'; }).join("")+'</select><button class="btn small" data-act="npc-place" data-tile="'+q.id+'">Place</button></div>';
+  if (VTYPES[q.k] && !S.map.owned[q.id] && placeLeft()>0) h+='<div class="farmadd"><span class="dur">Place an NPC city here ('+placeLeft()+' left today):</span><select id="placelvl">'+[1,2,3,4,5,6,7,8,9,10].map(function(n){ return '<option value="'+n+'"'+(n===PLACE_LV?' selected':'')+'>Level '+n+'</option>'; }).join("")+'</select><button class="btn small" data-act="npc-place" data-tile="'+q.id+'">Place</button></div>';
   if (q.k==="npc"||q.k==="ai") h+='<p class="hint">'+(q.k==="ai"?'An AI lord':'An NPC')+' only drops medals and items if its troop garrison is full when you hit it; otherwise you get just its resources. Let it recover before you hit it again.</p>';
   if (q.k==="npc") h+='<p class="hint">Demolishing turns it back into a flat, so you can occupy that flat on a better day and establish a higher level NPC city.</p>';
   if (q.k==="flat" && (S.items.teleport||0)>0 && (!C().fieldCap || hasHC(16))) h+='<div class="btnrow" style="margin:6px 0"><button class="btn" data-act="teleport" data-tile="'+q.id+'">'+(armedTile==="tp"+q.id?"Tap again to move "+esc(S.name)+" here":"Teleport "+esc(S.name)+" here ("+S.items.teleport+" left)")+'</button></div><p class="hint">The whole city moves: buildings, troops, heroes and held valleys. Its old tile becomes a flat.</p>';
@@ -14414,7 +14416,7 @@ document.addEventListener("click",function(e){
   if (act==="rankup"){ var nr=RANKS[S.rank+1]; if (!nr || !allMet(reqChecks(nr,false))) return; payQuest(nr); S.rank++; addPrestigeFlat(nr.prest); toast("Promoted to "+nr.name); refresh(); return; }
   if (act==="titleup"){ var nt=TITLES[S.title+1]; if (!nt || !allMet(reqChecks(nt,true))) return; payQuest(nt); S.title++; addPrestigeFlat(nt.award); toast("You are now "+nt.name+". "+nt.cities+" cities allowed."); refresh(); return; }
   if (act==="npc-place"){
-    var pt=a.dataset.tile, pq=TILE_BY[pt], pl=+(document.getElementById("placelvl")||{}).value||10;
+    var pt=a.dataset.tile, pq=TILE_BY[pt], pl=+(document.getElementById("placelvl")||{}).value||PLACE_LV;
     if (!pq || !VTYPES[pq.k] || S.map.owned[pt] || placeLeft()<1) return;
     if (!S.map.placed || S.map.placed.day!==gameDay()) S.map.placed={day:gameDay(),n:0};
     S.map.placed.n++; delete S.map.flat[pt]; delete S.map.hit[pt]; delete S.map.loy[pt]; S.map.npc[pt]=pl; miniDirty=true;
