@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.33";
+window.IBORY_V="0.2.35";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1095,10 +1095,11 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 :focus-visible{outline:2px solid var(--brass);outline-offset:2px}
 @media (prefers-reduced-motion: reduce){ #toast{transition:none} }
 @media (max-width:420px){
-  .ledger .res b{font-size:.76rem} .ledger .res small{font-size:.6rem}
+  .ledger .res b{font-size:.76rem} .ledger .res small{font-size:.6rem} .ledger .res b.long{font-size:.68rem;letter-spacing:-.02em}
   nav.tabs button{padding:9px 3px 10px;font-size:.9rem;letter-spacing:0}
   .plot .nm{font-size:.72rem}
 }
+@media (max-width:370px){ .ledger .res b.long{font-size:.64rem;letter-spacing:-.03em} }
 </style>
 </head>
 <body>
@@ -1170,7 +1171,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.33";
+var APP_VERSION = "0.2.35";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -3139,7 +3140,7 @@ function wizDraw(g, x0, y0, x1, y1, z){ var now=Date.now(), items=[];
     g.drawImage(im, fr*sp.w, 0, sp.w, sp.h, Math.round(bx-sp.ax*s), Math.round(by-sp.ay*s), Math.round(sp.w*s), Math.round(sp.h*s)); });
   g.imageSmoothingEnabled=sm; }
 setInterval(function(){ if ((WIZ_VIS||DECO_ANIM||EVM_VIS) && tab==="map" && !document.hidden) requestDraw(); }, 110);
-// 0.1.180: a wizard is tapped anywhere on its body, not just on its tile. The box is the idle body around the feet, in sprite pixels (a little padded);
+// 0.1.180: a wizard is tapped anywhere on its body, not just on its tile. The box is the idle body around the feet, in sprite pixels (a little padded)
 // when two overlap, the one standing lower (drawn in front) wins.
 var WIZ_HIT={1:[-20,-62,21,2], 2:[-30,-108,35,3]};
 function wizHit(px, py){ if (!S.wiz || mv.z<4) return null; var z=mv.z, best=null;
@@ -3742,6 +3743,10 @@ function presetTotal(pr){ return pr.t.reduce(function(a,b){return a+b;},0); }
 function presetReady(pr){ if (!presetTotal(pr) || presetTotal(pr)>armyCap()) return false; for (var i=0;i<12;i++) if (pr.t[i]>S.troops[i]) return false; return true; }
 function farmTarget(id){ var q=TILE_BY[id]; return q && (q.k==="npc"||q.k==="ai"||q.k==="hc"||(VTYPES[q.k] && !S.map.owned[q.id])); }
 var FARM_WAIT={}; // "cityId:preset" -> waiting for a full garrison somewhere on its list (shown on the preset)
+// 0.2.35 (Cody): a farm preset can hold its valleys and flats until they pay experience again (a tile pays once an hour, VXP_GAP, and only to a hero), instead of hitting the same one over and over for nothing
+function farmXpOk(id, pr, hid){ var q=TILE_BY[id]; if (!q || !VTYPES[q.k]) return true; if (!hid) return false; // no hero in the march: no experience from anything
+  var arr=S.gt+travelMs(pr.t,q,hid), vlast=(S.vxp||{})[id]; if (vlast!=null && arr-vlast<VXP_GAP) return false;
+  return !S.marches.some(function(m){ return m.tile===id && m.hero && (m.mission==="attack"||m.mission==="conquer") && m.phase!=="back" && m.phase!=="stay"; }); } // one of yours with a hero gets there first and takes the hour
 function farmFullOk(id, pr, hid){ var q=TILE_BY[id]; if (!q || (q.k!=="npc" && q.k!=="ai")) return true; // valleys and historic cities always drop
   var arr=S.gt+travelMs(pr.t,q,hid); if (garFullAt(q)>arr) return false;
   return !S.marches.some(function(m){ return m.tile===id && (m.mission==="attack"||m.mission==="conquer") && m.phase!=="back" && m.phase!=="stay"; }); } // one of yours will hit it first
@@ -3757,8 +3762,8 @@ function processAuto(){
     if (h && C().heroes.indexOf(h)>=0 && (h.away || seatLocked(h))) return; // a named hero: wait for them (Best / Any never wait)
     var tries=0; while (tries<pr.farm.length && !farmTarget(pr.farm[pr.idx % pr.farm.length])){ pr.farm.splice(pr.idx % pr.farm.length,1); tries++; if (!pr.farm.length) return; }
     var id=pr.farm[pr.idx % pr.farm.length];
-    if (pr.fullOnly){ // 0.1.232: only NPC cities and AI lords that will be at full garrison when this march lands; skip ahead in the rotation, or wait
-      id=null; for (var k=0;k<pr.farm.length;k++){ var cid=pr.farm[(pr.idx+k) % pr.farm.length]; if (farmFullOk(cid, pr, phid)){ id=cid; pr.idx=(pr.idx+k) % pr.farm.length; break; } }
+    if (pr.fullOnly || pr.xpOnly){ // 0.1.232: only NPC cities and AI lords that will be at full garrison when this march lands; 0.2.35: only valleys and flats that will pay experience; skip ahead in the rotation, or wait
+      id=null; for (var k=0;k<pr.farm.length;k++){ var cid=pr.farm[(pr.idx+k) % pr.farm.length]; if ((!pr.fullOnly || farmFullOk(cid, pr, phid)) && (!pr.xpOnly || farmXpOk(cid, pr, phid))){ id=cid; pr.idx=(pr.idx+k) % pr.farm.length; break; } }
       FARM_WAIT[C().id+":"+pi]=!id; if (!id) return; }
     pr.idx=(pr.idx+1) % pr.farm.length;
     launchMarch(id,"attack",pr.t,phid,{preset:pi});
@@ -3788,6 +3793,7 @@ function presetSheet(pi, mk){
   if (mk) return h+'<div class="act"><span></span><button class="closebtn" data-act="close">Done</button></div>';
   h+='<label class="chk"><input type="checkbox" id="pstop"'+(pr.stopOnLoss?' checked':'')+'> Pause auto-farm if a battle loses any troops</label>';
   h+='<label class="chk"><input type="checkbox" id="pfull"'+(pr.fullOnly?' checked':'')+'> Only hit NPC cities and AI lords at full garrison: auto-farm skips any that won\u2019t be full when the march lands (no medals or items drop otherwise) and waits if none will be</label>';
+  h+='<label class="chk"><input type="checkbox" id="pxp"'+(pr.xpOnly?' checked':'')+'> Only hit valleys and flats that will pay experience: a tile pays the hero once an hour, so auto-farm skips any still on its hour when the march lands, and waits if none is ready (or no hero is free)</label>';
   h+='<label class="chk"><input type="checkbox" id="pnocap"'+(pr.noCap?' checked':'')+'> Don\u2019t capture NPC cities: this preset\u2019s farm hits never take a city, even with room under your title and its loyalty at 0</label>';
   h+='<div class="h3">Farm list ('+pr.farm.length+')</div>';
   if (!pr.farm.length) h+='<p class="hint">Empty. Tap a target on the Map and use "Add to farm list".</p>';
@@ -3898,7 +3904,7 @@ function farmCardHtml(pr,pi){
 function farmDay(pi){ var since=S.gt-DAY, n=0, w=0, loot=0; S.log.forEach(function(c){ if (c.p===pi && c.c===S.name && c.at>since && !c.d){ n++; if (c.r===1) w++; loot+=c.lo||0; } }); return {n:n, w:w, loot:loot}; }
 function farmTileHtml(pr,pi){ var tot=presetTotal(pr), m=pr.farmMode?FARM_MODES[pr.farmMode]:null, d=farmDay(pi), st, cls='';
   if (!tot){ st='No troops set'; cls=' idle'; }
-  else if (pr.auto){ st='<b class="okc">Auto-farming</b>'; cls=' run'; }
+  else if (pr.auto){ st='<b class="okc">Auto-farming</b>'+(FARM_WAIT[C().id+":"+pi]?' <span class="dur">'+(pr.xpOnly&&pr.fullOnly?'\u00b7 waiting':pr.xpOnly?'\u00b7 waiting for the hour':'\u00b7 waiting for a full garrison')+'</span>':''); cls=' run'; } // 0.2.35: says when every target on the list is held back
   else if (pr.farm.length) st='Ready \u00b7 not running';
   else st=m?'Goal set \u00b7 list empty':'No farm list';
   return '<button class="reptile fmtile'+cls+'" data-act="farm-page" data-p="'+pi+'"><span class="rtop"><span class="nm">'+esc(pr.name)+'</span><span class="n">'+(pr.farm.length?pr.farm.length:'')+'</span></span>'+
@@ -4406,7 +4412,7 @@ function drawMap(){
   try { ryMapMarches(g, z, brass); } catch(e){}
   try { mapFarmDraw(g, z, x0, y0, x1, y1); } catch(e){}
   if (selTile && TILE_BY[selTile]){ var sq=TILE_BY[selTile]; g.strokeStyle=ink; g.lineWidth=2.5; g.strokeRect((sq.x-mv.x)*z+1,(sq.y-mv.y)*z+1,z-2,z-2); }
-  var cc=document.getElementById("mapcoord"); if (cc) cc.textContent="("+Math.round(mv.x+W/z/2)+", "+Math.round(mv.y+H/z/2)+")"; cc.title="Centre of the view";
+  var cc=document.getElementById("mapcoord"); if (cc){ cc.textContent="("+Math.round(mv.x+W/z/2)+", "+Math.round(mv.y+H/z/2)+")"; cc.title="Centre of the view"; }
   drawMini(); try { paintBar(); } catch(e){}
 }
 function selectTile(id, center){
@@ -4825,7 +4831,7 @@ function updateMarchInfo(){
   if (marchDraft.mission==="wd"){ wdMarchInfo(el, b); return; }
   if (marchDraft.mission==="arena"){ var acur=arById(marchDraft.mid); el.textContent="Travel about "+fmtT(arTravelEst())+(soloArOn()?" from your city":" from your kingdom square")+" to the Arena"+(acur?"; the window closes in "+fmtT(Math.max(0,acur.ends-Date.now())):"")+". Army size "+fmt(sumT(marchDraft.t))+" of "+fmt(armyCap(marchDraft.ensign, marchDraft.hero?heroById(marchDraft.hero):null))+"."; var amh=marchDraft.hero?heroById(marchDraft.hero):null; if (amh) el.textContent+=" Led by "+amh.name+" (Attack "+hs(amh,"atk")+", Intelligence "+hs(amh,"int")+").";
     var awhy=marchWhy(); b.disabled=!!awhy||!!ALS.arSending; b.textContent=awhy||"March to the Arena"; return; }
-  if (marchDraft.mission==="rally"){ var rcur=ryById(marchDraft.rid); el.textContent=(rcur&&rcur.mine?"Your own rally: no travel, they join it at once; the waves leave in "+fmtT(Math.max(0,rcur.hitAt-Date.now())):"Travel about "+fmtT(ryTravelEst(rcur))+" to "+(rcur?esc(rcur.host)+"\u2019s kingdom; the waves hit in "+fmtT(Math.max(0,rcur.hitAt-Date.now())):"the rally"))+". No rations, no loot. Army size "+fmt(sumT(marchDraft.t))+" of "+fmt(armyCap(marchDraft.ensign, marchDraft.hero?heroById(marchDraft.hero):null))+".";
+  if (marchDraft.mission==="rally"){ var rcur=ryById(marchDraft.rid); el.textContent=(rcur&&rcur.mine?"Your own rally: no travel, they join it at once; the waves leave in "+fmtT(Math.max(0,rcur.hitAt-Date.now())):"Travel about "+fmtT(ryTravelEst(rcur))+" to "+(rcur?rcur.host+"\u2019s kingdom; the waves hit in "+fmtT(Math.max(0,rcur.hitAt-Date.now())):"the rally"))+". No rations, no loot. Army size "+fmt(sumT(marchDraft.t))+" of "+fmt(armyCap(marchDraft.ensign, marchDraft.hero?heroById(marchDraft.hero):null))+".";
     var rwhy=marchWhy(); b.disabled=!!rwhy||!!RYS.sending; b.textContent=rwhy||"March to the rally"; return; }
   marchDraft.t.forEach(function(n,i){ cap+=n*LOAD[i]*loadMul(); });
   el.textContent = marchDraft.mission==="hide" ? "They leave at once and come back the moment you recall them." : !tm ? "" : (marchDraft.mission==="reinforce"||marchDraft.mission==="station") ? "Travel "+fmtT(realMs(tm))+". These troops will stay there"+(marchDraft.mission==="station"?" as a camp you can attack from":"")+"."+(marchDraft.mission==="reinforce"&&cargoTotal()?" Carrying "+fmt(cargoTotal())+" of "+fmt(cap)+" capacity in resources, delivered on arrival.":"") :
@@ -5126,7 +5132,7 @@ function bUpkeep(){ return (1-ACH_PCT*achLv("total"))*Math.max(0.5, 1-alFx("upke
 function achKills(before, after){ var a=achStore(); for (var i=0;i<12;i++) a.kills[i]+=Math.max(0,(before[i]||0)-(after[i]||0)); }
 function achMedal(key,n){ var a=achStore(); a.medals[key]=(a.medals[key]||0)+(n==null?1:n); }
 function achCapture(q){ var a=achStore(); if (q.k==="npc" && q.L>=10) a.caps[10]=1; if (q.k==="hc" && CAP_ORDER.indexOf(q.L)>0) a.caps[q.L]=1; }
-// toast a line the moment an achievement earns a new tier. Runs every tick, so the tiers (which scan every city) are only re-read every 2 s;
+// toast a line the moment an achievement earns a new tier. Runs every tick, so the tiers (which scan every city) are only re-read every 2 s
 // the sum is kept for the tab badge. Returns the total.
 var ACH_AT=0, ACH_TOT=0;
 function achCheck(){
@@ -5300,8 +5306,8 @@ function alViewSheet(){
   else if (ALV.err || !ALV.data) h+='<p class="why">'+esc(ALV.err||"That alliance is gone.")+'</p>';
   else { var d=ALV.data;
     h+=(d.desc?'<p class="hint">'+esc(d.desc)+'</p>':'')+
-      '<div class="rgrid"><span>Members <b>'+d.members.length+'</b> <span class="dur">/ '+d.cap+' · #'+d.rank.members+'</span></span><span>Prestige <b>'+fmt(d.prestige)+'</b> <span class="dur">#'+d.rank.prestige+'</span></span><span>Cities <b>'+fmt(d.cities)+'</b> <span class="dur">#'+d.rank.cities+'</span></span><span>Honor <b>'+fmt(d.honor)+'</b> <span class="dur">#'+d.rank.honor+'</span></span></div>'+
-      '<div class="section" style="margin-top:10px"><h3>Members</h3><div class="gearlist">'+d.members.map(function(m){
+      '<div class="rgrid"><span>Members <b>'+(d.members||[]).length+'</b> <span class="dur">/ '+d.cap+' · #'+(d.rank||{}).members+'</span></span><span>Prestige <b>'+fmt(d.prestige)+'</b> <span class="dur">#'+(d.rank||{}).prestige+'</span></span><span>Cities <b>'+fmt(d.cities)+'</b> <span class="dur">#'+d.rank.cities+'</span></span><span>Honor <b>'+fmt(d.honor)+'</b> <span class="dur">#'+d.rank.honor+'</span></span></div>'+
+      '<div class="section" style="margin-top:10px"><h3>Members</h3><div class="gearlist">'+(d.members||[]).map(function(m){
         return '<div class="gearrow"><span class="gn">'+plName(m.name)+'</span><span class="gb">'+fmt(m.prestige)+' prestige</span><span class="dur" style="grid-column:1/-1">'+fmt(m.cities)+' cities · '+fmt(m.honor)+' honor · joined '+alAgo(m.joined)+'</span></div>'; }).join("")+'</div></div>';
   }
   return h;
@@ -5336,6 +5342,8 @@ function alTick(){
   var inAl=!!alMine(), due = tab==="guild" ? (inAl && ALS.sub==="chat" ? 4000 : 15000) : 60000;
   if (inAl && (arCur() || (S.alArena||[]).some(function(m){ return m.st==="out"; }))) due=Math.min(due, 5000);
   if (inAl && ((S.alRally||[]).some(function(m){ return m.st==="out" && Date.now()>m.hitAt-30000; }) || ryLive().some(function(R){ return R.hitAt-Date.now()<60000; }))) due=Math.min(due, 5000); // a rally is about to hit
+  // 0.2.35: the moment a rally you're in lands, sync (the server fights it on the first sync after landing, and everyone's result came back on the next 5-second poll: up to 10 s from landing to coming home); then every 2 s until the result is in
+  if (inAl){ var landed=false; (S.alRally||[]).forEach(function(m){ if (m.st!=="out") return; var at=(m.land||m.hitAt)+300; if (Date.now()<at) return; landed=true; if (!m.lp){ m.lp=1; ALS.last=0; } }); if (landed) due=Math.min(due, 2000); }
   if (inAl && tab==="guild" && ALS.sub==="rally") due=Math.min(due, 8000); // a monster is up: keep close watch
   if (inAl && dockPin && !(tab==="guild" && ALS.sub==="chat")) due=Math.min(due, dockOpen?4000:10000); // pinned chat: keep it fresh
   if (Date.now()-ALS.last>=due) alSync();
@@ -5421,7 +5429,7 @@ function viewMyAlliance(al){
   var tabs=[["home","Overview"],["rally","Rallies"+(ryLive().length||arLive().length?" \u2022":"")],["reinf","Reinforce"+((al.reinf&&al.reinf.here&&al.reinf.here.length)?" ("+al.reinf.here.length+")":"")],["world","Map"],["city","City"+(al.econ&&al.econ.bd?" \u2022":"")],["projects","Projects"+(hp.canHelp?" ("+hp.canHelp+")":"")],["members","Members ("+al.members.length+")"],["about","Info"]];
   if (AW_ON) tabs.splice(3,0,["war","War"+((AWS.d&&AWS.d.war&&AWS.d.war.status!=="settled"&&AWS.d.war.status!=="over")?" \u2022":AWS.d&&AWS.d.round?" (sign-ups)":"")]);
   // a slim header: name, tag, members, your rank and honor; tap it for Info
-  var h='<button class="alhdr" data-act="al-sub" data-v="about"><b>'+esc(al.name)+'</b> <span class="dur">['+esc(al.tag)+'] \u00b7 '+al.members.length+' / '+al.cap+'</span><span class="alhdr2">'+esc(rk[my.rank].n)+' \u00b7 honor '+fmt(ALS.d.honor||0)+'</span></button>'+
+  var h='<button class="alhdr" data-act="al-sub" data-v="about"><b>'+esc(al.name)+'</b> <span class="dur">['+esc(al.tag)+'] \u00b7 '+al.members.length+' / '+al.cap+'</span><span class="alhdr2">'+esc((rk[my.rank]||{}).n||'')+' \u00b7 honor '+fmt(ALS.d.honor||0)+'</span></button>'+
     (ALS.err?'<p class="why" style="margin:6px 0 0">'+esc(ALS.err)+'</p>':'')+
     alNavHtml(tabs, sub, {home:need.n>0, battle:need.battle>0, build:need.build>0, people:need.people>0});
   if (sub==="home"){
@@ -6247,7 +6255,7 @@ function ryById(id){ return ryLive().filter(function(R){ return R.id===id; })[0]
 function ryTargetOk(q){ return q && ((q.k==="npc" && q.L>=10) || q.k==="hc" || q.k==="wiz" || isVamp(q)); } // 0.1.209: vampires too
 // when you can next call onto this kind of target (0 = now). Y.nc from the Worker (0.1.167); older Workers sent one weekly nextCall
 function ryWait(k){ if (k==="wiz" || k==="monster" || k==="vamp") return 0; var Y=ryData()||{}, t=Y.nc ? Y.nc[k==="hc"?"hc":k==="monster"?"mon":"npc"] : Y.nextCall; return t && t>Date.now() ? t : 0; }
-function ryRule(k){ return k==="hc" ? "One historic city rally a week" : "One level 10 NPC city rally a day"; }
+function ryRule(k){ return k==="hc" ? "One historic city rally a day" : "One level 10 NPC city rally a day"; } // 0.2.35: the text said a week (it has been a day since 0.2.9)
 // 0.1.177: up to RY_MAX_MINE of your own rallies at once, so the locked targets are a list (S.rallyLocks; the old single S.rallyLock moves in)
 var RY_MAX_MINE=10;
 function ryLocks(){ if (!S.rallyLocks){ S.rallyLocks=S.rallyLock?[S.rallyLock]:[]; delete S.rallyLock; } return S.rallyLocks; }
@@ -6285,7 +6293,7 @@ function ryTrv(ci, q, hid){ return withCity(ci, function(){ return U.map(functio
 function ryFastHero(ci, q){ return withCity(ci, function(){ var best=0, bt=Infinity, t=Z12(); t[7]=1;
   (C().heroes||[]).forEach(function(h){ if (h.away) return; var ms=travelMs(t,q,h.id); if (ms>0 && ms<bt){ bt=ms; best=h.id; } }); return best; }); }
 function ryCallSheet(){ var q=TILE_BY[sheetFor.tile]; if (!q) return '<p class="why">That target is gone.</p><button class="closebtn" data-act="close">Close</button>';
-  var cur=current(q), mins=Math.max(5,Math.min(1440,Math.floor(+RYS.mins||0))), fci=cityIndex(RYS.from); if (fci<0){ fci=S.cur; RYS.from=C().id; }
+  var cur=current(q), mins=Math.max(5,Math.min(1440,Math.floor(+RYS.mins||0))), fci=cityIdx(RYS.from); if (fci<0){ fci=S.cur; RYS.from=C().id; }
   var fh=ryFastHero(fci,q), trv=ryTrv(fci,q,fh), tmin=Math.min.apply(null,trv.filter(function(x){ return x>0; })), tmax=Math.max.apply(null,trv);
   var h='<div class="head"><span class="ico">'+ICON.rally+'</span><div><h2>Call the alliance</h2><div class="sub">onto '+esc(tileName(q))+' ('+q.x+', '+q.y+')</div></div></div>'+
     '<p class="hint">Every member can march from their kingdom square to yours (you too, from any city). At the leave time, every march that made it sets off together from the city you pick below, at the pace of the slowest troop in the whole rally, and '+(q.k==="wiz"?'they fight the wizard all together when they land (Arena-style: nobody dies, the wounded go home to their Medic Camps, and if it survives it heals to full). If it falls, everyone who got a march there rolls the rewards on their own: '+wizRewardText(q.L)+'.':'hits this target one after another when they land, in the order you set on the Rallies tab; each wave fights what the ones before it left.'+(isVamp(q)?' If it falls, everyone who got a march there takes its spoils, and the kill counts on their event track.':''))+' Then they ride back to that city and everyone\u2019s troops are home at once. Your own marches are at your kingdom the moment you send them. Marches still on the way to you when it leaves turn round.'+(q.k==="wiz"?'':' If the rally wipes the garrison, everyone who got a march there in time rolls the target\u2019s full drop table on their own (medals, boxes, gems, items; the garrison has to be full when it lands, like a normal attack). No resources are looted. Every wave that wins, and every one that hits it already empty, lowers its loyalty like your own win would; if it reaches 0 the city is yours. When it\u2019s over you get the garrison that\u2019s left, so send your own waves to finish it before it refills'+(q.k==="hc"?' (historic cities refill within an hour)':'')+'.')+' '+(q.k==="hc"?'One historic city call a week':q.k==="wiz"?'Wizard calls have no limit':'One level 10 NPC city call a day')+'; calling it off gives the call back.</p>'+
@@ -6299,7 +6307,7 @@ function ryCallSheet(){ var q=TILE_BY[sheetFor.tile]; if (!q) return '<p class="
   return h; }
 function ryCall(){ var q=TILE_BY[sheetFor.tile]; if (!q || RYS.sending) return; var mins=Math.max(5,Math.min(1440,Math.floor(+RYS.mins||60)));
   var b=baseOf(q), hh=S.map.hit[q.id], RT=q.k==="hc"?1*3.6e6:REGEN_T, f0=hh?Math.min(1,(S.gt-hh.at)/RT):1, rk=isVamp(q)?"vamp":q.k;
-  var fci=cityIndex(RYS.from); if (fci<0) fci=S.cur;
+  var fci=cityIdx(RYS.from); if (fci<0) fci=S.cur;
   var body={x:q.x, y:q.y, tname:tileName(q), k:rk, L:q.L, B:{t:b.t, f:b.f, wall:b.wall, r:b.r, am:b.am||1, fb:b.fb||1, hint:b.hint||0}, H:hh?{t:hh.t, f:hh.f}:{t:b.t, f:b.f}, f0:f0, rt:realMs(RT), mins:mins, from:S.cities[fci].name, trv:ryTrv(fci,q,ryFastHero(fci,q))};
   RYS.sending=true; lastSheet=""; renderSheet();
   alPost("/al/rally/call", body).then(function(r){ RYS.sending=false; if (r.error){ toast(r.error); lastSheet=""; renderSheet(); return; }
@@ -6356,7 +6364,7 @@ function ryDetailSheet(){ var R=ryById(sheetFor.rid), live=R && ryLive().indexOf
   return '<div class="head rchead">'+ryImg(R)+'<div style="flex:1;min-width:0"><h2><span>'+esc(R.name)+'</span> <span class="rcby" translate="no">'+esc(R.host)+'</span></h2><div class="sub">'+(gone?'On the road \u00b7 lands in ':'Leaves in ')+'<b class="arleft" data-ends="'+ends+'">'+fmtT(Math.max(0,ends-now))+'</b></div>'+(gone ? ryBar(R.hitAt, ends, now) : ryBar(R.at||R.hitAt-3600e3, R.hitAt, now))+'</div></div>'+
     ryBody(R)+'<button class="closebtn" data-act="close">Close</button>'; }
 function ryBody(R){ var now=Date.now(), mine=S.alRally||[], h=''; var g=R.garrison||{t:[],f:[]}, ord={}; (R.order||[]).forEach(function(id,i){ ord[id]=i; });
-    var ms=R.marches.slice().sort(function(a,b){ return (ord[a.id]!=null?ord[a.id]:1e6+a.arrive)-(ord[b.id]!=null?ord[b.id]:1e6+b.arrive); }), mineN=R.marches.filter(function(j){ return j.mine; }).length, total=0; ms.forEach(function(j){ total+=j.n; });
+    R.marches=R.marches||[]; var ms=R.marches.slice().sort(function(a,b){ return (ord[a.id]!=null?ord[a.id]:1e6+a.arrive)-(ord[b.id]!=null?ord[b.id]:1e6+b.arrive); }), mineN=R.marches.filter(function(j){ return j.mine; }).length, total=0; ms.forEach(function(j){ total+=j.n; });
     var gone=now>=R.hitAt, wz=R.k==="wiz";
     h+=
       '<p class="dur" style="margin:0 0 4px">At ('+R.x+', '+R.y+') on '+esc(R.host)+'\u2019s map'+(R.from?', leaving from '+esc(R.from):'')+(gone?'. On the road: no more marches can join.':', at '+wvClock(S.gt+(R.hitAt-now)*S.speed)+'.')+' '+(wz?'Health '+fmt(WIZ[R.L]?WIZ[R.L].hp:0)+'; it heals to full if it survives.':'Defenders now '+fmt(sumT(g.t))+' (about '+fmt(g.atHit)+' by the leave time, as it refills), fortifications '+fmt((g.f||[]).reduce(function(a,b){ return a+b; },0))+', wall level '+(g.wall||0)+'.')+'</p>'+
@@ -7066,6 +7074,7 @@ function wdMyMarches(){ var mine={}; ((WDS.d&&WDS.d.mine)||[]).forEach(function(
     if (!j){ r.what=m.st==="back"?"Heading home":"Sending\u2026"; r.end=m.st==="back"?m.home:0; return r; }
     if (j.st==="go" && now<j.arrive){ r.what=j.solo?"Attacking the "+nm:"To "+j.host+"\u2019s rally"; r.end=j.arrive; r.hasten=true; r.recall=true; }
     else if (j.st==="go"){ r.what=j.solo?"Setting off for the "+nm:"Waiting for "+j.host+"\u2019s rally"; r.end=j.leave; r.recall=true; }
+    if (j.st==="go" && j.rs==="open" && j.caller && !j.solo){ r.cancel=j.rid; } // 0.2.35: the caller can call the rally off until it leaves (everyone heads home)
     else if (j.st==="out"){ r.what="Attacking the "+nm; r.end=j.hit; r.hasten=!!(j.solo||j.caller); r.recall=!!j.solo; }
     else { r.what="Heading home"; r.end=j.home; r.hasten=j.home>now; }
     return r; }); }
@@ -7073,7 +7082,7 @@ function wdMarchListHtml(){ var L=wdMyMarches(); if (!L.length) return ''; var o
   var h='<div class="wdml"><button class="wdmlh" data-act="wd-mltog" aria-expanded="'+open+'">'+(open?'\u25be':'\u25b8')+' Marches ('+L.length+')</button>';
   if (open) h+=L.map(function(r){ var hh=r.m.hero?heroById(r.m.hero):null, id=r.j&&r.j.id;
     return '<div class="wdmlr"><div class="wdmlw">'+esc(r.what)+'</div><div class="dur">'+(hh?esc(hh.name):'No hero')+' \u00b7 '+fmt(sumT(r.m.t))+' troops'+(r.end?' \u00b7 <b data-wdend="'+r.end+'">'+fmtT(Math.max(0,r.end-Date.now()))+'</b>':'')+'</div>'+
-      (id&&(r.hasten||r.recall)?'<div class="wdmlb">'+(r.hasten?'<button class="link strong" data-act="wd-mhasten" data-id="'+id+'"'+(sp?'':' disabled')+'>Speed up'+(sp?' ('+sp+')':'')+'</button>':'')+(r.recall?'<button class="link" data-act="wd-mrecall" data-id="'+id+'">Recall</button>':'')+'</div>':'')+'</div>'; }).join("");
+      (id&&(r.hasten||r.recall||r.cancel)?'<div class="wdmlb">'+(r.hasten?'<button class="link strong" data-act="wd-mhasten" data-id="'+id+'"'+(sp?'':' disabled')+'>Speed up'+(sp?' ('+sp+')':'')+'</button>':'')+(r.recall?'<button class="link" data-act="wd-mrecall" data-id="'+id+'">Recall</button>':'')+(r.cancel?'<button class="link danger" data-act="wd-rcall" data-rid="'+r.cancel+'">'+(WDS.armOff===r.cancel?'Tap again to call it off':'Call off the rally')+'</button>':'')+'</div>':'')+'</div>'; }).join("");
   return h+'</div>'; }
 function wdMarchTick(){ var els=document.querySelectorAll("[data-wdend]"), now=Date.now(); for (var i=0;i<els.length;i++){ var t=fmtT(Math.max(0,+els[i].dataset.wdend-now)); if (els[i].textContent!==t) els[i].textContent=t; } }
 setInterval(wdMarchTick, 1000);
@@ -7125,7 +7134,7 @@ function worldHtml(){ if (!alOn()) return '<div class="section"><h3>Server map</
   if (!WDS.d && !WDS.busy) wdFetch();
   return '<div class="section"><div class="shead"><h3>Server map</h3>'+(WDS.d&&WDS.d.me.on?'<span class="badge">You’re on it</span>':'')+'</div><div id="wdwrap">'+worldInner()+'</div></div>'; }
 function worldSheet(){ return '<div class="head"><span class="ico">'+ICON.crest+'</span><div style="flex:1"><h2>Server map</h2><div class="sub">One world for every multiplayer player</div></div><button class="btn ghost small" data-act="close" aria-label="Close">✕</button></div>'+worldHtml(); }
-function wdAfter(d, ok){ WDS.acting=false; WDS.armed=""; if (d.error){ toast(d.error); wdPaint(); return; } if (ok) toast(ok); WDS.at=0; wdFetch(); }
+function wdAfter(d, ok){ WDS.acting=false; WDS.armed=""; WDS.armOff=null; if (d.error){ toast(d.error); wdPaint(); return; } if (ok) toast(ok); WDS.at=0; wdFetch(); }
 function wdJoin(quiet){ if (WDS.acting) return; if (!cbOn()){ if (!quiet) toast("Sign in to your cloud save first"); return; } WDS.acting=true; wdPaint();
   var b=wdCapBody(); b.lid=lbOn()?S.lb.id:undefined; b.lt=lbOn()?S.lb.token:undefined;
   alPost("/wd/join", b).then(function(d){ if (!d.error){ S.wdOn=true; S.wdCap=b.cap.id; save(); WDS.z=0; } if (quiet && d.error){ WDS.acting=false; WDS.err=d.error; wdPaint(); return; } wdAfter(d, d.error||d.already?"":"Your capital is on the server map"); })
@@ -7143,6 +7152,8 @@ function wdAct(act, a, e){
   if (act==="wd-popx"){ WDS.sel=null; WDS.armed=""; wdPaint(); return true; }
   if (act==="wd-mltog"){ WDS.mlOpen=WDS.mlOpen===false; wdPaint(); return true; }
   if (act==="wd-mrecall"){ wdMarchAct("/wd/recall", +a.dataset.id, "March recalled: it\u2019s heading home"); return true; }
+  if (act==="wd-rcall"){ var crid=+a.dataset.rid; if (WDS.armOff!==crid){ WDS.armOff=crid; wdPaint(); return true; } WDS.armOff=null; // 0.2.35: two taps, like the other things that can't be undone
+    if (WDS.acting) return true; WDS.acting=true; alPost("/wd/rcancel", {rid:crid}).then(function(d){ wdAfter(d, d.error?"":"Rally called off: everyone is heading home"); }).catch(function(){ WDS.acting=false; toast("Couldn\u2019t reach the server. Check your connection."); wdPaint(); }); return true; }
   if (act==="wd-mhasten"){ if (!(S.items.marchsp>0)){ toast("You have no March Speed items"); return true; } wdMarchAct("/wd/hasten", +a.dataset.id, "March sped up: half the time left"); return true; }
   if (act==="wd-fs"){ wdFs(!WDFS.on); return true; }
   if (act==="wd-rot"){ wdRot(); return true; }
@@ -7781,7 +7792,7 @@ function cbSave(auto, opt){
     if (o.st===409 && o.d && o.d.conflict){ // another device saved since: don't overwrite it, ask which game to keep
       CB.conflict=o.d.info; cbUi(""); if (!sheetFor || onPage("settings")) openSheet({kind:"cbconflict"}); return; }
     if (o.st===403){ S.cloud.token=null; save(); toast("Signed out of your cloud save (from another device?). Sign in again in Settings."); }
-    if (o.st===429 && auto) S.cloud.last=Date.now()-cbEvery()+HOUR; // try again in an hour
+    if (o.st===429 && auto) S.cloud.retryAt=Date.now()+HOUR; // try again in an hour (0.2.35: its own field; moving S.cloud.last into the future made a newer save from another device look older, and the next save overwrote it)
     if (!auto) cbUi((o.d&&o.d.error)||"Backup failed"); else cbUi("Last automatic backup failed: "+((o.d&&o.d.error)||"no connection"));
   }).catch(function(){ CB.busy=false; if (S.cloud) S.cloud.lastTry=Date.now(); if (!auto) cbUi("Couldn\u2019t reach the backup server. Check your connection."); });
 }
@@ -7995,7 +8006,7 @@ var WC=[];
     goals:[{cap:null},{cap:comm[L]},{cap:mast[L]}],
     rewards:[wcR(50000*L, 10000*L, {s150:1, gemD:10*n}), {res:QR(0,0,0,0,0), items:{s480:1, gemF:5*n, ingot:n}}, {res:QR(0,0,0,0,0), items:mastRw[L]}]}); }
 })();
-// 0.1.243: Historic city 12, one puzzle per daily garrison. 0.1.249: caps re-tuned for the 0.1.249 battle rules by the dev tools (best plan x1.1 at the decent and high reference gear;
+// 0.1.243: Historic city 12, one puzzle per daily garrison. 0.1.249: caps re-tuned for the 0.1.249 battle rules by the dev tools (best plan x1.1 at the decent and high reference gear
 // the notes below are 0.1.243 history). Caps were from war-college-tools/hc (best plan x1.1 at the decent and high reference gear,
 // cross-checked over 8 optimiser runs each); the Swordsman garrison's Commanding cap sits under what 100,000 plain Catapults lose at decent gear (56,447).
 var WC_HC_RW=[{medals:{justice:1}, items:{gemF:20, s480:1}}, {medals:{justice:1}, items:{gemF:50, s480:2}}, {medals:{justice:1}, items:{gemF:120, s480:3}}];
@@ -8764,6 +8775,7 @@ function buildOn(w,i){ for (var k=0;k<S.builds.length;k++){ var b=S.builds[k]; i
 function builderFree(){ return S.builds.length < BUILDERS-(S.alBld||0); } // builders lent to the alliance can't build here
 function withCity(ci, fn){ var keep=S.cur; S.cur=ci; try { return fn(); } finally { S.cur=keep; } }
 function cityIndex(id){ for (var i=0;i<S.cities.length;i++) if (S.cities[i].id===id) return i; return 0; }
+function cityIdx(id){ for (var i=0;i<S.cities.length;i++) if (S.cities[i].id===id) return i; return -1; } // 0.2.35: -1 for a city that isn't there (cityIndex answers 0 on purpose, so troops coming home to a gone city land in the first one instead of vanishing)
 /* ---------- safety copies: the game never goes empty without a way back ---------- */
 var BK_RING=["ibory-bk-a","ibory-bk-b","ibory-bk-c"], BK_PRE=["ibory-bk-pre1","ibory-bk-pre2"], BK_BEST="ibory-bk-best", BK_RESCUE="ibory-rescue", BK_EVERY=30*60e3;
 var saveLocked=false, loadFail=null, recoverOffer=false, bkLast=0;
@@ -8873,8 +8885,9 @@ var IDB={db:IDBL.db||null, bad:IDBL.state!=="ok", ok:false, busy:false, pend:nul
 function idbFlush(){ if (IDB.busy || !IDB.pend || IDB.bad || !IDB.db) return; var p=IDB.pend; IDB.pend=null; IDB.busy=true;
   var fail=function(e){ IDB.busy=false; IDB.err=String(e&&(e.name||e.message)||e||"error");
     // iPhones drop the connection after a while in the background: open it again once and retry the same save before giving up
-    if (!IDB.retried){ IDB.retried=true; try { IDB.db.close(); } catch(x){} try { var rq=indexedDB.open("ibory",1); rq.onsuccess=function(){ IDB.db=rq.result; if (!IDB.pend) IDB.pend=p; idbFlush(); };
-      rq.onerror=rq.onblocked=function(){ fail(rq.error||"reopen"); }; return; } catch(x){} }
+    if (!IDB.retried){ IDB.retried=true; try { IDB.db.close(); } catch(x){} IDB.busy=true; // 0.2.35: busy while the reopen is in flight, so a save in that window waits instead of writing to the closed connection (which marked the database bad for the session)
+      try { var rq=indexedDB.open("ibory",1); rq.onsuccess=function(){ IDB.db=rq.result; IDB.busy=false; if (!IDB.pend) IDB.pend=p; idbFlush(); };
+      rq.onerror=rq.onblocked=function(){ IDB.busy=false; fail(rq.error||"reopen"); }; return; } catch(x){ IDB.busy=false; } }
     IDB.bad=true; IDB.ok=false; if (IDB.lsOff){ IDB.lsOff=false; save(); } }; // back to localStorage (and its fallbacks)
   try { var tx=IDB.db.transaction("kv","readwrite"); tx.objectStore("kv").put({json:p.json, at:p.at, v:APP_VERSION}, "save");
     tx.oncomplete=function(){ IDB.busy=false; IDB.ok=true; IDB.retried=false; IDB.size=p.json.length; IDB.at=p.at; try { localStorage.setItem("ibory-idbat", String(p.at)); } catch(e){} idbFlush(); };
@@ -9101,7 +9114,7 @@ function advance(now){
     accrueAll(next - S.gt); S.gt = Math.max(S.gt,next);
     var before=finished.length;
     try {
-    if (ev.w==="poll"){ evGuard--; pollAt=S.gt+CATCHUP_POLL_MS; catchupPoll(); for (var pc=0; pc<S.cities.length; pc++){ S.cur=pc; var pb0=finished.length; processQueues(); if (typeof processAuto==="function") processAuto(); tagFinished(pb0, pc, viewing); } S.cur=viewing; } // polls always move the clock 5 minutes on, so they don't count toward the runaway guard
+    if (ev.w==="poll"){ pollAt=S.gt+CATCHUP_POLL_MS; catchupPoll(); for (var pc=0; pc<S.cities.length; pc++){ S.cur=pc; var pb0=finished.length; processQueues(); if (typeof processAuto==="function") processAuto(); tagFinished(pb0, pc, viewing); } S.cur=viewing; } // polls always move the clock 5 minutes on, so they don't count toward the runaway guard
     else if (ev.w==="al"){ handleAlliance(ev.e); }
     else if (ev.w==="ai"){ var aci=cityIndex(ev.a.city); handleAi(ev.a); tagFinished(before, aci, viewing); }
     else if (ev.w==="m"){ var mci=cityIndex(ev.m.city); handleMarch(ev.m); S.cur=mci; processQueues(); if (typeof processAuto==="function") processAuto(); S.cur=viewing; tagFinished(before, mci, viewing); }
@@ -9273,7 +9286,7 @@ function tickText(){
   queueSummary(); if (sheetFor && sheetFor.kind==="allheroes") ahTick();
   var r=rates();
   RES.forEach(function(k){
-    document.getElementById("r-"+k).textContent = fmt(S.res[k]);
+    var rb=document.getElementById("r-"+k), rt=fmt(S.res[k]); rb.textContent = rt; rb.classList.toggle("long", rt.length>=6); // 0.2.33: "823.2M" squeezes a little so a narrow phone doesn't cut it off
     var el=document.getElementById("rr-"+k);
     el.textContent = (r[k]<0?"−":"+")+fmt(Math.abs(r[k]))+"/h";
     el.className = r[k]<0 ? "neg" : "";
@@ -11143,7 +11156,7 @@ function invTake(j){
   var v=IV.st&&IV.st.inv;
   try { if (v && v.me) heroPvpReports("inv", v.id, v.reports, v.role==="defender"?v.me.cid:null); } catch(e){}
   if (v){ if (v.role==="invader") invMarkAway(v); if (v.id!==IV.seenId){ IV.seenId=v.id; IV.map=null; IV.draft=Z12(); IV.armed="";
-      if (v.role==="defender"){ toast("An invasion has begun against you"); note("inv", "Invasion: "+(v.camp?esc(v.camp.name):"someone")+" has landed a camp on your map."); } } }
+      if (v.role==="defender"){ toast("An invasion has begun against you"); note("inv", "Invasion: "+(v.camp?v.camp.name:"someone")+" has landed a camp on your map."); } } }
   if (j.results && j.results.length) invApply(j.results);
   if (j.p || j.view || (j.results && j.results.length) || IV.err!==IV.shownErr){ IV.shownErr=IV.err; lastView=""; if (typeof renderView==="function") renderView(true); } // 0.1.234: only redraw when there is news
 }
@@ -11173,9 +11186,10 @@ function invPoll(force){
 function invApply(list){
   if (!S.invApplied) S.invApplied=[]; var ids=[], ch=false;
   list.forEach(function(r){
-    ids.push(r.id); if (S.invApplied.indexOf(r.id)>=0) return;
-    S.invApplied.push(r.id); if (S.invApplied.length>60) S.invApplied.shift();
-    invApplyOne(r); ch=true; });
+    if (S.invApplied.indexOf(r.id)>=0){ ids.push(r.id); return; }
+    r.lost=r.lost||Z12(); r.fortsLost=r.fortsLost||[0,0,0,0,0]; r.res=r.res||{}; // 0.2.35: a result with a field missing used to throw after its id was already marked applied, and the city stayed away with its troops gone
+    try { invApplyOne(r); } catch(e){ S.evErr=String(e&&e.message||e); return; } // not marked, not acked: the next poll tries again
+    S.invApplied.push(r.id); if (S.invApplied.length>60) S.invApplied.shift(); ids.push(r.id); ch=true; });
   if (ids.length) invPost("applied",{ids:ids});
   if (ch){ lastView=""; flushFinished(); save(); }
 }
@@ -11203,8 +11217,8 @@ function invApplyOne(r){
   if (!S.invLog) S.invLog=[];
   S.invLog.unshift({at:S.gt, role:r.role, opp:r.opp, city:r.city, cancelled:!!r.cancelled, why:r.why||"", win:r.winner===(r.role==="invader"?0:1), lost:lostN, kills:r.kills||0, marks:r.marks||0, score:r.score||0, taken:r.taken||0, res:r.res||{}});
   if (S.invLog.length>12) S.invLog.length=12;
-  var txt=r.cancelled ? "The invasion with "+esc(r.opp)+" was cancelled"+(r.why?": "+esc(r.why):".")+" Nothing was lost."
-    : (r.role==="invader"?"Your invasion of "+esc(r.opp)+" is over: ":esc(r.opp)+"’s invasion of "+esc(r.city||"your city")+" is over: ")+(r.winner===(r.role==="invader"?0:1)?"you came out ahead":"you came out behind")+". You lost "+fmt(lostN)+" troops"+(wounded?" ("+fmt(wounded)+" of them only wounded: they wait in the Medic Camp for 24 hours)":"")+", and earned "+fmt(r.marks||0)+" War Marks.";
+  var txt=r.cancelled ? "The invasion with "+r.opp+" was cancelled"+(r.why?": "+r.why:".")+" Nothing was lost."
+    : (r.role==="invader"?"Your invasion of "+r.opp+" is over: ":r.opp+"’s invasion of "+(r.city||"your city")+" is over: ")+(r.winner===(r.role==="invader"?0:1)?"you came out ahead":"you came out behind")+". You lost "+fmt(lostN)+" troops"+(wounded?" ("+fmt(wounded)+" of them only wounded: they wait in the Medic Camp for 24 hours)":"")+", and earned "+fmt(r.marks||0)+" War Marks.";
   note("inv", txt); toast(r.cancelled?"Invasion cancelled":"Invasion finished: see the Kingdom tab");
 }
 // safety net: a city marked away with no invasion and no result for a long time (server reset, ledger lost) comes home
@@ -11449,7 +11463,7 @@ function pvPost(path, body){
   var my=++PV.seq;
   return fetch(LB_URL+"/pvp/"+path,{method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body), cache:"no-store"})
     .then(function(r){ return r.json().catch(function(){ return {error:"Server error "+r.status}; }).then(function(j){ j._st=r.status; return j; }); })
-    .then(function(j){ if (j && j.locked) mpLock(); if (j.view && my>PV.got){ PV.got=my; pvTake(j.view); } return j; },
+    .then(function(j){ if (j && j.locked) mpLock(); if (j.view && my>PV.got){ PV.got=my; try { pvTake(j.view); } catch(e){ S.evErr=String(e&&e.message||e); return {error:"That answer from the server couldn’t be read", _st:j._st}; } } return j; }, // 0.2.35: a view the phone can't take no longer rejects the chain (PV.busy stayed set for good and polling stopped)
           function(){ return {error:"Can’t reach the server. Check your connection.", _st:0}; });
 }
 function pvTake(v){
@@ -11508,20 +11522,20 @@ function pvTick(){
   PV.lastPoll=now; PV.busy=1;
   pvPost("state", pvKey()).then(function(j){ PV.busy=0;
     if (j.error){ PV.err=j.error; if (j._st===404 || j._st===403) PV.lost=true; } else { PV.err=""; }
-    lastView=""; });
+    lastView=""; }, function(){ PV.busy=0; });
 }
 function pvStart(path, body, ci){
   PV.busy=1; PV.err=""; PV.v=null; PV.bf=null; lastView=""; renderView(true);
   pvPost(path, body).then(function(j){ PV.busy=0;
     if (j.error || !j.token){ PV.err=j.error||"Something went wrong. Try again."; PV.idClash=j._st===403 && /rating/.test(PV.err); PV.v=null; PV.bf=null; lastView=""; refresh(); return; }
-    S.pvp={code:j.code||body.code, token:j.token, ci:ci}; PV.code=""; PV.lost=false; PV.lastPoll=Date.now(); tab="alliance"; save(); lastView=""; refresh(); });
+    S.pvp={code:j.code||body.code, token:j.token, ci:ci}; PV.code=""; PV.lost=false; PV.lastPoll=Date.now(); tab="alliance"; save(); lastView=""; refresh(); }, function(){ PV.busy=0; PV.err="Something went wrong. Try again."; lastView=""; refresh(); });
 }
 function pvClear(){ S.pvp=null; PV.v=null; PV.bf=null; PV.err=""; PV.lost=false; PV.quitArmed=false; PV_LEAVE_ARMED=false; PV.busy=0; document.body.classList.remove("bfmode"); tab="alliance"; lastView=""; }
 function pvOrder(o, ok, after){
   if (!pvLive() || PV.ordering) return; PV.ordering=1; // one order at a time, so a double tap can't send twice
   pvPost("order", pvWith({order:o})).then(function(j){ PV.ordering=0;
     if (j.error) toast(j.error); else { if (ok) toast(ok); if (after) after(); }
-    lastView=""; lastSheet=""; refresh(); });
+    lastView=""; lastSheet=""; refresh(); }, function(){ PV.ordering=0; });
 }
 // spoils: the single-player ladder, measured against the average of the two armies
 function pvSpoils(){
@@ -13213,7 +13227,8 @@ function renderView(force){
   }
   if (tab==="guild" && !mpShown()) tab="city";
   if (tab==="guild"){ // chat keeps updating even while you type: it lives in its own box
-    var gh="guild|"+viewGuild(), typing=v.contains(document.activeElement) && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
+    var gh; try { gh="guild|"+viewGuild(); } catch(e){ S.evErr=String(e&&e.message||e); gh='guild|<div class="section"><p class="hint">The alliance page couldn\u2019t be drawn from the last answer from the server. It tries again on the next sync.</p></div>'; } // 0.2.35: one bad sync answer threw on every tick and stopped the clock and saving while this tab was open
+    var typing=v.contains(document.activeElement) && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
     if (!typing && (gh!==lastView || force)){ var amo=document.getElementById("almap"), asl=amo?[amo.scrollLeft,amo.scrollTop]:null; v.innerHTML=gh.slice(6); lastView=gh; wireDetails(v);
       var amn=document.getElementById("almap"); if (amn){ var zk=ALS.zoomKeep; ALS.zoomKeep=null;
         if (zk){ var zc=46*alZ(); amn.scrollLeft=Math.max(0, zk[0]*zc-amn.clientWidth/2); amn.scrollTop=Math.max(0, zk[1]*zc-amn.clientHeight/2); }
@@ -14293,6 +14308,7 @@ document.addEventListener("click",function(e){
   if (act==="city-abandon"){
     var aid=+a.dataset.city, ai=cityIndex(aid), ac=S.cities[ai];
     if (S.cities.length<2 || ac.fieldCap) return;
+    if (ac.away){ toast("This city is away on an invasion. Wait for it to come back."); return; } // 0.2.35
     if (armedTile!=="ab"+aid){ armedTile="ab"+aid; renderTileInfo(); return; }
     armedTile=null;
     // 0.1.218: nothing is lost by abandoning: troops, wounded, heroes, marches (and rally and Arena marches) move to the nearest city; troops in training are refunded there
@@ -14301,13 +14317,13 @@ document.addEventListener("click",function(e){
     for (var ui=0;ui<12;ui++) tc.troops[ui]+=(ac.troops[ui]||0);
     if (ac.wounded && ac.wounded.length){ tc.wounded=(tc.wounded||[]).concat(ac.wounded); moved+=ac.wounded.reduce(function(a,b2){ return a+sumT(b2.t); },0); }
     var refund={}; (ac.train||[]).forEach(function(tr){ for (var rk in (tr.paid||{})) refund[rk]=(refund[rk]||0)+tr.paid[rk]; }); for (var rk2 in refund){ if (rk2 in tc.res) tc.res[rk2]+=refund[rk2]; }
-    var busyH={}; S.marches.forEach(function(m){ if (m.city===aid && m.hero) busyH[m.hero]=1; }); (S.alRally||[]).concat(S.alArena||[]).forEach(function(m){ if (m.city===aid && m.hero) busyH[m.hero]=1; });
+    var busyH={}; S.marches.forEach(function(m){ if (m.city===aid && m.hero) busyH[m.hero]=1; }); (S.alRally||[]).concat(S.alArena||[]).concat(S.wdM||[]).forEach(function(m){ if (m.city===aid && m.hero) busyH[m.hero]=1; }); // 0.2.35: server-map marches too
     var leading=ac.heroes.filter(function(hh){ return busyH[hh.id]; }), resting=ac.heroes.filter(function(hh){ return !busyH[hh.id]; });
     tc.heroes=tc.heroes||[]; tc.waiting=tc.waiting||[]; leading.forEach(function(hh){ tc.heroes.push(hh); }); // heroes out leading marches keep their place (they lead them home)
     resting.forEach(function(hh){ hh.away=false; if (tc.heroes.length<cap) tc.heroes.push(hh); else tc.waiting.push(hh); });
     (ac.waiting||[]).forEach(function(hh){ tc.waiting.push(hh); });
     S.marches.forEach(function(m){ if (m.city===aid) m.city=tc.id; });
-    (S.alRally||[]).concat(S.alArena||[]).forEach(function(m){ if (m.city===aid) m.city=tc.id; });
+    (S.alRally||[]).concat(S.alArena||[]).concat(S.wdM||[]).forEach(function(m){ if (m.city===aid) m.city=tc.id; });
     // marches heading for the abandoned city (reinforcements, supplies) turn round; camps on its valleys pack up and go home
     S.marches.forEach(function(m){ var mq=TILE_BY[m.tile]; if ((mq && mq.city===aid && m.phase!=="back") || (m.phase==="stay" && S.map.owned[m.tile]===aid)){ var wasStay=m.phase==="stay", el=Math.max(0,S.gt-(m.dep||S.gt)); m.phase="back"; m.bs=S.gt; m.ret=S.gt+(wasStay?(m.travel||0):Math.min(m.travel||el,el||m.travel||0)); } });
     S.aiWar=S.aiWar.filter(function(w){ return w.city!==aid; });
@@ -14376,7 +14392,7 @@ document.addEventListener("click",function(e){
     var ug=forgeGear(); if (!ug || upgWhy(ug)) return;
     if (armed!=="upg"){ armed="upg"; lastSheet=""; renderSheet(); return; }
     armed=null; var oldn=gearName(ug); upgradeGear(ug);
-    forgeLog.unshift(oldn+" reforged into a "+gearName(ug)+" ("+ug.stars+" star"+(ug.stars===1?"":"s")+")");
+    forgeLog.unshift(esc(oldn)+" reforged into a "+esc(gearName(ug))+" ("+ug.stars+" star"+(ug.stars===1?"":"s")+")"); // 0.2.35: gear names are typed by the player
     toast("Upgraded to "+gearName(ug)); save(); lastSheet=""; renderSheet(); lastView=""; refresh(); return;
   }
   if (act==="gear-scrap"){
@@ -14388,7 +14404,7 @@ document.addEventListener("click",function(e){
   if (act==="teleport"){
     var tt=a.dataset.tile, tq=TILE_BY[tt];
     if (!(S.items.teleport>0) || !tq || tq.k!=="flat" || S.map.owned[tt] || (C().fieldCap && !hasHC(16))) return;
-    // only this city's OWN marches block a teleport. Marches from your other cities that are heading here turn around and go home;
+    // only this city's OWN marches block a teleport. Marches from your other cities that are heading here turn around and go home
     // ones already on their way home (a delivery that has arrived) don't matter at all
     if (S.marches.some(function(m){ return m.city===C().id; })){ toast("Recall this city\u2019s marches first"); return; }
     if (armedTile!=="tp"+tt){ armedTile="tp"+tt; renderTileInfo(); return; }
@@ -14450,7 +14466,7 @@ document.addEventListener("click",function(e){
       } else if (mm.phase==="stay"){
         mm.phase="back"; mm.bs=S.gt; mm.ret=S.gt+mm.travel; mm.loot={}; toast((mm.mission==="station"?"Camp packed up":"Guards recalled")+", home in "+fmtT(realMs(mm.travel)));
       } else if (mm.phase==="out"){
-        mm.phase="back"; mm.bs=S.gt; mm.ret=S.gt+Math.max(1,Math.min(S.gt-mm.dep, mm.reach?mm.travel:Infinity)); mm.loot=refund; // a timed wave waiting at the target walks back the whole way toast("Army turned back, home in "+fmtT(realMs(mm.ret-S.gt)));
+        mm.phase="back"; mm.bs=S.gt; mm.ret=S.gt+Math.max(1,Math.min(S.gt-mm.dep, mm.reach?mm.travel:Infinity)); mm.loot=refund; toast("Army turned back, home in "+fmtT(realMs(mm.ret-S.gt))); // a timed wave waiting at the target walks back the whole way
       }
     });
     save(); refresh(); return;
@@ -14536,7 +14552,7 @@ document.addEventListener("click",function(e){
   if (act==="preset-edit"){ openSheet({kind:"preset",p:+a.dataset.p,m:a.dataset.m?1:0}); return; }
   if (act==="preset-copy"){ var cpp=presetsOf(a.dataset.m)[+a.dataset.p]; if (!cpp || !presetTotal(cpp)) return; presetClip={name:cpp.name, t:cpp.t.slice(), hero:cpp.hero, stopOnLoss:cpp.stopOnLoss, noCap:!!cpp.noCap, m:!!a.dataset.m}; toast("Copied "+cpp.name+"; Paste it onto another preset"); lastView=""; refresh(); return; }
   if (act==="preset-paste"){ var ppp=presetsOf(a.dataset.m)[+a.dataset.p]; if (!ppp || !presetClip) return;
-    ppp.t=presetClip.t.slice(); if (!a.dataset.m && !presetClip.m){ ppp.stopOnLoss=presetClip.stopOnLoss; ppp.noCap=presetClip.noCap; } // farm settings only travel farm to farm ppp.hero=(presetClip.hero>0 && !C().heroes.some(function(x){ return x.id===presetClip.hero; })) ? 0 : presetClip.hero;
+    ppp.t=presetClip.t.slice(); if (!a.dataset.m && !presetClip.m){ ppp.stopOnLoss=presetClip.stopOnLoss; ppp.noCap=presetClip.noCap; } ppp.hero=(presetClip.hero>0 && !C().heroes.some(function(x){ return x.id===presetClip.hero; })) ? 0 : presetClip.hero; // farm settings only travel farm to farm; the hero comes along when this city has it
     toast("Pasted "+presetClip.name+" onto "+ppp.name); save(); lastView=""; refresh(); return; }
   if (act==="preset-auto"){ var pa=S.presets[+a.dataset.p]; pa.auto=!pa.auto; toast(pa.name+(pa.auto?" is auto-farming":" stopped")); processAuto(); refresh(); return; }
   if (act==="mpop-farm"){ var mfs=document.getElementById("mpfarmsel"); if (mfs) MPOPFARM=+mfs.value; var mfp=S.presets[MPOPFARM], mft=a.dataset.tile; if (!mfp || !mft) return; var mfi=mfp.farm.indexOf(mft);
@@ -14702,7 +14718,7 @@ document.addEventListener("click",function(e){
   }
   if (act==="dismiss"){
     if (armed!=="dismiss"){ armed="dismiss"; lastSheet=""; renderSheet(); return; }
-    var dh=heroById(sheetFor.id); if (dh.away){ toast("That hero is away on a march"); return; }
+    var dh=heroById(sheetFor.id); if (!dh) return; if (dh.away){ toast("That hero is away on a march"); return; }
     if (dh.fav){ armed=null; toast("Unfavourite "+dh.name+" first (the star)"); lastSheet=""; renderSheet(); return; }
     if (dh.tier==="queen"){ armed=null; toast("The Queen will not leave your court"); lastSheet=""; renderSheet(); return; }
     if (dh.unique==="beta"){ armed=null; toast("Beta will not leave your court"); lastSheet=""; renderSheet(); return; }
@@ -14848,6 +14864,7 @@ document.addEventListener("change",function(e){ markDirty();
   if (e.target.id==="pstop"){ S.presets[sheetFor.p].stopOnLoss=e.target.checked; save(); }
   if (e.target.id==="pnocap"){ S.presets[sheetFor.p].noCap=e.target.checked; save(); }
   if (e.target.id==="pfull"){ S.presets[sheetFor.p].fullOnly=e.target.checked; save(); }
+  if (e.target.id==="pxp"){ S.presets[sheetFor.p].xpOnly=e.target.checked; save(); }
   if (e.target.id==="wmis"){ waveDraft.mission=e.target.value; updateWaveInfo(); }
   if (e.target.dataset && e.target.dataset.dgset){ var gt=e.target.dataset.dgset, gid=+e.target.value;
     allHeroes().forEach(function(x){ if (x.h.dragon===gt) delete x.h.dragon; });
@@ -14932,7 +14949,7 @@ setInterval(function(){
 setTimeout(updateTabArrows,50);
 setTimeout(function(){ lbSync(true); },4000); setInterval(function(){ if (!document.hidden) lbSync(false); },60000); // 0.1.235: the hide handler already posts once on the way out
 // the cloud save (every 10 minutes, 0.2.18); never before the opening check for a newer save has answered, and not while a conflict waits for a choice
-function cbAuto(){ if (cbOn() && !CB.busy && CB.checked && !CB.conflict && Date.now()-(S.cloud.last||0)>=cbEvery() && !(S.cloud.lastTry && Date.now()-S.cloud.lastTry<15*60000)) cbSave(true); }
+function cbAuto(){ if (cbOn() && !CB.busy && CB.checked && !CB.conflict && Date.now()-(S.cloud.last||0)>=cbEvery() && !(S.cloud.lastTry && Date.now()-S.cloud.lastTry<15*60000) && !(S.cloud.retryAt && Date.now()<S.cloud.retryAt)) cbSave(true); }
 setTimeout(function(){ CB.checked=false; cbCheck(); setTimeout(function(){ CB.checked=true; }, 6000); }, 1200); // on open: is there a newer game from another device?
 setTimeout(cbAuto, 8000); setInterval(function(){ if (!document.hidden) cbAuto(); }, 60000);
 // switching away saves to the cloud (so another device can pick up from here); coming back checks for a newer game
@@ -14950,7 +14967,7 @@ setInterval(function(){ if (sheetFor || saveLocked || !S.mpIntro || mpGraceAsked
 setTimeout(function(){ bkSnapshot("auto"); },60000); setInterval(function(){ if (!document.hidden) bkSnapshot("auto"); },120000);
 setInterval(function(){ if (saveLocked && !sheetFor) openSheet({kind:"recover"}); },15000);
 if (loadFail || recoverOffer) setTimeout(function(){ openSheet({kind:"recover"}); },800);
-// one listener for leaving and coming back. Leaving: catch the clock up and save (local first, then the cloud copy, then scores);
+// one listener for leaving and coming back. Leaving: catch the clock up and save (local first, then the cloud copy, then scores)
 // returning: look for a newer cloud game, a new build, and redraw the map
 var hiddenAt=0;
 document.addEventListener("visibilitychange",function(){
