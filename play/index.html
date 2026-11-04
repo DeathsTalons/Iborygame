@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.42";
+window.IBORY_V="0.2.46";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -539,13 +539,13 @@ nav.tabs{display:block;margin:0}
 .wdmlb{display:flex;gap:8px;flex-wrap:wrap}.wdml .link{color:#f3dc9a;font-size:.68rem;padding:0}.wdml .link[disabled]{opacity:.45}
 .wdview.fs .wdml{top:calc(8px + env(safe-area-inset-top,0px))}
 .wdview.fs{position:fixed;top:0;left:0;right:0;bottom:0;max-width:none;margin:0;z-index:1500;background:#22301f}
-.wdview.fs .wdbox{max-width:none;width:100%;height:100%;border-radius:0}.wdview.fs .wdmap{width:100%;height:100%}
+.wdview.fs .wdbox{max-width:none;width:100%;height:100%;border-radius:0;aspect-ratio:auto!important}.wdview.fs .wdmap{width:200%;height:200%}
 .wdview.fs.rot{right:auto;bottom:auto;width:100vh;height:100vw;transform-origin:0 0;transform:translateX(100vw) rotate(90deg)}
 @supports (height:100dvh){ .wdview.fs.rot{width:100dvh} }
 .wdview.fs .wdfsbar{display:flex;position:absolute;top:calc(8px + env(safe-area-inset-top,0px));right:8px;gap:6px;z-index:7}
 .wdview.fs.rot .wdfsbar{top:8px}.wdview.fs .wdmvbar{bottom:calc(10px + env(safe-area-inset-bottom,0px))}
 .wdfsbar .btn{min-width:40px;box-shadow:0 2px 8px rgba(0,0,0,.35)}
-body.wdfs{overflow:hidden}.wdmap{display:block;width:100%;height:auto;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none}.wdhit{cursor:pointer}
+body.wdfs{overflow:hidden}.wdmap{display:block;position:absolute;left:-50%;top:-50%;width:200%;height:200%;transform-origin:25% 25%;will-change:transform;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none}.wdhit{cursor:pointer}
 .wdtag{font-family:var(--display);font-weight:700}.wdsm{font-family:var(--body);font-weight:500}.wdzoom{flex-wrap:wrap;gap:6px}.wdzoom .btn{min-width:40px}
 .wdleg{display:flex;flex-wrap:wrap;gap:6px 12px;margin:8px 0 2px;font-size:13px;color:var(--muted)}.wdleg span{display:inline-flex;align-items:center;gap:5px}.wdleg i{display:inline-block;width:12px;height:12px;border-radius:3px;border:2px solid}.wdleg i.wdopen{border:2px dashed #8d928a}
 .wdhow{margin:6px 0 0;padding-left:20px}.wdhow li{margin:4px 0}
@@ -790,8 +790,24 @@ body.bfmode #tabs, body.bfmode .tabarrow, body.bfmode .queue, body.bfmode #march
 .doll{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:6px}
 .drow{display:grid;grid-template-columns:auto 1fr auto;gap:8px}.dcol{display:flex;flex-direction:column;gap:6px}
 .dslot{background:none;border:0;padding:0;cursor:pointer;border-radius:10px}
-.dmid{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;min-width:0}
-.dstat{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;width:100%}.dstat div{background:var(--panel);border-radius:8px;padding:4px 2px;font-size:.68rem;color:var(--muted)}.dstat b{display:block;font-size:.92rem;color:var(--ink)}.dstat i{font-style:normal;font-size:.66rem}
+.dmid{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:6px;text-align:center;min-width:0}
+.dstat{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;width:100%}.dstat div{background:var(--panel);border-radius:8px;padding:4px 2px;font-size:.68rem;color:var(--muted)}.dstat b{display:block;font-size:.92rem;color:var(--ink)}.dstat i{font-style:normal;font-size:.62rem;display:block}
+.dpt{display:flex;gap:3px;margin-top:4px;padding:0 2px}.dpb{flex:1;min-width:0;padding:4px 0;border:1px solid var(--brass);background:rgba(215,176,88,.14);color:var(--brass);border-radius:6px;font:700 .72rem var(--body);cursor:pointer}
+.dport{position:relative;padding:0;border:0;background:none;cursor:pointer;line-height:0}.dpcam{position:absolute;right:-4px;bottom:-4px;font-size:.85rem;line-height:1;background:var(--panel);border:1px solid var(--line);border-radius:50%;padding:3px}.dpdel{font-size:.68rem;margin-top:-2px}
+.acities{display:flex;gap:6px;overflow-x:auto;margin-top:8px;padding-bottom:2px;scrollbar-width:none}.acities::-webkit-scrollbar{display:none}
+.acity{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-start;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:3px 10px;color:var(--muted);font:inherit;font-size:.74rem;cursor:pointer}.acity b{color:var(--ink);font-size:.9rem}.acity.on{border-color:var(--brass);box-shadow:0 0 0 1px var(--brass) inset}
+.apanel{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:8px;margin-top:8px}.ag4{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:6px}
+.atile{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 2px 5px;color:var(--ink);font:inherit;cursor:pointer;min-width:0}
+.atile img{width:32px;height:32px;image-rendering:pixelated}.atile b{font-size:.95rem;line-height:1.15}.atile span{font-size:.62rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.atile i{font-style:normal;color:#e08a3c;font-weight:800;font-size:.75rem;margin-left:1px}.aline{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.atile.z{opacity:.42}.alock{position:absolute;top:3px;right:4px;font-size:.6rem}
+.abtns{margin-top:8px;flex-wrap:nowrap}.abtns .btn{flex:1;white-space:nowrap}.abtns .dur{font-size:.7rem;margin-left:4px}
+.ushead{display:flex;gap:12px;align-items:center;margin-bottom:8px}.ushead img{width:48px;height:48px;image-rendering:pixelated}
+.dmore{width:100%;display:flex;flex-direction:column;gap:5px;margin-top:2px}.dxpl{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted)}.dxpl b{color:var(--ink)}
+.dbooks{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}.dbook{position:relative;border:1px solid var(--line);background:var(--panel);border-radius:7px;padding:3px 0 1px;cursor:pointer;line-height:0}.dbook img{width:26px;height:26px;image-rendering:pixelated}.dbook span{display:block;line-height:1.2;font:700 .62rem var(--body);color:var(--ink)}.dbook[disabled]{opacity:.4}
+.dauto{border-top:1px solid var(--line);padding-top:5px}.dar{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-top:2px}.dar label{display:flex;flex-direction:column;align-items:center;font-size:.6rem;color:var(--muted)}.dar input{width:100%;text-align:center;padding:2px 0!important;font-size:.85rem;min-height:0}.dar2{display:flex;gap:4px;justify-content:center;margin-top:4px}
+.dfoot{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}.dfoot .hacts{margin:6px 0 0;padding:0;border:0;background:none}.dfoot details{margin-top:6px}.dxp{margin-top:4px}
+.hnrow{display:flex;align-items:center;gap:6px}input.hnamein{flex:1;min-width:0;font:700 1.4rem var(--display)!important;color:var(--ink);background:transparent!important;border:0!important;border-bottom:1px dashed var(--line)!important;border-radius:0!important;padding:2px 0!important;box-shadow:none!important;height:auto!important}input.hnamein:focus{outline:none;border-bottom-color:var(--brass)!important}.hnm{margin:0;overflow-wrap:anywhere}.hnq{font:700 1.4rem var(--display)}.hpen{color:var(--muted);font-size:.9rem}
+.rgrid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}.rcard{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:1px;min-width:0}.rcard b{font:700 1.3rem var(--display);color:var(--ink);overflow-wrap:anywhere}.rcard.kill b{color:#e0825a}.rcard.loss b{color:var(--muted)}.rcard.wide{grid-column:1/-1}.rcard.wide b{font-size:1.1rem}
+.dpts{font-size:.72rem;color:var(--muted)}.dpts b{color:var(--brass);font-size:.85rem}.dreset{padding:4px 8px!important;font-size:.72rem!important;min-height:0}
 .dgs{display:flex;flex-direction:column;align-items:center;font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}.dgs b{font-family:var(--display);font-size:1.5rem;color:var(--brass);letter-spacing:0;text-transform:none}
 .dset{margin-top:10px}.dbar,.ggauge{height:8px;border-radius:5px;background:var(--panel);overflow:hidden;margin-top:3px}.dbar i{display:block;height:100%;background:linear-gradient(90deg,#b8902f,#f3dc9a)}
 .ghead{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;margin-bottom:8px}.gstars{color:#f3dc9a;letter-spacing:1px}.gstars s{color:var(--line);text-decoration:none}
@@ -1269,7 +1285,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.42";
+var APP_VERSION = "0.2.46";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -2937,17 +2953,17 @@ function bgDraw(g, q, tx, ty, x, y, z, detail){ var bk=bgAt(q.id); if (!bk || !p
   g.imageSmoothingEnabled=false; g.drawImage(cv, px0, py0, Math.ceil(x+z)-px0, Math.ceil(y+z)-py0);
   var hit=S.map.hit[q.id], wash=0;
   if (VTYPES[q.k]){ if (hit) wash=1-Math.max(0,Math.min(1,(S.gt-hit.at)/REGEN_R)); if (wash>0){ g.fillStyle="rgba(236,228,206,.5)"; g.fillRect(x,y,z,Math.round(z*wash)); }
-    if (detail && nums){ g.lineWidth=3; g.lineJoin="round"; g.miterLimit=2; g.strokeStyle="rgba(0,0,0,.6)"; g.strokeText(q.L,x+z/2,y+z/2+1); g.fillStyle="#fff"; g.fillText(q.L,x+z/2,y+z/2+1); } }
+    if (detail && nums){ g.lineWidth=3; g.lineJoin="round"; g.miterLimit=2; g.strokeStyle="rgba(0,0,0,.6)"; ctext(g,1,q.L,x+z/2,y+z/2+1); g.fillStyle="#fff"; ctext(g,0,q.L,x+z/2,y+z/2+1); } }
   else if (q.k==="hc" && hcBig(q)){} // drawn big later, on top of this background
   else if (q.k==="npc" && q.L>=10 && EXT_IMG.npc10){ var dw=Math.ceil(x+z)-px0, im10=EXT_IMG.npc10, pad=Math.max(1,dw*0.03), sc10=(dw-2*pad)/Math.max(im10.width,im10.height), sp10=extSprite("npc10", im10.width*sc10*(window.devicePixelRatio||1));
     if (sp10){ g.imageSmoothingEnabled=true; g.drawImage(sp10, px0+(dw-im10.width*sc10)/2, py0+dw-pad-im10.height*sc10, im10.width*sc10, im10.height*sc10); }
     if (hit) wash=1-Math.max(0,Math.min(1,(S.gt-hit.at)/REGEN_R)); if (wash>0){ g.fillStyle="rgba(236,228,206,.5)"; g.fillRect(x,y,z,Math.round(z*wash)); }
-    if (z>=18 && nums){ var t10=String(q.L), bw10=Math.max(12,t10.length*7+6), bx10=x+z-bw10-1, by10=y+z-14; g.fillStyle="rgba(20,16,12,.78)"; g.fillRect(bx10,by10,bw10,13); g.save(); g.font="700 10px sans-serif"; g.fillStyle="#f6ecd4"; g.textAlign="center"; g.textBaseline="middle"; g.fillText(t10,bx10+bw10/2,by10+7); g.restore(); } }
+    if (z>=18 && nums){ var t10=String(q.L), bw10=Math.max(12,t10.length*7+6), bx10=x+z-bw10-1, by10=y+z-14; g.fillStyle="rgba(20,16,12,.78)"; g.fillRect(bx10,by10,bw10,13); g.save(); g.font="700 10px sans-serif"; g.fillStyle="#f6ecd4"; g.textAlign="center"; g.textBaseline="middle"; ctext(g,0,t10,bx10+bw10/2,by10+7); g.restore(); } }
   else { var sk=q.k==="hc"?"hc"+(SET_ROWS["hc"+q.L]?q.L:12):q.k+Math.max(1,Math.min(10,q.L)), sid="strip_"+sk; if (!SPRITES[sid]) SPRITES[sid]={ppt:16, ax:8, ay:15.5, set:sk};
     var sc=sprCanvas(sid); if (sc) g.drawImage(sc, px0, py0, Math.ceil(x+z)-px0, Math.ceil(y+z)-py0);
     if (q.k==="npc" && hit) wash=1-Math.max(0,Math.min(1,(S.gt-hit.at)/REGEN_R)); if (wash>0){ g.fillStyle="rgba(236,228,206,.5)"; g.fillRect(x,y,z,Math.round(z*wash)); }
     if (z>=18 && nums){ var t=String(q.L), bw=Math.max(12,t.length*7+6), bh=13, bx=x+z-bw-1, by=y+z-bh-1; g.fillStyle="rgba(20,16,12,.78)"; if (g.roundRect){ g.beginPath(); g.roundRect(bx,by,bw,bh,4); g.fill(); } else g.fillRect(bx,by,bw,bh);
-      g.save(); g.font="700 10px sans-serif"; g.fillStyle="#f6ecd4"; g.textAlign="center"; g.textBaseline="middle"; g.fillText(t,bx+bw/2,by+bh/2+.5); g.restore(); } }
+      g.save(); g.font="700 10px sans-serif"; g.fillStyle="#f6ecd4"; g.textAlign="center"; g.textBaseline="middle"; ctext(g,0,t,bx+bw/2,by+bh/2+.5); g.restore(); } }
   g.imageSmoothingEnabled=true; return true; }
 function decoIsRoad(k){ var d=DECOS[String(k).split("|")[0]]; return !!(d&&d.road); }
 function roadAt(x,y){ var l=S.deco&&S.deco.at[x+","+y]; if (!l) return ""; for (var i=0;i<l.length;i++){ var k=String(l[i]).split("|")[0]; if (DECOS[k]&&DECOS[k].road) return k; } return ""; }
@@ -4361,12 +4377,12 @@ function viewMap(){
   var lv='<option value="0">Any level</option>'; for (var i=1;i<=10;i++) lv+='<option value="'+i+'">Level '+i+'</option>'; [12,14,16,18].forEach(function(i){ lv+='<option value="'+i+'">Level '+i+'</option>'; });
   return '<div class="btnrow" style="margin:0 0 8px;align-items:center;flex-wrap:nowrap"><button class="btn ghost small" style="flex:0 0 auto" data-act="march-open" data-tile="'+homeTileId()+'" data-mission="hide">Hide troops in the woods</button>'+bmJumpHtml()+'</div>'+
     '<div class="section"><div class="shead"><h3 id="realmh">'+esc(realmName())+'</h3><button class="link dur" id="mapstat" data-act="held-open" title="See every valley and flat you hold"></button></div>'+
-    '<div class="maptools" style="flex-wrap:nowrap"><button class="btn ghost small" data-act="map-zoom" data-z="1" aria-label="Zoom in">+</button><button class="btn ghost small" data-act="map-zoom" data-z="-1" aria-label="Zoom out">\u2212</button><button class="btn ghost small" data-act="map-home">My city</button><span class="dur" id="mapcoord" style="flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span><button class="btn ghost small dpickbtn" data-act="dpick" aria-pressed="'+(DPICK.on?'true':'false')+'" title="Tap decorations instead of tiles" aria-label="Pick decorations" style="margin-left:auto">\ud83d\uddbc\ufe0f</button><button class="btn ghost small" data-act="map-fs" title="Full screen" aria-label="Full screen">\u26f6</button></div>'+
+    '<div class="maptools" style="flex-wrap:nowrap"><button class="btn ghost small" data-act="map-home">My city</button><span class="dur" id="mapcoord" style="flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span><button class="btn ghost small dpickbtn" data-act="dpick" aria-pressed="'+(DPICK.on?'true':'false')+'" title="Tap decorations instead of tiles" aria-label="Pick decorations" style="margin-left:auto">\ud83d\uddbc\ufe0f</button><button class="btn ghost small" data-act="map-fs" title="Full screen" aria-label="Full screen">\u26f6</button></div>'+
     '<div id="mapfarmbox">'+mapFarmHtml()+'</div>'+
     '<div class="mapview" id="mapview"><canvas id="mapc" aria-label="Map. Drag to pan, tap a tile to see it."></canvas><div class="mpop" id="mappop" hidden></div><div class="wdml kml" id="kmml" hidden></div><div class="paintbar" id="paintbar" hidden></div>'+
-      '<div class="mapfsbar"><button class="btn small" data-act="map-zoom" data-z="1" aria-label="Zoom in">+</button><button class="btn small" data-act="map-zoom" data-z="-1" aria-label="Zoom out">\u2212</button><button class="btn small" data-act="map-home">My city</button><button class="btn small" data-act="map-rot" aria-label="Turn sideways">\u27f3</button><button class="btn small" data-act="map-fs" aria-label="Leave full screen">\u2715</button></div></div>'+
+      '<div class="mapfsbar"><button class="btn small" data-act="map-home">My city</button><button class="btn small" data-act="map-rot" aria-label="Turn sideways">\u27f3</button><button class="btn small" data-act="map-fs" aria-label="Leave full screen">\u2715</button></div></div>'+
     '<div class="mapbottom"><canvas id="minic" width="'+MAPW+'" height="'+MAPH+'" aria-label="Overview map. Tap to jump there."></canvas><div id="mapglance" class="glance"></div>'+
-    '</div></div><p class="hint">Drag to pan, pinch or use + and \u2212 to zoom, tap the overview to jump, \u26f6 for full screen. Historic cities sit on a grid: level 12s every 24 tiles, 14s every 66, and Atlantis at the center (198, 198).</p></div>'+
+    '</div></div><p class="hint">Drag to pan, pinch to zoom, tap the overview to jump, \u26f6 for full screen. Historic cities sit on a grid: level 12s every 24 tiles, 14s every 66, and Atlantis at the center (198, 198).</p></div>'+
     '<div id="bmpanel">'+bmPanel()+'</div>'+occPanel()+
     '<details class="section det" id="tidet" data-det="tileinfo"'+(DET.tileinfo?' open':'')+(selTile?'':' hidden')+'><summary><b>Tile details</b> <span class="dur" id="tisum"></span></summary><div id="tileinfo"></div></details><div id="marchbox"></div>';
 }
@@ -4453,7 +4469,7 @@ function setDraw(g, key, x, y, z, wash, lv){ if (!mapNums()) lv=null; var px0=Ma
   g.imageSmoothingEnabled=!!ex; g.drawImage(cv, px0, py0, dw, dh); g.imageSmoothingEnabled=true;
   if (wash>0){ g.fillStyle="rgba(236,228,206,.6)"; g.fillRect(x,y,z,Math.round(z*wash)); }
   if (lv!=null && z>=18){ var t=String(lv), bw=Math.max(12, t.length*7+6), bh=13, bx=x+z-bw-1, by=y+z-bh-1; g.fillStyle="rgba(20,16,12,.78)"; if (g.roundRect){ g.beginPath(); g.roundRect(bx,by,bw,bh,4); g.fill(); } else g.fillRect(bx,by,bw,bh);
-    g.save(); g.font="700 10px sans-serif"; g.fillStyle="#f6ecd4"; g.textAlign="center"; g.textBaseline="middle"; g.fillText(t, bx+bw/2, by+bh/2+0.5); g.restore(); }
+    g.save(); g.font="700 10px sans-serif"; g.fillStyle="#f6ecd4"; g.textAlign="center"; g.textBaseline="middle"; ctext(g,0,t, bx+bw/2, by+bh/2+0.5); g.restore(); }
   return true; }
 function pixTiles(){ return S.pixTiles!==false; }
 function valTile(k, v){ var key=k+v; if (VAL_CV[key]!==undefined) return VAL_CV[key]; var rows=VAL_TILES[k]&&VAL_TILES[k][v]; if (!rows) return (VAL_CV[key]=null);
@@ -4489,13 +4505,54 @@ function drawMini(){
   (S.bm||[]).forEach(function(b){ var xy=b.id.split(","); g.fillStyle="#000"; g.fillRect(+xy[0]-2,+xy[1]-2,5,5); g.fillStyle="#ffd34d"; g.fillRect(+xy[0]-1,+xy[1]-1,3,3); });
   mapFarmIds().forEach(function(id){ var q=TILE_BY[id]; g.fillStyle="#000"; g.fillRect(q.x-2,q.y-2,5,5); g.fillStyle=MAPFARM_COL; g.fillRect(q.x-1,q.y-1,3,3); }); // 0.1.243
 }
+/* 0.2.43: map text from a cache. Outlined and filled text was most of a zoomed-in map frame (Cody, Nov 4: full-screen maps lag when
+   dragged), so each label (text, font, colours, alignment, screen scale) is drawn once onto a small canvas and stamped after that.
+   Only on the map canvas (drawMap sets g._cs to its scale); anything else draws text as before. */
+var CTXT={}, CTXTN=0;
+if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener("loadingdone", function(){ CTXT={}; CTXTN=0; });
+function ctext(g, st, t, x, y){ var sc=window.NOCT?0:g._cs, fsty=st?g.strokeStyle:g.fillStyle;
+  if (!sc || typeof fsty!=="string"){ if (st) g.strokeText(t,x,y); else g.fillText(t,x,y); return; }
+  t=String(t); var al=g.textAlign, bl=g.textBaseline, lw=st?g.lineWidth:0, k=st+"|"+g.font+"|"+fsty+"|"+lw+"|"+(st?g.lineJoin:"")+"|"+al+"|"+bl+"|"+sc+"|"+t, c=CTXT[k];
+  if (!c){ if (CTXTN>3000){ CTXT={}; CTXTN=0; }
+    var fp=+((/(\d+(?:\.\d+)?)px/.exec(g.font)||[])[1]||12), mw=g.measureText(t).width, pad=Math.ceil(lw+2), w=Math.ceil(mw+pad*2), h=Math.ceil(fp*1.6+pad*2),
+      ax=al==="center"?w/2:(al==="right"||al==="end")?w-pad:pad, ay=bl==="middle"?h/2:(bl==="top"||bl==="hanging")?pad:bl==="bottom"?h-pad:pad+fp;
+    var cv=document.createElement("canvas"); cv.width=Math.max(1,Math.ceil(w*sc)); cv.height=Math.max(1,Math.ceil(h*sc)); var q=cv.getContext("2d");
+    if (!q){ if (st) g.strokeText(t,x,y); else g.fillText(t,x,y); return; }
+    q.setTransform(sc,0,0,sc,0,0); q.font=g.font; q.textAlign=al; q.textBaseline=bl;
+    if (st){ q.strokeStyle=fsty; q.lineWidth=lw; q.lineJoin=g.lineJoin; q.miterLimit=g.miterLimit; q.strokeText(t,ax,ay); } else { q.fillStyle=fsty; q.fillText(t,ax,ay); }
+    c=CTXT[k]={cv:cv, ax:ax, ay:ay, w:cv.width/sc, h:cv.height/sc}; CTXTN++; }
+  var px=Math.round((x-c.ax)*sc)/sc, py=Math.round((y-c.ay)*sc)/sc; g.drawImage(c.cv, px, py, c.w, c.h); }
+/* 0.2.43: dragging the Kingdom map doesn't redraw it. A copy with a margin round the view (MAPOC) is drawn while you're not touching
+   it; during a drag or pinch each frame just copies the right part of it (mapBlit), and the full drawing comes back when you let go.
+   A drag past the margin draws the copy again around where you are. */
+var MAPOC={cv:null, ok:false, key:"", t:0};
+function mapOcKey(c){ return [mv.x.toFixed(3), mv.y.toFixed(3), mv.z.toFixed(3), c.clientWidth, c.clientHeight].join("|"); }
+function mapBlit(c){ var O=MAPOC; if (!O.ok || !O.cv) return false; var dpr=window.devicePixelRatio||1, W=c.clientWidth||360, H=c.clientHeight||360;
+  if (O.W!==W || O.H!==H || c.width!==Math.round(W*dpr) || c.height!==Math.round(H*dpr)) return false;
+  var k=O.zo*O.sc, sx=(mv.x-O.ox)*k, sy=(mv.y-O.oy)*k, sw=W/mv.z*k, sh=H/mv.z*k;
+  if (!(sx>=0 && sy>=0 && sx+sw<=O.cv.width+0.5 && sy+sh<=O.cv.height+0.5)) return false;
+  var g=c.getContext("2d"); if (!g) return false; g.setTransform(1,0,0,1,0,0); g.imageSmoothingEnabled=!(Math.abs(mv.z-O.zo)<1e-6 && O.sc===dpr);
+  g.drawImage(O.cv, sx, sy, sw, sh, 0, 0, c.width, c.height); g.imageSmoothingEnabled=true; return true; }
+function mapOcRender(c){ var W=c.clientWidth||360, H=c.clientHeight||360, dpr=Math.min(2, window.devicePixelRatio||1), m=Math.round(Math.min(300, 0.4*Math.max(W,H))), z=mv.z;
+  if (!MAPOC.cv) MAPOC.cv=document.createElement("canvas");
+  var sx=mv.x, sy=mv.y, keep=[DECO_ANIM, DECO_HITS, EVM_VIS, VAMP_LIST, WIZ_VIS]; MAPOC.ok=false;
+  mv.x-=m/z; mv.y-=m/z;
+  try { drawMapCore(c, {cv:MAPOC.cv, W:W+2*m, H:H+2*m, dpr:dpr}); MAPOC.ok=true; MAPOC.ox=mv.x; MAPOC.oy=mv.y; MAPOC.zo=z; MAPOC.sc=dpr; MAPOC.W=W; MAPOC.H=H; }
+  catch(e){ MAPOC.ok=false; }
+  finally { mv.x=sx; mv.y=sy; DECO_ANIM=keep[0]; DECO_HITS=keep[1]; EVM_VIS=keep[2]; VAMP_LIST=keep[3]; WIZ_VIS=keep[4]; }
+  MAPOC.key=mapOcKey(c); }
+function mapOcSoon(c){ var k=mapOcKey(c); if ((MAPOC.ok && MAPOC.key===k) || MAPOC.pk===k) return; clearTimeout(MAPOC.t); MAPOC.pk=k; // animation redraws of the same view don't push it back
+  MAPOC.t=setTimeout(function(){ MAPOC.pk=""; var c2=document.getElementById("mapc"); if (!c2 || drag || document.hidden || mapOcKey(c2)!==k) return; mapOcRender(c2); }, 400); }
 function drawMap(){
   var c=document.getElementById("mapc"); if (!c) return; try { mapPopPos(); } catch(e){}
   if (!isFinite(mv.x) || !isFinite(mv.y) || !isFinite(mv.z)) clampView();
-  var dpr=window.devicePixelRatio||1, W=c.clientWidth||360, H=c.clientHeight||360;
+  if (drag && (drag.moved || drag.pinch)){ if (mapBlit(c)) return; mapOcRender(c); if (mapBlit(c)) return; }
+  drawMapCore(c, null); mapOcSoon(c); }
+function drawMapCore(c, OV){
+  var dpr=OV?OV.dpr:(window.devicePixelRatio||1), W=OV?OV.W:(c.clientWidth||360), H=OV?OV.H:(c.clientHeight||360); if (OV) c=OV.cv;
   if (c.width!==Math.round(W*dpr) || c.height!==Math.round(H*dpr)){ c.width=Math.round(W*dpr); c.height=Math.round(H*dpr); }
   var g=c.getContext("2d"); if (!g) return;
-  g.setTransform(dpr,0,0,dpr,0,0);
+  g.setTransform(dpr,0,0,dpr,0,0); g._cs=dpr;
   var cs=getComputedStyle(document.documentElement), brass=cs.getPropertyValue("--brass").trim()||"#c9a24a", ink=cs.getPropertyValue("--ink").trim()||"#222", bg=cs.getPropertyValue("--panel2").trim()||"#333";
   g.fillStyle=bg; g.fillRect(0,0,W,H);
   var z=mv.z, x0=Math.max(0,Math.floor(mv.x)), y0=Math.max(0,Math.floor(mv.y)), x1=Math.min(MAPW-1,Math.ceil(mv.x+W/z)), y1=Math.min(MAPH-1,Math.ceil(mv.y+H/z));
@@ -4518,29 +4575,29 @@ function drawMap(){
     else if (q.k==="hc" && pixTiles() && z>=8 && setDraw(g, "hc"+(SET_ROWS["hc"+q.L]?q.L:12), x, y, z, 0, q.L)){}
     else if (q.k==="npc"){ var nh=S.map.hit[q.id], nf=nh?Math.max(0,Math.min(1,(S.gt-nh.at)/REGEN_R)):1;
       if (nf<1){ g.fillStyle="#a39b8e"; g.fillRect(x,y,z,z); var fh=Math.round(z*nf); g.fillStyle="#4a4541"; g.fillRect(x,y+z-fh,z,fh); } else { g.fillStyle="#4a4541"; g.fillRect(x,y,z,z); }
-      if (detail){ var u2=z/30; g.fillStyle="#b9b2a6"; g.fillRect(x+6*u2,y+13*u2,18*u2,10*u2); g.fillRect(x+6*u2,y+9*u2,4*u2,4*u2); g.fillRect(x+13*u2,y+9*u2,4*u2,4*u2); g.fillRect(x+20*u2,y+9*u2,4*u2,4*u2); g.fillStyle="#fff"; numOk&&g.fillText(q.L,x+z/2,y+z*0.6); } }
+      if (detail){ var u2=z/30; g.fillStyle="#b9b2a6"; g.fillRect(x+6*u2,y+13*u2,18*u2,10*u2); g.fillRect(x+6*u2,y+9*u2,4*u2,4*u2); g.fillRect(x+13*u2,y+9*u2,4*u2,4*u2); g.fillRect(x+20*u2,y+9*u2,4*u2,4*u2); g.fillStyle="#fff"; numOk&&ctext(g,0,q.L,x+z/2,y+z*0.6); } }
     else if (q.k==="bully" || q.k==="war" || q.k==="chal" || q.k==="allycity"){ g.fillStyle=q.k==="allycity"?"#3f8f5a":"#b8322a"; g.fillRect(x,y,z,z);
-      if (detail){ g.fillStyle="#fff"; g.fillText(q.k==="bully"?"!":q.k==="war"?"W":q.k==="chal"?(q.seat?"\u2605":"C"):"A",x+z/2,y+z/2+1); } }
+      if (detail){ g.fillStyle="#fff"; ctext(g,0,q.k==="bully"?"!":q.k==="war"?"W":q.k==="chal"?(q.seat?"\u2605":"C"):"A",x+z/2,y+z/2+1); } }
     else if (q.k==="monster" && q.ev && VAMP_K[q.mon] && vampImg(VAMP_K[q.mon], q.ev) && z>=8){ // an event monster, idling (its own loop on every tile)
       var vL=VAMP_K[q.mon], vs=evArt(q.ev, vL), vim=vampImg(vL, q.ev), atk=S.marches.some(function(m){ return m.tile===q.id && (m.phase==="out"||m.phase==="wait"); }), seq=atk?vs.atk:vs.idle, vf=seq[0]+Math.floor(Date.now()/(atk?110:200)+tx*3+ty*5)%seq[1]; EVM_VIS=true;
       g.fillStyle=(evDef(q.ev)||{}).tile||"#2a1636"; g.fillRect(x,y,z,z); VAMP_LIST.push([vL, vf, x, y, q.ev]); // the figure goes on later, over the tiles around it
-      if (detail && numOk){ var vt=String(q.L), vbw=Math.max(12,vt.length*7+6), vbx=x+z-vbw-1, vby=y+z-14; g.fillStyle="rgba(20,16,12,.78)"; g.fillRect(vbx,vby,vbw,13); g.save(); g.font="700 10px sans-serif"; g.fillStyle="#f6ecd4"; g.textAlign="center"; g.textBaseline="middle"; g.fillText(vt,vbx+vbw/2,vby+7); g.restore(); } }
+      if (detail && numOk){ var vt=String(q.L), vbw=Math.max(12,vt.length*7+6), vbx=x+z-vbw-1, vby=y+z-14; g.fillStyle="rgba(20,16,12,.78)"; g.fillRect(vbx,vby,vbw,13); g.save(); g.font="700 10px sans-serif"; g.fillStyle="#f6ecd4"; g.textAlign="center"; g.textBaseline="middle"; ctext(g,0,vt,vbx+vbw/2,vby+7); g.restore(); } }
     else if (q.k==="monster" && q.ev){ g.fillStyle="#2a1636"; g.fillRect(x,y,z,z); var pr=z*0.32; g.fillStyle="#f07d1a"; g.beginPath(); g.ellipse(x+z/2,y+z*0.55,pr*1.15,pr,0,0,Math.PI*2); g.fill(); g.fillStyle="#3c6b1e"; g.fillRect(x+z/2-z*0.04,y+z*0.55-pr-z*0.1,z*0.08,z*0.12);
-      if (detail){ g.fillStyle="#2a1636"; numOk&&g.fillText(q.L,x+z/2,y+z*0.58); } }
+      if (detail){ g.fillStyle="#2a1636"; numOk&&ctext(g,0,q.L,x+z/2,y+z*0.58); } }
     else if (q.k==="monster"){ g.fillStyle="#5b2a6e"; g.fillRect(x,y,z,z);
-      if (detail){ var u5=z/30; g.fillStyle="#e7c6f5"; g.beginPath(); g.moveTo(x+6*u5,y+22*u5); g.lineTo(x+10*u5,y+8*u5); g.lineTo(x+15*u5,y+14*u5); g.lineTo(x+20*u5,y+8*u5); g.lineTo(x+24*u5,y+22*u5); g.fill(); g.fillStyle="#fff"; numOk&&g.fillText(q.L,x+z/2,y+z*0.8); } }
+      if (detail){ var u5=z/30; g.fillStyle="#e7c6f5"; g.beginPath(); g.moveTo(x+6*u5,y+22*u5); g.lineTo(x+10*u5,y+8*u5); g.lineTo(x+15*u5,y+14*u5); g.lineTo(x+20*u5,y+8*u5); g.lineTo(x+24*u5,y+22*u5); g.fill(); g.fillStyle="#fff"; numOk&&ctext(g,0,q.L,x+z/2,y+z*0.8); } }
     else if (q.k==="ai"){ var hitA=S.map.hit[q.id] && (S.gt-S.map.hit[q.id].at)<24*3.6e6; g.fillStyle=hitA?"#4f7c78":"#2c6763"; g.fillRect(x,y,z,z);
-      if (detail){ var u4=z/30; g.fillStyle="#d9efe9"; g.fillRect(x+6*u4,y+12*u4,18*u4,11*u4); g.fillRect(x+13*u4,y+6*u4,4*u4,6*u4); g.fillStyle="#e05a4f"; g.fillRect(x+17*u4,y+6*u4,6*u4,3*u4); g.fillStyle="#12302d"; numOk&&g.fillText(q.L,x+z/2,y+z*0.62); } }
+      if (detail){ var u4=z/30; g.fillStyle="#d9efe9"; g.fillRect(x+6*u4,y+12*u4,18*u4,11*u4); g.fillRect(x+13*u4,y+6*u4,4*u4,6*u4); g.fillStyle="#e05a4f"; g.fillRect(x+17*u4,y+6*u4,6*u4,3*u4); g.fillStyle="#12302d"; numOk&&ctext(g,0,q.L,x+z/2,y+z*0.62); } }
     else if (q.k==="hc"){ g.fillStyle=HC_COL[q.L]; g.fillRect(x,y,z,z); g.fillStyle="#f3d88a"; var u3=z/30;
       g.fillRect(x+9*u3,y+5*u3,2*u3,20*u3); g.beginPath(); g.moveTo(x+11*u3,y+5*u3); g.lineTo(x+23*u3,y+9*u3); g.lineTo(x+11*u3,y+13*u3); g.fill();
-      if (detail){ g.fillStyle="#fff"; numOk&&g.fillText(q.L,x+z*0.62,y+z*0.75); } }
+      if (detail){ g.fillStyle="#fff"; numOk&&ctext(g,0,q.L,x+z*0.62,y+z*0.75); } }
     else if (pixTiles() && z>=8 && valTile(q.k,0)){ var vh2=S.map.hit[q.id], vf2=vh2?Math.max(0,Math.min(1,(S.gt-vh2.at)/REGEN_R)):1, vv=((tx*7919+ty*104729)>>>0)%3, px0=Math.floor(x), py0=Math.floor(y);
       g.imageSmoothingEnabled=false; g.drawImage(valTile(q.k,vv), px0, py0, Math.ceil(x+z)-px0, Math.ceil(y+z)-py0); g.imageSmoothingEnabled=true;
       if (vf2<1){ g.fillStyle="rgba(236,228,206,.6)"; g.fillRect(x,y,z,Math.round(z*(1-vf2))); } // still refilling: the empty part is washed out
-      if (detail){ g.lineWidth=3; g.lineJoin="round"; g.miterLimit=2; g.strokeStyle="rgba(0,0,0,.6)"; numOk&&g.strokeText(q.L,x+z/2,y+z/2+1); g.fillStyle="#fff"; numOk&&g.fillText(q.L,x+z/2,y+z/2+1); } }
+      if (detail){ g.lineWidth=3; g.lineJoin="round"; g.miterLimit=2; g.strokeStyle="rgba(0,0,0,.6)"; numOk&&ctext(g,1,q.L,x+z/2,y+z/2+1); g.fillStyle="#fff"; numOk&&ctext(g,0,q.L,x+z/2,y+z/2+1); } }
     else { var vh=S.map.hit[q.id], vf=vh?Math.max(0,Math.min(1,(S.gt-vh.at)/REGEN_R)):1, vcol=VTYPES[q.k].col;
       if (vf<1){ g.fillStyle=tileFade(vcol); g.fillRect(x,y,z,z); var vfh=Math.round(z*vf); g.fillStyle=vcol; g.fillRect(x,y+z-vfh,z,vfh); } else { g.fillStyle=vcol; g.fillRect(x,y,z,z); }
-      if (detail){ g.fillStyle=(q.k==="desert"||q.k==="flat")?"rgba(0,0,0,.55)":"rgba(255,255,255,.8)"; numOk&&g.fillText(q.L,x+z/2,y+z/2+1); } }
+      if (detail){ g.fillStyle=(q.k==="desert"||q.k==="flat")?"rgba(0,0,0,.55)":"rgba(255,255,255,.8)"; numOk&&ctext(g,0,q.L,x+z/2,y+z/2+1); } }
     if (S.map.owned[q.id]){ g.strokeStyle=brass; g.lineWidth=Math.max(1.5,z/10); g.strokeRect(x+1.5,y+1.5,z-3,z-3);
       if (campAt(q.id)){ var tw=z*0.42, cx=x+z-tw-2, cy=y+3; g.fillStyle="#c0503c"; g.beginPath(); g.moveTo(cx+tw/2,cy); g.lineTo(cx+tw,cy+tw*0.85); g.lineTo(cx,cy+tw*0.85); g.closePath(); g.fill(); g.strokeStyle="#2a1a12"; g.lineWidth=1; g.stroke(); } } // 0.1.234: the camp flag used tx/ty, the tile loop's own counters, and threw the loop off whenever a camp was on screen
     if ((q.k==="ai" && isAlly(q.id)) || (q.k==="npc" && S.alliance && S.alliance.farms[q.id])){ g.strokeStyle="#5fd17f"; g.lineWidth=Math.max(1.5,z/10); g.strokeRect(x+1.5,y+1.5,z-3,z-3); }
@@ -4551,7 +4608,7 @@ function drawMap(){
     for (var gy=y0; gy<=y1+1; gy++){ var py=Math.round((gy-mv.y)*z)+.5; g.moveTo(0,py); g.lineTo(W,py); } g.stroke(); }
   if (S.bm && S.bm.length && z>=5){ var bfs=Math.max(9,Math.min(16,Math.round(z*0.45))); g.font=bfs+"px sans-serif"; g.textAlign="left"; g.textBaseline="top";
     S.bm.forEach(function(b){ var xy=b.id.split(","), bx=+xy[0], by=+xy[1]; if (bx<x0||bx>x1||by<y0||by>y1) return; var px=(bx-mv.x)*z+1, py=(by-mv.y)*z;
-      g.lineWidth=3; g.strokeStyle="rgba(0,0,0,.7)"; g.strokeText("\u2605",px,py); g.fillStyle="#ffd34d"; g.fillText("\u2605",px,py); });
+      g.lineWidth=3; g.strokeStyle="rgba(0,0,0,.7)"; ctext(g,1,"\u2605",px,py); g.fillStyle="#ffd34d"; ctext(g,0,"\u2605",px,py); });
     g.textAlign="center"; g.textBaseline="middle"; }
   DECO_ANIM=false; DECO_HITS=[]; if (S.deco && z>=6 && !decoOff()){ g.textAlign="center"; g.textBaseline="middle"; var smooth=g.imageSmoothingEnabled; g.imageSmoothingEnabled=false; // decorations: drawn row by row from the top so lower ones stand in front; on one tile, back to front
     var dlist=[], rlist=[]; for (var did in S.deco.at){ var dl0=S.deco.at[did]; if (!dl0 || !dl0.length) continue; var dxy=did.split(","), dx=+dxy[0], dy=+dxy[1]; if (dx<x0-DECO_REACH.x||dx>x1+DECO_REACH.x||dy<y0-1||dy>y1+DECO_REACH.y) continue; // a big piece is drawn while any of it can be on screen, not just its base tile
@@ -4577,7 +4634,7 @@ function drawMap(){
         if (dd.spr){ var sp=SPRITES[dd.spr], cv=sprFrame(dd.spr, dx*7+dy*13+di*3); if (!sp||!cv) continue; var sc=z/sp.ppt, bx=(dx-mv.x+0.5+c*0.42)*z, by=(dy-mv.y+0.94+c*0.06)*z, dw=Math.round(cv.width*sc), dh=Math.round(cv.height*sc), ox=sp.ax*sc;
           if (flip){ g.save(); g.translate(Math.round(bx),0); g.scale(-1,1); g.drawImage(cv, Math.round(-ox), Math.round(by-sp.ay*sc), dw, dh); g.restore(); decoHitAdd(dx+","+dy, e[4][di], dk[0], Math.round(bx)+Math.round(ox)-dw, Math.round(by-sp.ay*sc), dw, dh, cv, true, z); }
           else { g.drawImage(cv, Math.round(bx-ox), Math.round(by-sp.ay*sc), dw, dh); decoHitAdd(dx+","+dy, e[4][di], dk[0], Math.round(bx-ox), Math.round(by-sp.ay*sc), dw, dh, cv, false, z); } }
-        else { var ex=(dx-mv.x+0.5+c*0.42)*z, ey=(dy-mv.y+0.5+c*0.24)*z; g.font=dfs+"px sans-serif"; g.fillText(dd.e,ex,ey); decoHitAdd(dx+","+dy, e[4][di], dk[0], ex-dfs/2, ey-dfs/2, dfs, dfs, null, false, z); } } });
+        else { var ex=(dx-mv.x+0.5+c*0.42)*z, ey=(dy-mv.y+0.5+c*0.24)*z; g.font=dfs+"px sans-serif"; ctext(g,0,dd.e,ex,ey); decoHitAdd(dx+","+dy, e[4][di], dk[0], ex-dfs/2, ey-dfs/2, dfs, dfs, null, false, z); } } });
     g.imageSmoothingEnabled=smooth; g.font="700 "+fs+"px Cinzel, Georgia, serif"; }
   if (!hcDone){ try { hcBigDraw(g, x0, y0, x1, y1, z); } catch(e){} } // no decorations drawn (none, or zoomed far out)
   try { VAMP_LIST.forEach(function(v){ vampFrame(g, v[0], v[1], v[2], v[3], z, v[4]); }); if (VAMP_FX.length && z>=8) vampFxDraw(g, x0, y0, x1, y1, z); } catch(e){}
@@ -4605,6 +4662,7 @@ function drawMap(){
   try { ryMapMarches(g, z, brass); } catch(e){}
   try { mapFarmDraw(g, z, x0, y0, x1, y1); } catch(e){}
   if (selTile && TILE_BY[selTile]){ var sq=TILE_BY[selTile]; g.strokeStyle=ink; g.lineWidth=2.5; g.strokeRect((sq.x-mv.x)*z+1,(sq.y-mv.y)*z+1,z-2,z-2); }
+  if (OV) return;
   var cc=document.getElementById("mapcoord"); if (cc){ cc.textContent="("+Math.round(mv.x+W/z/2)+", "+Math.round(mv.y+H/z/2)+")"; cc.title="Centre of the view"; }
   drawMini(); try { paintBar(); } catch(e){}
 }
@@ -7033,7 +7091,11 @@ function wdCastle(x, y, col, sz, look){ var w=col[0], dk=col[1], dr=col[2]; sz=s
 function wdFree1(x, y, occ){ var d=WDS.d; if (x<0||y<0||x>=d.n||y>=d.n) return false; if (Math.pow(x+0.5-d.c,2)+Math.pow(y+0.5-d.c,2)<d.heart*d.heart) return false;
   for (var i=0;i<d.slots.length;i++){ var s=d.slots[i]; if (s.ring<d.open && x>=s.x && y>=s.y && x<s.x+d.sz && y<s.y+d.sz) return false; } return !occ[x+","+y]; }
 function wdFree(x, y, occ){ var LS=wdLS(); for (var j=0;j<LS;j++) for (var i=0;i<LS;i++) if (!wdFree1(x+i, y+j, occ)) return false; return true; } // 0.2.23: a whole 2 x 2 block
-function wdSvg(){ var d=WDS.d, V=wdWin(), z=V.z, close=z>=WD_CLOSE, fs=function(n){ return (n/z).toFixed(2); }, sel=WDS.sel, mine=wdMineAid(), h='';
+/* 0.2.43: the drawing covers the window plus half a window on every side (WD_OV), in an svg twice the box's size centred on it.
+   While a finger is down only a CSS transform moves it (wdView), so dragging and pinching don't redraw the map; it redraws when the
+   gesture ends, or if a drag runs past the margin. Before, every finger move reset the viewBox and the whole map was rasterized again. */
+var WD_OV=0.5;
+function wdSvg(){ var d=WDS.d, V0=wdWin(), V={x:V0.x-V0.w*WD_OV, y:V0.y-V0.h*WD_OV, w:V0.w*(1+2*WD_OV), h:V0.h*(1+2*WD_OV), z:V0.z, N:V0.N}, z=V.z, close=z>=WD_CLOSE, fs=function(n){ return (n/z).toFixed(2); }, sel=WDS.sel, mine=wdMineAid(), h=''; WDS.vb=V0;
   h+='<svg class="wdmap" id="wdsvg" viewBox="'+V.x.toFixed(2)+' '+V.y.toFixed(2)+' '+V.w.toFixed(2)+' '+V.h.toFixed(2)+'" role="img" aria-label="Server map" data-act="wd-tap">';
   if (close){ if (!WD_GRASS) WD_GRASS=wdGrassDefs(); h+=WD_GRASS; }
   h+='<rect x="0" y="0" width="'+V.N+'" height="'+V.N+'" fill="'+(close?'url(#wdgr)':'#33452c')+'"/>';
@@ -7120,7 +7182,14 @@ function wdBoxEl(){ return document.getElementById("wdbox"); }
 function wdLoc(cx, cy){ var b=wdBoxEl(); if (!b) return null; var w=b.offsetWidth||1, h=b.offsetHeight||1;
   if (WDFS.on && WDFS.rot) return {x:cy, y:window.innerWidth-cx, w:w, h:h};
   var r=b.getBoundingClientRect(); return {x:cx-r.left, y:cy-r.top, w:w, h:h}; }
-function wdView(){ var sv=document.getElementById("wdsvg"); if (!sv) return; var V=wdWin(); sv.setAttribute("viewBox", V.x.toFixed(2)+" "+V.y.toFixed(2)+" "+V.w.toFixed(2)+" "+V.h.toFixed(2)); }
+function wdView(){ if (wdView.q) return; wdView.q=1; (window.requestAnimationFrame||setTimeout)(function(){ wdView.q=0; wdViewNow(); }); }
+function wdViewNow(){ var sv=document.getElementById("wdsvg"), b=wdBoxEl(); if (!sv || !b) return; var V=wdWin(), B=WDS.vb, W=b.offsetWidth||1, H=b.offsetHeight||1;
+  if (B){ var s=B.w/V.w, tx=(B.x-V.x)/V.w*W, ty=(B.y-V.y)/V.h*H, m=WD_OV;
+    /* the box's own corner sits at the svg's 25% point; where the drawn area (box plus margin) lands after the move */
+    var L=tx-m*W*s, T=ty-m*H*s, Rr=tx+(1+m)*W*s, Bt=ty+(1+m)*H*s;
+    if (L<=0.5 && T<=0.5 && Rr>=W-0.5 && Bt>=H-0.5){ sv.style.transform="translate("+tx.toFixed(1)+"px,"+ty.toFixed(1)+"px) scale("+s.toFixed(4)+")"; return; } }
+  /* past the margin: draw the map again around where it is now */
+  var t=document.createElement("div"); t.innerHTML=wdSvg(); var nsv=t.querySelector("svg"); if (nsv && sv.parentNode) sv.parentNode.replaceChild(nsv, sv); }
 function wdClampC(){ var N=WDS.d?WDS.d.n:180; WDS.cx=Math.max(-0.5,Math.min(N-0.5,WDS.cx)); WDS.cy=Math.max(-0.5,Math.min(N-0.5,WDS.cy)); }
 function wdSetZf(zf){ zf=Math.max(1, Math.min(WD_ZOOMS[WD_ZOOMS.length-1], zf)); var keepZ=WDS._z; WDS.zf=zf; WDS._z=keepZ||1; return zf; }
 function wdGestOn(){ if (!WDS.gest){ WDS.gest=true; var v=document.getElementById("wdview"); if (v) v.classList.add("gest"); } }
@@ -7334,13 +7403,13 @@ function worldInner(){ var d=WDS.d;
   var z=wdWin().z, legend=[["#f3dc9a","#1f2421","Your capital"],["#6b5a2a","#d7b058","Your alliance"],["#313834","#8d928a","Alliance"],["#c9cdc0","#1f2421","Lord"],["#e08a3c","#1f2421","Lord in the Wilds"],["#3a423d","#b4b9aa","Capture building"],["transparent",WB_RCOL.own,"Your side"],["transparent",WB_RCOL.ally,"Coalition"],["transparent",WB_RCOL.foe,"Enemy"]];
   var onTab=wdOnTab(), top=wbTopHtml()+wdMeHtml();
   return (onTab?'':top)+
-    '<div class="btnrow wdzoom" style="margin:8px 0 6px"><button class="btn ghost small" data-act="wd-zoom" data-v="-1"'+(z<=1.01?' disabled':'')+' aria-label="Zoom out">−</button><button class="btn ghost small" data-act="wd-zoom" data-v="1"'+(z>=WD_ZOOMS[WD_ZOOMS.length-1]-0.01?' disabled':'')+' aria-label="Zoom in">+</button>'+
+    '<div class="btnrow wdzoom" style="margin:8px 0 6px">'+
     (z>1.05?['←:-1:0','↑:0:-1','↓:0:1','→:1:0'].map(function(p){ var q=p.split(":"); return '<button class="btn ghost small" data-act="wd-pan" data-x="'+q[1]+'" data-y="'+q[2]+'">'+q[0]+'</button>'; }).join(""):'')+'<span class="dur" style="align-self:center">'+(z>1.05?'×'+(Math.round(z*10)/10):'Whole world')+'</span><button class="btn ghost small" data-act="wd-fs" title="Full screen" aria-label="Full screen" style="margin-left:auto">\u26f6</button></div>'+
-    '<div class="wdview'+(WDFS.on?' fs'+(WDFS.rot?' rot':''):'')+'" id="wdview"><div class="wdbox" id="wdbox">'+wdSvg()+wdMarchListHtml()+
+    '<div class="wdview'+(WDFS.on?' fs'+(WDFS.rot?' rot':''):'')+'" id="wdview"><div class="wdbox" id="wdbox" style="aspect-ratio:'+(1/wdAsp()).toFixed(4)+'">'+wdSvg()+wdMarchListHtml()+
       (WDS.sel && !ALS.moving?wdPopHtml():'')+
       (ALS.moving?'<div class="wdmvbar"><span>Tap '+(ALS.moving.what==="city"?'where the middle of the Alliance City should go':ALS.moving.what==="b"?'where the building should go':'a free 2 \u00d7 2 spot')+' on your alliance’s land'+(ALS.moving.what==="member"?' for '+esc(ALS.moving.who):'')+'.</span><button class="btn small ghost" data-act="wd-mvx">Cancel</button></div>':'')+
-      '</div><div class="wdfsbar"><button class="btn small" data-act="wd-zoom" data-v="1" aria-label="Zoom in">+</button><button class="btn small" data-act="wd-zoom" data-v="-1" aria-label="Zoom out">\u2212</button><button class="btn small" data-act="wd-findme" aria-label="Find my capital">\u2316</button><button class="btn small" data-act="wd-rot" aria-label="Turn sideways">\u27f3</button><button class="btn small" data-act="wd-fs" aria-label="Leave full screen">\u2715</button></div></div>'+
-    (WDS.sel?'':'<p class="hint" style="margin:6px 0 0">Tap the map to see what’s there. Drag to move around; pinch or use + to zoom in and pick a single tile.</p>')+
+      '</div><div class="wdfsbar"><button class="btn small" data-act="wd-findme" aria-label="Find my capital">\u2316</button><button class="btn small" data-act="wd-rot" aria-label="Turn sideways">\u27f3</button><button class="btn small" data-act="wd-fs" aria-label="Leave full screen">\u2715</button></div></div>'+
+    (WDS.sel?'':'<p class="hint" style="margin:6px 0 0">Tap the map to see what’s there. Drag to move around; pinch to zoom in and pick a single tile.</p>')+
     (onTab?'<div style="margin-top:10px">'+top+'</div>':'')+
     '<div class="wdleg">'+legend.map(function(l){ return '<span><i style="background:'+l[0]+';border-color:'+l[1]+'"></i>'+l[2]+'</span>'; }).join("")+'<span><i style="background:transparent;border-color:#7fb0e0"></i>Protected</span><span><i class="wdopen"></i>Open slot</span>'+(z>=WD_CLOSE&&d.me.on?'<span><i style="background:rgba(243,220,154,.7);border-color:transparent;border-radius:50%;width:6px;height:6px"></i>You can move here</span>':'')+'</div>'+
     (WDS.err?'<p class="why">'+esc(WDS.err)+'</p>':'')+
@@ -9793,7 +9862,7 @@ function tickText(){
   renderDock();
   var qbd=document.getElementById("qbadge"); if (qbd){ var qn=questsReady(); var qt=qn?" "+qn:""; if (qbd.textContent!==qt) qbd.textContent=qt;
     var qbtn=qbd.parentNode, qgone=QUESTS.length>0 && QUESTS.every(function(q){ return S.qdone&&S.qdone[q.id]; }), qdisp=qgone?"none":""; if (qbtn && qbtn.style.display!==qdisp) qbtn.style.display=qdisp; } // every quest claimed: the button goes away
-  if (tab==="army"){ U.forEach(function(u,i){ updateTrainRow(i); }); setText(document.getElementById("idlepop"), fmt(idlePop())); }
+  if (tab==="army"){ U.forEach(function(u,i){ updateTrainRow(i); }); setText(document.getElementById("idlepop"), fmt(idlePop())); setText(document.getElementById("idlepop2"), fmt(idlePop())); }
   if (tab==="city") FORTS.forEach(function(f,i){ updateFortRow(i); });
   if (S.fortQ){ var fe=document.getElementById("fq-t"), fb=document.getElementById("fq-bar"); if (fe){ fe.textContent=fmtT(realMs(S.fortQ.end-S.gt)); fb.style.width=Math.min(100,(S.gt-S.fortQ.start)/Math.max(1,S.fortQ.end-S.fortQ.start)*100)+"%"; } }
   renderThreats(); renderMarchStrip(); [].forEach.call(document.querySelectorAll("#threats .tt, #view .tt"), function(e){ e.textContent=fmtT(realMs(+e.dataset.t-S.gt)); });
@@ -9908,8 +9977,11 @@ function heroActionsHtml(hr){
     '<div class="gearlist">'+XP_BOOKS.map(function(bk){ var n=S.items[bk]||0; return '<div class="gearrow"><span class="gn"><b>'+ITEMS[bk].name+'</b><div class="dur">+'+fmt(ITEMS[bk].xp)+' each</div></span><span class="gb">'+n+'</span>'+
       '<span class="btnrow" style="grid-column:1/-1;margin-top:4px"><button class="btn small" data-act="tome" data-book="'+bk+'"'+(n&&canRead?'':' disabled')+'>Use 1</button><button class="btn ghost small" data-act="tome-all" data-book="'+bk+'"'+(n>1&&canRead?'':' disabled')+'>Use all '+(n>1?'('+n+')':'')+'</button></span></div>'; }).join("")+'</div>'+
     '<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="tome-every"'+(nb&&canRead?'':' disabled')+'>'+(armed==="tomeevery"?'Tap again: read all '+nb+' books (+'+fmt(bookXpAll())+')':'Use every book')+'</button></div></details>';
-  h+='<div class="btnrow" style="margin-top:8px"><button class="btn ghost small" data-act="respec"'+(spentPts&&!rsWait?'':' disabled')+'>'+(rsWait?"Reset points: again in "+fmtT(rsWait):armed==="respec"?"Tap again: take back "+spentPts+" point"+(spentPts>1?"s":""):"Reset points"+(spentPts?" ("+spentPts+")":""))+'</button></div></div>';
+  h+='</div>';
   return h; }
+/* 0.2.44: Reset points sits in the gear box, under the stat buttons */
+function respecBtnHtml(hr){ var spentPts=heroSpent(hr), rsWait=respecWait(hr);
+  return '<button class="btn ghost small dreset" data-act="respec"'+(spentPts&&!rsWait?'':' disabled')+'>'+(rsWait?"Reset points: again in "+fmtT(rsWait):armed==="respec"?"Tap again: take back "+spentPts+" point"+(spentPts>1?"s":""):"Reset points"+(spentPts?" ("+spentPts+")":""))+'</button>'; }
 // read books until they run out (or the hero can't level further); returns [books read, levels gained, experience given]
 function readBooks(h, kinds){ var read=0, ups=0, xp=0;
   kinds.forEach(function(bk){ while ((S.items[bk]||0)>0 && h.level<HERO_MAX){ S.items[bk]--; read++; xp+=ITEMS[bk].xp; ups+=giveXp(h, ITEMS[bk].xp); } });
@@ -10026,10 +10098,12 @@ function heroRecordHtml(h){ var pv=HREC_MODE==="pvp", r=pv?h.pvp:h.rec;
   var tog='<div class="btnrow" style="margin:4px 0 6px"><button class="btn small'+(pv?' ghost':'')+'" data-act="hero-recmode" data-m="rec">Kingdom</button><button class="btn small'+(pv?'':' ghost')+'" data-act="hero-recmode" data-m="pvp">PvP</button></div>';
   var head='<div class="h3" style="margin-top:8px">Service record</div>'+tog;
   if (!r || !(r.b||r.d)) return head+'<p class="hint">'+(pv?esc(h.name)+' hasn’t led a PvP fight yet. Battlefield matches against players and invasions (attacking, or defending as wall hero) count here.':esc(h.name)+' hasn’t led a fight yet. Every battle from now on goes on the record.')+'</p>';
-  var row=function(l,v){ return '<div class="merow"><span>'+l+'</span><b>'+v+'</b></div>'; };
-  return head+'<div class="mestats">'+row(pv?"Attacks led":"Battles led",fmt(r.b)+(r.b?' ('+fmt(r.w)+' won)':''))+row("Defenses led",fmt(r.d)+(r.d?' ('+fmt(r.dw)+' held)':''))+row("Troops killed",fmt(r.k))+row("Prestige destroyed",fmt(r.kv))+row("Troops lost",fmt(r.l))+
-    (pv?'':row("Valleys and flats beaten",fmt(r.v))+row("NPC cities beaten",fmt(r.n)))+
-    (r.best?row("Best battle",fmt(r.best.k)+' killed'+(r.best.n?' at '+esc(r.best.n):'')+(r.best.won?'':' (lost)')):'')+'</div><p class="dur">'+(pv?'PvP records started with version 0.1.127: Battlefield matches against players and invasions. Kept apart from the kingdom record.':'Records started with version 0.1.123: older battles aren’t counted. PvP fights are kept on the PvP side.')+'</p>'; }
+  /* 0.2.45: cards, not lines */
+  var card=function(l,v,sub,cls){ return '<div class="rcard'+(cls?' '+cls:'')+'"><span class="dur">'+l+'</span><b>'+v+'</b>'+(sub?'<span class="dur">'+sub+'</span>':'')+'</div>'; },
+    wr=r.b?Math.round(r.w/r.b*100):0;
+  return head+'<div class="rgrid2">'+card(pv?"Attacks led":"Battles led",fmt(r.b),r.b?fmt(r.w)+' won \u00b7 '+wr+'%':'')+card("Defenses led",fmt(r.d),r.d?fmt(r.dw)+' held':'')+card("Troops killed",fmt(r.k),"","kill")+card("Troops lost",fmt(r.l),"","loss")+
+    (pv?'':card("Valleys and flats",fmt(r.v),"beaten")+card("NPC cities",fmt(r.n),"beaten"))+
+    card("Prestige destroyed",fmt(r.kv),"","wide")+(r.best?card("Best battle",fmt(r.best.k)+' killed',(r.best.n?'at '+esc(r.best.n):'')+(r.best.won?'':' (lost)'),"wide"):'')+'</div><p class="dur">'+(pv?'PvP records started with version 0.1.127: Battlefield matches against players and invasions. Kept apart from the kingdom record.':'Records started with version 0.1.123: older battles aren’t counted. PvP fights are kept on the PvP side.')+'</p>'; }
 // PvP fights are fought on the server: each view carries recent reports, and each one is credited to its hero once
 function heroPvpSeen(key){ var l=S.pvpSeen||(S.pvpSeen=[]); if (l.indexOf(key)>=0) return true; l.push(key); if (l.length>400) l.splice(0,l.length-400); return false; }
 function heroPvpReports(kind, id, reps, defCity){ if (!reps || !reps.length || id==null) return; var ch=false;
@@ -10059,9 +10133,9 @@ function offPickSheet(){ var role=sheetFor.role, o=OFFICES.filter(function(x){ r
   if (role!=="wallHero") h+='<p class="hint" style="margin-top:8px">A hero you appoint is locked to the job: it stays home and auto-fill leaves the seat alone.</p>';
   return h+'<button class="closebtn" data-act="close">Done</button>'; }
 function heroAutoHtml(h){ var a=h.auto||{pol:0,atk:0,int:0}, on=!!h.auto, d=HAD[h.id]||a;
-  return '<div class="h3" style="margin-top:8px">Auto level-up</div><p class="hint">Every point '+esc(h.name)+' earns goes into politics, attack and intelligence by this ratio (for example 0 : 2 : 1 = two attack for every intelligence). Turning it on spends the unused points now.</p>'+
+  return '<details class="det" data-det="hauto"'+(DET.hauto?' open':'')+'><summary><b>Auto level-up</b> <span class="dur">'+(on?'on, '+(a.pol||0)+' : '+(a.atk||0)+' : '+(a.int||0):'off')+'</span></summary><p class="hint">Every point '+esc(h.name)+' earns goes into politics, attack and intelligence by this ratio (for example 0 : 2 : 1 = two attack for every intelligence). Turning it on spends the unused points now.</p>'+
     '<div class="farmadd"><label class="dur" for="hauto-pol">Pol</label><input type="number" min="0" max="9" id="hauto-pol" value="'+(d.pol||0)+'" style="width:60px"><label class="dur" for="hauto-atk">Atk</label><input type="number" min="0" max="9" id="hauto-atk" value="'+(d.atk||0)+'" style="width:60px"><label class="dur" for="hauto-int">Int</label><input type="number" min="0" max="9" id="hauto-int" value="'+(d.int||0)+'" style="width:60px"></div>'+
-    '<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="hero-auto">'+(on?'Save ratio':'Turn on')+'</button>'+(on?'<button class="btn ghost small" data-act="hero-autooff">Turn off</button><span class="dur">On: '+(a.pol||0)+' : '+(a.atk||0)+' : '+(a.int||0)+'</span>':'')+'</div>'; }
+    '<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="hero-auto">'+(on?'Save ratio':'Turn on')+'</button>'+(on?'<button class="btn ghost small" data-act="hero-autooff">Turn off</button><span class="dur">On: '+(a.pol||0)+' : '+(a.atk||0)+' : '+(a.int||0)+'</span>':'')+'</div></details>'; }
 var HAD={}; // auto level-up ratio being typed, per hero
 function viewHeroes(){
   var cap=hallCap(), il=innLv(), h="";
@@ -10214,12 +10288,31 @@ function heroDollHtml(hr){ var gb={atk:gearBonus(hr,"atk"), int:gearBonus(hr,"in
     return '<button class="dslot" data-act="gear-pick" data-slot="'+k+'" aria-label="'+ps.name+(g?': '+esc(gearName(g))+', '+g.stars+' stars':': empty')+'">'+gearTile(g,{type:ps.type, up:gearUpFor(hr,k)})+'</button>'; }).join("")+'</div>'; };
   var st=starSet(hr), low=99, at={}; GEAR_POS.forEach(function(ps){ var g=wornAt(hr,ps.k); var s=g?g.stars:-1; low=Math.min(low,s); at[ps.k]=s; });
   var nx=nextSetTier(Math.max(0,st)), goal=nx?nx[0]:SET_TIERS[0][0], okN=GEAR_POS.filter(function(ps){ return at[ps.k]>=goal; }).length, miss=GEAR_POS.filter(function(ps){ return at[ps.k]<goal; }).map(function(ps){ return ps.name; });
-  var h='<div class="doll"><div class="drow">'+col(DOLL_L)+'<div class="dmid">'+heroPortrait(hr,112)+
-    '<div class="dstat">'+[["atk","Attack"],["int","Intel."],["pol","Politics"]].map(function(s){ return '<div>'+s[1]+'<b>'+fmt(hs(hr,s[0]))+'</b><i style="color:'+STATC[s[0]]+'">+'+fmt(gb[s[0]])+'</i></div>'; }).join("")+'</div>'+
-    '<div class="dgs"><span>Gear score</span><b>'+fmt(gearScore(hr))+'</b><span>'+n+' of '+GEAR_POS.length+' slots</span></div></div>'+col(DOLL_R)+'</div>';
+  var h='<div class="doll"><div class="drow">'+col(DOLL_L)+'<div class="dmid"><button class="dport" data-act="hero-pic" aria-label="'+(hr.pic?'Change picture':'Add a picture')+'">'+heroPortrait(hr,112)+'<span class="dpcam" aria-hidden="true">\ud83d\udcf7</span></button>'+(hr.pic?'<button class="link dpdel" data-act="hero-picdel">Remove picture</button>':'')+'<input type="file" id="heroimgf" accept="image/*,.png,.jpg,.jpeg,.webp,.gif,.bmp,.avif,.heic,.heif" hidden>'+
+    '<div class="dstat">'+[["atk","Attack"],["int","Intel."],["pol","Politics"]].map(function(s){ return '<div>'+s[1]+'<b>'+fmt(hs(hr,s[0]))+'</b><i style="color:'+STATC[s[0]]+'">+'+fmt(gb[s[0]])+' gear</i>'+
+      (hr.pts?'<span class="dpt"><button class="dpb" data-act="pt" data-stat="'+s[0]+'" aria-label="Add a point to '+STATN[s[0]]+'">+</button><button class="dpb" data-act="ptall" data-stat="'+s[0]+'" aria-label="Add all points to '+STATN[s[0]]+'">All</button></span>':'')+'</div>'; }).join("")+'</div>'+
+    '<div class="dpts">'+(hr.pts?'<b>'+fmt(hr.pts)+'</b> point'+(hr.pts>1?'s':'')+' to assign':'No points to assign')+'</div>'+respecBtnHtml(hr)+
+    '<div class="dgs"><span>Gear score</span><b>'+fmt(gearScore(hr))+'</b><span>'+n+' of '+GEAR_POS.length+' slots</span></div>'+heroMidMore(hr)+'</div>'+col(DOLL_R)+'</div>';
   h+='<div class="dset"><div class="act" style="margin:0"><span class="dur">'+(nx?'Star set '+goal+'★ on every slot':'Star set: the highest there is')+'</span><span class="dur">'+okN+' / '+GEAR_POS.length+'</span></div><div class="dbar"><i style="width:'+Math.round(okN/GEAR_POS.length*100)+'%"></i></div>'+
     '<p class="dur" style="margin:4px 0 0">'+(st<0?'Wear all 16 pieces to earn a star set bonus to troop life.':'Now: star set '+st+', troops led by '+esc(hr.name)+' have ×'+setLife(hr)+' life.')+(nx?' '+(miss.length<=4?'Raise '+miss.join(", ")+' to '+goal+'★':'Every slot at '+goal+'★')+' for ×'+nx[1]+'.':'')+'</p></div>';
-  return h+'<p class="dur" style="margin:4px 0 0">▲ a better spare piece is in the armory. Dots: <span style="color:'+STATC.atk+'">●</span> Attack <span style="color:'+STATC.int+'">●</span> Intelligence <span style="color:'+STATC.pol+'">●</span> Politics</p></div>'; }
+  return h+'<p class="dur" style="margin:4px 0 0">▲ a better spare piece is in the armory. Dots: <span style="color:'+STATC.atk+'">●</span> Attack <span style="color:'+STATC.int+'">●</span> Intelligence <span style="color:'+STATC.pol+'">●</span> Politics</p>'+heroDollFoot(hr)+'</div>'; }
+/* 0.2.45: under the gear score, in the box's middle: experience, the books (tap one to read one), auto level-up */
+function heroMidMore(hr){ var need=xpNeed(hr.level), top=hr.level>=HERO_MAX, f=top?1:Math.max(0,Math.min(1,hr.xp/Math.max(1,need))), nb=bookCount(), canRead=!top;
+  var a=hr.auto||{pol:0,atk:0,int:0}, on=!!hr.auto, d=HAD[hr.id]||a;
+  var h='<div class="dmore"><div class="dxpl"><b>Level '+hr.level+'</b><span>'+(top?'Max':fmt(hr.xp)+' / '+fmt(need))+'</span></div><div class="dbar dxp"><i style="width:'+Math.round(f*100)+'%"></i></div>';
+  h+='<div class="dbooks">'+XP_BOOKS.map(function(bk){ var k=S.items[bk]||0; return '<button class="dbook" data-act="tome" data-book="'+bk+'" title="'+esc(ITEMS[bk].name)+': +'+fmt(ITEMS[bk].xp)+' experience each"'+(k&&canRead?'':' disabled')+'>'+itemImg(bk)+'<span>'+fmt(k)+'</span></button>'; }).join("")+'</div>'+
+    '<button class="btn ghost small dreset" data-act="tome-every"'+(nb&&canRead?'':' disabled')+'>'+(armed==="tomeevery"?'Tap again: read all '+fmt(nb):nb?'Read all books (+'+fmt(bookXpAll())+')':'No experience books')+'</button>';
+  h+='<div class="dauto"><span class="dur">Auto level-up'+(on?' \u00b7 on':'')+'</span><div class="dar">'+[["pol","Pol"],["atk","Atk"],["int","Int"]].map(function(q){ return '<label><span>'+q[1]+'</span><input type="number" min="0" max="9" id="hauto-'+q[0]+'" value="'+(d[q[0]]||0)+'"></label>'; }).join("")+'</div>'+
+    '<div class="dar2"><button class="btn small dreset" data-act="hero-auto">'+(on?'Save':'Turn on')+'</button>'+(on?'<button class="btn ghost small dreset" data-act="hero-autooff">Off</button>':'')+'</div></div>';
+  return h+'</div>'; }
+/* 0.2.45: the rest of the hero inside the gear box: salary, what the stats do */
+function heroDollFoot(hr){ var need=xpNeed(hr.level), top=hr.level>=HERO_MAX, f=top?1:Math.max(0,Math.min(1,hr.xp/Math.max(1,need))), hdg=dragonOf(hr);
+  var h='<div class="dfoot">'+
+    '<p class="dur" style="margin:0">Auto level-up puts every point the hero earns into Politics, Attack and Intelligence by that ratio (0 : 2 : 1 = two Attack for every Intelligence); turning it on spends the unused points now. Salary '+fmt(hr.level*20)+' gold/h'+(hr.fav?' \u00b7 a favourite: pinned to the top and can\u2019t be dismissed':'')+'. Tap the picture to change it; other players see it.</p>';
+  h+='<details class="det" data-det="hstats"'+(DET.hstats?' open':'')+'><summary><b>What the stats do</b></summary><div class="gearlist">'+[["pol","Politics","Production and building speed as mayor"],["atk","Attack","Training speed as trainer, +0.5% troop attack per point in battle"],["int","Intelligence","Research speed as researcher; in battle every troop gets +1 life per point, and marches 1% faster per point"]].map(function(st){ return '<div class="gearrow"><span class="gn"><b>'+st[1]+' '+fmt(hs(hr,st[0]))+'</b>'+(gearBonus(hr,st[0])?' <span class="dur">('+hr[st[0]]+' + '+gearBonus(hr,st[0])+' gear)</span>':'')+'<div class="dur">'+st[2]+'</div></span></div>'; }).join("")+'</div>'+
+    '<p class="dur" style="margin:6px 0 0">As mayor: production +'+pct(hs(hr,"pol")*0.003)+', buildings '+pct(1-1/(1+hs(hr,"pol")/200))+' faster, population grows '+pct(hs(hr,"pol")/400)+' faster. As trainer: training '+pct(1-Math.pow(0.9975,hs(hr,"atk")))+' faster. As researcher: research '+pct(1-1/(1+hs(hr,"int")/200))+' faster.</p>'+
+    (hdg?'<p class="dur" style="margin:4px 0 0"><b style="color:'+hdg.def.col+'">'+hdg.def.name+' Dragon</b>, level '+hdg.lv+': '+dragonBuffTxt(hdg.t,hdg.lv)+'. Change it in the Overlook.</p>':'')+'</details>';
+  return h+'</div>'; }
 // the head of a piece's screen: big tile, names, stars, bonus, who wears it
 function gearHeadHtml(g){ var who=g.on?heroById(g.on):null, max=GEAR_MAX[g.tier], s="";
   for (var i=0;i<max;i++) s+= i<g.stars ? '★' : '<s>★</s>';
@@ -13305,25 +13398,40 @@ function troopTotals(){
   h+='<p class="dur" style="margin:4px 0 0">Marching counts everything out of the city: attacks, scouts, transports, troops guarding allies and armies on their way home. Troops still training and wounded in the Medic Camp aren\u2019t counted.</p>';
   return h+'</details>';
 }
+/* 0.2.46: the Army tab (Cody's pick, mockup C): city chips with "All cities" first, then one 4 x 3 grid of every unit with its count
+   (marching shown as ↗). Tap a unit to train it (a sheet with the unit's block); Barracks and Goals are their own pages. */
+var ARMYV="", ARMYALL=false;
+function TRHOWf(){ return TRHOW.replace('data-det="trhow">','data-det="trhow"'+(DET.trhow?' open':'')+'>'); }
+var TRHOW='<details class="det" data-det="trhow"'+'>'+'<summary class="dur">How the train buttons work</summary><p class="hint"><b>Train</b> sends an order to one idle Barracks, or, when none is idle, to the queue of the one that frees up soonest. <b>All idle</b> shares it evenly across every idle Barracks that can train it. <b>All</b> shares it across every Barracks: busy ones queue their part behind what they are training, balanced so everything finishes together. Each Barracks holds as many waiting batches as its level.</p></details>';
+function unitTrainHtml(i){ var u=U[i], r=simResearch(), miss=missing(u.req), st=effStats(i,r), h='';
+  h+='<div class="unit'+(miss.length?' locked':'')+'"><h4>'+u.name+'</h4><span class="own" title="At home">'+fmt(S.troops[i])+'</span>'+
+    '<div class="us"><span>Atk <b>'+st.atk+'</b></span><span>Def <b>'+st.def+'</b></span><span>Life <b>'+st.life+'</b></span><span>Speed <b>'+st.speed+'</b></span><span>Range <b>'+st.range+'</b></span><span>Eats <b>'+u.up+'</b>/h</span><span>Pop <b>'+u.pop+'</b></span></div>';
+  if (miss.length) h+='<div class="reqs">Needs '+miss.map(reqName).join(", ")+'</div>';
+  else if (!barracksList().length) h+='<div class="reqs">Build a Barracks on an empty city plot to train troops.</div>';
+  else h+='<div style="grid-column:1/-1">'+chips(u.cost)+'</div><div id="tr-cost-'+i+'" class="trcost" style="grid-column:1/-1">'+trainCostHtml(i)+'</div><div class="trainrow"><input type="number" min="0" step="1" id="tr-amt-'+i+'" data-unit="'+i+'" value="'+(trainAmt[i]||"")+'" placeholder="Amount" aria-label="How many '+u.name+'s">'+
+      '<button class="btn ghost small" data-act="train-max" data-unit="'+i+'" id="tr-max-'+i+'">Max</button><button class="btn small" data-act="train" data-unit="'+i+'" id="tr-btn-'+i+'">Train</button><button class="btn ghost small" data-act="train-split" data-mode="idle" data-unit="'+i+'" id="tr-idle-'+i+'">All idle</button><button class="btn ghost small" data-act="train-split" data-mode="all" data-unit="'+i+'" id="tr-all-'+i+'">All</button><span id="tr-info-'+i+'" class="dur"></span><span id="tr-sinfo-'+i+'" class="dur" style="flex-basis:100%"></span><span id="tr-by-'+i+'" style="flex-basis:100%">'+trainByHtml(i)+'</span></div>';
+  return h+'</div>'; }
+function unitSheet(i){ var u=U[i]; if (!u) return ''; var t=cityTroops(S.cur);
+  return '<div class="ushead">'+itemImg("u_"+u.k)+'<div><h2 style="margin:0">'+u.name+'</h2><div class="sub">'+esc(S.name)+': '+fmt(t.home[i])+' at home'+(t.out[i]?', '+fmt(t.out[i])+' out marching':'')+'. Idle people: <b id="idlepop2">'+fmt(idlePop())+'</b></div></div></div>'+
+    '<div class="unitlist">'+unitTrainHtml(i)+'</div>'+TRHOWf()+'<button class="closebtn" data-act="close">Close</button>'; }
+function trainSheetRe(i){ var inp=document.getElementById("tr-amt-"+i); if (inp) inp.value=""; if (sheetFor && sheetFor.kind==="unit"){ EDITING=null; lastSheet=""; renderSheet(); } } // 0.2.46: the order went in; the sheet shows it
+function armyBack(){ return '<div class="albk"><button class="link" data-act="army-v" data-v="">‹ Army</button></div>'; }
 function viewArmy(){
   if (ARMYB>=0){ var ob=S.inside[ARMYB]; if (ob && ob.type==="barracks" && ob.level>0) return barracksPage(ARMYB); ARMYB=-1; }
-  var bl=barracksList(), total=S.troops.reduce(function(a,b){return a+b;},0), r=simResearch();
-  var h='<div class="section"><div class="shead"><h3>Your army</h3><span class="dur">'+fmt(total)+' at home, eating '+fmt(upkeep())+' food/h</span></div>'+
-    '<p class="hint">Troops eat food but never starve; food just stops at zero. Training draws from idle people (population not working the fields): <b id="idlepop"></b> right now.</p>'+troopTotals();
+  var bl=barracksList();
+  if (ARMYV==="barracks") return armyBack()+(bl.length?barracksHub(bl):'<div class="section"><p class="warn">Build a Barracks on an empty city plot to train troops.</p></div>');
+  if (ARMYV==="goals"){ DET.tgoals=true; return armyBack()+goalsSection()+(bl.length?trainByBar():'')+TRHOWf(); }
+  var all=ARMYALL, here=cityTroops(S.cur), every=Z12(), outAll=Z12(), per=[];
+  S.cities.forEach(function(c,ci){ var t=cityTroops(ci); for (var k=0;k<12;k++){ every[k]+=t.all[k]; outAll[k]+=t.out[k]; } per.push(sumT(t.all)); });
+  var t=all?every:here.all, o=all?outAll:here.out, out=sumT(o);
+  var h='<div class="section"><div class="shead"><h3>Your army</h3><span class="dur">'+fmt(sumT(t))+' troops</span></div>'+
+    '<div class="acities"><button class="acity'+(all?' on':'')+'" data-act="army-all"><span>All cities</span><b>'+fmt(sumT(every))+'</b></button>'+
+    S.cities.map(function(c,ci){ return '<button class="acity'+(!all&&ci===S.cur?' on':'')+'" data-act="army-city" data-ci="'+ci+'"><span>'+esc(c.name)+'</span><b>'+fmt(per[ci])+'</b></button>'; }).join("")+'</div>'+
+    '<div class="apanel"><div class="dur aline">'+(out?'↗ '+fmt(out)+' out':'None out')+(all?' · every city':' · −'+fmt(upkeep())+' food/h · idle <b id="idlepop"></b>')+'</div><div class="ag4">'+
+    U.map(function(u,i){ var n=t[i], ou=o[i], lk=missing(u.req).length; return '<button class="atile'+(n?'':' z')+'" data-act="army-unit" data-unit="'+i+'" aria-label="'+u.name+': '+fmt(n)+'">'+(lk&&!n?'<span class="alock">🔒</span>':'')+itemImg("u_"+u.k)+'<b>'+fmt(n)+(ou?'<i title="'+fmt(ou)+' out marching">↗</i>':'')+'</b><span>'+(u.k==="ram"?"Ram":u.name)+'</span></button>'; }).join("")+'</div></div>';
   if (!bl.length) h+='<p class="warn">Build a Barracks on an empty city plot to train troops.</p>';
-  h+='</div>'+barracksHub(bl)+goalsSection()+(bl.length?trainByBar():'');
-  h+='<details class="det" data-det="trhow" style="margin:0 2px 8px"'+(DET.trhow?' open':'')+'><summary class="dur">How the train buttons work</summary><p class="hint"><b>Train</b> sends an order to one idle Barracks, or, when none is idle, to the queue of the one that frees up soonest. <b>All idle</b> shares it evenly across every idle Barracks that can train it. <b>All</b> shares it across every Barracks: busy ones queue their part behind what they are training, balanced so everything finishes together. Each Barracks holds as many waiting batches as its level.</p></details><div class="unitlist">';
-  U.forEach(function(u,i){
-    var miss=missing(u.req), st=effStats(i,r);
-    h+='<div class="unit'+(miss.length?' locked':'')+'"><h4>'+u.name+'</h4><span class="own" title="Owned">'+fmt(S.troops[i])+'</span>'+
-      '<div class="us"><span>Atk <b>'+st.atk+'</b></span><span>Def <b>'+st.def+'</b></span><span>Life <b>'+st.life+'</b></span><span>Speed <b>'+st.speed+'</b></span><span>Range <b>'+st.range+'</b></span><span>Eats <b>'+u.up+'</b>/h</span><span>Pop <b>'+u.pop+'</b></span></div>';
-    if (miss.length) h+='<div class="reqs">Needs '+miss.map(reqName).join(", ")+'</div>';
-    else {
-      h+='<div style="grid-column:1/-1">'+chips(u.cost)+'</div><div id="tr-cost-'+i+'" class="trcost" style="grid-column:1/-1">'+trainCostHtml(i)+'</div><div class="trainrow"><input type="number" min="0" step="1" id="tr-amt-'+i+'" data-unit="'+i+'" value="'+(trainAmt[i]||"")+'" placeholder="Amount" aria-label="How many '+u.name+'s">'+
-        '<button class="btn ghost small" data-act="train-max" data-unit="'+i+'" id="tr-max-'+i+'">Max</button><button class="btn small" data-act="train" data-unit="'+i+'" id="tr-btn-'+i+'">Train</button><button class="btn ghost small" data-act="train-split" data-mode="idle" data-unit="'+i+'" id="tr-idle-'+i+'">All idle</button><button class="btn ghost small" data-act="train-split" data-mode="all" data-unit="'+i+'" id="tr-all-'+i+'">All</button><span id="tr-info-'+i+'" class="dur"></span><span id="tr-sinfo-'+i+'" class="dur" style="flex-basis:100%"></span><span id="tr-by-'+i+'" style="flex-basis:100%">'+trainByHtml(i)+'</span></div>';
-    }
-    h+='</div>';
-  });
+  var nBusy=bl.filter(function(sl){ return trainingAt(sl); }).length, nl=tgLines().length;
+  h+='<div class="btnrow abtns"><button class="btn ghost small" data-act="army-v" data-v="barracks">Barracks <span class="dur">'+(bl.length?nBusy+'/'+bl.length+' busy':'none')+'</span></button><button class="btn ghost small" data-act="army-v" data-v="goals">Goals <span class="dur">'+(S.autoTrain?'auto on':nl+' line'+(nl===1?'':'s'))+'</span></button></div>';
   return h+'</div>';
 }
 
@@ -13661,7 +13769,7 @@ function openMedalBox(key, all){ // 0.2.37: all = every box of this kind at once
   toast((times>1?fmt(times)+" opened: ":b.name+": ")+parts.join(", ")); save(); lastView=""; refresh();
 }
 // 0.2.37: item icons (art/items, cut by art/tools/items.py); an item without one keeps its line drawing
-var ITEM_IMG={"_deco":"art/items/_deco.png", "_res":"art/items/_res.png", annals:"art/items/annals.png", banish:"art/items/banish.png", build50:"art/items/build50.png", codex:"art/items/codex.png", corselet:"art/items/corselet.png", corselet2:"art/items/corselet2.png", dstone:"art/items/dstone.png", ensign:"art/items/ensign.png", g_amulet:"art/items/g_amulet.png", g_armor:"art/items/g_armor.png", g_belt:"art/items/g_belt.png", g_boots:"art/items/g_boots.png", g_cloak:"art/items/g_cloak.png", g_gauntlets:"art/items/g_gauntlets.png", g_greaves:"art/items/g_greaves.png", g_helm:"art/items/g_helm.png", g_mount:"art/items/g_mount.png", g_pauldrons:"art/items/g_pauldrons.png", g_ring:"art/items/g_ring.png", g_shield:"art/items/g_shield.png", g_talisman:"art/items/g_talisman.png", g_weapon:"art/items/g_weapon.png", gemD:"art/items/gemD.png", gemF:"art/items/gemF.png", ingot:"art/items/ingot.png", marchsp:"art/items/marchsp.png", medalbox:"art/items/medalbox.png", medalbox2:"art/items/medalbox2.png", medalbox3:"art/items/medalbox3.png", mithril:"art/items/mithril.png", msize100:"art/items/msize100.png", msize50:"art/items/msize50.png", ore:"art/items/ore.png", primer:"art/items/primer.png", s15:"art/items/s15.png", s150:"art/items/s150.png", s480:"art/items/s480.png", s60:"art/items/s60.png", scale:"art/items/scale.png", script:"art/items/script.png", starmetal:"art/items/starmetal.png", surgeon:"art/items/surgeon.png", teleport:"art/items/teleport.png", tome:"art/items/tome.png", warhorn:"art/items/warhorn.png", warhorn2:"art/items/warhorn2.png"}, ITSEL="";
+var ITEM_IMG={"_deco":"art/items/_deco.png", "_res":"art/items/_res.png", annals:"art/items/annals.png", banish:"art/items/banish.png", build50:"art/items/build50.png", codex:"art/items/codex.png", corselet:"art/items/corselet.png", corselet2:"art/items/corselet2.png", dstone:"art/items/dstone.png", ensign:"art/items/ensign.png", g_amulet:"art/items/g_amulet.png", g_armor:"art/items/g_armor.png", g_belt:"art/items/g_belt.png", g_boots:"art/items/g_boots.png", g_cloak:"art/items/g_cloak.png", g_gauntlets:"art/items/g_gauntlets.png", g_greaves:"art/items/g_greaves.png", g_helm:"art/items/g_helm.png", g_mount:"art/items/g_mount.png", g_pauldrons:"art/items/g_pauldrons.png", g_ring:"art/items/g_ring.png", g_shield:"art/items/g_shield.png", g_talisman:"art/items/g_talisman.png", g_weapon:"art/items/g_weapon.png", gemD:"art/items/gemD.png", gemF:"art/items/gemF.png", ingot:"art/items/ingot.png", marchsp:"art/items/marchsp.png", medalbox:"art/items/medalbox.png", medalbox2:"art/items/medalbox2.png", medalbox3:"art/items/medalbox3.png", mithril:"art/items/mithril.png", msize100:"art/items/msize100.png", msize50:"art/items/msize50.png", ore:"art/items/ore.png", primer:"art/items/primer.png", s15:"art/items/s15.png", s150:"art/items/s150.png", s480:"art/items/s480.png", s60:"art/items/s60.png", scale:"art/items/scale.png", script:"art/items/script.png", starmetal:"art/items/starmetal.png", surgeon:"art/items/surgeon.png", teleport:"art/items/teleport.png", tome:"art/items/tome.png", u_archer:"art/items/u_archer.png", u_ballista:"art/items/u_ballista.png", u_cataphract:"art/items/u_cataphract.png", u_catapult:"art/items/u_catapult.png", u_cavalry:"art/items/u_cavalry.png", u_pikeman:"art/items/u_pikeman.png", u_ram:"art/items/u_ram.png", u_scout:"art/items/u_scout.png", u_swordsman:"art/items/u_swordsman.png", u_transporter:"art/items/u_transporter.png", u_warrior:"art/items/u_warrior.png", u_worker:"art/items/u_worker.png", warhorn:"art/items/warhorn.png", warhorn2:"art/items/warhorn2.png"}, ITSEL="";
 function itemImg(k){ return ITEM_IMG[k] ? '<img class="iic" src="'+ITEM_IMG[k]+'" alt="" loading="lazy" decoding="async">' : (ICON[(ITEMS[k]||{}).icon]||ICON.crest); }
 function itemActs(k, n){ var acts="";
   if (MEDAL_BOXES[k] && n) acts='<button class="btn small" data-act="open-box" data-box="'+k+'">Open</button>'+(n>1?' <button class="btn small ghost" data-act="open-box" data-box="'+k+'" data-all="1">Open all</button>':'');
@@ -13985,6 +14093,7 @@ function renderPage(force){
   try { renderSheetCore(); } finally { pageLast=lastSheet; sheetFor=sv[0]; lastSheet=sv[1]; sheetBody=sv[2]; }
 }
 function renderSheetCore(){
+  if (sheetFor && sheetFor.kind==="world" && WDS.gest){ WDS.needPaint=1; return; } // 0.2.43: never rebuild the server map under a moving finger
   if (sheetFor && !sheetFor.page && (sheetFor.kind==="deco"||sheetFor.kind==="decopick") && lastSheet!=="") return; // 0.1.202: nothing on it changes by itself; anything that changes it rebuilds it (lastSheet="")
   if (!sheetFor) return;
   var ae=document.activeElement; if (lastSheet && ae && sheetBody.contains(ae) && /INPUT|SELECT|TEXTAREA/.test(ae.tagName) && ae.type!=="checkbox") return;
@@ -14065,6 +14174,8 @@ function renderSheetCore(){
     h=invBoardSheet();
   } else if (sheetFor.kind==="pvboard"){
     h=pvBoardSheet();
+  } else if (sheetFor.kind==="unit"){
+    h=unitSheet(sheetFor.unit);
   } else if (sheetFor.kind==="world"){
     h=worldSheet();
   } else if (sheetFor.kind==="alview"){
@@ -14189,10 +14300,11 @@ function renderSheetCore(){
     var hr=heroById(sheetFor.id);
     if (!hr){ closeSheet(); return; }
     var isM = S.mayor===hr.id, need=xpNeed(hr.level);
-    var renameRow = hr.fixedName ? '<p class="hint">'+esc(hr.name)+' keeps this name.</p>' : hr.tier==="queen" ? '<div><label class="sub" for="hname">Name</label><div style="display:flex;align-items:center;gap:6px"><b>Queen</b><input type="text" id="hname" maxlength="22" style="flex:1" value="'+esc(hr.name.replace(/^Queen\s+/i,""))+'"></div></div>' : hr.tier!=="historic" ? '<div><label class="sub" for="hname">Name</label><input type="text" id="hname" maxlength="28" value="'+esc(hr.name)+'"></div>' : '<p class="hint">Historic heroes keep their names.</p>';
-    h='<div class="hhead htop"><div style="min-width:0"><h2 id="hname-h" style="margin:0;overflow-wrap:anywhere">'+esc(hr.name)+' <button class="hfav'+(hr.fav?' on':'')+'" data-act="hero-fav" data-id="'+hr.id+'" aria-label="Favourite">'+(hr.fav?'\u2605':'\u2606')+'</button></h2><div class="sub"><span style="color:'+TIERS[hr.tier].color+';font-weight:700">'+TIERS[hr.tier].name+'</span>, level '+hr.level+(officeOf(hr)?', '+officeOf(hr)[1].toLowerCase()+(hr.autoSeat&&officeOf(hr)[0]!=="wallHero"?' (auto)':''):'')+'</div></div></div>';
+    /* 0.2.45: the name at the top is the name box (fixed and historic names stay plain) */
+    var nmEd = (hr.fixedName||hr.tier==="historic") ? '<h2 id="hname-h" class="hnm">'+esc(hr.name)+'</h2>' : hr.tier==="queen" ? '<span class="hnq">Queen</span><input id="hname" class="hnamein" type="text" maxlength="22" aria-label="Name" value="'+esc(hr.name.replace(/^Queen\s+/i,""))+'">' : '<input id="hname" class="hnamein" type="text" maxlength="28" aria-label="Name" value="'+esc(hr.name)+'">';
+    h='<div class="hhead htop"><div style="min-width:0"><div class="hnrow">'+nmEd+(nmEd.indexOf('hnamein')>=0?'<span class="hpen" aria-hidden="true">\u270e</span>':'')+'<button class="hfav'+(hr.fav?' on':'')+'" data-act="hero-fav" data-id="'+hr.id+'" aria-label="Favourite">'+(hr.fav?'\u2605':'\u2606')+'</button></div><div class="sub"><span style="color:'+TIERS[hr.tier].color+';font-weight:700">'+TIERS[hr.tier].name+'</span>, level '+hr.level+(officeOf(hr)?', '+officeOf(hr)[1].toLowerCase()+(hr.autoSeat&&officeOf(hr)[0]!=="wallHero"?' (auto)':''):'')+'</div></div></div>';
     var hset=starSet(hr), nxt=nextSetTier(Math.max(0,hset));
-    h+='<div class="h3" id="herogear">Gear</div><div class="speeds gsettabs">'; for (var gti=0; gti<GEAR_SETS; gti++){ var gtin=gearSetInfo(hr,gti); h+='<button data-act="gset-load" data-i="'+gti+'"'+(gtin&&gtin.have?'':' disabled')+'><b>'+esc(gearSetName(hr,gti))+'</b><span class="dur">'+(gtin?gtin.have+' pieces':'empty')+'</span></button>'; }
+    h+='<div class="speeds gsettabs" id="herogear">'; for (var gti=0; gti<GEAR_SETS; gti++){ var gtin=gearSetInfo(hr,gti); h+='<button data-act="gset-load" data-i="'+gti+'"'+(gtin&&gtin.have?'':' disabled')+'><b>'+esc(gearSetName(hr,gti))+'</b><span class="dur">'+(gtin?gtin.have+' pieces':'empty')+'</span></button>'; }
     h+='</div>'+heroDollHtml(hr);
     var wornN=S.gear.filter(function(g){ return g.on===hr.id; }).length;
     var freeN=S.gear.filter(function(g){ return !g.on || !heroById(g.on); }).length;
@@ -14208,20 +14320,7 @@ function renderSheetCore(){
         '<span class="btnrow" style="grid-column:1/-1;margin-top:4px"><button class="btn small" data-act="gset-load" data-i="'+gsi+'"'+(gin&&gin.have?'':' disabled')+'>Equip</button><button class="btn ghost small" data-act="gset-save" data-i="'+gsi+'">'+(armed==="gsave"+gsi?'Tap again to overwrite':'Save current gear')+'</button></span></div>';
     }
     h+='</div></details>';
-    h+='<div class="h3" style="margin-top:16px">Hero</div><div class="hpic">'+heroPortrait(hr,64)+'<div style="min-width:0">'+
-      '<div class="btnrow" style="margin-top:6px"><button class="btn ghost small" data-act="hero-pic">'+(hr.pic?'Change picture':'Add a picture')+'</button>'+(hr.pic?'<button class="link" data-act="hero-picdel">Remove</button>':'')+'</div><input type="file" id="heroimgf" accept="image/*,.png,.jpg,.jpeg,.webp,.gif,.bmp,.avif,.heic,.heif" hidden>'+
-      '<p class="dur" style="margin:4px 0 0">'+(hr.fav?'A favourite: pinned to the top and can\u2019t be dismissed.':'Tap the star to make a favourite.')+' Pictures are seen by other players.</p></div></div>';
-    h+=renameRow;
-    h+=heroActionsHtml(hr); /* 0.2.40: experience books and reset points; offices are set from the office slots */
-    h+='<div class="effect">'+(hr.level>=HERO_MAX?'Max level':'Experience '+fmt(hr.xp)+' / '+fmt(need))+'. Salary '+fmt(hr.level*20)+' gold/h.</div>';
-    h+='<div class="statgrid">';
-    [["pol","Politics","Production and building speed as mayor"],["atk","Attack","Training speed as trainer, +0.5% troop attack per point in battle"],["int","Intelligence","Research speed as researcher; in battle every troop gets +1 life per point, and marches 1% faster per point"]].forEach(function(s){
-      h+='<div><b>'+s[1]+'</b><div class="sub">'+s[2]+'</div></div><span class="sv">'+hs(hr,s[0])+(gearBonus(hr,s[0])?'<div class="dur" style="font:400 .78rem var(--body)">'+hr[s[0]]+' + '+gearBonus(hr,s[0])+' gear</div>':'')+'</span><span class="ptbtns"><button class="plus" data-act="pt" data-stat="'+s[0]+'" aria-label="Add a point to '+s[1]+'"'+(hr.pts?'':' disabled')+'>+</button><button class="plus all" data-act="ptall" data-stat="'+s[0]+'" aria-label="Add all points to '+s[1]+'"'+(hr.pts?'':' disabled')+'>All</button></span>';
-    });
-    h+='</div>'+(hr.pts?'<p class="sub" style="color:var(--brass)">'+hr.pts+' point'+(hr.pts>1?'s':'')+' to assign.</p>':'');
-    h+=heroAutoHtml(hr)+heroRecordHtml(hr);
-    var hdg=dragonOf(hr); if (hdg) h+='<p class="sub"><b style="color:'+hdg.def.col+'">'+hdg.def.name+' Dragon</b>, level '+hdg.lv+': '+dragonBuffTxt(hdg.t,hdg.lv)+'. Change it in the Overlook.</p>';
-    h+='<p class="sub">As mayor: production +'+pct(hs(hr,"pol")*0.003)+', buildings '+pct(1-1/(1+hs(hr,"pol")/200))+' faster, population grows '+pct(hs(hr,"pol")/400)+' faster. As trainer: training '+pct(1-Math.pow(0.9975,hs(hr,"atk")))+' faster. As researcher: research '+pct(1-1/(1+hs(hr,"int")/200))+' faster.</p>';
+    h+=heroRecordHtml(hr);
     h+='<div class="act" style="margin-top:14px"><button class="btn ghost danger small" data-act="dismiss"'+(hr.fav?' disabled':'')+'>'+(armed==="dismiss"?"Tap again to dismiss":"Dismiss hero")+'</button><button class="closebtn" data-act="'+(sheetFor.back==="ah"?'ah-open':'close')+'">'+(sheetFor.back==="ah"?'Back to all heroes':'Close')+'</button></div>'; // 0.1.239: dismiss sits at the very bottom, away from Reset points
   } else {
     var w=sheetFor.w, i=sheetFor.i, s=getSlot(w,i);
@@ -14564,7 +14663,7 @@ document.addEventListener("click",function(e){
   if (act==="bk-fresh"){ if (armed!=="bkfresh"){ armed="bkfresh"; lastSheet=""; renderSheet(); return; } armed=null; saveLocked=false; loadFail=null; save(); closeSheet(); toast("A new city begins. The unopened save is still kept on this device."); return; }
   if (advance(Date.now())) flushFinished(); markDirty();
   if (act==="tab" && a.dataset.tab==="guild"){ ALS.last=0; ALS.listAt=0; setTimeout(function(){ alTick(); },0); }
-  if (act==="tab"){ if (bfOn()) return; closeSheet(); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); arrange=null; warArmed=false; chalArmed=false; bfArmed=false; farmArmed=false; if (a.dataset.tab!=="items") itemsNote=""; tab=a.dataset.tab; lastView=""; renderView(true); window.scrollTo({top:0});
+  if (act==="tab"){ if (bfOn()) return; closeSheet(); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); arrange=null; warArmed=false; chalArmed=false; bfArmed=false; farmArmed=false; if (a.dataset.tab!=="items") itemsNote=""; if (a.dataset.tab==="army"){ ARMYV=""; ARMYB=-1; } tab=a.dataset.tab; lastView=""; renderView(true); window.scrollTo({top:0});
     return; }
   if (act==="tabscroll"){ var nv=document.getElementById("tabs"); nv.scrollLeft += (+a.dataset.dir)*nv.clientWidth*0.7; setTimeout(updateTabArrows,350); return; }
   if (act==="city-go"){ // 0.2.1: from the map, stay put: same view, same tile picked, same scroll (so "Switch to X to build here" lands on the Establish button)
@@ -14886,6 +14985,10 @@ document.addEventListener("click",function(e){
   if (act==="speedup" && a.dataset.target==="research" && S.research && realMs(S.research.end-S.gt)<=FREE_MS){ S.research.end=S.gt; if (S.research.start>S.research.end) S.research.start=S.research.end; if (advance(Date.now())) flushFinished(); refresh(); return; }
   if (act==="speedup"){ openSheet({kind:"speedup",target:a.dataset.target,slot:+a.dataset.slot}); return; }
   if (act==="bar-open"){ ARMYB=+a.dataset.slot; BQD.n=""; lastView=""; renderView(true); window.scrollTo({top:0}); return; }
+  if (act==="army-unit"){ openSheet({kind:"unit", unit:+a.dataset.unit}); return; }
+  if (act==="army-all"){ ARMYALL=true; lastView=""; renderView(true); return; }
+  if (act==="army-city"){ var aci=+a.dataset.ci; ARMYALL=false; if (aci!==S.cur && S.cities[aci]){ ARMYB=-1; FARMV=-1; farmArmed=false; MAPFARM=-1; S.cur=aci; mv.init=false; selTile=null; var cnm=document.getElementById("cityname"); if (cnm) cnm.textContent=S.name; toast("Now viewing "+S.name); } lastView=""; refresh(); return; }
+  if (act==="army-v"){ ARMYV=a.dataset.v||""; ARMYB=-1; lastView=""; renderView(true); window.scrollTo({top:0}); return; }
   if (act==="bar-hub"){ ARMYB=-1; lastView=""; renderView(true); return; }
   if (act==="bq-max"){ BQD.n=String(maxTrain(BQD.u)); lastView=""; renderView(true); return; }
   if (act==="bq-train"){ var bqn=Math.floor(+BQD.n||0), busy0=!!trainingAt(ARMYB); if (!trainOn(BQD.u,bqn,ARMYB)){ toast(trainOnWhy(BQD.u,bqn,ARMYB)||"Can\u2019t train that"); return; }
@@ -14899,11 +15002,11 @@ document.addEventListener("click",function(e){
   if (act==="train"){
     var tu=+a.dataset.unit, tn=Math.floor(trainAmt[tu]||0);
     if (!startTrain(tu,tn)) return;
-    trainAmt[tu]=0; toast("Training "+fmt(tn)+" "+uname(tu,tn)); save(); lastView=""; refresh(); return;
+    trainAmt[tu]=0; toast("Training "+fmt(tn)+" "+uname(tu,tn)); save(); lastView=""; refresh(); trainSheetRe(tu); return;
   }
   if (act==="train-split"){
     var su=+a.dataset.unit, sn=Math.floor(trainAmt[su]||0), sm=a.dataset.mode==="all"?"all":"idle", nb=startTrainSplit(su,sn,sm); if (!nb) return;
-    trainAmt[su]=0; toast("Training "+fmt(sn)+" "+uname(su,sn)+" across "+nb+" barracks"); save(); lastView=""; refresh(); return;
+    trainAmt[su]=0; toast("Training "+fmt(sn)+" "+uname(su,sn)+" across "+nb+" barracks"); save(); lastView=""; refresh(); trainSheetRe(su); return;
   }
   if (act==="cancel-q"){
     var qt=S.train[+a.dataset.ti]; if (!qt || !qt.q) return;
