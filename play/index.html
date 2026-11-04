@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.38";
+window.IBORY_V="0.2.39";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -770,6 +770,36 @@ body.bfmode #tabs, body.bfmode .tabarrow, body.bfmode .queue, body.bfmode #march
 .irow .d{grid-column:2/4}
 .irow .ia{grid-column:2/4;display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
 .ilist{display:grid;gap:8px;margin-top:8px}
+/* 0.2.39: hero gear tiles */
+.gtile{position:relative;display:inline-flex;align-items:center;justify-content:center;flex:none;border-radius:10px;border:2px solid var(--tc);background:radial-gradient(circle at 50% 40%,color-mix(in srgb,var(--tc) 30%,var(--panel2)),var(--panel) 75%);box-shadow:0 0 6px color-mix(in srgb,var(--tc) 40%,transparent)}
+.gtile.empty{border:2px dashed var(--line);background:var(--panel);box-shadow:none}.gtile.empty .iic{opacity:.22;filter:grayscale(1)}
+.gtile .gst2{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);font-size:.62rem;font-weight:800;color:#f3dc9a;background:#1d211f;border-radius:6px;padding:0 4px;line-height:1.3;white-space:nowrap}
+.gtile .gsd{position:absolute;top:4px;left:4px;width:7px;height:7px;border-radius:50%}
+.gtile .gup{position:absolute;top:-6px;right:-6px;background:#4c9a5c;color:#fff;font-size:.58rem;border-radius:50%;width:17px;height:17px;display:flex;align-items:center;justify-content:center;border:2px solid var(--panel)}
+.gtile .glk{position:absolute;bottom:-6px;right:-7px;font-size:.7rem}
+.doll{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:6px}
+.drow{display:grid;grid-template-columns:auto 1fr auto;gap:8px}.dcol{display:flex;flex-direction:column;gap:6px}
+.dslot{background:none;border:0;padding:0;cursor:pointer;border-radius:10px}
+.dmid{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;min-width:0}
+.dstat{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;width:100%}.dstat div{background:var(--panel);border-radius:8px;padding:4px 2px;font-size:.68rem;color:var(--muted)}.dstat b{display:block;font-size:.92rem;color:var(--ink)}.dstat i{font-style:normal;font-size:.66rem}
+.dgs{display:flex;flex-direction:column;align-items:center;font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}.dgs b{font-family:var(--display);font-size:1.5rem;color:var(--brass);letter-spacing:0;text-transform:none}
+.dset{margin-top:10px}.dbar,.ggauge{height:8px;border-radius:5px;background:var(--panel);overflow:hidden;margin-top:3px}.dbar i{display:block;height:100%;background:linear-gradient(90deg,#b8902f,#f3dc9a)}
+.ghead{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;margin-bottom:8px}.gstars{color:#f3dc9a;letter-spacing:1px}.gstars s{color:var(--line);text-decoration:none}
+.gpanel{display:block}.gpanel .farmadd{margin:6px 0}
+.ggauge{height:16px;border-radius:8px;background:#5a2e31;position:relative;margin-top:6px}.ggauge i{display:block;height:100%;background:#4c9a5c}.ggauge span{position:absolute;inset:0;font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;color:#fff;text-shadow:0 1px 2px #000}
+.gladder{display:flex;align-items:center;margin:8px 0 2px}.gld{width:18px;height:18px;border-radius:50%;border:2px solid var(--c);background:var(--panel);flex:none}.gld.f{background:var(--c)}.gll{flex:1;height:3px;background:var(--line)}.gll.f{background:var(--brass)}
+.gcmp .gcmpr{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center;text-align:center}.gcmp .gcmpr>span{display:flex;flex-direction:column;align-items:center;gap:4px}
+.armtabs{margin:6px 0}.armtabs button{padding:7px 4px;font-size:.82rem;line-height:1.2}.gsettabs button{padding:6px 4px;font-size:.8rem;line-height:1.2}.armtypes{display:flex;gap:6px;overflow-x:auto;padding:4px 0 6px;scrollbar-width:thin}
+.atype{display:flex;flex-direction:column;align-items:center;gap:1px;flex:none;min-width:46px;border:1px solid var(--line);border-radius:9px;padding:4px 5px;background:var(--panel2);color:var(--muted);font:inherit;font-size:.66rem;cursor:pointer}
+.atype b{font-size:.95rem;line-height:28px;color:var(--brass)}.atype.on{border-color:var(--brass);color:var(--brass)}.atype.none{opacity:.45}
+.armgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:10px 6px;margin-top:8px}
+.acell{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:4px 0;border-radius:10px}
+.acell.sel{background:var(--brass-soft);outline:2px solid var(--brass)}.acell .av{font-size:.7rem;color:var(--muted);text-align:center;line-height:1.2;overflow-wrap:anywhere}.acell .av b{color:var(--ink)}.acell .av i{font-style:normal}
+.acell .achk{position:absolute;top:2px;left:4px;background:var(--brass);color:#1d211f;border-radius:50%;width:18px;height:18px;font-size:.7rem;font-weight:800;display:flex;align-items:center;justify-content:center}
+.armgh{display:flex;align-items:center;gap:6px;margin-top:10px}
+.armbar{position:sticky;bottom:0;margin:10px -12px -12px;background:#3a3020;border-top:1px solid var(--brass);padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.85rem;z-index:2}
+.gsettabs button{display:flex;flex-direction:column;align-items:center;gap:0}
+.chipbtn .iic,.gpanel .iic{width:18px;height:18px;vertical-align:-4px}
 /* 0.2.37: the satchel as a grid of item tiles (pixel icons from Clockwork Raven, art/items) */
 .igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:6px;margin-top:8px}
 .itile{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--panel2);border:1px solid transparent;border-radius:10px;padding:8px 4px 6px;color:inherit;font:inherit;cursor:pointer;min-width:0}
@@ -1227,7 +1257,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.38";
+var APP_VERSION = "0.2.39";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -5162,7 +5192,7 @@ function equipBest(hr,stat,free){
   var rank=function(a,b){ var va=gearStat(a)===stat?gearVal(a):0, vb=gearStat(b)===stat?gearVal(b):0; return vb-va || gearRank(a,b); };
   Object.keys(byType).forEach(function(type){
     var poss=byType[type].slice(), before=poss.map(function(p){ var g=wornAt(hr,p); return g?g.id:0; });
-    var pool=S.gear.filter(function(g){ return g.slot===type && (free ? (!g.on || g.on===hr.id || !heroById(g.on)) : (gearStat(g)===stat || !g.on || g.on===hr.id)); }).sort(rank).slice(0,poss.length);
+    var pool=S.gear.filter(function(g){ return g.slot===type && (!g.lock || g.on===hr.id || !g.on || !heroById(g.on)) && (free ? (!g.on || g.on===hr.id || !heroById(g.on)) : (gearStat(g)===stat || !g.on || g.on===hr.id)); }).sort(rank).slice(0,poss.length);
     pool.forEach(function(g,i){ if (g.on===hr.id && poss.indexOf(posOf(g))>=0){ poss=poss.filter(function(p){ return p!==posOf(g); }); pool[i]=null; } });
     S.gear.forEach(function(g){ if (g.on===hr.id && g.slot===type && pool.indexOf(g)<0 && poss.indexOf(posOf(g))>=0){ g.on=0; delete g.at; } }); gearChanged();
     pool.filter(Boolean).forEach(function(g,i){ if (g.on && g.on!==hr.id){ var o=heroById(g.on); if (o) took[o.name]=(took[o.name]||0)+1; } wearPiece(g,hr.id,poss[i]); });
@@ -10118,49 +10148,138 @@ function updateFortRow(i){
 }
 function setText(el,t){ if (el && el.textContent!==t) el.textContent=t; }
 
-/* armory */
-var armoryFilter="all";
+/* ---------- 0.2.39: hero gear with pixel icons (Clockwork Raven, art/items/g_*), the Armory's Currently unworn, locked pieces ----------
+   A tile shows a piece's type (its icon), tier (the frame), stars (the chip) and stat (the dot). A ▲ marks a better spare piece.
+   Locked pieces (g.lock) can't be scrapped and stay where they are when Equip best runs. */
+var TCOLV=["--t-common","--t-rare","--t-epic","--t-legendary","--t-mythic"], STATC={atk:"#e0825a",int:"#6fa8e0",pol:"#8fc06a"};
+var DOLL_L=["helm","amulet","pauldrons","armor","cloak","gauntlets","belt","greaves"], DOLL_R=["weapon","shield","talisman","talisman2","ring","ring2","mount","boots"];
+function gearImg(type, sz){ var u=ITEM_IMG["g_"+type]; return u ? '<img class="iic" src="'+u+'" alt="" style="width:'+sz+'px;height:'+sz+'px">' : ICON.helm; }
+function gearTile(g, o){ o=o||{}; var sz=o.size||56;
+  if (!g) return '<span class="gtile empty" style="width:'+sz+'px;height:'+sz+'px">'+gearImg(o.type,sz-18)+(o.up?'<span class="gup">▲</span>':'')+'</span>';
+  return '<span class="gtile" style="width:'+sz+'px;height:'+sz+'px;--tc:var('+TCOLV[g.tier]+')">'+gearImg(g.slot,sz-16)+'<span class="gst2">'+g.stars+'★</span><span class="gsd" style="background:'+STATC[gearStat(g)]+'"></span>'+
+    (o.up?'<span class="gup">▲</span>':'')+(g.lock?'<span class="glk">🔒</span>':'')+'</span>'; }
+function gearUnworn(g){ return !g.on || !heroById(g.on); }
+function gearScore(hr){ var s=0; S.gear.forEach(function(g){ if (g.on===hr.id) s+=gearVal(g); }); return s; }
+// a better spare piece for this slot of this hero: the same stat as the piece worn there (any stat when the slot is empty)
+function gearUpFor(hr, posk){ var ps=posInfo(posk), cur=wornAt(hr,posk), cv=cur?gearVal(cur):0, cs=cur?gearStat(cur):null;
+  return S.gear.some(function(g){ return g.slot===ps.type && gearUnworn(g) && (!cs || gearStat(g)===cs) && gearVal(g)>cv; }); }
+// the hero whose worn piece (same type and stat) this spare would improve the most: {h, pos, cur, gain}
+function gearBeats(g){ if (!gearUnworn(g)) return null; var best=null;
+  allHeroes().forEach(function(e){ var h=e.h; GEAR_POS.forEach(function(ps){ if (ps.type!==g.slot) return; var cur=wornAt(h,ps.k); if (!cur || gearStat(cur)!==gearStat(g)) return;
+    var gain=gearVal(g)-gearVal(cur); if (gain>0 && (!best || gain>best.gain)) best={h:h, pos:ps.k, cur:cur, gain:gain}; }); });
+  return best; }
+// put a piece on a hero: an empty position of its type first, else in place of the weakest piece of that type
+function gearGive(g, hr, pos){ if (!pos){ var ps=GEAR_POS.filter(function(p){ return p.type===g.slot; }), empty=ps.filter(function(p){ return !wornAt(hr,p.k); })[0];
+    if (empty) pos=empty.k; else { var w=ps.map(function(p){ return wornAt(hr,p.k); }).sort(function(a,b){ return gearVal(a)-gearVal(b); })[0]; pos=w?posOf(w):ps[0].k; } }
+  S.gear.forEach(function(x){ if (x!==g && x.on===hr.id && posOf(x)===pos){ x.on=0; delete x.at; } }); wearPiece(g, hr.id, pos); gearChanged(); return pos; }
+// the hero's gear: every slot round the portrait, what the gear adds, the gear score, the star set
+function heroDollHtml(hr){ var gb={atk:gearBonus(hr,"atk"), int:gearBonus(hr,"int"), pol:gearBonus(hr,"pol")}, n=S.gear.filter(function(g){ return g.on===hr.id; }).length;
+  var col=function(L){ return '<div class="dcol">'+L.map(function(k){ var g=wornAt(hr,k), ps=posInfo(k);
+    return '<button class="dslot" data-act="gear-pick" data-slot="'+k+'" aria-label="'+ps.name+(g?': '+esc(gearName(g))+', '+g.stars+' stars':': empty')+'">'+gearTile(g,{type:ps.type, up:gearUpFor(hr,k)})+'</button>'; }).join("")+'</div>'; };
+  var st=starSet(hr), low=99, at={}; GEAR_POS.forEach(function(ps){ var g=wornAt(hr,ps.k); var s=g?g.stars:-1; low=Math.min(low,s); at[ps.k]=s; });
+  var nx=nextSetTier(Math.max(0,st)), goal=nx?nx[0]:SET_TIERS[0][0], okN=GEAR_POS.filter(function(ps){ return at[ps.k]>=goal; }).length, miss=GEAR_POS.filter(function(ps){ return at[ps.k]<goal; }).map(function(ps){ return ps.name; });
+  var h='<div class="doll"><div class="drow">'+col(DOLL_L)+'<div class="dmid">'+heroPortrait(hr,112)+
+    '<div class="dstat">'+[["atk","Attack"],["int","Intel."],["pol","Politics"]].map(function(s){ return '<div>'+s[1]+'<b>'+fmt(hs(hr,s[0]))+'</b><i style="color:'+STATC[s[0]]+'">+'+fmt(gb[s[0]])+'</i></div>'; }).join("")+'</div>'+
+    '<div class="dgs"><span>Gear score</span><b>'+fmt(gearScore(hr))+'</b><span>'+n+' of '+GEAR_POS.length+' slots</span></div></div>'+col(DOLL_R)+'</div>';
+  h+='<div class="dset"><div class="act" style="margin:0"><span class="dur">'+(nx?'Star set '+goal+'★ on every slot':'Star set: the highest there is')+'</span><span class="dur">'+okN+' / '+GEAR_POS.length+'</span></div><div class="dbar"><i style="width:'+Math.round(okN/GEAR_POS.length*100)+'%"></i></div>'+
+    '<p class="dur" style="margin:4px 0 0">'+(st<0?'Wear all 16 pieces to earn a star set bonus to troop life.':'Now: star set '+st+', troops led by '+esc(hr.name)+' have ×'+setLife(hr)+' life.')+(nx?' '+(miss.length<=4?'Raise '+miss.join(", ")+' to '+goal+'★':'Every slot at '+goal+'★')+' for ×'+nx[1]+'.':'')+'</p></div>';
+  return h+'<p class="dur" style="margin:4px 0 0">▲ a better spare piece is in the armory. Dots: <span style="color:'+STATC.atk+'">●</span> Might <span style="color:'+STATC.int+'">●</span> Wisdom <span style="color:'+STATC.pol+'">●</span> Rule</p></div>'; }
+// the head of a piece's screen: big tile, names, stars, bonus, who wears it
+function gearHeadHtml(g){ var who=g.on?heroById(g.on):null, max=GEAR_MAX[g.tier], s="";
+  for (var i=0;i<max;i++) s+= i<g.stars ? '★' : '<s>★</s>';
+  return '<div class="ghead">'+gearTile(g,{size:88})+'<div style="min-width:0"><div class="sub" style="color:var('+TCOLV[g.tier]+')">'+gearTypeName(g)+'</div><h2 style="margin:0;overflow-wrap:anywhere">'+(g.nm?'“'+esc(g.nm)+'”':esc(gearTypeName(g)))+'</h2>'+
+    '<div class="gstars">'+s+'</div><div style="font-weight:700">'+gearBuffTxt(g)+'</div><div class="sub">'+(who?'Worn by '+esc(who.name)+' · '+posInfo(posOf(g)).name:'Unworn · fits the '+posInfo(posOf(g)).name+' slot')+(g.lock?' · 🔒 locked':'')+'</div></div></div>'; }
+// a spare piece: what it would do for the hero it suits best, and who to give it to
+function gearGiveHtml(g){ if (!gearUnworn(g)) return ''; var b=gearBeats(g), hs2=allHeroes().map(function(e){ return e.h; });
+  var h='<div class="effect gcmp">';
+  if (b) h+='<div class="sub" style="margin-bottom:6px">Compared with what '+esc(b.h.name)+' wears there</div><div class="gcmpr"><span>'+gearTile(b.cur,{size:44})+'<span class="dur">'+TIERS[GEAR_TIERS[b.cur.tier]].name+' '+b.cur.stars+'★ · +'+gearVal(b.cur)+'</span></span><b class="okc">→ +'+b.gain+'</b><span>'+gearTile(g,{size:44})+'<span class="dur">this · +'+gearVal(g)+'</span></span></div>'+
+    '<div class="btnrow" style="margin-top:8px"><button class="btn small" data-act="gear-give" data-g="'+g.id+'" data-h="'+b.h.id+'" data-pos="'+b.pos+'">Equip on '+esc(b.h.name)+'</button></div>';
+  else h+='<div class="sub">No hero wears a weaker '+slotOf(g).name.toLowerCase()+' of '+STAT_WORD[gearStat(g)]+'.</div>';
+  if (hs2.length) h+='<div class="farmadd" style="margin-top:6px"><select id="ggive" aria-label="Hero">'+hs2.map(function(x){ return '<option value="'+x.id+'"'+(b&&b.h===x?' selected':'')+'>'+esc(x.name)+'</option>'; }).join("")+'</select><button class="btn ghost small" data-act="gear-give" data-g="'+g.id+'" data-h="sel">Equip on this hero</button></div>';
+  return h+'</div>'; }
+
+/* the Armory: Worn, Currently unworn and All, filtered by type, stat and tier, sorted, grouped by type; pick several to scrap together */
+var ARM={tab:"unworn", stat:"", tier:-1, sort:"str", group:false, sel:null};
+function armSortFn(){ var by={str:function(a,b){ return gearVal(b)-gearVal(a) || b.tier-a.tier; }, stars:function(a,b){ return b.stars-a.stars || gearVal(b)-gearVal(a); }, tier:function(a,b){ return b.tier-a.tier || b.stars-a.stars; },
+  new:function(a,b){ return b.id-a.id; }, type:function(a,b){ return slotIdx(a)-slotIdx(b) || gearVal(b)-gearVal(a); }}; return by[ARM.sort]||by.str; }
+function slotIdx(g){ for (var i=0;i<GEAR_SLOTS.length;i++) if (GEAR_SLOTS[i].k===g.slot) return i; return 99; }
+function armList(){ return S.gear.filter(function(g){ var un=gearUnworn(g); return (ARM.tab==="all" || (ARM.tab==="unworn")===un) && (armoryFilter==="all" || g.slot===armoryFilter) && (!ARM.stat || gearStat(g)===ARM.stat) && (ARM.tier<0 || g.tier===ARM.tier); }).sort(armSortFn()); }
+function armCell(g){ var who=g.on?heroById(g.on):null, on=ARM.sel&&ARM.sel[g.id], beats=gearUnworn(g)&&!!gearBeats(g);
+  return '<button class="acell'+(on?' sel':'')+'" data-act="'+(ARM.sel?'arm-pick':'forge-open')+'" data-g="'+g.id+'" aria-pressed="'+!!on+'" aria-label="'+esc(gearName(g))+'">'+gearTile(g,{size:60, up:beats})+
+    '<span class="av"><b>+'+gearVal(g)+' '+STATN[gearStat(g)].slice(0,3)+'</b><br>'+(g.nm?esc(g.nm):slotOf(g).name)+(who&&ARM.tab!=="unworn"?'<br><i>'+esc(who.name)+'</i>':'')+'</span>'+(on?'<span class="achk">✓</span>':'')+'</button>'; }
 function armorySection(){
-  var list=S.gear.slice().sort(function(a,b){ return b.tier-a.tier || b.stars-a.stars; });
-  if (armoryFilter!=="all") list=list.filter(function(g){ return g.slot===armoryFilter; });
-  var h='<div class="section"><div class="shead"><h3>Armory</h3><span class="dur">'+S.gear.length+' pieces, '+fmt(S.items.gemD||0)+' Delicate, '+fmt(S.items.gemF||0)+' Flawless gems</span></div>'+
-    '<p class="hint">Gear is crafted from materials with a Workshop in any city (on its page, or from a hero\u2019s gear slot), and its tier and stars can be upgraded from any city too. Stars raise a piece\u2019s stat, and a hero wearing all 16 pieces gets a star set bonus to troop life based on their lowest-starred piece: 6 stars \u00d71.4, 9 \u00d72, 12 \u00d72.5, 15 \u00d73.5. Below 6 stars there is no bonus.</p>'+
-    '<div class="farmadd"><button class="chipbtn'+(armoryFilter==="all"?' on':'')+'" data-act="armory-filter" data-slot="all">All</button>'+GEAR_SLOTS.map(function(sl){ return '<button class="chipbtn'+(armoryFilter===sl.k?' on':'')+'" data-act="armory-filter" data-slot="'+sl.k+'">'+sl.name+'</button>'; }).join("")+'</div>';
-  if (!list.length) h+='<p class="hint" style="margin-top:8px">Nothing here yet.</p>';
-  h+='<div class="gearlist">'+list.slice(0,60).map(gearRow).join("")+'</div>'+(list.length>60?'<p class="hint">Showing the best 60.</p>':'');
-  return h+'</div>';
-}
+  var all=S.gear, unN=all.filter(gearUnworn).length, list=armList(), base=all.filter(function(g){ var un=gearUnworn(g); return ARM.tab==="all" || (ARM.tab==="unworn")===un; });
+  var h='<div class="section"><div class="shead"><h3>Armory</h3><span class="dur">'+all.length+' pieces · '+(all.length-unN)+' worn · '+unN+' unworn</span></div>'+
+    '<p class="hint">Gear is crafted from materials with a Workshop in any city (on its page, or from a hero’s gear slot), and its tier and stars can be upgraded from any city too. A hero wearing all 16 pieces gets a star set bonus to troop life based on their lowest-starred piece.</p>'+
+    '<div class="speeds armtabs">'+[["worn","Worn"],["unworn","Currently unworn · "+unN],["all","All"]].map(function(t){ return '<button data-act="arm-tab" data-v="'+t[0]+'" aria-pressed="'+(ARM.tab===t[0])+'">'+t[1]+'</button>'; }).join("")+'</div>';
+  var cnt=function(k){ return base.filter(function(g){ return k==="all"||g.slot===k; }).length; };
+  h+='<div class="armtypes">'+['<button class="atype'+(armoryFilter==="all"?' on':'')+'" data-act="armory-filter" data-slot="all"><b>All</b><span>'+cnt("all")+'</span></button>'].concat(GEAR_SLOTS.map(function(sl){ var n=cnt(sl.k);
+    return '<button class="atype'+(armoryFilter===sl.k?' on':'')+(n?'':' none')+'" data-act="armory-filter" data-slot="'+sl.k+'" aria-label="'+sl.name+'">'+gearImg(sl.k,28)+'<span>'+n+'</span></button>'; })).join("")+'</div>';
+  h+='<div class="farmadd"><button class="chipbtn'+(!ARM.stat?' on':'')+'" data-act="arm-stat" data-v="">Any stat</button>'+["atk","int","pol"].map(function(k){ return '<button class="chipbtn'+(ARM.stat===k?' on':'')+'" data-act="arm-stat" data-v="'+k+'" style="color:'+STATC[k]+'">'+STAT_WORD[k]+'</button>'; }).join("")+'</div>'+
+    '<div class="farmadd">'+GEAR_TIERS.map(function(t,i){ return '<button class="chipbtn'+(ARM.tier===i?' on':'')+'" data-act="arm-tier" data-v="'+i+'" style="border-color:var('+TCOLV[i]+');color:var('+TCOLV[i]+')">'+TIERS[t].name+'</button>'; }).join("")+'</div>'+
+    '<div class="farmadd"><select id="armsort" aria-label="Sort">'+[["str","Strongest first"],["stars","Most stars"],["tier","Highest tier"],["new","Newest"],["type","By type"]].map(function(o){ return '<option value="'+o[0]+'"'+(ARM.sort===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join("")+'</select>'+
+    '<label class="chk"><input type="checkbox" id="armgroup"'+(ARM.group?' checked':'')+'> Group by type</label><button class="chipbtn'+(ARM.sel?' on':'')+'" data-act="arm-selmode">'+(ARM.sel?'Done':'☐ Select')+'</button></div>';
+  if (!list.length) h+='<p class="hint" style="margin-top:8px">'+(all.length?'Nothing matches.':'Nothing here yet.')+'</p>';
+  var shown=list.slice(0,240);
+  if (ARM.group){ GEAR_SLOTS.forEach(function(sl){ var L=shown.filter(function(g){ return g.slot===sl.k; }); if (!L.length) return; h+='<div class="h3 armgh">'+gearImg(sl.k,20)+' '+sl.name+' <span class="dur">'+L.length+'</span></div><div class="armgrid">'+L.map(armCell).join("")+'</div>'; }); }
+  else h+='<div class="armgrid">'+shown.map(armCell).join("")+'</div>';
+  if (list.length>shown.length) h+='<p class="hint">Showing the first '+shown.length+' of '+list.length+'. Filter to see the rest.</p>';
+  if (list.length) h+='<p class="dur" style="margin:6px 0 0">▲ better than what one of your heroes wears there · 🔒 locked: never scrapped, and Equip best leaves it be</p>';
+  if (ARM.sel){ var ids=Object.keys(ARM.sel).map(Number), sel=S.gear.filter(function(g){ return ids.indexOf(g.id)>=0; }), gems=sel.reduce(function(a,g){ return a+GEAR_SCRAP[g.tier]+g.stars; },0), lk=sel.filter(function(g){ return g.lock; }).length, wn=sel.filter(function(g){ return !gearUnworn(g); }).length;
+    h+='<div class="armbar"><span><b>'+sel.length+' selected</b>'+(lk?' · '+lk+' locked (kept)':'')+(wn?' · '+wn+' worn':'')+'</span><button class="btn ghost danger small" data-act="arm-scrap"'+(sel.length-lk?'':' disabled')+'>'+(armed==="armscrap"?'Tap again: scrap '+(sel.length-lk):'Scrap → '+fmt(gems-sel.filter(function(g){ return g.lock; }).reduce(function(a,g){ return a+GEAR_SCRAP[g.tier]+g.stars; },0))+' gems')+'</button></div>'; }
+  return h+'</div>'; }
+function armRe(){ lastView=""; renderView(true); if (sheetFor && sheetFor.kind==="armory"){ lastSheet=""; renderSheet(); } }
+function gearActs(act, a){
+  if (act==="arm-tab"){ ARM.tab=a.dataset.v; armRe(); return true; }
+  if (act==="arm-stat"){ ARM.stat=a.dataset.v; armRe(); return true; }
+  if (act==="arm-tier"){ var t=+a.dataset.v; ARM.tier=ARM.tier===t?-1:t; armRe(); return true; }
+  if (act==="arm-selmode"){ ARM.sel=ARM.sel?null:{}; armed=null; armRe(); return true; }
+  if (act==="arm-pick"){ var id=+a.dataset.g; if (ARM.sel[id]) delete ARM.sel[id]; else ARM.sel[id]=1; armed=null; armRe(); return true; }
+  if (act==="arm-scrap"){ if (!ARM.sel) return true; if (armed!=="armscrap"){ armed="armscrap"; armRe(); return true; } armed=null;
+    var ids=Object.keys(ARM.sel).map(Number), got=0, n=0; S.gear=S.gear.filter(function(g){ if (ids.indexOf(g.id)<0 || g.lock) return true; got+=GEAR_SCRAP[g.tier]+g.stars; n++; return false; });
+    S.items.gemD=(S.items.gemD||0)+got; gearChanged(); ARM.sel={}; save(); toast("Scrapped "+n+" piece"+(n===1?"":"s")+" for "+fmt(got)+" Delicate Gems"); armRe(); refresh(); return true; }
+  if (act==="gear-lock"){ var lg=forgeGear(); if (!lg) return true; lg.lock=!lg.lock; save(); toast(lg.lock?"Locked: it can’t be scrapped, and Equip best leaves it be":"Unlocked"); lastSheet=""; renderSheet(); refresh(); return true; }
+  if (act==="gear-give"){ var gg=S.gear.filter(function(x){ return x.id===+a.dataset.g; })[0], hid=a.dataset.h==="sel"?+((document.getElementById("ggive")||{}).value||0):+a.dataset.h, gh=heroById(hid); if (!gg||!gh) return true;
+    gearGive(gg, gh, a.dataset.h==="sel"?null:a.dataset.pos); save(); toast(gearName(gg)+" equipped on "+gh.name); lastSheet=""; renderSheet(); refresh(); return true; }
+  if (act==="gear-off2"){ var og=forgeGear(); if (og){ og.on=0; delete og.at; gearChanged(); save(); } lastSheet=""; renderSheet(); refresh(); return true; }
+  return false; }
+document.addEventListener("change", function(e){ var t=e.target; if (!t) return;
+  if (t.id==="armsort"){ ARM.sort=t.value; armRe(); } else if (t.id==="armgroup"){ ARM.group=!!t.checked; armRe(); } });
+var armoryFilter="all";
 function gearRow(g){
   var sl=slotOf(g), who=g.on?heroById(g.on):null;
   return '<button class="gearrow gearpiece t'+g.tier+'" data-act="forge-open" data-g="'+g.id+'"><span class="gn">'+gearName(g)+'</span><span class="gst">'+starStr(g)+'</span><span class="gb">+'+gearVal(g)+' '+STATN[gearStat(g)]+(g.slot==="mount"?', '+pct(MOUNT_SPD[g.tier])+' march speed':'')+'</span><span class="dur">'+(who?'Worn by '+esc(who.name):'Unequipped')+'</span></button>';
 }
-function forgeControls(g){ // star and tier upgrades for one piece: shared by the Forge's piece menu and a hero's gear slot menu
+function forgeControls(g){ // star and tier upgrades for one piece: shared by the Forge's piece menu and a hero's gear slot menu (0.2.39: the new look)
   var sl=slotOf(g), max=GEAR_MAX[g.tier], h="";
-  h+='<div><label for="gname" class="sub">Name this piece'+(g.nm?' ('+gearTypeName(g)+')':'')+'</label><input id="gname" type="text" maxlength="28" value="'+esc(g.nm||"")+'" placeholder="'+esc(gearTypeName(g))+'"></div>';
-  if (g.stars>=max) h+='<p class="effect">This piece is at its maximum of '+max+' stars.</p>';
+  if (g.stars>=max) h+='<div class="effect">This piece is at its maximum of '+max+' stars.</div>';
   else {
-    var have=S.items["gem"+forgeGem]||0, n=Math.max(1,Math.min(4,forgeN)), p=gemChance(g,forgeGem,n), m=bestFor(gearStat(g));
-    h+='<div class="farmadd"><span class="dur">Gem:</span><button class="chipbtn'+(forgeGem==="D"?' on':'')+'" data-act="forge-gem" data-v="D">Delicate ('+fmt(S.items.gemD||0)+')</button><button class="chipbtn'+(forgeGem==="F"?' on':'')+'" data-act="forge-gem" data-v="F">Flawless ('+fmt(S.items.gemF||0)+')</button></div>';
-    h+='<div class="farmadd"><span class="dur">Gems per try:</span>'+[1,2,3,4].map(function(k){ return '<button class="chipbtn'+(n===k?' on':'')+'" data-act="forge-n" data-v="'+k+'">'+k+'</button>'; }).join("")+'</div>';
-    h+='<div class="effect">'+g.stars+' \u2192 '+(g.stars+1)+' stars: <b>'+Math.round(p)+'%</b> chance'+(m?' (includes +'+Math.min(10,hs(m,gearStat(g))/40).toFixed(1)+'% from '+esc(m.name)+'\u2019s '+STATN[gearStat(g)]+')':'')+'. Success makes it +'+Math.round(GEAR_BASE[g.tier]*(1+0.2*(g.stars+1)))+'. A failure drops it to <b>'+failTo(g.stars)+' star'+(failTo(g.stars)===1?'':'s')+'</b>'+(alFx("gemguard")&&failTo(g.stars)!==FAIL_TO[g.stars]?' (the Guardian\u2019s Wings save '+(failTo(g.stars)-FAIL_TO[g.stars])+')':'')+'.'+(alFx("gemluck")?' Includes +'+alFx("gemluck")+'% from the Halo of Fortune.':'')+'</div>';
+    var have=S.items["gem"+forgeGem]||0, n=Math.max(1,Math.min(4,forgeN)), p=gemChance(g,forgeGem,n), m=bestFor(gearStat(g)), nv=Math.round(GEAR_BASE[g.tier]*(1+0.2*(g.stars+1)));
+    h+='<div class="effect gpanel"><div class="act" style="margin:0"><b>Add a star ('+g.stars+' \u2192 '+(g.stars+1)+')</b><span class="dur">a failure drops it to '+failTo(g.stars)+'\u2605</span></div>'+
+      '<div class="farmadd">'+[["F","Flawless"],["D","Delicate"]].map(function(q){ return '<button class="chipbtn'+(forgeGem===q[0]?' on':'')+'" data-act="forge-gem" data-v="'+q[0]+'">'+itemImg("gem"+q[0])+' '+q[1]+' \u00b7 '+fmt(S.items["gem"+q[0]]||0)+'</button>'; }).join("")+'</div>'+
+      '<div class="farmadd"><span class="dur">Gems per try</span>'+[1,2,3,4].map(function(k){ return '<button class="chipbtn'+(n===k?' on':'')+'" data-act="forge-n" data-v="'+k+'">'+k+'</button>'; }).join("")+'</div>'+
+      '<div class="ggauge"><i style="width:'+Math.round(p)+'%"></i><span>'+Math.round(p)+'% success \u00b7 +'+nv+' '+STATN[gearStat(g)]+' if it lands</span></div>'+
+      (m?'<p class="dur" style="margin:4px 0 0">Includes +'+Math.min(10,hs(m,gearStat(g))/40).toFixed(1)+'% from '+esc(m.name)+'\u2019s '+STATN[gearStat(g)]+'.</p>':'');
     var why = have<n ? "Not enough "+(forgeGem==="D"?"Delicate":"Flawless")+" gems" : "";
-    h+='<div class="act"><span class="why">'+why+'</span><button class="btn" data-act="forge-strike"'+(why?' disabled':'')+'>Upgrade star</button></div>';
+    h+='<div class="act"><span class="why">'+why+'</span><button class="btn" data-act="forge-strike"'+(why?' disabled':'')+'>Strike the star</button></div></div>';
   }
   var ut=g.tier+1;
-  if (ut<GEAR_TIERS.length){
-    var uw=upgWhy(g), ns=Math.max(0,g.stars-1);
-    h+='<div class="effect">Upgrade to <b>'+TIERS[GEAR_TIERS[ut]].name+' '+sl.name+'</b> with '+MAT_NEED[ut]+' '+ITEMS[MAT[ut]].name+' (Workshop '+MAT_WS[ut]+' in any city): +'+Math.round(GEAR_BASE[ut]*(1+0.2*ns))+' '+STATN[gearStat(g)]+' at '+ns+' star'+(ns===1?'':'s')+'. The work costs it one star.</div>'+
-      '<div class="act"><span class="why">'+uw+'</span><button class="btn" data-act="gear-upgrade"'+(uw?' disabled':'')+'>'+(armed==="upg"?'Tap again to upgrade':'Upgrade tier')+'</button></div>';
-  }
+  h+='<div class="effect gpanel"><b>Tier</b><div class="gladder">'+GEAR_TIERS.map(function(t,i){ return '<span class="gld'+(i<=g.tier?' f':'')+'" style="--c:var('+TCOLV[i]+')"></span>'+(i<GEAR_TIERS.length-1?'<span class="gll'+(i<g.tier?' f':'')+'"></span>':''); }).join("")+'</div>'+
+    '<div class="act" style="margin:0">'+GEAR_TIERS.map(function(t,i){ return '<span class="dur" style="font-size:.68rem">'+TIERS[t].name+'</span>'; }).join("")+'</div>';
+  if (ut<GEAR_TIERS.length){ var uw=upgWhy(g), ns=Math.max(0,g.stars-1);
+    h+='<p class="dur" style="margin:6px 0 0">'+itemImg(MAT[ut])+' '+MAT_NEED[ut]+' '+ITEMS[MAT[ut]].name+' (you have '+fmt(S.items[MAT[ut]]||0)+') \u00b7 Workshop '+MAT_WS[ut]+' \u00b7 costs one star: +'+Math.round(GEAR_BASE[ut]*(1+0.2*ns))+' '+STATN[gearStat(g)]+' at '+ns+'\u2605 as '+TIERS[GEAR_TIERS[ut]].name+'.</p>'+
+      '<div class="act"><span class="why">'+uw+'</span><button class="btn ghost" data-act="gear-upgrade"'+(uw?' disabled':'')+'>'+(armed==="upg"?'Tap again to upgrade':'Raise to '+TIERS[GEAR_TIERS[ut]].name)+'</button></div>'; }
+  else h+='<p class="dur" style="margin:6px 0 0">The highest tier.</p>';
+  h+='</div><div><label for="gname" class="sub">Name this piece'+(g.nm?' ('+gearTypeName(g)+')':'')+'</label><input id="gname" type="text" maxlength="28" value="'+esc(g.nm||"")+'" placeholder="'+esc(gearTypeName(g))+'"></div>';
   if (forgeLog.length) h+='<ul class="log">'+forgeLog.slice(0,6).map(function(x){ return '<li>'+x+'</li>'; }).join("")+'</ul>';
   return h;
 }
 function forgeSheet(g){
-  var sl=slotOf(g), max=GEAR_MAX[g.tier], who=g.on?heroById(g.on):null;
-  var h='<div class="head"><span class="ico">'+ICON.anvil+'</span><div><h2>'+gearName(g)+'</h2><div class="sub">'+starStr(g)+'  +'+gearVal(g)+' '+STATN[gearStat(g)]+(who?', worn by '+esc(who.name):'')+'</div></div></div>';
-  h+=forgeControls(g);
-  h+='<div class="act"><button class="btn ghost danger small" data-act="gear-scrap">'+(armed==="scrap"?'Tap again to scrap for '+(GEAR_SCRAP[g.tier]+g.stars)+' Delicate Gems':'Scrap for gems')+'</button><button class="closebtn" data-act="'+(sheetFor.back==="armory"?'armory-sheet':'close')+'">'+(sheetFor.back==="armory"?'Back to the Armory':'Close')+'</button></div>';
-  return h;
+  var who=g.on?heroById(g.on):null, back=sheetFor.back==="armory";
+  var h=gearHeadHtml(g)+gearGiveHtml(g)+forgeControls(g);
+  h+='<div class="btnrow" style="margin-top:10px">'+(who?'<button class="btn ghost small" data-act="gear-off2">Take it off '+esc(who.name)+'</button>':'')+'<button class="btn ghost small" data-act="gear-lock">'+(g.lock?'\ud83d\udd13 Unlock':'\ud83d\udd12 Lock')+'</button>'+
+    (g.lock?'':'<button class="btn ghost danger small" data-act="gear-scrap">'+(armed==="scrap"?'Tap again: scrap for '+(GEAR_SCRAP[g.tier]+g.stars)+' gems':'Scrap \u00b7 '+(GEAR_SCRAP[g.tier]+g.stars)+' Delicate Gems')+'</button>')+'</div>';
+  return h+'<button class="closebtn" data-act="'+(back?'armory-sheet':'close')+'">'+(back?'Back to the armory':'Close')+'</button>';
 }
 var forgeLog=[], forgeGem="D", forgeN=1;
 function forgeGear(){ // the piece the open menu is upgrading: the one in the Forge menu, or the one worn in a hero's slot
@@ -10173,13 +10292,14 @@ function gearPickSheet(hr, slot){
   var ps=posInfo(slot), sl=GEAR_SLOTS.filter(function(x){ return x.k===ps.type; })[0], cur=wornAt(hr,ps.k);
   var opts=S.gear.filter(function(x){ return x.slot===ps.type && x!==cur; }).sort(function(a,b){ return gearVal(b)-gearVal(a); });
   var h='<div class="head"><span class="ico">'+ICON.helm+'</span><div><h2>'+ps.name+' for '+esc(hr.name)+'</h2><div class="sub">Takes a '+sl.name+'. Each piece adds Attack, Politics or Intelligence'+(ps.type==="mount"?', and marches go faster: 3% (Common) up to 15% (Mythic)':'')+'.</div></div></div>';
-  if (cur) h+='<div class="effect">Wearing '+gearName(cur)+' '+starStr(cur)+' ('+gearBuffTxt(cur)+')</div>'+'<div class="h3">Upgrade '+esc(hr.name)+'\u2019s '+gearName(cur)+'</div>'+forgeControls(cur)+'<div class="btnrow"><button class="btn ghost small" data-act="gear-off" data-g="'+cur.id+'">Take it off</button></div>';
+  if (cur) h+=gearHeadHtml(cur)+forgeControls(cur)+'<div class="btnrow" style="margin-top:8px"><button class="btn ghost small" data-act="gear-off" data-g="'+cur.id+'">Take it off</button><button class="btn ghost small" data-act="gear-lock">'+(cur.lock?'\ud83d\udd13 Unlock':'\ud83d\udd12 Lock')+'</button></div>';
   var cw=craftWhy(0);
   h+='<div class="h3">Craft a new one</div>'+craftStatChips()+'<div class="effect">Common '+sl.name+' of '+STAT_WORD[craftStat]+': +'+GEAR_BASE[0]+' '+STATN[craftStat]+', made from '+MAT_NEED[0]+' '+ITEMS[MAT[0]].name+' (you have '+fmt(S.items[MAT[0]]||0)+'). Upgrade its tier and stars right here afterwards.</div>'+
     '<div class="act"><span class="why">'+cw+'</span><span class="btnrow"><button class="btn ghost small" data-act="gear-craft"'+(cw?' disabled':'')+'>Craft</button><button class="btn small" data-act="gear-craft" data-wear="1"'+(cw?' disabled':'')+'>Craft and wear</button></span></div>';
   if (opts.length) h+='<div class="h3">'+(cur?'Swap it for':'Equip')+'</div>';
   if (!opts.length) h+='<p class="hint">No other '+sl.name.toLowerCase()+' in the armory. Craft one above.</p>';
-  else h+='<div class="gearlist">'+opts.map(function(g){ var who=g.on?heroById(g.on):null; if (who===hr) who=null; return '<button class="gearrow gearpiece t'+g.tier+'" data-act="gear-on" data-g="'+g.id+'"><span class="gn">'+gearName(g)+'</span><span class="gst">'+starStr(g)+'</span><span class="gb">'+gearBuffTxt(g)+'</span><span class="dur">'+(who?'Take from '+esc(who.name):'Equip')+'</span></button>'; }).join("")+'</div>';
+  else h+='<div class="armgrid">'+opts.sort(function(a,b){ return (gearUnworn(b)?1:0)-(gearUnworn(a)?1:0) || gearVal(b)-gearVal(a); }).map(function(g){ var who=g.on?heroById(g.on):null; if (who===hr) who=null; var d=gearVal(g)-(cur?gearVal(cur):0);
+    return '<button class="acell" data-act="gear-on" data-g="'+g.id+'" aria-label="'+esc(gearName(g))+'">'+gearTile(g,{size:60})+'<span class="av"><b>+'+gearVal(g)+' '+STATN[gearStat(g)].slice(0,3)+'</b>'+(cur?' <i class="'+(d>0?'okc':d<0?'badc':'')+'">'+(d>0?'+':'')+d+'</i>':'')+'<br>'+(who?'<i>on '+esc(who.name)+'</i>':'spare')+'</span></button>'; }).join("")+'</div>';
   return h+'<button class="closebtn" data-act="close">Back to '+esc(hr.name)+'\u2019s gear</button>';
 }
 
@@ -13456,7 +13576,7 @@ function openMedalBox(key, all){ // 0.2.37: all = every box of this kind at once
   toast((times>1?fmt(times)+" opened: ":b.name+": ")+parts.join(", ")); save(); lastView=""; refresh();
 }
 // 0.2.37: item icons (art/items, cut by art/tools/items.py); an item without one keeps its line drawing
-var ITEM_IMG={"_deco":"art/items/_deco.png", "_res":"art/items/_res.png", annals:"art/items/annals.png", banish:"art/items/banish.png", build50:"art/items/build50.png", codex:"art/items/codex.png", corselet:"art/items/corselet.png", corselet2:"art/items/corselet2.png", dstone:"art/items/dstone.png", ensign:"art/items/ensign.png", gemD:"art/items/gemD.png", gemF:"art/items/gemF.png", ingot:"art/items/ingot.png", marchsp:"art/items/marchsp.png", medalbox:"art/items/medalbox.png", medalbox2:"art/items/medalbox2.png", medalbox3:"art/items/medalbox3.png", mithril:"art/items/mithril.png", msize100:"art/items/msize100.png", msize50:"art/items/msize50.png", ore:"art/items/ore.png", primer:"art/items/primer.png", s15:"art/items/s15.png", s150:"art/items/s150.png", s480:"art/items/s480.png", s60:"art/items/s60.png", scale:"art/items/scale.png", script:"art/items/script.png", starmetal:"art/items/starmetal.png", surgeon:"art/items/surgeon.png", teleport:"art/items/teleport.png", tome:"art/items/tome.png", warhorn:"art/items/warhorn.png", warhorn2:"art/items/warhorn2.png"}, ITSEL="";
+var ITEM_IMG={"_deco":"art/items/_deco.png", "_res":"art/items/_res.png", annals:"art/items/annals.png", banish:"art/items/banish.png", build50:"art/items/build50.png", codex:"art/items/codex.png", corselet:"art/items/corselet.png", corselet2:"art/items/corselet2.png", dstone:"art/items/dstone.png", ensign:"art/items/ensign.png", g_amulet:"art/items/g_amulet.png", g_armor:"art/items/g_armor.png", g_belt:"art/items/g_belt.png", g_boots:"art/items/g_boots.png", g_cloak:"art/items/g_cloak.png", g_gauntlets:"art/items/g_gauntlets.png", g_greaves:"art/items/g_greaves.png", g_helm:"art/items/g_helm.png", g_mount:"art/items/g_mount.png", g_pauldrons:"art/items/g_pauldrons.png", g_ring:"art/items/g_ring.png", g_shield:"art/items/g_shield.png", g_talisman:"art/items/g_talisman.png", g_weapon:"art/items/g_weapon.png", gemD:"art/items/gemD.png", gemF:"art/items/gemF.png", ingot:"art/items/ingot.png", marchsp:"art/items/marchsp.png", medalbox:"art/items/medalbox.png", medalbox2:"art/items/medalbox2.png", medalbox3:"art/items/medalbox3.png", mithril:"art/items/mithril.png", msize100:"art/items/msize100.png", msize50:"art/items/msize50.png", ore:"art/items/ore.png", primer:"art/items/primer.png", s15:"art/items/s15.png", s150:"art/items/s150.png", s480:"art/items/s480.png", s60:"art/items/s60.png", scale:"art/items/scale.png", script:"art/items/script.png", starmetal:"art/items/starmetal.png", surgeon:"art/items/surgeon.png", teleport:"art/items/teleport.png", tome:"art/items/tome.png", warhorn:"art/items/warhorn.png", warhorn2:"art/items/warhorn2.png"}, ITSEL="";
 function itemImg(k){ return ITEM_IMG[k] ? '<img class="iic" src="'+ITEM_IMG[k]+'" alt="" loading="lazy" decoding="async">' : (ICON[(ITEMS[k]||{}).icon]||ICON.crest); }
 function itemActs(k, n){ var acts="";
   if (MEDAL_BOXES[k] && n) acts='<button class="btn small" data-act="open-box" data-box="'+k+'">Open</button>'+(n>1?' <button class="btn small ghost" data-act="open-box" data-box="'+k+'" data-all="1">Open all</button>':'');
@@ -14000,20 +14120,20 @@ function renderSheetCore(){
     var hdg=dragonOf(hr); if (hdg) h+='<p class="sub"><b style="color:'+hdg.def.col+'">'+hdg.def.name+' Dragon</b>, level '+hdg.lv+': '+dragonBuffTxt(hdg.t,hdg.lv)+'. Change it in the Overlook.</p>';
     h+='<p class="sub">As mayor: production +'+pct(hs(hr,"pol")*0.003)+', buildings '+pct(1-1/(1+hs(hr,"pol")/200))+' faster, population grows '+pct(hs(hr,"pol")/400)+' faster. As trainer: training '+pct(1-Math.pow(0.9975,hs(hr,"atk")))+' faster. As researcher: research '+pct(1-1/(1+hs(hr,"int")/200))+' faster.</p>';
     var hset=starSet(hr), nxt=nextSetTier(Math.max(0,hset));
-    h+='<div class="h3" id="herogear">Gear</div><p class="sub">'+(hset<0?'Wear all 16 pieces to earn a star set bonus.':'Star set '+hset+': troops led by this hero have \u00d7'+setLife(hr)+' life.'+(nxt?' Next bonus (\u00d7'+nxt[1]+') at a '+nxt[0]+'-star set.':' Maximum bonus.'))+'</p><div class="gearslots">'+GEAR_POS.map(function(ps){ var g=wornAt(hr,ps.k), sl=g?slotOf(g):null;
-      return '<button class="gslot'+(g?' t'+g.tier:'')+'" data-act="gear-pick" data-slot="'+ps.k+'"><span class="gs-n">'+ps.name+'</span>'+(g?'<span class="gs-s">'+starStr(g)+'</span><span class="gs-b">+'+gearVal(g)+' '+STATN[gearStat(g)].slice(0,3)+(ps.k==="mount"?', '+pct(MOUNT_SPD[g.tier])+' march':'')+'</span>':'<span class="gs-e">Empty</span>')+'</button>'; }).join("")+'</div>';
+    h+='<div class="h3" id="herogear">Gear</div>'+heroDollHtml(hr);
     var wornN=S.gear.filter(function(g){ return g.on===hr.id; }).length;
     var freeN=S.gear.filter(function(g){ return !g.on || !heroById(g.on); }).length;
     h+= (armed==="best"||armed==="bestfree")
       ? '<div class="effect" style="margin-top:6px">'+(armed==="best"?'Equip the best gear for which stat? Pieces of that stat are taken from other heroes.':'Equip the best unworn gear for which stat? Only spare pieces (and '+esc(hr.name)+'\u2019s own): nothing is taken from another hero.')+'</div><div class="btnrow">'+["atk","pol","int"].map(function(k){ return '<button class="btn small" data-act="gear-best-go" data-free="'+(armed==="bestfree"?1:0)+'" data-stat="'+k+'">'+STATN[k]+'</button>'; }).join("")+'<button class="btn ghost small" data-act="gear-best-cancel">Cancel</button></div>'
       : '<div class="btnrow" style="margin-top:6px"><button class="btn ghost small" data-act="gear-best"'+(S.gear.length?'':' disabled')+'>Equip best gear</button><button class="btn ghost small" data-act="gear-bestfree"'+(freeN?'':' disabled')+'>Equip best unworn</button><button class="btn ghost small" data-act="gear-unequip"'+(wornN?'':' disabled')+'>Unequip all</button></div>';
-    h+='<div class="h3" style="margin-top:8px">Gear presets</div><p class="hint">Save what '+esc(hr.name)+' wears now, then equip it again in one tap. Pieces another hero is wearing get taken from them.</p><div class="gearlist">';
+    h+='<div class="h3" style="margin-top:8px">Gear presets</div><div class="speeds gsettabs">'; for (var gti=0; gti<GEAR_SETS; gti++){ var gtin=gearSetInfo(hr,gti); h+='<button data-act="gset-load" data-i="'+gti+'"'+(gtin&&gtin.have?'':' disabled')+'><b>'+esc(gearSetName(hr,gti))+'</b><span class="dur">'+(gtin?gtin.have+' pieces':'empty')+'</span></button>'; }
+    h+='</div><p class="dur" style="margin:4px 0 0">Tap a preset to put it on. Pieces another hero is wearing get taken from them.</p><details class="det" data-det="gsets"'+(DET.gsets?' open':'')+'><summary><b>Name and save presets</b></summary><div class="gearlist">';
     for (var gsi=0; gsi<GEAR_SETS; gsi++){ var gin=gearSetInfo(hr,gsi);
       h+='<div class="gearrow"><span class="gn"><input data-gsn="'+gsi+'" type="text" maxlength="24" value="'+esc(((hr.gearSetNames||[])[gsi])||"")+'" placeholder="Preset '+(gsi+1)+'" aria-label="Preset name" style="width:100%;font:inherit;padding:2px 6px"></span><span class="gb">'+(gin?gin.have+' piece'+(gin.have===1?'':'s'):'Empty')+'</span>'+
         (gin&&(gin.gone||gin.others.length)?'<span class="dur" style="grid-column:1/-1">'+(gin.others.length?'Worn now by '+esc(gin.others.join(", ")):'')+(gin.others.length&&gin.gone?'. ':'')+(gin.gone?gin.gone+' scrapped piece'+(gin.gone===1?'':'s')+' will be skipped':'')+'</span>':'')+
         '<span class="btnrow" style="grid-column:1/-1;margin-top:4px"><button class="btn small" data-act="gset-load" data-i="'+gsi+'"'+(gin&&gin.have?'':' disabled')+'>Equip</button><button class="btn ghost small" data-act="gset-save" data-i="'+gsi+'">'+(armed==="gsave"+gsi?'Tap again to overwrite':'Save current gear')+'</button></span></div>';
     }
-    h+='</div>';
+    h+='</div></details>';
     h+='<div class="act" style="margin-top:14px"><button class="btn ghost danger small" data-act="dismiss"'+(hr.fav?' disabled':'')+'>'+(armed==="dismiss"?"Tap again to dismiss":"Dismiss hero")+'</button><button class="closebtn" data-act="'+(sheetFor.back==="ah"?'ah-open':'close')+'">'+(sheetFor.back==="ah"?'Back to all heroes':'Close')+'</button></div>'; // 0.1.239: dismiss sits at the very bottom, away from Reset points
   } else {
     var w=sheetFor.w, i=sheetFor.i, s=getSlot(w,i);
@@ -14789,6 +14909,7 @@ document.addEventListener("click",function(e){
   if (act==="occ-go"){ occupyFlats(); return; }
   if (act==="map-find"){ var ft=document.getElementById("findtype").value, fl=+document.getElementById("findlvl").value, fq=findNearest(ft,fl);
     if (!fq){ toast("None found"); return; } selectTile(fq.id,true); return; }
+  if (gearActs(act, a)) return;
   if (act==="armory-filter"){ armoryFilter=a.dataset.slot; lastView=""; renderView(true); if (sheetFor && sheetFor.kind==="armory"){ lastSheet=""; renderSheet(); } return; }
   if (act==="forge-open"){ forgeLog=[]; openSheet({kind:"forge",g:+a.dataset.g, back:sheetFor&&sheetFor.kind==="armory"?"armory":null}); return; }
   if (act==="armory-sheet"){ openSheet({kind:"armory"}); return; }
@@ -14837,7 +14958,7 @@ document.addEventListener("click",function(e){
   }
   if (act==="gear-scrap"){
     if (armed!=="scrap"){ armed="scrap"; lastSheet=""; renderSheet(); return; }
-    var xg=S.gear.filter(function(x){ return x.id===sheetFor.g; })[0]; if (!xg) return;
+    var xg=S.gear.filter(function(x){ return x.id===sheetFor.g; })[0]; if (!xg || xg.lock) return;
     var got=GEAR_SCRAP[xg.tier]+xg.stars; S.items.gemD=(S.items.gemD||0)+got; S.gear=S.gear.filter(function(x){ return x!==xg; });
     if (sheetFor.back==="armory") openSheet({kind:"armory"}); else closeSheet(); toast("Scrapped for "+got+" Delicate Gems"); refresh(); return;
   }
