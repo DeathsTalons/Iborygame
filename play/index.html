@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.48";
+window.IBORY_V="0.2.49";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -653,11 +653,14 @@ select,input[type=number],input[type=text],input[type=search],input[type=time]{f
 .hport{position:relative;display:inline-block;border-radius:12px;overflow:hidden;flex:none;vertical-align:middle;background:#1b2023}
 .hport img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}.hport svg{display:block;width:100%;height:100%}
 .hhead{display:grid;grid-template-columns:128px 1fr;gap:14px;align-items:center;margin-bottom:8px}
-.hhead.htop{grid-template-columns:1fr;margin-bottom:0}.hhead.htop+.h3{margin-top:6px}
+.hhead.htop{grid-template-columns:minmax(0,1fr) auto;margin-bottom:0} /* 0.2.49: the name, and the close button beside it */.hhead.htop+.h3{margin-top:6px}
 .gemrow{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}.gemrow .chipbtn{width:100%;margin:0;justify-content:center;white-space:nowrap;font-variant-numeric:tabular-nums}
 .aspanel{margin-top:8px;border-top:1px solid var(--line);padding-top:6px}.aspanel.on{border:1px solid var(--brass);border-radius:8px;padding:6px 8px;background:rgba(215,176,88,.08)}
 .asrow{display:flex;gap:6px;align-items:center;margin-top:6px}.asrow select{flex:1;min-width:0;padding:4px 6px}.asrow select[data-asd^=n]{flex:0 0 60px}.asrow select[data-asd^=to]{flex:0 0 70px}
 .gacts{margin-top:8px;display:grid!important;grid-template-columns:repeat(3,1fr);gap:6px}.gacts .btn{margin:0;padding-left:4px;padding-right:4px;white-space:nowrap}.gpop{margin-top:6px}.gsettabs{margin-bottom:8px}
+.gsettabs .gsren{flex:0 0 38px;min-width:0;padding:6px 0;font-size:1rem;color:var(--muted)}.gsettabs .gsren.on{color:var(--brass);border-color:var(--brass)}
+.gsedit{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}.gsedit input{width:100%;min-width:0;font:inherit;font-size:.8rem;padding:4px 6px}.gsedit .dur{font-size:.68rem;text-align:center}
+.gup.gadd{background:var(--panel2);color:var(--brass);box-shadow:inset 0 0 0 1px var(--brass);font-size:.8rem;font-weight:800}
 .hpic{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;margin-bottom:6px}
 @media (max-width:380px){ .hhead{grid-template-columns:96px 1fr} .hhead .hport{width:96px!important;height:96px!important} }
 .hero{display:grid;grid-template-columns:42px 1fr auto;gap:2px 12px;align-items:center;text-align:left;background:var(--panel2);border:1px solid transparent;border-radius:10px;padding:9px 12px;cursor:pointer;width:100%}
@@ -771,11 +774,11 @@ table.gt.rpt2 td{vertical-align:top} table.gt.rpt2 td:first-child{white-space:no
 body.bfmode #tabs, body.bfmode .tabarrow, body.bfmode .queue, body.bfmode #marchstrip, body.bfmode #threats{display:none!important}
 /* 0.2.48: the slim header (Cody picked option A, with the clock and a status row): city name + switcher, power and server time; Chat, Items, More.
    Everything live (marches first, attacks, alerts) on one status row that only shows when something is on. One row of tabs, the rest under More. */
-header.hd2{flex-wrap:nowrap;gap:8px;padding:4px 2px 8px;position:relative}
+header.hd2{flex-wrap:nowrap;gap:8px;padding:6px 2px 14px;position:relative} /* 0.2.48b: room under the picture's frame and badge before the status row */
 header.hd2 .hdl{gap:10px;flex:1;min-width:0}
 header.hd2 .hdn{min-width:0;flex:1}
 .cpick{display:flex;align-items:center;gap:4px;max-width:100%;border:0;background:none;padding:0;color:inherit;font:inherit;cursor:pointer;text-align:left}
-.cpick h1{font-size:1.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;overflow-wrap:normal;min-width:0}
+.cpick h1{font-size:1.25rem;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;overflow-wrap:normal;min-width:0} /* the display font's capitals were cut off at the top */
 .cpick .cpdd{color:var(--muted);font-size:.85rem;flex:none}
 .cpick.one{cursor:default}.cpick.one .cpdd{display:none}
 .cpick .idot{flex:none;width:7px;height:7px;border-radius:50%;background:var(--red)}
@@ -792,7 +795,7 @@ header.hd2 .citybar button{display:flex;align-items:center;justify-content:space
 header.hd2 .citybar button:last-child{border-bottom:0}
 header.hd2 .citybar button .dur{font:400 .74rem var(--body)}
 header.hd2 .citybar button[aria-pressed="true"]{color:var(--brass);background:var(--brass-soft)}
-#statusrow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 8px}
+#statusrow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 6px}
 #statusrow[hidden]{display:none}
 #statusrow #mchip:empty,#statusrow #threats:empty{display:none}
 #statusrow #mchip,#statusrow #threats{display:contents}
@@ -802,7 +805,7 @@ header.hd2 .citybar button[aria-pressed="true"]{color:var(--brass);background:va
 .mchipb{border-color:var(--brass);color:var(--ink)}.mchipb[aria-expanded="true"]{background:var(--brass-soft);color:var(--brass)}
 .tchip{border-color:var(--red);color:var(--red);background:rgba(200,60,60,.12)}.tchip b{color:var(--red)}
 #marchstrip .mstrip{margin:-2px 0 8px}
-.tabbar{margin:4px 0 12px}
+.tabbar{margin:0 0 12px}
 nav.tabs .tabrow{flex-wrap:nowrap}
 nav.tabs .tabrow button{flex:1 1 auto;padding:9px 2px 10px;white-space:nowrap}
 nav.tabs .tabrow button[hidden]{display:none}
@@ -819,6 +822,58 @@ nav.tabs .morepanel .mptile[aria-selected="true"]{border-color:var(--brass);colo
 .mptile .mpb:empty{display:none}
 .mptile.evchip svg{color:#e8893a!important} .mptile.evchip .mpb{display:none} nav.tabs .morepanel .mptile.hasnew::after{display:none}
 body.bfmode #statusrow, body.bfmode #morepanel{display:none!important}
+.hstrip{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:0 2px 10px}.hstrip .dur b{color:var(--ink)}.hstripb{display:flex;gap:6px}
+.hstripb .chipbtn{flex:none;white-space:nowrap;padding:0 12px;font-size:.84rem;color:var(--ink)}.hstripb .hallchip .dur{margin-left:6px;font:600 .74rem var(--body)}
+.ofhd{display:flex;align-items:center;gap:8px}.ofauto{margin:0;font-size:.82rem}
+.ofq{width:24px;height:24px;border-radius:50%;border:1px solid var(--line);background:none;color:var(--muted);font:700 .78rem var(--body);cursor:pointer;padding:0}.ofq.on{border-color:var(--brass);color:var(--brass)}
+.ofhelp .hint{margin:0 0 8px}
+.oftiles.of4{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.of4 .oftile{align-items:center;text-align:center;gap:3px;padding:7px 3px}
+.of4 .ofjob{font-size:.72rem;letter-spacing:0;text-transform:none;max-width:100%;white-space:normal;line-height:1.12;text-wrap:balance;display:flex;align-items:center;justify-content:center}
+html:not([lang=en]) .of4 .ofjob{min-height:2.3em} /* a long job name (Héroe de la muralla) wraps; every tile keeps the same shape */
+.of4 .hport{width:52px!important;height:52px!important}.of4 .ofempty{width:52px;height:52px}
+.of4 .ofname{font-size:.72rem;display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;overflow-wrap:normal}
+.of4 .ofst{font-size:.64rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.hsorts{display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.hsorts .chipbtn{padding:4px 9px;font-size:.78rem}
+.hsortmore{width:30px;padding:3px 2px;font-size:.72rem;border-radius:999px}.hsortmore.on{width:auto;border-color:var(--brass);color:var(--brass)}
+.hgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.hcard.hc3{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;padding:9px 4px 8px;min-width:0}
+.hc3 .hport{width:72px!important;height:72px!important}
+.hc3 .hn{font:700 .8rem/1.15 var(--display);max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}
+.hc3 .hct{font-size:.66rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.hc3 .hcs{display:flex;gap:clamp(2px,1vw,5px);justify-content:center;font-size:clamp(.56rem,2.75vw,.64rem);color:var(--muted);flex-wrap:nowrap;white-space:nowrap;letter-spacing:-.01em}.hc3 .hcs span{white-space:nowrap}.hc3 .hcs b{color:var(--ink)}
+.hc3 .hfav{position:absolute;top:3px;right:4px;padding:2px;z-index:2}.hcdot,.hcpts{z-index:2}
+.hcdot{position:absolute;top:8px;left:8px;width:8px;height:8px;border-radius:50%;background:#5fa36a}.hcdot.away{background:var(--red)}
+.hcpts{position:absolute;top:58px;right:14%;background:var(--brass);color:var(--bg);border-radius:999px;font:800 .62rem var(--body);padding:1px 5px}
+.hcjob.auto{border-style:dashed}.hcjob{font-size:.62rem;color:var(--brass);border:1px solid var(--brass);border-radius:999px;padding:0 6px;margin-top:2px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hcjob.away{color:var(--red);border-color:var(--red)}
+.inngrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.innc{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 8px;align-items:center;background:var(--panel2);border-radius:12px;padding:8px}
+.innc .innt{display:flex;flex-direction:column;min-width:0}.innc .innt b{font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.innc .innt .dur{font-size:.7rem}
+.innc .innst{grid-column:1/-1;font-size:.72rem;color:var(--muted);display:flex;gap:8px}.innc .innst b{color:var(--ink)}
+.innc .btn,.innc .link{grid-column:1/-1}.innc .btn{width:100%}
+
+.citytiles{margin-top:10px}
+#sheetbody:focus{outline:none}
+.bhead .sub{margin-top:1px}.bpips{display:flex;gap:3px;margin-top:5px}.bpips i{flex:1;max-width:16px;height:5px;border-radius:3px;background:var(--line)}.bpips i.f{background:var(--brass)}
+.bmore{margin:0}.bmore summary{list-style:none;cursor:pointer;color:var(--ink)}.bmore summary::-webkit-details-marker{display:none}.bmore summary .link{font-size:.85rem}.bmore[open] summary .link{display:none}.bmore p{margin:6px 0 0}.bmore0{margin:0}
+.bnow{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;background:var(--panel2);border-radius:12px;padding:10px 12px}.bnow.one{grid-template-columns:1fr}
+.bnow .dur{display:block;font-size:.68rem;text-transform:uppercase;letter-spacing:.05em}.bnow b{font-size:.92rem;font-weight:600;line-height:1.3}.bnow div+span+div b{color:var(--brass)}.bnow .barr{color:var(--brass);font-size:1.2rem}
+.bup{display:grid;gap:8px}.bpq{text-align:center;font-size:.74rem}
+.bfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.bfoot .dur{font-size:.76rem;flex:1}
+.brq{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.brqt{display:flex;flex-direction:column;align-items:center;gap:1px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:6px 2px;text-align:center;opacity:.55;min-width:0}
+.brqt.ok{opacity:1;border-color:var(--brass)}.brqt img,.brqt .iic{width:30px;height:30px;image-rendering:pixelated}.brqt b{font-size:.7rem;line-height:1.15}.brqt span{font-size:.62rem;line-height:1.2}
+.bpick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.bptile{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);padding:10px 4px 8px;cursor:pointer;font:inherit;color:var(--ink);text-align:center;min-width:0}
+.bptile .ico svg{width:30px;height:30px;color:var(--brass)}.bptile b{font-size:.8rem;line-height:1.15}.bptile .dur{font-size:.68rem}
+.bptile.on{border-color:var(--brass);box-shadow:inset 0 0 0 1px var(--brass)}.bptile.lock{opacity:.5}.bptile.lock.on{opacity:.8}
+.bplk{position:absolute;top:5px;right:7px;color:var(--muted)}.bplk svg{width:12px;height:12px}
+.bpdet{display:grid;gap:8px;border:1px solid var(--brass);border-radius:12px;background:var(--panel2);padding:10px 12px}
+.bphd{display:flex;gap:10px;align-items:center}.bphd .ico svg{width:34px;height:34px;color:var(--brass)}.bphd b{font:700 1rem var(--display)}
+.bpact{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.bpgo{width:100%}
+.ctiles{display:grid;gap:6px}.ctiles div{display:flex;flex-direction:column;align-items:center;gap:1px;background:var(--panel);border-radius:9px;padding:5px 2px;min-width:0}
+.ctiles svg{width:16px;height:16px;color:var(--muted)}.ctiles b{font-size:.84rem}.ctiles div.short{box-shadow:inset 0 0 0 1px var(--red)}.ctiles div.short b{color:var(--red)}
+.wstats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:8px 0}.wstats div{background:var(--panel2);border-radius:10px;padding:6px 4px;text-align:center}.wstats b{display:block;font-size:.95rem}.wstats span{font-size:.7rem;color:var(--muted)}
 header.hd2 .avatar.hd{width:42px;height:42px;border-radius:11px;font-size:1.1rem}
 header.hd2 .avatar.hd img{border-radius:10px}
 header.hd2 .avatar.hd .fbadge{width:18px;height:18px;right:-6px;bottom:-6px}
@@ -1361,7 +1416,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.48";
+var APP_VERSION = "0.2.49";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -9961,11 +10016,15 @@ function tickText(){
 
 /* ---------- views ---------- */
 var tab = "city";
+// 0.2.49: a cost as resource tiles (red when short), for the build picker and the building pop-ups
+function costTilesHtml(c){ var ks=RES.filter(function(k){ return c[k]; }); if (c.script) ks.push("script");
+  return '<div class="ctiles" style="grid-template-columns:repeat('+Math.max(1,ks.length)+',minmax(0,1fr))">'+ks.map(function(k){ var have=k==="script"?((S.items&&S.items.script)||0):S.res[k], ic=k==="script"?ICON.crest:ICON[k];
+    return '<div class="'+(have<c[k]?'short':'')+'" title="'+(RNAME[k]||"Script")+'">'+ic+'<b>'+fmt(c[k])+'</b></div>'; }).join("")+'</div>'; }
 var PLOT_SHORT={beacon:"Beacon", feasting:"Feast Hall", market:"Market", overlook:"Overlook"}; // 0.2.47: short names on the city tiles so they don't cut off ("Beacon T…"); the full name stays in the label and the popup
 function plotHtml(w,i,s){
   var busy = !!buildOn(w,i), picked = arrange && arrange.w===w && arrange.sel===i;
   if (picked) busy=true;
-  if (!s) return '<button class="plot empty" data-w="'+w+'" data-i="'+i+'" aria-label="Empty plot"><span class="ico">'+ICON.plus+'</span><span class="nm">Empty</span></button>';
+  if (!s) return '<button class="plot empty" data-w="'+w+'" data-i="'+i+'" aria-label="Empty plot"><span class="ico">'+ICON.plus+'</span></button>'; // 0.2.49: the dashed + says it
   var lv = s.level>0 ? '<span class="lv">'+s.level+'</span>' : '';
   var nm = s.level>0 ? (PLOT_SHORT[s.type]||DEF[s.type].name) : "Building…";
   return '<button class="plot'+(busy?' busy':'')+'" data-w="'+w+'" data-i="'+i+'" aria-label="'+DEF[s.type].name+' level '+s.level+'"><span class="ico">'+ICON[s.type]+'</span><span class="nm">'+nm+'</span>'+lv+'</button>';
@@ -9995,22 +10054,30 @@ function swapPlots(w,a,b){
   if (pg && pg.w===w) pg.i=sw(pg.i);
 }
 function viewCity(){
+  if (CITYV==="fields") return cityBack()+fieldsSection();
+  if (CITYV==="walls") return cityBack()+fortSection();
   var thBusy = !!buildOn("th",0);
   var wBusy = !!buildOn("wall",0);
   var h=arrangeBar("in")+'<div class="walls'+(wBusy?' busy':'')+(arrange&&arrange.w==="in"?' arranging':'')+'" data-w="wall" data-i="0" title="Walls level '+(S.wall||0)+'"><span class="walltag">Walls '+(S.wall||0)+'</span><div class="citymap">';
   h+='<button class="plot th'+(thBusy?' busy':'')+'" data-w="th" data-i="0" aria-label="Town Hall level '+S.th+'"><span class="ico">'+ICON.townhall+'</span><span class="nm">Town Hall</span><span class="lv">'+S.th+'</span></button>';
   S.inside.forEach(function(s,i){ h+=plotHtml("in",i,s); });
   h+='</div><div class="gate"></div></div>';
-  h+=fieldsSection();
-  h+=fortSection();
-  h+='<p class="hint" style="margin-top:12px">Tap the Town Hall for taxes and titles, the Academy for research, the Forge for the armory, the Rally Spot for march presets, and the Marketplace to trade.</p>';
+  h+=cityTiles(); // 0.2.49: Fields and Walls are two tiles that open their own pages (they were dropdowns); the closing paragraph went
   return h;
 }
-function fieldsSection(){
-  var slots=fieldSlots(S.th), used=0, lv=0;
-  for (var i=0;i<slots;i++){ var f=S.fields[i]; if (f){ used++; lv+=f.level; } }
-  return '<details class="section det" data-det="fields"'+(DET.fields?' open':'')+'><summary><b>Fields</b> <span class="dur">'+used+' of '+slots+' plots worked, '+fmt(workersNeeded())+' workers needed</span></summary>'+
-    viewFields()+'</details>';
+var CITYV="";
+function cityBack(){ return '<div class="albk"><button class="link" data-act="city-v" data-v="">\u2039 '+esc(S.name)+'</button></div>'; }
+function cityTiles(){
+  var slots=fieldSlots(S.th), used=0; for (var i=0;i<slots;i++) if (S.fields[i]) used++;
+  var wn=workersNeeded(), L=S.wall||0, fb=S.fortQ?FORTS[S.fortQ.f].name:"", fbusy=S.builds.some(function(b){ return b.where==="f"; }), wbusy=!!buildOn("wall",0)||!!S.fortQ;
+  return '<div class="reptiles citytiles">'+
+    '<button class="reptile" data-act="city-v" data-v="fields"><span class="rtop">'+ICON.farm+'<span class="nm">Fields</span><span class="n">'+used+'/'+slots+'</span></span><span class="ln">'+(wn>0?fmt(wn)+' workers needed':'every field worked')+(fbusy?' \u00b7 building':'')+'</span></button>'+
+    '<button class="reptile" data-act="city-v" data-v="walls"><span class="rtop">'+ICON.walls+'<span class="nm">Walls</span><span class="n">'+L+'</span></span><span class="ln">'+(L?fmt(fortUsed())+' of '+fmt(fortCap())+' space':'not built yet')+(fb?' \u00b7 building '+esc(fb):wbusy?' \u00b7 building':'')+'</span></button></div>';
+}
+function fieldsSection(){ // 0.2.49: its own page from the Fields tile
+  var slots=fieldSlots(S.th), used=0;
+  for (var i=0;i<slots;i++){ if (S.fields[i]) used++; }
+  return '<div class="section" data-det="fields"><div class="shead"><h3>Fields</h3><span class="dur">'+used+' of '+slots+' plots worked, '+fmt(workersNeeded())+' workers needed</span></div>'+viewFields()+'</div>';
 }
 function viewFields(){
   var slots=fieldSlots(S.th), h=arrangeBar("f")+'<p class="note">'+slots+' of 44 plots open. Each field level needs 20 workers from your population.</p><div class="fieldmap'+(arrange&&arrange.w==="f"?' arranging':'')+'">';
@@ -10069,7 +10136,7 @@ function heroActionsHtml(hr){
   return h; }
 /* 0.2.44: Reset points sits in the gear box, under the stat buttons */
 function respecBtnHtml(hr){ var spentPts=heroSpent(hr), rsWait=respecWait(hr);
-  return '<button class="btn ghost small dreset" data-act="respec"'+(spentPts&&!rsWait?'':' disabled')+'>'+(rsWait?"Reset points: again in "+fmtT(rsWait):armed==="respec"?"Tap again: take back "+spentPts+" point"+(spentPts>1?"s":""):"Reset points"+(spentPts?" ("+spentPts+")":""))+'</button>'; }
+  return '<button class="btn ghost small dreset" data-act="respec"'+(spentPts&&!rsWait?'':' disabled')+'>'+(rsWait?"Reset points: again in "+fmtT(rsWait):armed==="respec"?"Tap again: take back "+spentPts+" point"+(spentPts>1?"s":""):"Reset "+(spentPts?spentPts+" point"+(spentPts>1?"s":""):"points"))+'</button>'; }
 // read books until they run out (or the hero can't level further); returns [books read, levels gained, experience given]
 function readBooks(h, kinds){ var read=0, ups=0, xp=0;
   kinds.forEach(function(bk){ while ((S.items[bk]||0)>0 && h.level<HERO_MAX){ S.items[bk]--; read++; xp+=ITEMS[bk].xp; ups+=giveXp(h, ITEMS[bk].xp); } });
@@ -10116,15 +10183,14 @@ function heroesSorted(list){ var o=C().heroSort||{a:"level",b:"atk"};
     return x.id-y.id; }); }
 function heroSortBar(){ var o=C().heroSort||{a:"level",b:"atk"}, opt=function(sel){ return HSORT.map(function(x){ return '<option value="'+x[0]+'"'+(x[0]===sel?' selected':'')+'>'+x[1]+'</option>'; }).join(""); };
   return '<div class="farmadd" style="margin-top:6px"><label class="dur" for="hsort1">Sort by</label><select id="hsort1">'+opt(o.a)+'</select><label class="dur" for="hsort2">then</label><select id="hsort2"><option value="">nothing</option>'+opt(o.b)+'</select></div>'; }
-function heroCardBig(h){
-  var xp = h.level>=HERO_MAX ? 100 : Math.floor(h.xp/xpNeed(h.level)*100), jb=jobOf(h), off=jb&&jb.o, set=starSet(h), r=h.rec, a=h.auto;
-  var status = off ? '<span class="badge">'+off[1]+(jb.auto?' (auto)':'')+'</span>' : h.away ? '<span class="badge" style="background:var(--red)">Marching</span>' : '<span class="dur">At home</span>';
-  return '<div class="hcard" role="button" tabindex="0" data-act="hero" data-id="'+h.id+'">'+heroPortrait(h,76)+
-    '<div class="hcb"><div class="hct"><b class="hn">'+esc(h.name)+'</b><button class="hfav'+(h.fav?' on':'')+'" data-act="hero-fav" data-id="'+h.id+'" aria-label="'+(h.fav?'Unfavourite':'Favourite')+' '+esc(h.name)+'">'+(h.fav?'★':'☆')+'</button></div>'+
-    '<div class="dur"><span style="color:'+TIERS[h.tier].color+';font-weight:700">'+TIERS[h.tier].name+'</span> · Lv '+h.level+' · '+status+(set>=0?' · ★'+set+' set':'')+'</div>'+
-    '<div class="hcs"><span>Pol <b>'+hs(h,"pol")+'</b></span><span>Atk <b>'+hs(h,"atk")+'</b></span><span>Int <b>'+hs(h,"int")+'</b></span></div>'+
-    '<div class="dur">'+(r&&(r.b||r.d)?fmt(r.b)+' battle'+(r.b===1?'':'s')+(r.d?', '+fmt(r.d)+' defense'+(r.d===1?'':'s'):'')+' · '+fmt(r.k)+' killed':'No battles yet')+(a?' · auto '+(a.pol||0)+':'+(a.atk||0)+':'+(a.int||0):'')+(h.pts?' · <span style="color:var(--brass)">+'+h.pts+' to assign</span>':'')+'</div>'+
-    '<span class="xpbar"><i style="width:'+xp+'%"></i></span></div></div>';
+function heroCardBig(h){ // 0.2.49: a grid tile: portrait, name, tier and level, the three stats; a dot for home / marching, the job as a tag, + points to assign
+  var jb=jobOf(h), off=jb&&jb.o, set=starSet(h);
+  return '<div class="hcard hc3" role="button" tabindex="0" data-act="hero" data-id="'+h.id+'" aria-label="'+esc(h.name)+'">'+
+    '<span class="hcdot '+(h.away?'away':'home')+'" title="'+(h.away?'Marching':'At home')+'"></span><button class="hfav'+(h.fav?' on':'')+'" data-act="hero-fav" data-id="'+h.id+'" aria-label="'+(h.fav?'Unfavourite':'Favourite')+' '+esc(h.name)+'">'+(h.fav?'★':'☆')+'</button>'+
+    heroPortrait(h,72)+(h.pts?'<span class="hcpts">+'+h.pts+'</span>':'')+
+    '<b class="hn">'+esc(h.name)+'</b><span class="dur hct">Lv '+h.level+(set>=0?' · ★'+set:'')+' · <span style="color:'+TIERS[h.tier].color+';font-weight:700">'+TIERS[h.tier].name+'</span></span>'+
+    '<span class="hcs"><span>A <b>'+hs(h,"atk")+'</b></span><span>I <b>'+hs(h,"int")+'</b></span><span>P <b>'+hs(h,"pol")+'</b></span></span>'+
+    (off?'<span class="hcjob'+(jb.auto?' auto" title="Auto-filled':'')+'">'+off[1]+'</span>':h.away?'<span class="hcjob away">Marching</span>':'')+'</div>';
 }
 /* 0.1.244: All heroes: every hero in every city on one page, where each one is right now, sorted by any stat. The page itself only
    changes when something about a hero changes; the timers tick in place (ahTick), so it doesn't flicker. */
@@ -10185,13 +10251,14 @@ var HREC_MODE="rec"; // which service record the hero page shows: "rec" (kingdom
 function heroRecordHtml(h){ var pv=HREC_MODE==="pvp", r=pv?h.pvp:h.rec;
   var tog='<div class="btnrow" style="margin:4px 0 6px"><button class="btn small'+(pv?' ghost':'')+'" data-act="hero-recmode" data-m="rec">Kingdom</button><button class="btn small'+(pv?'':' ghost')+'" data-act="hero-recmode" data-m="pvp">PvP</button></div>';
   var head='<div class="h3" style="margin-top:8px">Service record</div>'+tog;
+  if (!r || !(r.b||r.d)){ var oth=pv?h.rec:h.pvp; if (!(oth&&(oth.b||oth.d))) return '<div class="h3" style="margin-top:8px">Service record</div><p class="dur" style="margin:0">'+esc(h.name)+' hasn\u2019t led a fight yet.</p>'; } // 0.2.49: one line until there's a fight
   if (!r || !(r.b||r.d)) return head+'<p class="hint">'+(pv?esc(h.name)+' hasn’t led a PvP fight yet. Battlefield matches against players and invasions (attacking, or defending as wall hero) count here.':esc(h.name)+' hasn’t led a fight yet. Every battle from now on goes on the record.')+'</p>';
   /* 0.2.45: cards, not lines */
   var card=function(l,v,sub,cls){ return '<div class="rcard'+(cls?' '+cls:'')+'"><span class="dur">'+l+'</span><b>'+v+'</b>'+(sub?'<span class="dur">'+sub+'</span>':'')+'</div>'; },
     wr=r.b?Math.round(r.w/r.b*100):0;
   return head+'<div class="rgrid2">'+card(pv?"Attacks led":"Battles led",fmt(r.b),r.b?fmt(r.w)+' won \u00b7 '+wr+'%':'')+card("Defenses led",fmt(r.d),r.d?fmt(r.dw)+' held':'')+card("Troops killed",fmt(r.k),"","kill")+card("Troops lost",fmt(r.l),"","loss")+
     (pv?'':card("Valleys and flats",fmt(r.v),"beaten")+card("NPC cities",fmt(r.n),"beaten"))+
-    card("Prestige destroyed",fmt(r.kv),"","wide")+(r.best?card("Best battle",fmt(r.best.k)+' killed',(r.best.n?'at '+esc(r.best.n):'')+(r.best.won?'':' (lost)'),"wide"):'')+'</div><p class="dur">'+(pv?'PvP records started with version 0.1.127: Battlefield matches against players and invasions. Kept apart from the kingdom record.':'Records started with version 0.1.123: older battles aren’t counted. PvP fights are kept on the PvP side.')+'</p>'; }
+    card("Prestige destroyed",fmt(r.kv),"","wide")+(r.best?card("Best battle",fmt(r.best.k)+' killed',(r.best.n?'at '+esc(r.best.n):'')+(r.best.won?'':' (lost)'),"wide"):'')+'</div>'; } // 0.2.49: the version footnotes went
 // PvP fights are fought on the server: each view carries recent reports, and each one is credited to its hero once
 function heroPvpSeen(key){ var l=S.pvpSeen||(S.pvpSeen=[]); if (l.indexOf(key)>=0) return true; l.push(key); if (l.length>400) l.splice(0,l.length-400); return false; }
 function heroPvpReports(kind, id, reps, defCity){ if (!reps || !reps.length || id==null) return; var ch=false;
@@ -10225,50 +10292,53 @@ function heroAutoHtml(h){ var a=h.auto||{pol:0,atk:0,int:0}, on=!!h.auto, d=HAD[
     '<div class="farmadd"><label class="dur" for="hauto-pol">Pol</label><input type="number" min="0" max="9" id="hauto-pol" value="'+(d.pol||0)+'" style="width:60px"><label class="dur" for="hauto-atk">Atk</label><input type="number" min="0" max="9" id="hauto-atk" value="'+(d.atk||0)+'" style="width:60px"><label class="dur" for="hauto-int">Int</label><input type="number" min="0" max="9" id="hauto-int" value="'+(d.int||0)+'" style="width:60px"></div>'+
     '<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="hero-auto">'+(on?'Save ratio':'Turn on')+'</button>'+(on?'<button class="btn ghost small" data-act="hero-autooff">Turn off</button><span class="dur">On: '+(a.pol||0)+' : '+(a.atk||0)+' : '+(a.int||0)+'</span>':'')+'</div></details>'; }
 var HAD={}; // auto level-up ratio being typed, per hero
-function viewHeroes(){
+function viewHeroes(){ // 0.2.49 (Cody's pick from the design plan): one line on top, offices as 4 equal tiles, the hall as a 3-column grid with sort chips, the Inn as 2 x 2 cards
   var cap=hallCap(), il=innLv(), h="";
   if (!cap && !il && !S.heroes.length && !S.waiting.length)
     return '<div class="empty-state"><p>Build a Feasting Hall to house heroes and an Inn to hire them. Legendary heroes won on the wheel wait at the gate until you have room; lesser ones move on.</p><button class="btn" data-act="tab" data-tab="city">Go to city</button></div>'+'<div class="section">'+hallBtnHtml()+'</div>';
-  var mb=mayorBonus(), anyOff=OFFICES.some(function(o){ return officer(o[0]); }), ahN=ahAll().length;
-  h+=hallBtnHtml(); // 0.2.36
-  if (ahN) h+='<div class="section"><div class="act"><span class="dur">'+ahN+' hero'+(ahN>1?'es':'')+(S.cities.length>1?' across '+S.cities.length+' cities':'')+'</span><span class="btnrow"><button class="btn ghost small" data-act="armory-sheet">Armory</button><button class="btn small" data-act="ah-open">All heroes</button></span></div></div>'; // 0.1.244
-  // 0.2.4: offices as tiles (portrait, job, hero, what it gives); tap one to pick its hero. The rules fold into dropdowns.
-  h+='<div class="section"><div class="shead"><h3>Offices</h3><span class="dur">'+OFFICES.filter(function(o){ return officer(o[0]); }).length+' of '+OFFICES.length+' filled</span></div><div class="oftiles">'+
-    OFFICES.map(function(o){ var oh=officer(o[0]), mine=!!seatHolder(o[0]), eff=offEffect(o[0], mb);
-      return '<button class="oftile'+(oh?'':' vacant')+'" data-act="off-open" data-role="'+o[0]+'"><span class="ofjob">'+o[1]+'</span>'+
-        '<span class="ofhero">'+(oh?heroPortrait(oh,46):'<span class="ofempty" aria-hidden="true">?</span>')+'<span class="ofname">'+(oh?esc(oh.name)+'<span class="dur">'+STATN[o[2]].slice(0,3)+' '+hs(oh,o[2])+'</span>':'<span class="why">Vacant</span><span class="dur">tap to appoint</span>')+'</span></span>'+
-        '<span class="ofst">'+(oh?(mine?'<span class="okc">Your pick</span>':'Auto, borrowed')+' \u00b7 ':'')+(oh?eff:esc(o[3]))+'</span></button>'; }).join("")+'</div>';
+  var mb=mayorBonus(), anyOff=OFFICES.some(function(o){ return officer(o[0]); }), ahN=ahAll().length, HH=(function(){ try { hallSync(); } catch(e){} return hallS(); })();
+  var nHall=Object.keys(HH.h).filter(function(n){ return hallHero(n); }).length, nHc=Object.keys(HH.c).length;
+  h+='<div class="hstrip"><span class="dur"><b>'+S.heroes.length+(cap?' / '+cap:'')+'</b> heroes'+(salary()?' · '+fmt(salary())+' gold/h':'')+'</span><span class="hstripb">'+
+    '<button class="chipbtn" data-act="armory-sheet">Armory</button>'+(ahN&&S.cities.length>1?'<button class="chipbtn" data-act="ah-open">All cities</button>':ahN?'<button class="chipbtn" data-act="ah-open">List</button>':'')+
+    '<button class="chipbtn hallchip" data-act="hall-open" aria-label="Hall of History: '+nHall+(nHall===1?' hero':' heroes')+', '+nHc+(nHc===1?' city':' cities')+'">History<span class="dur">'+nHall+'</span></button></span></div>';
+  // offices: four equal tiles; what each gives is in the tile's label and on its picker
+  h+='<div class="section"><div class="shead"><h3>Offices</h3><span class="ofhd"><label class="chk ofauto"><input type="checkbox" id="automayor"'+(S.autoMayor?' checked':'')+'> Auto-fill</label><button class="ofq'+(OFFHELP?' on':'')+'" data-act="off-help" aria-label="How offices work" aria-expanded="'+(OFFHELP?'true':'false')+'">?</button></span></div>';
+  if (OFFHELP) h+='<div class="ofhelp"><p class="hint">Four jobs: the mayor (Politics) sets production and building speed, the trainer (Attack) training speed, the researcher (Intelligence) research speed, and the wall hero (Attack) leads your troops when this city is attacked. A hero you seat yourself stays home. With auto-fill on, an empty seat borrows the best hero who is home and lets go straight away, so borrowed heroes still march.</p></div>';
+  h+='<div class="oftiles of4">'+OFFICES.map(function(o){ var oh=officer(o[0]), mine=!!seatHolder(o[0]), eff=oh?offEffect(o[0], mb):o[3];
+      return '<button class="oftile'+(oh?'':' vacant')+'" data-act="off-open" data-role="'+o[0]+'" title="'+esc(eff)+'" aria-label="'+o[1]+': '+(oh?esc(oh.name)+', '+esc(eff):'vacant')+'"><span class="ofjob">'+o[1]+'</span>'+
+        (oh?heroPortrait(oh,52):'<span class="ofempty" aria-hidden="true">+</span>')+'<span class="ofname">'+(oh?esc(oh.name):'<span class="why">Vacant</span>')+'</span>'+
+        '<span class="ofst">'+(oh?STATN[o[2]].slice(0,3)+' '+hs(oh,o[2])+' · '+(mine?'<span class="okc">Your pick</span>':'Auto'):'tap to appoint')+'</span></button>'; }).join("")+'</div>';
   if (anyOff && S.res.gold<=0 && salary()>0) h+='<p class="warn">Your treasury is empty, so your mayor, trainer and researcher have stopped working (the wall hero stays on the wall). Raise taxes or trade for gold.</p>';
-  h+='<label class="chk" style="margin-top:10px"><input type="checkbox" id="automayor"'+(S.autoMayor?' checked':'')+'> Auto-fill each seat with the best free hero</label>';
-  h+='<details class="det" data-det="offhow"'+(DET.offhow?' open':'')+'><summary class="dur">How offices work</summary><p class="hint">Four jobs, four heroes: the mayor (Politics) sets production and building speed, the trainer (Attack) training speed, the researcher (Intelligence) research speed. The wall hero (Attack) leads your troops whenever this city is attacked; with no wall hero, no hero leads the defense, and the wall hero keeps working even when the treasury is empty. Officers earn experience while they serve. A hero you seat yourself stays home (never in a march list).</p></details>';
-  h+='<details class="det" data-det="offauto"'+(DET.offauto?' open':'')+'><summary class="dur">How auto-fill works</summary>'+(S.autoMayor?'<p class="hint">An empty seat borrows the best hero who is home when its job needs one (Politics for the mayor, Attack for the trainer, Intelligence for the researcher), one job per hero, and lets go straight away: a build, research or training batch takes the borrowed hero\u2019s bonus when it starts, and production uses whoever is home right now. Borrowed heroes are never held back: they march and auto-farm as usual. A seat you pick yourself is locked (no marches) and its hero is never borrowed for another job. The wall hero is always yours to pick.</p>':'<p class="hint">Auto-fill is off: you pick every officer. An empty seat does no work: no mayor means no production bonus, no trainer means no training bonus, no researcher means no research bonus.</p>')+'</details>';
   h+='</div>';
-  h+='<div class="section"><div class="shead"><h3>Feasting Hall</h3><span class="dur">'+S.heroes.length+' / '+cap+' heroes'+(salary()?', salaries '+fmt(salary())+' gold/h':'')+'</span></div>';
+  // the hall
+  var so=C().heroSort||{a:"level",b:"atk"}, chip=function(k,l){ return '<button class="chipbtn'+(so.a===k?' on':'')+'" data-act="hsort" data-k="'+k+'" aria-pressed="'+(so.a===k)+'">'+l+'</button>'; };
+  h+='<div class="section"><div class="shead"><h3>Feasting Hall</h3>'+(S.heroes.length>1?'<span class="hsorts">'+chip("level","Level")+chip("atk","Atk")+chip("int","Int")+chip("pol","Pol")+
+    (function(){ var four=["level","atk","int","pol"], more=four.indexOf(so.a)<0; return '<select id="hsort1" aria-label="More ways to sort" class="hsortmore'+(more?' on':'')+'">'+(more?'':'<option value="" selected>\u22ef</option>')+HSORT.filter(function(x){ return four.indexOf(x[0])<0; }).map(function(x){ return '<option value="'+x[0]+'"'+(x[0]===so.a?' selected':'')+'>'+x[1]+'</option>'; }).join("")+'</select>'; })()+'</span>':'')+'</div>';
   if (!cap) h+='<p class="hint">Build a Feasting Hall to keep heroes.</p>';
   else if (!S.heroes.length) h+='<p class="hint">The hall is empty. Hire at the Inn or try the wheel.</p>';
-  if (S.heroes.length>1) h+=heroSortBar();
-  h+='<div class="herolist">'+heroesSorted(S.heroes).map(heroCardBig).join("")+'</div></div>';
+  h+='<div class="hgrid">'+heroesSorted(S.heroes).map(heroCardBig).join("")+'</div></div>';
   if (S.waiting.length){
-    h+='<div class="section"><h3>Waiting at the gate</h3><p class="hint">Legendary and historic heroes wait here, free, until the hall has room. Lesser heroes with nowhere to sleep just move on.</p><div class="herolist">';
+    h+='<div class="section"><div class="shead"><h3>Waiting at the gate</h3><span class="dur">free, until the hall has room</span></div><div class="inngrid">';
     S.waiting.forEach(function(w){
-      h+='<div class="offer">'+shield(w)+'<span class="hn" style="font:700 1rem var(--display)">'+esc(w.name)+'</span><span class="dur"><span style="color:'+TIERS[w.tier].color+';font-weight:700">'+TIERS[w.tier].name+'</span> Lv '+w.level+', Pol '+w.pol+', Atk '+w.atk+', Int '+w.int+'</span>'+
-        '<div class="btnrow" style="grid-row:1/3;grid-column:3"><button class="btn small" data-act="welcome" data-id="'+w.id+'"'+(S.heroes.length>=cap?' disabled':'')+'>Welcome in</button><button class="link" data-act="sendaway" data-id="'+w.id+'">Send away</button></div></div>';
+      h+='<div class="innc">'+heroPortrait(w,44)+'<div class="innt"><b>'+esc(w.name)+'</b><span class="dur"><span style="color:'+TIERS[w.tier].color+';font-weight:700">'+TIERS[w.tier].name+'</span> · Lv '+w.level+'</span></div><span class="innst">A <b>'+w.atk+'</b> I <b>'+w.int+'</b> P <b>'+w.pol+'</b></span>'+
+        '<button class="btn small" data-act="welcome" data-id="'+w.id+'"'+(S.heroes.length>=cap?' disabled':'')+'>Welcome in</button><button class="link" data-act="sendaway" data-id="'+w.id+'">Send away</button></div>';
     });
     h+='</div></div>';
   }
-  h+='<div class="section"><div class="shead"><h3>Inn</h3>'+(il?'<span class="dur">New faces in about '+Math.max(1,Math.ceil(realMs(S.innRefreshAt-S.gt)/60000))+' min</span>':'')+'</div>';
+  h+='<div class="section"><div class="shead"><h3>Inn</h3>'+(il?'<span class="dur">new faces in '+Math.max(1,Math.ceil(realMs(S.innRefreshAt-S.gt)/60000))+' min · <button class="link" data-act="reroll"'+(S.res.gold<200?' disabled':'')+'>now, 200 gold</button></span>':'')+'</div>';
   if (!il) h+='<p class="hint">Build an Inn to see heroes for hire.</p>';
   else {
-    h+='<div class="herolist">';
+    h+='<div class="inngrid">';
     S.innOffers.forEach(function(o){
       var c=hireCost(o), why = S.heroes.length>=cap ? "Hall full" : S.res.gold<c ? "Need "+fmt(c)+" gold" : "";
-      h+='<div class="offer">'+shield(o)+'<span class="hn" style="font:700 1rem var(--display)">'+esc(o.name)+'</span><span class="dur">Lv '+o.level+', Pol '+o.pol+', Atk '+o.atk+', Int '+o.int+'</span><button class="btn small" data-act="hire" data-id="'+o.id+'"'+(why?' disabled title="'+why+'"':'')+'>'+(why||'Hire, '+fmt(c)+' gold')+'</button></div>';
+      h+='<div class="innc">'+shield(o,34)+'<div class="innt"><b>'+esc(o.name)+'</b><span class="dur">Lv '+o.level+'</span></div><span class="innst">A <b>'+o.atk+'</b> I <b>'+o.int+'</b> P <b>'+o.pol+'</b></span><button class="btn small" data-act="hire" data-id="'+o.id+'"'+(why?' disabled title="'+why+'"':'')+'>'+(why||'Hire · '+fmt(c))+'</button></div>';
     });
+    h+='</div>';
     if (!S.innOffers.length) h+='<p class="hint">No one is looking for work right now.</p>';
-    h+='</div><div class="act" style="margin-top:10px"><span class="dur">Inn heroes are common. The real prizes come from the wheel.</span><button class="btn ghost small" data-act="reroll"'+(S.res.gold<200?' disabled':'')+'>New faces, 200 gold</button></div>';
   }
   return h+'</div>';
 }
+var OFFHELP=false;
 function viewAcademy(){
   var al=academyLv();
   if (!al) return '<div class="empty-state"><p>Build an Academy on an empty city plot to start researching.</p><button class="btn" data-act="tab" data-tab="city">Go to city</button></div>';
@@ -10321,12 +10391,12 @@ function wallUpRow(L){
 }
 function fortSection(){
   var L=S.wall||0, busy=S.fortQ?', building '+FORTS[S.fortQ.f].name:'';
-  var h='<details class="section det" data-det="fort"'+(DET.fort?' open':'')+'><summary><b>Walls and fortifications</b> <span class="dur">Walls level '+L+', '+fmt(fortUsed())+' of '+fmt(fortCap())+' space'+busy+'</span></summary>';
-  if (!L){ return h+'<p class="hint">No walls yet. Tap the stone ring around your city to build them. Walls hold fortifications and must be broken before an attacker wins.</p><button class="btn small" data-w="wall" data-i="0">Build walls</button></details>'; }
+  var h='<div class="section" data-det="fort"><div class="shead"><h3>Walls and fortifications</h3><span class="dur">Level '+L+busy+'</span></div>'; // 0.2.49: its own page from the Walls tile
+  if (!L){ return h+'<p class="hint">No walls yet. Walls hold fortifications and must be broken before an attacker wins.</p><button class="btn small" data-w="wall" data-i="0">Build walls</button></div>'; }
   var shut=S.gate==="closed";
   h+='<div class="gaterow'+(shut?' shut':'')+'"><div><b>Gate '+(shut?'closed':'open')+'</b><div class="dur">'+(shut?'Your troops stay hidden when attacked. Only the walls and fortifications fight, so a broken wall still gets you plundered, but no troops die.':'Your troops march out and fight alongside the walls when attacked.')+'</div></div><button class="btn small'+(shut?'':' ghost')+'" data-act="gate">'+(shut?'Open gate':'Close gate')+'</button></div>';
   h+=wallUpRow(L);
-  h+='<p class="hint">Durability '+fmt(wallDurability(L))+'. Space '+fmt(fortUsed())+' of '+fmt(fortCap())+'. Archer tower reach +'+(L*3).toFixed(1)+'%. These fight exactly like the fortifications on NPC cities and AI lords.</p>';
+  h+='<div class="wstats"><div><b>'+fmt(wallDurability(L))+'</b><span>durability</span></div><div><b>'+fmt(fortUsed())+' / '+fmt(fortCap())+'</b><span>space</span></div><div><b>+'+(L*3).toFixed(1)+'%</b><span>tower reach</span></div></div>';
   if (S.fortQ) h+='<div class="bq"><span>Building '+fmt(S.fortQ.n)+' '+FORTS[S.fortQ.f].name+'</span><span class="qtime" id="fq-t"></span><div class="bar"><i id="fq-bar"></i></div><div class="qacts">'+(hasSpeedups()?'<button class="link strong" data-act="speedup" data-target="fort">Speed up</button>':'')+'<button class="link" data-act="cancel-fort">Cancel</button></div></div>';
   h+='<div class="unitlist">';
   FORTS.forEach(function(f,i){
@@ -10336,7 +10406,7 @@ function fortSection(){
     else h+='<div style="grid-column:1/-1">'+chips(f.cost)+'</div><div class="trainrow"><input type="number" min="0" data-fort="'+i+'" id="ft-amt-'+i+'" value="'+(fortAmt[i]||"")+'" placeholder="Amount"><button class="btn ghost small" data-act="fort-max" data-f="'+i+'" id="ft-max-'+i+'">Max</button><button class="btn small" data-act="fort-build" data-f="'+i+'" id="ft-btn-'+i+'">Build</button><span id="ft-info-'+i+'" class="dur"></span></div>';
     h+='</div>';
   });
-  return h+'</div>'+fortGoalsHtml()+'</details>';
+  return h+'</div>'+fortGoalsHtml()+'</div>';
 }
 function updateFortRow(i){
   var b=document.getElementById("ft-btn-"+i), inf=document.getElementById("ft-info-"+i); if (!b) return;
@@ -10353,7 +10423,7 @@ var TCOLV=["--t-common","--t-rare","--t-epic","--t-legendary","--t-mythic"], STA
 var DOLL_L=["helm","amulet","pauldrons","armor","cloak","gauntlets","belt","greaves"], DOLL_R=["weapon","shield","talisman","talisman2","ring","ring2","mount","boots"];
 function gearImg(type, sz){ var u=ITEM_IMG["g_"+type]; return u ? '<img class="iic" src="'+u+'" alt="" style="width:'+sz+'px;height:'+sz+'px">' : ICON.helm; }
 function gearTile(g, o){ o=o||{}; var sz=o.size||56;
-  if (!g) return '<span class="gtile empty" style="width:'+sz+'px;height:'+sz+'px">'+gearImg(o.type,sz-18)+(o.up?'<span class="gup">▲</span>':'')+'</span>';
+  if (!g) return '<span class="gtile empty" style="width:'+sz+'px;height:'+sz+'px">'+gearImg(o.type,sz-18)+(o.up?'<span class="gup gadd">+</span>':'')+'</span>'; // 0.2.49: ▲ means "a better piece than the one worn" everywhere; an empty slot with a spare to fill it shows +
   return '<span class="gtile" style="width:'+sz+'px;height:'+sz+'px;--tc:var('+TCOLV[g.tier]+')">'+gearImg(g.slot,sz-16)+'<span class="gst2">'+g.stars+'★</span><span class="gsd" style="background:'+STATC[gearStat(g)]+'"></span>'+
     (o.up?'<span class="gup">▲</span>':'')+(g.lock?'<span class="glk">🔒</span>':'')+'</span>'; }
 function gearUnworn(g){ return !g.on || !heroById(g.on); }
@@ -10383,23 +10453,23 @@ function heroDollHtml(hr){ var gb={atk:gearBonus(hr,"atk"), int:gearBonus(hr,"in
     '<div class="dgs"><span>Gear score</span><b>'+fmt(gearScore(hr))+'</b><span>'+n+' of '+GEAR_POS.length+' slots</span></div>'+heroMidMore(hr)+'</div>'+col(DOLL_R)+'</div>';
   h+='<div class="dset"><div class="act" style="margin:0"><span class="dur">'+(nx?'Star set '+goal+'★ on every slot':'Star set: the highest there is')+'</span><span class="dur">'+okN+' / '+GEAR_POS.length+'</span></div><div class="dbar"><i style="width:'+Math.round(okN/GEAR_POS.length*100)+'%"></i></div>'+
     '<p class="dur" style="margin:4px 0 0">'+(st<0?'Wear all 16 pieces to earn a star set bonus to troop life.':'Now: star set '+st+', troops led by '+esc(hr.name)+' have ×'+setLife(hr)+' life.')+(nx?' '+(miss.length<=4?'Raise '+miss.join(", ")+' to '+goal+'★':'Every slot at '+goal+'★')+' for ×'+nx[1]+'.':'')+'</p></div>';
-  return h+'<p class="dur" style="margin:4px 0 0">▲ a better spare piece is in the armory. Dots: <span style="color:'+STATC.atk+'">●</span> Attack <span style="color:'+STATC.int+'">●</span> Intelligence <span style="color:'+STATC.pol+'">●</span> Politics</p>'+heroDollFoot(hr)+'</div>'; }
+  return h+heroDollFoot(hr)+'</div>'; } // 0.2.49: the legend line went
 /* 0.2.45: under the gear score, in the box's middle: experience, the books (tap one to read one), auto level-up */
 function heroMidMore(hr){ var need=xpNeed(hr.level), top=hr.level>=HERO_MAX, f=top?1:Math.max(0,Math.min(1,hr.xp/Math.max(1,need))), nb=bookCount(), canRead=!top;
   var a=hr.auto||{pol:0,atk:0,int:0}, on=!!hr.auto, d=HAD[hr.id]||a;
   var h='<div class="dmore"><div class="dxpl"><b>Level '+hr.level+'</b><span>'+(top?'Max':fmt(hr.xp)+' / '+fmt(need))+'</span></div><div class="dbar dxp"><i style="width:'+Math.round(f*100)+'%"></i></div>';
   h+='<div class="dbooks">'+XP_BOOKS.map(function(bk){ var k=S.items[bk]||0; return '<button class="dbook" data-act="tome" data-book="'+bk+'" title="'+esc(ITEMS[bk].name)+': +'+fmt(ITEMS[bk].xp)+' experience each"'+(k&&canRead?'':' disabled')+'>'+itemImg(bk)+'<span>'+fmt(k)+'</span></button>'; }).join("")+'</div>'+
     '<button class="btn ghost small dreset" data-act="tome-every"'+(nb&&canRead?'':' disabled')+'>'+(armed==="tomeevery"?'Tap again: read all '+fmt(nb):nb?'Read all books (+'+fmt(bookXpAll())+')':'No experience books')+'</button>';
-  h+='<div class="dauto"><span class="dur">Auto level-up'+(on?' \u00b7 on':'')+'</span><div class="dar">'+[["pol","Pol"],["atk","Atk"],["int","Int"]].map(function(q){ return '<label><span>'+q[1]+'</span><input type="number" min="0" max="9" id="hauto-'+q[0]+'" value="'+(d[q[0]]||0)+'"></label>'; }).join("")+'</div>'+
+  h+='<div class="dauto"><span class="dur">Auto level-up'+(on?' \u00b7 on':'')+'</span><div class="dar">'+[["atk","Atk"],["int","Int"],["pol","Pol"]].map(function(q){ return '<label><span>'+q[1]+'</span><input type="number" min="0" max="9" id="hauto-'+q[0]+'" value="'+(d[q[0]]||0)+'"></label>'; }).join("")+'</div>'+
     '<div class="dar2"><button class="btn small dreset" data-act="hero-auto">'+(on?'Save':'Turn on')+'</button>'+(on?'<button class="btn ghost small dreset" data-act="hero-autooff">Off</button>':'')+'</div></div>';
   return h+'</div>'; }
 /* 0.2.45: the rest of the hero inside the gear box: salary, what the stats do */
 function heroDollFoot(hr){ var need=xpNeed(hr.level), top=hr.level>=HERO_MAX, f=top?1:Math.max(0,Math.min(1,hr.xp/Math.max(1,need))), hdg=dragonOf(hr);
-  var h='<div class="dfoot">'+
-    '<p class="dur" style="margin:0">Auto level-up puts every point the hero earns into Politics, Attack and Intelligence by that ratio (0 : 2 : 1 = two Attack for every Intelligence); turning it on spends the unused points now. Salary '+fmt(hr.level*20)+' gold/h'+(hr.fav?' \u00b7 a favourite: pinned to the top and can\u2019t be dismissed':'')+'. Tap the picture to change it; other players see it.</p>';
-  h+='<details class="det" data-det="hstats"'+(DET.hstats?' open':'')+'><summary><b>What the stats do</b></summary><div class="gearlist">'+[["pol","Politics","Production and building speed as mayor"],["atk","Attack","Training speed as trainer, +0.5% troop attack per point in battle"],["int","Intelligence","Research speed as researcher; in battle every troop gets +1 life per point, and marches 1% faster per point"]].map(function(st){ return '<div class="gearrow"><span class="gn"><b>'+st[1]+' '+fmt(hs(hr,st[0]))+'</b>'+(gearBonus(hr,st[0])?' <span class="dur">('+hr[st[0]]+' + '+gearBonus(hr,st[0])+' gear)</span>':'')+'<div class="dur">'+st[2]+'</div></span></div>'; }).join("")+'</div>'+
+  var h='<div class="dfoot">'+ // 0.2.49: the paragraph went (salary is under the name; auto level-up is explained in "What the stats do")
+    (hdg?'<p class="dur" style="margin:0"><b style="color:'+hdg.def.col+'">'+hdg.def.name+' Dragon</b>, level '+hdg.lv+': '+dragonBuffTxt(hdg.t,hdg.lv)+'. Change it in the Overlook.</p>':'');
+  h+='<details class="det" data-det="hstats"'+(DET.hstats?' open':'')+'><summary><b>What the stats do</b></summary><div class="gearlist">'+[["atk","Attack","Training speed as trainer, +0.5% troop attack per point in battle"],["int","Intelligence","Research speed as researcher; in battle every troop gets +1 life per point, and marches 1% faster per point"],["pol","Politics","Production and building speed as mayor"]].map(function(st){ return '<div class="gearrow"><span class="gn"><b>'+st[1]+' '+fmt(hs(hr,st[0]))+'</b>'+(gearBonus(hr,st[0])?' <span class="dur">('+hr[st[0]]+' + '+gearBonus(hr,st[0])+' gear)</span>':'')+'<div class="dur">'+st[2]+'</div></span></div>'; }).join("")+'</div>'+
     '<p class="dur" style="margin:6px 0 0">As mayor: production +'+pct(hs(hr,"pol")*0.003)+', buildings '+pct(1-1/(1+hs(hr,"pol")/200))+' faster, population grows '+pct(hs(hr,"pol")/400)+' faster. As trainer: training '+pct(1-Math.pow(0.9975,hs(hr,"atk")))+' faster. As researcher: research '+pct(1-1/(1+hs(hr,"int")/200))+' faster.</p>'+
-    (hdg?'<p class="dur" style="margin:4px 0 0"><b style="color:'+hdg.def.col+'">'+hdg.def.name+' Dragon</b>, level '+hdg.lv+': '+dragonBuffTxt(hdg.t,hdg.lv)+'. Change it in the Overlook.</p>':'')+'</details>';
+    '<p class="dur" style="margin:4px 0 0">Auto level-up puts each point the hero earns into Attack, Intelligence and Politics by its ratio (2 : 1 : 0 = two Attack for every Intelligence); turning it on spends the unused points now.</p></details>';
   return h+'</div>'; }
 // the head of a piece's screen: big tile, names, stars, bonus, who wears it
 function gearHeadHtml(g){ var who=g.on?heroById(g.on):null, max=GEAR_MAX[g.tier], s="";
@@ -13240,28 +13310,29 @@ function levelGuideHtml(type, cur){
   var body='<div class="lvguide">'+rows.map(function(r){ return '<div class="lvrow'+(r.L===cur?' cur':r.L===cur+1?' next':'')+'"><b>'+r.L+'</b><span>'+r.bits.join('<br>')+(r.L===cur?' <span class="dur">(you are here)</span>':'')+'</span></div>'; }).join("")+'</div>';
   return detBox("lv_"+type, false, '<b>What each level does</b> <span class="dur">levels 1 to '+rows.length+'</span>', body, "det lvdet");
 }
-function troopReqHtml(){
-  var rows=U.map(function(u,i){ var others=u.req.filter(function(r){ return r[0]!=="barracks"; }), can=!missing(u.req).length;
-    return '<tr class="'+(can?'ok':'')+'"><td>'+u.name+'</td><td>'+barracksReq(i)+'</td><td>'+(others.length?others.map(function(r){ return '<span class="'+(missing([r]).length?'why':'')+'">'+reqName(r)+'</span>'; }).join(', '):'\u2014')+'</td></tr>'; }).join("");
-  return detBox("barracks_troops", true, '<b>Troops and what they need</b>',
-    '<p class="hint">Each unit needs a Barracks of at least this level, plus anything listed. Names in green you can train in '+esc(S.name)+' now; requirements in red are still missing.</p><div class="tscroll"><table class="gt reqt"><thead><tr><th>Unit</th><th>Brks</th><th>Also needs</th></tr></thead><tbody>'+rows+'</tbody></table></div>', "det lvdet");
+function troopReqHtml(){ // 0.2.49: the units as tiles, like the Army tab: lit when you can train them here, dimmed with what is missing
+  return '<div class="brq">'+U.map(function(u,i){ var miss=missing(u.req), can=!miss.length;
+    return '<div class="brqt'+(can?' ok':'')+'" title="'+esc(u.name)+'">'+itemImg("u_"+u.k)+'<b>'+(u.name==="Battering Ram"?"Ram":u.name)+'</b><span class="'+(can?'dur':'why')+'">'+(can?'Barracks '+barracksReq(i):esc(miss.map(reqName).join(", ")))+'</span></div>'; }).join("")+'</div>';
 }
-function upgradeBlock(w,i){
-  var s=getSlot(w,i), d=DEF[s.type], L=s.level, busy=!!buildOn(w,i), h;
-  h='<div class="head"><span class="ico">'+ICON[s.type]+'</span><div><h2>'+d.name+'</h2><div class="sub">'+(L>0?"Level "+L:s.type==="walls"?"Not built yet":"Under construction")+'</div></div></div><p>'+d.desc+'</p>';
-  if (L>0) h+='<div class="effect">'+effectLine(s.type,L)+'</div>';
+function upgradeBlock(w,i){ // 0.2.49: one layout for every building: header with level pips, the description behind More, now -> next, cost tiles, one button, then the level guide and Demolish
+  var s=getSlot(w,i), d=DEF[s.type], L=s.level, busy=!!buildOn(w,i), h, top=cityMax();
+  var pips=''; for (var k=1;k<=top;k++) pips+='<i class="'+(k<=L?'f':'')+'"></i>';
+  var sents=String(d.desc).split(". "), first=sents[0].replace(/\.?$/,"."), rest=sents.slice(1).join(". ");
+  h='<div class="head bhead"><span class="ico">'+ICON[s.type]+'</span><div style="flex:1;min-width:0"><h2>'+d.name+'</h2><div class="sub">'+(L>0?"Level "+L+" of "+top:s.type==="walls"?"Not built yet":"Under construction")+'</div>'+(L>0?'<div class="bpips">'+pips+'</div>':'')+'</div><button class="btn ghost small" data-act="close" aria-label="Close">\u2715</button></div>';
+  h+=rest ? '<details class="bmore"><summary>'+first+' <span class="link">More</span></summary><p>'+rest+'</p></details>' : '<p class="bmore0">'+first+'</p>';
+  if (L>0){ var ef=effectLine(s.type,L), ar=ef.indexOf(" \u2192 ");
+    h+= ar>0 ? '<div class="bnow"><div><span class="dur">now</span><b>'+ef.slice(0,ar)+'</b></div><span class="barr">\u2192</span><div><span class="dur">next level</span><b>'+ef.slice(ar+3).replace(/^level \d+: /,"")+'</b></div></div>' : '<div class="bnow one"><div><b>'+ef+'</b></div></div>'; }
   if (s.type==="barracks") h+=troopReqHtml();
-  h+=levelGuideHtml(s.type, L);
   var qn=S.bq.filter(function(x){ return x.w===w && x.i===i; }).length, nextL=L+1+(busy?1:0)+qn;
-  if (nextL<=cityMax()){
-    var why=busy?"Upgrading now":upgradeWhy(s.type,L), canQ=nextL<=cityMax();
-    h+=chips(costFor(s.type,nextL))+'<div class="upact"><div class="upinfo"><span class="dur">Level '+nextL+': '+fmtT(realMs(timeFor(s.type,nextL)))+'</span><span class="why">'+(why||'')+'</span></div>'+
-      '<div class="upbtns">'+(!why?'<button class="btn" data-act="upgrade">Upgrade</button>':'<button class="btn ghost" data-act="queue-up"'+(canQ?'':' disabled')+'>Add to queue</button>')+'</div>'+ // one button, one spot: Upgrade when it can start now, otherwise Add to queue
-      '<p class="hint">'+(busy?'Construction in progress; the timer is in the queue at the top. ':'')+(qn?qn+' already queued here. ':'')+'Queued upgrades start on their own when a builder is free and you can afford them.</p></div>';
+  if (nextL<=top){
+    var why=busy?"Upgrading now":upgradeWhy(s.type,L), c=costFor(s.type,nextL);
+    h+='<div class="bup">'+costTilesHtml(c)+'<div class="bpact"><span class="dur">\u23f1 Level '+nextL+': '+fmtT(realMs(timeFor(s.type,nextL)))+'</span><span class="why">'+(why||'')+'</span></div>'+
+      (!why?'<button class="btn bpgo" data-act="upgrade">Upgrade</button>':'<button class="btn ghost bpgo" data-act="queue-up">Add to queue</button><div class="dur bpq">Starts when a builder is free and you can afford it'+(qn?' \u00b7 '+qn+' already queued':'')+'</div>')+'</div>';
   } else h+='<p class="sub">'+(busy||qn?'Its last level is already underway or queued.':'Fully upgraded.')+'</p>';
+  h+=levelGuideHtml(s.type, L);
   if (L>0 && w!=="th" && w!=="wall"){
     var dw=demolishWhy(w,i);
-    h+='<div class="act"><span class="dur">'+(dw?dw:'Clears the plot for something else. Nothing is refunded.')+'</span><button class="btn ghost danger small" data-act="demolish"'+(dw?' disabled':'')+'>'+(armed==="demolish"?"Tap again to demolish":"Demolish")+'</button></div>';
+    h+='<div class="bfoot"><span class="dur">'+(dw?esc(dw):armed==="demolish"?'Nothing is refunded.':'')+'</span><button class="btn ghost danger small" data-act="demolish"'+(dw?' disabled':'')+'>'+(armed==="demolish"?"Tap again to demolish":"Demolish")+'</button></div>';
   }
   return h;
 }
@@ -13283,7 +13354,7 @@ function taxSection(){
 function viewBuilding(){
   var s=pg && getSlot(pg.w,pg.i);
   if (!s || !s.level || !PAGE_TYPES[s.type]){ tab="city"; return viewCity(); }
-  var h='<div class="pagehead"><button class="btn ghost small" data-act="tab" data-tab="city">\u2039 City</button></div><div class="section bpage">'+upgradeBlock(pg.w,pg.i)+'</div>';
+  var h='<div class="pagehead"><button class="btn ghost small" data-act="tab" data-tab="city">\u2039 City</button></div><div class="section bpage">'+upgradeBlock(pg.w,pg.i).replace('<button class="btn ghost small" data-act="close" aria-label="Close">\u2715</button>','')+'</div>';
   if (s.type==="townhall") h+=taxSection()+detBox("titles", false, '<b>Titles and ranks</b> <span class="dur">medals, prestige and promotions</span>', viewTitles());
   else if (s.type==="academy") h+='<div class="pagelabel">Research</div>'+viewAcademy();
   else if (s.type==="forge") h+=armorySection();
@@ -14127,7 +14198,7 @@ var PAGES={settings:1,ach:1,quests:1,lb:1,me:1}, pageLast=""; // these four open
 function onPage(k){ return sheetFor ? sheetFor.kind===k : tab===k; }
 function goPage(k){ if (bfOn()||pvOn()){ openSheet({kind:k}); return; } closeSheet(); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); arrange=null; warArmed=false; chalArmed=false; bfArmed=false; farmArmed=false; itemsNote=""; armed=null; tab=k; lastView=""; renderView(true); window.scrollTo({top:0}); }
 var SHEET_T=0; // when a window last opened: a phone's tap sends its click after the window is already up, and that click mustn't count as tapping outside it
-function openSheet(kind){ SHEET_T=Date.now(); var keep=kind&&kind.keepScroll, foc=kind&&kind.focus; if (keep!=null) delete kind.focus; sheetFor=kind; lastSheet=""; armed=null; renderSheet(); if (!sheet.open) sheet.showModal();
+function openSheet(kind){ SHEET_T=Date.now(); var keep=kind&&kind.keepScroll, foc=kind&&kind.focus; if (keep!=null) delete kind.focus; sheetFor=kind; lastSheet=""; armed=null; renderSheet(); if (!sheet.open){ sheet.showModal(); try { sheetBody.setAttribute("tabindex","-1"); sheetBody.focus({preventScroll:true}); } catch(e){} } // 0.2.49: focus the window itself, so no button or dropdown opens with a highlight ring
   if (kind && kind.kind==="report"){ fitReport(); requestAnimationFrame(function(){ if (sheetFor===kind) fitReport(); }); } /* measure after the window is open */
   if (keep!=null) sheetBody.scrollTop=keep; else if (kind && !foc && sheetBody.scrollTop) sheetBody.scrollTop=0; }
 // back from a gear menu to the hero's sheet, scrolled to exactly where it was
@@ -14412,10 +14483,13 @@ function renderSheetCore(){
     var isM = S.mayor===hr.id, need=xpNeed(hr.level);
     /* 0.2.45: the name at the top is the name box (fixed and historic names stay plain) */
     var nmEd = (hr.fixedName||hr.tier==="historic") ? '<h2 id="hname-h" class="hnm">'+esc(hr.name)+'</h2>' : hr.tier==="queen" ? '<span class="hnq">Queen</span><input id="hname" class="hnamein" type="text" maxlength="22" aria-label="Name" value="'+esc(hr.name.replace(/^Queen\s+/i,""))+'">' : '<input id="hname" class="hnamein" type="text" maxlength="28" aria-label="Name" value="'+esc(hr.name)+'">';
-    h='<div class="hhead htop"><div style="min-width:0"><div class="hnrow">'+nmEd+(nmEd.indexOf('hnamein')>=0?'<span class="hpen" aria-hidden="true">\u270e</span>':'')+'<button class="hfav'+(hr.fav?' on':'')+'" data-act="hero-fav" data-id="'+hr.id+'" aria-label="Favourite">'+(hr.fav?'\u2605':'\u2606')+'</button></div><div class="sub"><span style="color:'+TIERS[hr.tier].color+';font-weight:700">'+TIERS[hr.tier].name+'</span>, level '+hr.level+(officeOf(hr)?', '+officeOf(hr)[1].toLowerCase()+(hr.autoSeat&&officeOf(hr)[0]!=="wallHero"?' (auto)':''):'')+'</div></div></div>';
+    h='<div class="hhead htop"><div style="min-width:0"><div class="hnrow">'+nmEd+(nmEd.indexOf('hnamein')>=0?'<span class="hpen" aria-hidden="true">\u270e</span>':'')+'<button class="hfav'+(hr.fav?' on':'')+'" data-act="hero-fav" data-id="'+hr.id+'" aria-label="Favourite">'+(hr.fav?'\u2605':'\u2606')+'</button></div><div class="sub"><span style="color:'+TIERS[hr.tier].color+';font-weight:700">'+TIERS[hr.tier].name+'</span>, level '+hr.level+(function(){ var jb=jobOf(hr); return jb?', '+jb.o[1].toLowerCase()+(jb.auto?' (auto)':''):''; })()+' \u00b7 '+fmt(hr.level*20)+' gold/h</div></div>'+(sheetFor.back==="ah"?'':'<button class="btn ghost small" data-act="close" aria-label="Close" style="margin-left:auto;align-self:flex-start">\u2715</button>')+'</div>';
     var hset=starSet(hr), nxt=nextSetTier(Math.max(0,hset));
-    h+='<div class="speeds gsettabs" id="herogear">'; for (var gti=0; gti<GEAR_SETS; gti++){ var gtin=gearSetInfo(hr,gti); h+='<button data-act="gset-load" data-i="'+gti+'"'+(gtin&&gtin.have?'':' disabled')+'><b>'+esc(gearSetName(hr,gti))+'</b><span class="dur">'+(gtin?gtin.have+' pieces':'empty')+'</span></button>'; }
-    h+='</div>'+heroDollHtml(hr);
+    var gren=armed==="gsren"; // 0.2.49: presets are only these tabs; the pencil turns them into name boxes
+    h+='<div class="speeds gsettabs" id="herogear">'; for (var gti=0; gti<GEAR_SETS; gti++){ var gtin=gearSetInfo(hr,gti);
+      h+= gren ? '<span class="gsedit"><input data-gsn="'+gti+'" type="text" maxlength="24" value="'+esc(((hr.gearSetNames||[])[gti])||"")+'" placeholder="Preset '+(gti+1)+'" aria-label="Preset '+(gti+1)+' name"><span class="dur">'+(gtin?gtin.have+' pieces':'empty')+'</span></span>'
+        : '<button data-act="gset-load" data-i="'+gti+'"'+(gtin&&gtin.have?'':' disabled')+' title="'+(gtin&&gtin.others&&gtin.others.length?'Takes pieces from '+esc(gtin.others.join(", ")):'Put this preset on')+'"><b>'+esc(gearSetName(hr,gti))+'</b><span class="dur">'+(gtin?gtin.have+' pieces':'empty')+'</span></button>'; }
+    h+='<button class="gsren'+(gren?' on':'')+'" data-act="gset-ren" aria-label="'+(gren?'Done naming presets':'Name the presets')+'">'+(gren?'\u2713':'\u270e')+'</button></div>'+heroDollHtml(hr);
     var wornN=S.gear.filter(function(g){ return g.on===hr.id; }).length;
     var freeN=S.gear.filter(function(g){ return !g.on || !heroById(g.on); }).length;
     var gsaving=armed==="gsavepick"||/^gsave\d$/.test(armed||"");
@@ -14423,35 +14497,30 @@ function renderSheetCore(){
     if (armed==="best") h+='<div class="effect gpop"><div class="sub">Best of everything: pieces of that stat are taken from other heroes.</div><div class="btnrow">'+["atk","int","pol"].map(function(k){ return '<button class="btn small" data-act="gear-best-go" data-free="0" data-stat="'+k+'">'+STATN[k]+'</button>'; }).join("")+'</div>'+
       '<div class="sub" style="margin-top:6px">Spare pieces only: nothing is taken from another hero.</div><div class="btnrow">'+["atk","int","pol"].map(function(k){ return '<button class="btn ghost small" data-act="gear-best-go" data-free="1" data-stat="'+k+'"'+(freeN?'':' disabled')+'>'+STATN[k]+'</button>'; }).join("")+'<button class="link" data-act="gear-best-cancel">Cancel</button></div></div>';
     if (gsaving) h+='<div class="effect gpop"><div class="sub">Save what '+esc(hr.name)+' wears now into:</div><div class="btnrow">'+Array.apply(null,Array(GEAR_SETS)).map(function(_,i){ var gi=gearSetInfo(hr,i); return '<button class="btn '+(armed==="gsave"+i?'':'ghost ')+'small" data-act="gset-save" data-i="'+i+'">'+(armed==="gsave"+i?'Tap again to overwrite':esc(gearSetName(hr,i))+(gi?' ('+gi.have+')':''))+'</button>'; }).join("")+'<button class="link" data-act="gear-best-cancel">Cancel</button></div></div>';
-    h+='<p class="dur" style="margin:4px 0 0">Tap a preset tab to put it on. Pieces another hero is wearing get taken from them.</p><details class="det" data-det="gsets"'+(DET.gsets?' open':'')+'><summary><b>Name presets</b></summary><div class="gearlist">';
-    for (var gsi=0; gsi<GEAR_SETS; gsi++){ var gin=gearSetInfo(hr,gsi);
-      h+='<div class="gearrow"><span class="gn"><input data-gsn="'+gsi+'" type="text" maxlength="24" value="'+esc(((hr.gearSetNames||[])[gsi])||"")+'" placeholder="Preset '+(gsi+1)+'" aria-label="Preset name" style="width:100%;font:inherit;padding:2px 6px"></span><span class="gb">'+(gin?gin.have+' piece'+(gin.have===1?'':'s'):'Empty')+'</span>'+
-        (gin&&(gin.gone||gin.others.length)?'<span class="dur" style="grid-column:1/-1">'+(gin.others.length?'Worn now by '+esc(gin.others.join(", ")):'')+(gin.others.length&&gin.gone?'. ':'')+(gin.gone?gin.gone+' scrapped piece'+(gin.gone===1?'':'s')+' will be skipped':'')+'</span>':'')+
-        '<span class="btnrow" style="grid-column:1/-1;margin-top:4px"><button class="btn small" data-act="gset-load" data-i="'+gsi+'"'+(gin&&gin.have?'':' disabled')+'>Equip</button><button class="btn ghost small" data-act="gset-save" data-i="'+gsi+'">'+(armed==="gsave"+gsi?'Tap again to overwrite':'Save current gear')+'</button></span></div>';
-    }
-    h+='</div></details>';
     h+=heroRecordHtml(hr);
-    h+='<div class="act" style="margin-top:14px"><button class="btn ghost danger small" data-act="dismiss"'+(hr.fav?' disabled':'')+'>'+(armed==="dismiss"?"Tap again to dismiss":"Dismiss hero")+'</button><button class="closebtn" data-act="'+(sheetFor.back==="ah"?'ah-open':'close')+'">'+(sheetFor.back==="ah"?'Back to all heroes':'Close')+'</button></div>'; // 0.1.239: dismiss sits at the very bottom, away from Reset points
+    h+='<div class="act" style="margin-top:14px"><button class="btn ghost danger small" data-act="dismiss"'+(hr.fav?' disabled':'')+'>'+(armed==="dismiss"?"Tap again to dismiss":"Dismiss hero")+'</button>'+(sheetFor.back==="ah"?'<button class="closebtn" data-act="ah-open">Back to all heroes</button>':'')+'</div>'; // 0.1.239: dismiss sits at the very bottom, away from Reset points
   } else {
     var w=sheetFor.w, i=sheetFor.i, s=getSlot(w,i);
     if (!s){
-      var list = w==="in"?INSIDE:FIELD;
-      h='<div class="head"><div><h2>'+(w==="in"?"Empty city plot":"Empty field")+'</h2><div class="sub">Choose what to build here.</div></div></div><div class="choices">';
-      list.forEach(function(type){
-        var d=DEF[type], why="";
-        if (d.unique && findUnique(type)) why="You already have one";
-        if (!why) why=buildReqWhy(type,1);
-        var soon = !why && (!builderFree() || !afford(costFor(type,1)));
-        h+='<button class="choice" data-act="build-new" data-type="'+type+'"'+(why?' disabled':'')+'><span class="ico">'+ICON[type]+'</span><b>'+d.name+'</b><span class="d">'+d.desc+' '+fmtT(realMs(timeFor(type,1)))+'.</span>'+chips(costFor(type,1))+(why?'<span class="why">'+why+'</span>':soon?'<span class="dur">Tap to add to the build queue</span>':'')+'</button>';
-      });
-      h+='</div><button class="closebtn" data-act="close">Close</button>';
+      var list = w==="in"?INSIDE:FIELD, built=[], rows=[];
+      // 0.2.49: a tile picker. One-per-city buildings you already have are left out (named on one line); tap a tile for its cost and Build
+      list.forEach(function(type){ var d=DEF[type]; if (d.unique && findUnique(type)){ built.push(d.name); return; } rows.push({t:type, why:buildReqWhy(type,1)}); });
+      var sel=rows.filter(function(r){ return r.t===sheetFor.sel; })[0] || rows.filter(function(r){ return !r.why; })[0] || rows[0];
+      h='<div class="head"><div style="flex:1"><h2>'+(w==="in"?"Build here":"Build a field")+'</h2>'+(built.length?'<div class="sub">Already built: '+esc(built.join(", "))+'</div>':'')+'</div><button class="btn ghost small" data-act="close" aria-label="Close">\u2715</button></div><div class="bpick">';
+      rows.forEach(function(r){ var d=DEF[r.t];
+        h+='<button class="bptile'+(r.why?' lock':'')+(sel&&sel.t===r.t?' on':'')+'" data-act="build-pick" data-type="'+r.t+'" aria-pressed="'+(sel&&sel.t===r.t)+'">'+(r.why?'<span class="bplk">'+ICON.lock+'</span>':'')+'<span class="ico">'+ICON[r.t]+'</span><b>'+(PLOT_SHORT[r.t]||d.name)+'</b><span class="dur">'+(r.why?'locked':fmtT(realMs(timeFor(r.t,1))))+'</span></button>'; });
+      h+='</div>';
+      if (sel){ var sd=DEF[sel.t], c1=costFor(sel.t,1), soon=!sel.why && (!builderFree() || !afford(c1)), first=String(sd.desc).split(". ")[0].replace(/\.?$/,".");
+        h+='<div class="bpdet"><div class="bphd"><span class="ico">'+ICON[sel.t]+'</span><div><b>'+sd.name+'</b><div class="dur">'+esc(first)+'</div></div></div>'+costTilesHtml(c1)+
+          '<div class="bpact"><span class="dur">\u23f1 '+fmtT(realMs(timeFor(sel.t,1)))+'</span>'+(sel.why?'<span class="why">'+sel.why+'</span>':'')+'</div>'+
+          '<button class="btn bpgo" data-act="build-new" data-type="'+sel.t+'"'+(sel.why?' disabled':'')+'>'+(sel.why?'Locked':soon?'Add to queue':'Build')+'</button>'+(soon?'<div class="dur" style="text-align:center">Starts when a builder is free and you can afford it</div>':'')+'</div>';
+      }
     } else {
       h=upgradeBlock(w,i);
       var L=s.level;
-      if (L>0 && (s.type==="feasting"||s.type==="inn")) h+='<button class="btn ghost" data-act="tab" data-tab="heroes">See heroes</button>';
-      if (L>0 && s.type==="barracks") h+='<button class="btn ghost" data-act="tab" data-tab="army">Train troops</button>';
+      if (L>0 && (s.type==="feasting"||s.type==="inn")) h=h.replace('<div class="bfoot">','<div class="bfoot"><button class="btn ghost small" data-act="tab" data-tab="heroes">See heroes</button>');
+      if (L>0 && s.type==="barracks") h=h.replace('<details class="det lvdet"','<button class="btn ghost small bpgo" data-act="tab" data-tab="army">Train troops</button><details class="det lvdet"');
       if (L>0 && s.type==="overlook") h+=overlookHtml();
-      h+='<button class="closebtn" data-act="close">Close</button>';
     }
   }
   if (sheetFor.page) h=h.replace(/<button class="closebtn" data-act="close">[^<]*<\/button>/g,"").replace(/<button class="btn ghost small" data-act="close" aria-label="Close">[^<]*<\/button>/g,"");
@@ -14777,7 +14846,7 @@ document.addEventListener("click",function(e){
   if (act==="bk-fresh"){ if (armed!=="bkfresh"){ armed="bkfresh"; lastSheet=""; renderSheet(); return; } armed=null; saveLocked=false; loadFail=null; save(); closeSheet(); toast("A new city begins. The unopened save is still kept on this device."); return; }
   if (advance(Date.now())) flushFinished(); markDirty();
   if (act==="tab" && a.dataset.tab==="guild"){ ALS.last=0; ALS.listAt=0; setTimeout(function(){ alTick(); },0); }
-  if (act==="tab"){ if (bfOn()) return; closeSheet(); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); arrange=null; warArmed=false; chalArmed=false; bfArmed=false; farmArmed=false; if (a.dataset.tab!=="items") itemsNote=""; if (a.dataset.tab==="army"){ ARMYV=""; ARMYB=-1; } tab=a.dataset.tab; lastView=""; renderView(true); window.scrollTo({top:0});
+  if (act==="tab"){ if (bfOn()) return; closeSheet(); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); arrange=null; warArmed=false; chalArmed=false; bfArmed=false; farmArmed=false; if (a.dataset.tab!=="items") itemsNote=""; if (a.dataset.tab==="army"){ ARMYV=""; ARMYB=-1; } if (a.dataset.tab==="city") CITYV=""; tab=a.dataset.tab; lastView=""; renderView(true); window.scrollTo({top:0});
     return; }
   if (act==="tabscroll"){ var nv=document.getElementById("tabs"); nv.scrollLeft += (+a.dataset.dir)*nv.clientWidth*0.7; setTimeout(updateTabArrows,350); return; }
   if (act==="city-go"){ // 0.2.1: from the map, stay put: same view, same tile picked, same scroll (so "Switch to X to build here" lands on the Establish button)
@@ -14891,6 +14960,7 @@ document.addEventListener("click",function(e){
     bkSnapshot("pre",true);
     S=newState(); installProxies(S); genMap(); sim=null; simOut=null; selTile=null; armed=null; lastPrize=null; document.getElementById("cityname").textContent=S.name; closeSheet(); refresh(); toast("A new city begins."); return;
   }
+  if (act==="build-pick"){ sheetFor.sel=a.dataset.type; lastSheet=""; renderSheet(); return; }
   if (act==="build-new"){ if (!startBuild(sheetFor.w,sheetFor.i,a.dataset.type)){ S.bq.push({w:sheetFor.w,i:sheetFor.i,type:a.dataset.type}); toast(DEF[a.dataset.type].name+" added to the build queue"); } closeSheet(); refresh(); return; }
   if (act==="tax"){ S.tax=Math.max(0,Math.min(80,S.tax+(+a.dataset.d))); save(); tickText(); lastView=""; renderView(true); return; }
   if (act==="quests"){ goPage("quests"); return; }
@@ -15102,6 +15172,7 @@ document.addEventListener("click",function(e){
   if (act==="army-unit"){ openSheet({kind:"unit", unit:+a.dataset.unit}); return; }
   if (act==="army-all"){ ARMYALL=true; lastView=""; renderView(true); return; }
   if (act==="army-city"){ var aci=+a.dataset.ci; ARMYALL=false; if (aci!==S.cur && S.cities[aci]){ ARMYB=-1; FARMV=-1; farmArmed=false; MAPFARM=-1; S.cur=aci; mv.init=false; selTile=null; var cnm=document.getElementById("cityname"); if (cnm) cnm.textContent=S.name; toast("Now viewing "+S.name); } lastView=""; refresh(); return; }
+  if (act==="city-v"){ CITYV=a.dataset.v||""; arrange=null; lastView=""; renderView(true); window.scrollTo({top:0}); return; }
   if (act==="army-v"){ ARMYV=a.dataset.v||""; ARMYB=-1; lastView=""; renderView(true); window.scrollTo({top:0}); return; }
   if (act==="bar-hub"){ ARMYB=-1; lastView=""; renderView(true); return; }
   if (act==="bq-max"){ BQD.n=String(maxTrain(BQD.u)); lastView=""; renderView(true); return; }
@@ -15219,6 +15290,7 @@ document.addEventListener("click",function(e){
   if (act==="forge-open"){ forgeLog=[]; openSheet({kind:"forge",g:+a.dataset.g, back:sheetFor&&sheetFor.kind==="armory"?"armory":null}); return; }
   if (act==="armory-sheet"){ openSheet({kind:"armory"}); return; }
   if (act==="gear-best"){ armed=armed==="best"?null:"best"; lastSheet=""; renderSheet(); return; }
+  if (act==="gset-ren"){ armed=armed==="gsren"?null:"gsren"; lastSheet=""; renderSheet(); return; }
   if (act==="gset-savepick"){ armed=(armed==="gsavepick"||/^gsave\d$/.test(armed||""))?null:"gsavepick"; lastSheet=""; renderSheet(); return; }
   if (act==="gear-bestfree"){ armed="bestfree"; lastSheet=""; renderSheet(); return; }
   if (act==="gear-best-cancel"){ armed=null; lastSheet=""; renderSheet(); return; }
@@ -15551,6 +15623,8 @@ document.addEventListener("click",function(e){
   if (act==="wh-pick"){ openSheet({kind:"whpick"}); return; }
   if (act==="wh-set"){ var whh=heroById(+a.dataset.id); if (!whh || whh.away || seatLocked(whh)) return; S.wallHero=whh.id; save(); closeSheet(); lastView=""; refresh(); toast(whh.name+" now holds the walls of "+S.name); return; }
   if (act==="hero-recmode"){ HREC_MODE=a.dataset.m==="pvp"?"pvp":"rec"; lastSheet=""; renderSheet(); return; }
+  if (act==="hsort"){ var hs0=C().heroSort=C().heroSort||{a:"level",b:"atk"}; if (hs0.a!==a.dataset.k){ hs0.b=hs0.a; hs0.a=a.dataset.k; } save(); lastView=""; renderView(true); return; } // 0.2.49: sort chips on the Heroes tab
+  if (act==="off-help"){ OFFHELP=!OFFHELP; lastView=""; renderView(true); return; }
   if (act==="hero-fav"){ var fh=heroById(+a.dataset.id); if (fh){ fh.fav=!fh.fav; save(); lastSheet=""; renderSheet(); lastView=""; refresh(); toast(fh.fav?fh.name+" is a favourite":fh.name+" is no longer a favourite"); } return; }
   if (act==="hero-pic"){ var hfi=document.getElementById("heroimgf"); if (hfi) hfi.click(); return; }
   if (act==="hero-picdel"){ var hpd=heroById(sheetFor&&sheetFor.id); if (hpd) heroImageRemove(hpd); return; }
@@ -15749,7 +15823,7 @@ document.addEventListener("change",function(e){ markDirty();
   if (e.target.id==="mrepl"){ marchDraft.repl=e.target.checked; }
   if (e.target.id==="heroimgf"){ var hf0=e.target.files&&e.target.files[0]; e.target.value=""; var hfh=heroById(sheetFor&&sheetFor.id); if (hfh) heroImageFromFile(hfh, hf0); return; }
   if (e.target.dataset && e.target.dataset.ah){ var ahv=ahView(); ahv[e.target.dataset.ah]=e.target.dataset.ah==="city"?+e.target.value:e.target.value; e.target.blur(); save(); lastSheet=""; renderSheet(); return; } // 0.1.244
-  if (e.target.id==="hsort1"||e.target.id==="hsort2"){ var hso=C().heroSort=C().heroSort||{a:"level",b:"atk"}; if (e.target.id==="hsort1") hso.a=e.target.value; else hso.b=e.target.value; e.target.blur(); save(); lastView=""; renderView(true); return; }
+  if (e.target.id==="hsort1"||e.target.id==="hsort2"){ if (!e.target.value) return; if (e.target.id==="hsort1" && C().heroSort && C().heroSort.a!==e.target.value) C().heroSort.b=C().heroSort.a; var hso=C().heroSort=C().heroSort||{a:"level",b:"atk"}; if (e.target.id==="hsort1") hso.a=e.target.value; else hso.b=e.target.value; e.target.blur(); save(); lastView=""; renderView(true); return; }
   if (e.target.id && e.target.id.indexOf("hauto-")===0 && sheetFor && sheetFor.kind==="hero"){ var hah=heroById(sheetFor.id); if (hah){ var cur0=HAD[hah.id]||Object.assign({pol:0,atk:0,int:0},hah.auto||{}); cur0[e.target.id.slice(6)]=Math.max(0,Math.min(9,Math.floor(+e.target.value||0))); HAD[hah.id]=cur0; } return; }
   if (e.target.id==="meimg"){ var mf0=e.target.files&&e.target.files[0]; e.target.value=""; meImageFromFile(mf0); return; }
   if (e.target.id==="rysend"){ RYS.sendToo=e.target.checked; return; }
