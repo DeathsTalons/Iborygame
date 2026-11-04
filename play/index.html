@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.39";
+window.IBORY_V="0.2.40";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -646,6 +646,9 @@ select,input[type=number],input[type=text],input[type=search],input[type=time]{f
 .hport{position:relative;display:inline-block;border-radius:12px;overflow:hidden;flex:none;vertical-align:middle;background:#1b2023}
 .hport img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}.hport svg{display:block;width:100%;height:100%}
 .hhead{display:grid;grid-template-columns:128px 1fr;gap:14px;align-items:center;margin-bottom:8px}
+.hhead.htop{grid-template-columns:1fr;margin-bottom:0}.hhead.htop+.h3{margin-top:6px}
+.gacts{margin-top:8px;display:grid!important;grid-template-columns:repeat(3,1fr);gap:6px}.gacts .btn{margin:0;padding-left:4px;padding-right:4px;white-space:nowrap}.gpop{margin-top:6px}.gsettabs{margin-bottom:8px}
+.hpic{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;margin-bottom:6px}
 @media (max-width:380px){ .hhead{grid-template-columns:96px 1fr} .hhead .hport{width:96px!important;height:96px!important} }
 .hero{display:grid;grid-template-columns:42px 1fr auto;gap:2px 12px;align-items:center;text-align:left;background:var(--panel2);border:1px solid transparent;border-radius:10px;padding:9px 12px;cursor:pointer;width:100%}
 .hero:hover{border-color:var(--brass)}
@@ -1257,7 +1260,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.39";
+var APP_VERSION = "0.2.40";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -9866,9 +9869,7 @@ function bookXpAll(){ return XP_BOOKS.reduce(function(a,bk){ return a+(S.items[b
 function bookCount(){ return XP_BOOKS.reduce(function(a,bk){ return a+(S.items[bk]||0); },0); }
 function heroActionsHtml(hr){
   var hoff=officeOf(hr), spentPts=heroSpent(hr), rsWait=respecWait(hr), nb=bookCount(), canRead=hr.level<HERO_MAX;
-  var h='<div class="section hacts"><div class="h3" style="margin-top:0">Office</div><div class="btnrow">'+
-    (hoff?'<button class="btn ghost" data-act="unoffice">Step down as '+hoff[1].toLowerCase()+'</button>':OFFICES.map(function(o){ return '<button class="btn'+(o[0]==="mayor"?'':' ghost')+' small" data-act="office" data-role="'+o[0]+'">'+o[1]+'</button>'; }).join(""))+'</div>';
-  h+='<details class="det" data-det="hbooks"'+(DET.hbooks?' open':'')+'><summary><b>Experience books</b> <span class="dur">'+(nb?nb+' book'+(nb===1?'':'s')+', +'+fmt(bookXpAll())+' experience':'none')+'</span></summary>'+
+  var h='<div class="section hacts"><details class="det" data-det="hbooks"'+(DET.hbooks?' open':'')+'><summary><b>Experience books</b> <span class="dur">'+(nb?nb+' book'+(nb===1?'':'s')+', +'+fmt(bookXpAll())+' experience':'none')+'</span></summary>'+
     '<div class="gearlist">'+XP_BOOKS.map(function(bk){ var n=S.items[bk]||0; return '<div class="gearrow"><span class="gn"><b>'+ITEMS[bk].name+'</b><div class="dur">+'+fmt(ITEMS[bk].xp)+' each</div></span><span class="gb">'+n+'</span>'+
       '<span class="btnrow" style="grid-column:1/-1;margin-top:4px"><button class="btn small" data-act="tome" data-book="'+bk+'"'+(n&&canRead?'':' disabled')+'>Use 1</button><button class="btn ghost small" data-act="tome-all" data-book="'+bk+'"'+(n>1&&canRead?'':' disabled')+'>Use all '+(n>1?'('+n+')':'')+'</button></span></div>'; }).join("")+'</div>'+
     '<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="tome-every"'+(nb&&canRead?'':' disabled')+'>'+(armed==="tomeevery"?'Tap again: read all '+nb+' books (+'+fmt(bookXpAll())+')':'Use every book')+'</button></div></details>';
@@ -10183,7 +10184,7 @@ function heroDollHtml(hr){ var gb={atk:gearBonus(hr,"atk"), int:gearBonus(hr,"in
     '<div class="dgs"><span>Gear score</span><b>'+fmt(gearScore(hr))+'</b><span>'+n+' of '+GEAR_POS.length+' slots</span></div></div>'+col(DOLL_R)+'</div>';
   h+='<div class="dset"><div class="act" style="margin:0"><span class="dur">'+(nx?'Star set '+goal+'★ on every slot':'Star set: the highest there is')+'</span><span class="dur">'+okN+' / '+GEAR_POS.length+'</span></div><div class="dbar"><i style="width:'+Math.round(okN/GEAR_POS.length*100)+'%"></i></div>'+
     '<p class="dur" style="margin:4px 0 0">'+(st<0?'Wear all 16 pieces to earn a star set bonus to troop life.':'Now: star set '+st+', troops led by '+esc(hr.name)+' have ×'+setLife(hr)+' life.')+(nx?' '+(miss.length<=4?'Raise '+miss.join(", ")+' to '+goal+'★':'Every slot at '+goal+'★')+' for ×'+nx[1]+'.':'')+'</p></div>';
-  return h+'<p class="dur" style="margin:4px 0 0">▲ a better spare piece is in the armory. Dots: <span style="color:'+STATC.atk+'">●</span> Might <span style="color:'+STATC.int+'">●</span> Wisdom <span style="color:'+STATC.pol+'">●</span> Rule</p></div>'; }
+  return h+'<p class="dur" style="margin:4px 0 0">▲ a better spare piece is in the armory. Dots: <span style="color:'+STATC.atk+'">●</span> Attack <span style="color:'+STATC.int+'">●</span> Intelligence <span style="color:'+STATC.pol+'">●</span> Politics</p></div>'; }
 // the head of a piece's screen: big tile, names, stars, bonus, who wears it
 function gearHeadHtml(g){ var who=g.on?heroById(g.on):null, max=GEAR_MAX[g.tier], s="";
   for (var i=0;i<max;i++) s+= i<g.stars ? '★' : '<s>★</s>';
@@ -10194,7 +10195,7 @@ function gearGiveHtml(g){ if (!gearUnworn(g)) return ''; var b=gearBeats(g), hs2
   var h='<div class="effect gcmp">';
   if (b) h+='<div class="sub" style="margin-bottom:6px">Compared with what '+esc(b.h.name)+' wears there</div><div class="gcmpr"><span>'+gearTile(b.cur,{size:44})+'<span class="dur">'+TIERS[GEAR_TIERS[b.cur.tier]].name+' '+b.cur.stars+'★ · +'+gearVal(b.cur)+'</span></span><b class="okc">→ +'+b.gain+'</b><span>'+gearTile(g,{size:44})+'<span class="dur">this · +'+gearVal(g)+'</span></span></div>'+
     '<div class="btnrow" style="margin-top:8px"><button class="btn small" data-act="gear-give" data-g="'+g.id+'" data-h="'+b.h.id+'" data-pos="'+b.pos+'">Equip on '+esc(b.h.name)+'</button></div>';
-  else h+='<div class="sub">No hero wears a weaker '+slotOf(g).name.toLowerCase()+' of '+STAT_WORD[gearStat(g)]+'.</div>';
+  else h+='<div class="sub">No hero wears a weaker '+STATN[gearStat(g)]+' '+slotOf(g).name.toLowerCase()+'.</div>';
   if (hs2.length) h+='<div class="farmadd" style="margin-top:6px"><select id="ggive" aria-label="Hero">'+hs2.map(function(x){ return '<option value="'+x.id+'"'+(b&&b.h===x?' selected':'')+'>'+esc(x.name)+'</option>'; }).join("")+'</select><button class="btn ghost small" data-act="gear-give" data-g="'+g.id+'" data-h="sel">Equip on this hero</button></div>';
   return h+'</div>'; }
 
@@ -10215,7 +10216,7 @@ function armorySection(){
   var cnt=function(k){ return base.filter(function(g){ return k==="all"||g.slot===k; }).length; };
   h+='<div class="armtypes">'+['<button class="atype'+(armoryFilter==="all"?' on':'')+'" data-act="armory-filter" data-slot="all"><b>All</b><span>'+cnt("all")+'</span></button>'].concat(GEAR_SLOTS.map(function(sl){ var n=cnt(sl.k);
     return '<button class="atype'+(armoryFilter===sl.k?' on':'')+(n?'':' none')+'" data-act="armory-filter" data-slot="'+sl.k+'" aria-label="'+sl.name+'">'+gearImg(sl.k,28)+'<span>'+n+'</span></button>'; })).join("")+'</div>';
-  h+='<div class="farmadd"><button class="chipbtn'+(!ARM.stat?' on':'')+'" data-act="arm-stat" data-v="">Any stat</button>'+["atk","int","pol"].map(function(k){ return '<button class="chipbtn'+(ARM.stat===k?' on':'')+'" data-act="arm-stat" data-v="'+k+'" style="color:'+STATC[k]+'">'+STAT_WORD[k]+'</button>'; }).join("")+'</div>'+
+  h+='<div class="farmadd"><button class="chipbtn'+(!ARM.stat?' on':'')+'" data-act="arm-stat" data-v="">Any stat</button>'+["atk","int","pol"].map(function(k){ return '<button class="chipbtn'+(ARM.stat===k?' on':'')+'" data-act="arm-stat" data-v="'+k+'" style="color:'+STATC[k]+'">'+STATN[k]+'</button>'; }).join("")+'</div>'+
     '<div class="farmadd">'+GEAR_TIERS.map(function(t,i){ return '<button class="chipbtn'+(ARM.tier===i?' on':'')+'" data-act="arm-tier" data-v="'+i+'" style="border-color:var('+TCOLV[i]+');color:var('+TCOLV[i]+')">'+TIERS[t].name+'</button>'; }).join("")+'</div>'+
     '<div class="farmadd"><select id="armsort" aria-label="Sort">'+[["str","Strongest first"],["stars","Most stars"],["tier","Highest tier"],["new","Newest"],["type","By type"]].map(function(o){ return '<option value="'+o[0]+'"'+(ARM.sort===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join("")+'</select>'+
     '<label class="chk"><input type="checkbox" id="armgroup"'+(ARM.group?' checked':'')+'> Group by type</label><button class="chipbtn'+(ARM.sel?' on':'')+'" data-act="arm-selmode">'+(ARM.sel?'Done':'☐ Select')+'</button></div>';
@@ -14105,11 +14106,29 @@ function renderSheetCore(){
     if (!hr){ closeSheet(); return; }
     var isM = S.mayor===hr.id, need=xpNeed(hr.level);
     var renameRow = hr.fixedName ? '<p class="hint">'+esc(hr.name)+' keeps this name.</p>' : hr.tier==="queen" ? '<div><label class="sub" for="hname">Name</label><div style="display:flex;align-items:center;gap:6px"><b>Queen</b><input type="text" id="hname" maxlength="22" style="flex:1" value="'+esc(hr.name.replace(/^Queen\s+/i,""))+'"></div></div>' : hr.tier!=="historic" ? '<div><label class="sub" for="hname">Name</label><input type="text" id="hname" maxlength="28" value="'+esc(hr.name)+'"></div>' : '<p class="hint">Historic heroes keep their names.</p>';
-    h='<div class="hhead">'+heroPortrait(hr,128)+'<div style="min-width:0"><h2 id="hname-h" style="margin:0;overflow-wrap:anywhere">'+esc(hr.name)+' <button class="hfav'+(hr.fav?' on':'')+'" data-act="hero-fav" data-id="'+hr.id+'" aria-label="Favourite">'+(hr.fav?'\u2605':'\u2606')+'</button></h2><div class="sub"><span style="color:'+TIERS[hr.tier].color+';font-weight:700">'+TIERS[hr.tier].name+'</span>, level '+hr.level+(officeOf(hr)?', '+officeOf(hr)[1].toLowerCase()+(hr.autoSeat&&officeOf(hr)[0]!=="wallHero"?' (auto)':''):'')+'</div>'+
+    h='<div class="hhead htop"><div style="min-width:0"><h2 id="hname-h" style="margin:0;overflow-wrap:anywhere">'+esc(hr.name)+' <button class="hfav'+(hr.fav?' on':'')+'" data-act="hero-fav" data-id="'+hr.id+'" aria-label="Favourite">'+(hr.fav?'\u2605':'\u2606')+'</button></h2><div class="sub"><span style="color:'+TIERS[hr.tier].color+';font-weight:700">'+TIERS[hr.tier].name+'</span>, level '+hr.level+(officeOf(hr)?', '+officeOf(hr)[1].toLowerCase()+(hr.autoSeat&&officeOf(hr)[0]!=="wallHero"?' (auto)':''):'')+'</div></div></div>';
+    var hset=starSet(hr), nxt=nextSetTier(Math.max(0,hset));
+    h+='<div class="h3" id="herogear">Gear</div><div class="speeds gsettabs">'; for (var gti=0; gti<GEAR_SETS; gti++){ var gtin=gearSetInfo(hr,gti); h+='<button data-act="gset-load" data-i="'+gti+'"'+(gtin&&gtin.have?'':' disabled')+'><b>'+esc(gearSetName(hr,gti))+'</b><span class="dur">'+(gtin?gtin.have+' pieces':'empty')+'</span></button>'; }
+    h+='</div>'+heroDollHtml(hr);
+    var wornN=S.gear.filter(function(g){ return g.on===hr.id; }).length;
+    var freeN=S.gear.filter(function(g){ return !g.on || !heroById(g.on); }).length;
+    var gsaving=armed==="gsavepick"||/^gsave\d$/.test(armed||"");
+    h+='<div class="btnrow gacts"><button class="btn small" data-act="gear-best"'+(S.gear.length?'':' disabled')+'>Equip best '+(armed==="best"?'\u25b4':'\u25be')+'</button><button class="btn ghost small" data-act="gear-unequip"'+(wornN?'':' disabled')+'>Take all off</button><button class="btn ghost small" data-act="gset-savepick">Save preset '+(gsaving?'\u25b4':'\u25be')+'</button></div>';
+    if (armed==="best") h+='<div class="effect gpop"><div class="sub">Best of everything: pieces of that stat are taken from other heroes.</div><div class="btnrow">'+["atk","int","pol"].map(function(k){ return '<button class="btn small" data-act="gear-best-go" data-free="0" data-stat="'+k+'">'+STATN[k]+'</button>'; }).join("")+'</div>'+
+      '<div class="sub" style="margin-top:6px">Spare pieces only: nothing is taken from another hero.</div><div class="btnrow">'+["atk","int","pol"].map(function(k){ return '<button class="btn ghost small" data-act="gear-best-go" data-free="1" data-stat="'+k+'"'+(freeN?'':' disabled')+'>'+STATN[k]+'</button>'; }).join("")+'<button class="link" data-act="gear-best-cancel">Cancel</button></div></div>';
+    if (gsaving) h+='<div class="effect gpop"><div class="sub">Save what '+esc(hr.name)+' wears now into:</div><div class="btnrow">'+Array.apply(null,Array(GEAR_SETS)).map(function(_,i){ var gi=gearSetInfo(hr,i); return '<button class="btn '+(armed==="gsave"+i?'':'ghost ')+'small" data-act="gset-save" data-i="'+i+'">'+(armed==="gsave"+i?'Tap again to overwrite':esc(gearSetName(hr,i))+(gi?' ('+gi.have+')':''))+'</button>'; }).join("")+'<button class="link" data-act="gear-best-cancel">Cancel</button></div></div>';
+    h+='<p class="dur" style="margin:4px 0 0">Tap a preset tab to put it on. Pieces another hero is wearing get taken from them.</p><details class="det" data-det="gsets"'+(DET.gsets?' open':'')+'><summary><b>Name presets</b></summary><div class="gearlist">';
+    for (var gsi=0; gsi<GEAR_SETS; gsi++){ var gin=gearSetInfo(hr,gsi);
+      h+='<div class="gearrow"><span class="gn"><input data-gsn="'+gsi+'" type="text" maxlength="24" value="'+esc(((hr.gearSetNames||[])[gsi])||"")+'" placeholder="Preset '+(gsi+1)+'" aria-label="Preset name" style="width:100%;font:inherit;padding:2px 6px"></span><span class="gb">'+(gin?gin.have+' piece'+(gin.have===1?'':'s'):'Empty')+'</span>'+
+        (gin&&(gin.gone||gin.others.length)?'<span class="dur" style="grid-column:1/-1">'+(gin.others.length?'Worn now by '+esc(gin.others.join(", ")):'')+(gin.others.length&&gin.gone?'. ':'')+(gin.gone?gin.gone+' scrapped piece'+(gin.gone===1?'':'s')+' will be skipped':'')+'</span>':'')+
+        '<span class="btnrow" style="grid-column:1/-1;margin-top:4px"><button class="btn small" data-act="gset-load" data-i="'+gsi+'"'+(gin&&gin.have?'':' disabled')+'>Equip</button><button class="btn ghost small" data-act="gset-save" data-i="'+gsi+'">'+(armed==="gsave"+gsi?'Tap again to overwrite':'Save current gear')+'</button></span></div>';
+    }
+    h+='</div></details>';
+    h+='<div class="h3" style="margin-top:16px">Hero</div><div class="hpic">'+heroPortrait(hr,64)+'<div style="min-width:0">'+
       '<div class="btnrow" style="margin-top:6px"><button class="btn ghost small" data-act="hero-pic">'+(hr.pic?'Change picture':'Add a picture')+'</button>'+(hr.pic?'<button class="link" data-act="hero-picdel">Remove</button>':'')+'</div><input type="file" id="heroimgf" accept="image/*,.png,.jpg,.jpeg,.webp,.gif,.bmp,.avif,.heic,.heif" hidden>'+
       '<p class="dur" style="margin:4px 0 0">'+(hr.fav?'A favourite: pinned to the top and can\u2019t be dismissed.':'Tap the star to make a favourite.')+' Pictures are seen by other players.</p></div></div>';
     h+=renameRow;
-    h+=heroActionsHtml(hr); // 0.1.238: office, experience books, reset points and dismiss, together at the top
+    h+=heroActionsHtml(hr); /* 0.2.40: experience books and reset points; offices are set from the office slots */
     h+='<div class="effect">'+(hr.level>=HERO_MAX?'Max level':'Experience '+fmt(hr.xp)+' / '+fmt(need))+'. Salary '+fmt(hr.level*20)+' gold/h.</div>';
     h+='<div class="statgrid">';
     [["pol","Politics","Production and building speed as mayor"],["atk","Attack","Training speed as trainer, +0.5% troop attack per point in battle"],["int","Intelligence","Research speed as researcher; in battle every troop gets +1 life per point, and marches 1% faster per point"]].forEach(function(s){
@@ -14119,21 +14138,6 @@ function renderSheetCore(){
     h+=heroAutoHtml(hr)+heroRecordHtml(hr);
     var hdg=dragonOf(hr); if (hdg) h+='<p class="sub"><b style="color:'+hdg.def.col+'">'+hdg.def.name+' Dragon</b>, level '+hdg.lv+': '+dragonBuffTxt(hdg.t,hdg.lv)+'. Change it in the Overlook.</p>';
     h+='<p class="sub">As mayor: production +'+pct(hs(hr,"pol")*0.003)+', buildings '+pct(1-1/(1+hs(hr,"pol")/200))+' faster, population grows '+pct(hs(hr,"pol")/400)+' faster. As trainer: training '+pct(1-Math.pow(0.9975,hs(hr,"atk")))+' faster. As researcher: research '+pct(1-1/(1+hs(hr,"int")/200))+' faster.</p>';
-    var hset=starSet(hr), nxt=nextSetTier(Math.max(0,hset));
-    h+='<div class="h3" id="herogear">Gear</div>'+heroDollHtml(hr);
-    var wornN=S.gear.filter(function(g){ return g.on===hr.id; }).length;
-    var freeN=S.gear.filter(function(g){ return !g.on || !heroById(g.on); }).length;
-    h+= (armed==="best"||armed==="bestfree")
-      ? '<div class="effect" style="margin-top:6px">'+(armed==="best"?'Equip the best gear for which stat? Pieces of that stat are taken from other heroes.':'Equip the best unworn gear for which stat? Only spare pieces (and '+esc(hr.name)+'\u2019s own): nothing is taken from another hero.')+'</div><div class="btnrow">'+["atk","pol","int"].map(function(k){ return '<button class="btn small" data-act="gear-best-go" data-free="'+(armed==="bestfree"?1:0)+'" data-stat="'+k+'">'+STATN[k]+'</button>'; }).join("")+'<button class="btn ghost small" data-act="gear-best-cancel">Cancel</button></div>'
-      : '<div class="btnrow" style="margin-top:6px"><button class="btn ghost small" data-act="gear-best"'+(S.gear.length?'':' disabled')+'>Equip best gear</button><button class="btn ghost small" data-act="gear-bestfree"'+(freeN?'':' disabled')+'>Equip best unworn</button><button class="btn ghost small" data-act="gear-unequip"'+(wornN?'':' disabled')+'>Unequip all</button></div>';
-    h+='<div class="h3" style="margin-top:8px">Gear presets</div><div class="speeds gsettabs">'; for (var gti=0; gti<GEAR_SETS; gti++){ var gtin=gearSetInfo(hr,gti); h+='<button data-act="gset-load" data-i="'+gti+'"'+(gtin&&gtin.have?'':' disabled')+'><b>'+esc(gearSetName(hr,gti))+'</b><span class="dur">'+(gtin?gtin.have+' pieces':'empty')+'</span></button>'; }
-    h+='</div><p class="dur" style="margin:4px 0 0">Tap a preset to put it on. Pieces another hero is wearing get taken from them.</p><details class="det" data-det="gsets"'+(DET.gsets?' open':'')+'><summary><b>Name and save presets</b></summary><div class="gearlist">';
-    for (var gsi=0; gsi<GEAR_SETS; gsi++){ var gin=gearSetInfo(hr,gsi);
-      h+='<div class="gearrow"><span class="gn"><input data-gsn="'+gsi+'" type="text" maxlength="24" value="'+esc(((hr.gearSetNames||[])[gsi])||"")+'" placeholder="Preset '+(gsi+1)+'" aria-label="Preset name" style="width:100%;font:inherit;padding:2px 6px"></span><span class="gb">'+(gin?gin.have+' piece'+(gin.have===1?'':'s'):'Empty')+'</span>'+
-        (gin&&(gin.gone||gin.others.length)?'<span class="dur" style="grid-column:1/-1">'+(gin.others.length?'Worn now by '+esc(gin.others.join(", ")):'')+(gin.others.length&&gin.gone?'. ':'')+(gin.gone?gin.gone+' scrapped piece'+(gin.gone===1?'':'s')+' will be skipped':'')+'</span>':'')+
-        '<span class="btnrow" style="grid-column:1/-1;margin-top:4px"><button class="btn small" data-act="gset-load" data-i="'+gsi+'"'+(gin&&gin.have?'':' disabled')+'>Equip</button><button class="btn ghost small" data-act="gset-save" data-i="'+gsi+'">'+(armed==="gsave"+gsi?'Tap again to overwrite':'Save current gear')+'</button></span></div>';
-    }
-    h+='</div></details>';
     h+='<div class="act" style="margin-top:14px"><button class="btn ghost danger small" data-act="dismiss"'+(hr.fav?' disabled':'')+'>'+(armed==="dismiss"?"Tap again to dismiss":"Dismiss hero")+'</button><button class="closebtn" data-act="'+(sheetFor.back==="ah"?'ah-open':'close')+'">'+(sheetFor.back==="ah"?'Back to all heroes':'Close')+'</button></div>'; // 0.1.239: dismiss sits at the very bottom, away from Reset points
   } else {
     var w=sheetFor.w, i=sheetFor.i, s=getSlot(w,i);
@@ -14913,7 +14917,8 @@ document.addEventListener("click",function(e){
   if (act==="armory-filter"){ armoryFilter=a.dataset.slot; lastView=""; renderView(true); if (sheetFor && sheetFor.kind==="armory"){ lastSheet=""; renderSheet(); } return; }
   if (act==="forge-open"){ forgeLog=[]; openSheet({kind:"forge",g:+a.dataset.g, back:sheetFor&&sheetFor.kind==="armory"?"armory":null}); return; }
   if (act==="armory-sheet"){ openSheet({kind:"armory"}); return; }
-  if (act==="gear-best"){ armed="best"; lastSheet=""; renderSheet(); return; }
+  if (act==="gear-best"){ armed=armed==="best"?null:"best"; lastSheet=""; renderSheet(); return; }
+  if (act==="gset-savepick"){ armed=(armed==="gsavepick"||/^gsave\d$/.test(armed||""))?null:"gsavepick"; lastSheet=""; renderSheet(); return; }
   if (act==="gear-bestfree"){ armed="bestfree"; lastSheet=""; renderSheet(); return; }
   if (act==="gear-best-cancel"){ armed=null; lastSheet=""; renderSheet(); return; }
   if (act==="gear-best-go"){ var bh=heroById(sheetFor.id), bst=a.dataset.stat, bfree=a.dataset.free==="1"; if (!bh || !STATN[bst]) return; armed=null;
