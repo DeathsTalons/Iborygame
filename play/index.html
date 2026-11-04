@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.41";
+window.IBORY_V="0.2.42";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -651,6 +651,9 @@ select,input[type=number],input[type=text],input[type=search],input[type=time]{f
 .hport img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}.hport svg{display:block;width:100%;height:100%}
 .hhead{display:grid;grid-template-columns:128px 1fr;gap:14px;align-items:center;margin-bottom:8px}
 .hhead.htop{grid-template-columns:1fr;margin-bottom:0}.hhead.htop+.h3{margin-top:6px}
+.gemrow{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}.gemrow .chipbtn{width:100%;margin:0;justify-content:center;white-space:nowrap;font-variant-numeric:tabular-nums}
+.aspanel{margin-top:8px;border-top:1px solid var(--line);padding-top:6px}.aspanel.on{border:1px solid var(--brass);border-radius:8px;padding:6px 8px;background:rgba(215,176,88,.08)}
+.asrow{display:flex;gap:6px;align-items:center;margin-top:6px}.asrow select{flex:1;min-width:0;padding:4px 6px}.asrow select[data-asd^=n]{flex:0 0 60px}.asrow select[data-asd^=to]{flex:0 0 70px}
 .gacts{margin-top:8px;display:grid!important;grid-template-columns:repeat(3,1fr);gap:6px}.gacts .btn{margin:0;padding-left:4px;padding-right:4px;white-space:nowrap}.gpop{margin-top:6px}.gsettabs{margin-bottom:8px}
 .hpic{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;margin-bottom:6px}
 @media (max-width:380px){ .hhead{grid-template-columns:96px 1fr} .hhead .hport{width:96px!important;height:96px!important} }
@@ -1266,7 +1269,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.41";
+var APP_VERSION = "0.2.42";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -10289,12 +10292,13 @@ function forgeControls(g){ // star and tier upgrades for one piece: shared by th
   else {
     var have=S.items["gem"+forgeGem]||0, n=Math.max(1,Math.min(4,forgeN)), p=gemChance(g,forgeGem,n), m=bestFor(gearStat(g)), nv=Math.round(GEAR_BASE[g.tier]*(1+0.2*(g.stars+1)));
     h+='<div class="effect gpanel"><div class="act" style="margin:0"><b>Add a star ('+g.stars+' \u2192 '+(g.stars+1)+')</b><span class="dur">a failure drops it to '+failTo(g.stars)+'\u2605</span></div>'+
-      '<div class="farmadd">'+[["F","Flawless"],["D","Delicate"]].map(function(q){ return '<button class="chipbtn'+(forgeGem===q[0]?' on':'')+'" data-act="forge-gem" data-v="'+q[0]+'">'+itemImg("gem"+q[0])+' '+q[1]+' \u00b7 '+fmt(S.items["gem"+q[0]]||0)+'</button>'; }).join("")+'</div>'+
+      '<div class="gemrow">'+[["D","Delicate"],["F","Flawless"]].map(function(q){ return '<button class="chipbtn'+(forgeGem===q[0]?' on':'')+'" data-act="forge-gem" data-v="'+q[0]+'">'+itemImg("gem"+q[0])+' '+q[1]+' \u00b7 '+fmt(S.items["gem"+q[0]]||0)+'</button>'; }).join("")+'</div>'+
       '<div class="farmadd"><span class="dur">Gems per try</span>'+[1,2,3,4].map(function(k){ return '<button class="chipbtn'+(n===k?' on':'')+'" data-act="forge-n" data-v="'+k+'">'+k+'</button>'; }).join("")+'</div>'+
       '<div class="ggauge"><i style="width:'+Math.round(p)+'%"></i><span>'+Math.round(p)+'% success \u00b7 +'+nv+' '+STATN[gearStat(g)]+' if it lands</span></div>'+
       (m?'<p class="dur" style="margin:4px 0 0">Includes +'+Math.min(10,hs(m,gearStat(g))/40).toFixed(1)+'% from '+esc(m.name)+'\u2019s '+STATN[gearStat(g)]+'.</p>':'');
     var why = have<n ? "Not enough "+(forgeGem==="D"?"Delicate":"Flawless")+" gems" : "";
-    h+='<div class="act"><span class="why">'+why+'</span><button class="btn" data-act="forge-strike"'+(why?' disabled':'')+'>Strike the star</button></div></div>';
+    var asOn=S.autoStar&&S.autoStar.gid===g.id;
+    h+='<div class="act"><span class="why">'+why+'</span><button class="btn" data-act="forge-strike"'+(why||asOn?' disabled':'')+'>Strike the star</button></div>'+autoStarHtml(g)+'</div>';
   }
   var ut=g.tier+1;
   h+='<div class="effect gpanel"><b>Tier</b><div class="gladder">'+GEAR_TIERS.map(function(t,i){ return '<span class="gld'+(i<=g.tier?' f':'')+'" style="--c:var('+TCOLV[i]+')"></span>'+(i<GEAR_TIERS.length-1?'<span class="gll'+(i<g.tier?' f':'')+'"></span>':''); }).join("")+'</div>'+
@@ -10315,6 +10319,54 @@ function forgeSheet(g){
   return h+'<button class="closebtn" data-act="'+(back?'armory-sheet':'close')+'">'+(back?'Back to the armory':'Close')+'</button>';
 }
 var forgeLog=[], forgeGem="D", forgeN=1;
+/* one star attempt on a piece (0.2.41: shared by the button and auto-strike); false when it can't be tried */
+function forgeStrike(sg, gem, n, pre){
+  if (!sg || sg.stars>=GEAR_MAX[sg.tier]) return false;
+  var gk="gem"+gem, gn=Math.max(1,Math.min(4,n)); if ((S.items[gk]||0)<gn) return false;
+  var chance=gemChance(sg,gem,gn); S.items[gk]-=gn; gearChanged(); // the stars change either way below
+  if (Math.random()*100<chance){ sg.stars++; if (sg.stars>=11){ S.starLog=(S.starLog||[]).filter(function(e){ return e.at>Date.now()-HOUR; }); S.starLog.push({at:Date.now(), st:sg.stars, nm:(sg.nm?sg.nm+' ('+TIERS[GEAR_TIERS[sg.tier]].name+' '+slotOf(sg).name+')':gearTypeName(sg))}); } forgeLog.unshift((pre||'')+'<b class="okc">Success!</b> Now '+sg.stars+' star'+(sg.stars>1?'s':'')+' ('+Math.round(chance)+'% roll).'); return {ok:true}; }
+  var from=sg.stars; sg.stars=failTo(from); forgeLog.unshift((pre||'')+'<b class="badc">Failed</b> at '+Math.round(chance)+'%. '+(sg.stars===from?'No stars lost.':'Dropped from '+from+' to '+sg.stars+'.')); if (forgeLog.length>40) forgeLog.length=40; return {ok:false}; }
+/* ---------- 0.2.41: auto-strike. Up to two steps (gem, gems per try, up to which star); one try every AS_EVERY while the game is open.
+   Same odds and costs as tapping; it stops at the target, when the gems for a step run out, or on Stop. One piece at a time. ---------- */
+var AS_EVERY=1000, ASD=null;
+var GEMN={D:"Delicate",F:"Flawless"};
+function asDraft(g){ var max=GEAR_MAX[g.tier];
+  if (!ASD || ASD.gid!==g.id) ASD={gid:g.id, g1:"D", n1:4, to1:Math.min(max, Math.max(g.stars+1, 9)), two:true, g2:"F", n2:4, to2:max};
+  ASD.to1=Math.max(g.stars+1, Math.min(max, ASD.to1)); ASD.to2=Math.max(ASD.to1+1, Math.min(max, ASD.to2)); if (ASD.to1>=max) ASD.two=false; return ASD; }
+function asSteps(A){ return A.steps.filter(function(st){ return st.to>0; }); }
+function asStepNow(A, g){ var L=asSteps(A); for (var i=0;i<L.length;i++) if (g.stars<L[i].to) return L[i]; return null; }
+function asPlan(A){ return asSteps(A).map(function(st,i){ return (i?'then ':'')+GEMN[st.gem]+' \u00d7'+st.n+' until '+st.to+'\u2605'; }).join(', '); }
+function autoStarHtml(g){ var A=S.autoStar, max=GEAR_MAX[g.tier];
+  if (A && A.gid===g.id){ var st=asStepNow(A,g), left=Math.max(0, Math.ceil((A.next-Date.now())/1000));
+    return '<div class="aspanel on"><div class="act" style="margin:0"><b>Auto-strike is running</b><button class="btn ghost small" data-act="as-stop">Stop</button></div>'+
+      '<p class="dur" style="margin:2px 0">'+asPlan(A)+'.</p>'+
+      '<p class="dur" style="margin:2px 0">'+(st?'Now '+g.stars+'\u2605. Next try in <b id="asnext">'+left+'s</b>.':'Done.')+'</p><p class="dur" style="margin:2px 0">'+asCount(A)+'</p></div>'; }
+  if (A){ var og=gearById(A.gid); return '<div class="aspanel"><p class="dur" style="margin:0">Auto-strike is working on '+(og?esc(gearName(og)):'another piece')+'. One piece at a time.</p><div class="btnrow" style="margin-top:4px"><button class="btn ghost small" data-act="as-stop">Stop it</button></div></div>'; }
+  var D=asDraft(g), gsel=function(k,v){ return '<select data-asd="'+k+'">'+["D","F"].map(function(q){ return '<option value="'+q+'"'+(v===q?' selected':'')+'>'+GEMN[q]+'</option>'; }).join("")+'</select>'; },
+    nsel=function(k,v){ return '<select data-asd="'+k+'">'+[1,2,3,4].map(function(q){ return '<option value="'+q+'"'+(v===q?' selected':'')+'>\u00d7'+q+'</option>'; }).join("")+'</select>'; },
+    tsel=function(k,v,lo){ var o=''; for (var q=lo;q<=max;q++) o+='<option value="'+q+'"'+(v===q?' selected':'')+'>'+q+'\u2605</option>'; return '<select data-asd="'+k+'">'+o+'</select>'; };
+  return '<details class="det aspanel" data-det="autostar"'+(DET.autostar?' open':'')+'><summary><b>Auto-strike</b> <span class="dur">one try every '+(AS_EVERY/1000)+'s while the game is open</span></summary>'+
+    '<div class="asrow">'+gsel("g1",D.g1)+nsel("n1",D.n1)+'<span class="dur">until</span>'+tsel("to1",D.to1,g.stars+1)+'</div>'+
+    (D.to1<max?'<label class="chk dur" style="margin-top:4px"><input type="checkbox" data-asd="two"'+(D.two?' checked':'')+'> then</label>'+(D.two?'<div class="asrow">'+gsel("g2",D.g2)+nsel("n2",D.n2)+'<span class="dur">until</span>'+tsel("to2",D.to2,D.to1+1)+'</div>':''):'')+
+    '<p class="dur" style="margin:4px 0 0">Same odds and gems as striking by hand. A failure can drop stars; it just keeps going until it reaches the target or a step runs out of gems.</p>'+
+    '<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="as-start">Start auto-strike</button></div></details>'; }
+function asCount(A){ return 'Tries: '+fmt(A.tries)+' \u00b7 landed: '+fmt(A.ok)+' \u00b7 Delicate used: '+fmt(A.used.D||0)+' \u00b7 Flawless used: '+fmt(A.used.F||0); }
+function asStart(g){ var D=asDraft(g), steps=[{gem:D.g1, n:D.n1, to:D.to1}]; if (D.two && D.to1<GEAR_MAX[g.tier]) steps.push({gem:D.g2, n:D.n2, to:D.to2});
+  S.autoStar={gid:g.id, steps:steps, next:Date.now()+500, tries:0, ok:0, used:{D:0,F:0}, start:g.stars}; save(); }
+function asEnd(why, toastIt){ var A=S.autoStar; if (!A) return; var g=gearById(A.gid);
+  var msg=(g?'Auto-strike on '+gearName(g):'Auto-strike')+': '+why+'. '+asCount(A)+'.';
+  S.autoStar=null; note("heroes", msg); if (toastIt) toast(msg); forgeLog.unshift(esc(msg)); save(); lastSheet=""; if (sheetFor) renderSheet(); }
+function asTick(){ var A=S&&S.autoStar; if (!A || saveLocked) return; var now=Date.now();
+  var el=document.getElementById("asnext"); if (el) el.textContent=Math.max(0,Math.ceil((A.next-now)/1000))+"s";
+  if (now<A.next) return;
+  var g=gearById(A.gid); if (!g){ asEnd("stopped: the piece is gone", true); return; }
+  var st=asStepNow(A,g); if (!st || g.stars>=GEAR_MAX[g.tier]){ asEnd("reached "+g.stars+"\u2605", true); return; }
+  if ((S.items["gem"+st.gem]||0)<st.n){ asEnd(st.gem==="D"?"out of Delicate gems at "+g.stars+"\u2605":"out of Flawless gems at "+g.stars+"\u2605", true); return; }
+  var r=forgeStrike(g, st.gem, st.n, '<span class="dur">Auto:</span> '); A.next=now+AS_EVERY; if (!r){ asEnd("stopped", true); return; }
+  A.tries++; if (r.ok) A.ok++; A.used[st.gem]=(A.used[st.gem]||0)+st.n;
+  var st2=asStepNow(A,g); if (!st2) { asEnd("reached "+g.stars+"\u2605", true); return; }
+  save(); if (sheetFor && !editingIn(sheetBody)){ lastSheet=""; renderSheet(); } tickText(); }
+setInterval(asTick, 500);
 function forgeGear(){ // the piece the open menu is upgrading: the one in the Forge menu, or the one worn in a hero's slot
   if (!sheetFor) return null;
   if (sheetFor.kind==="forge") return S.gear.filter(function(x){ return x.id===sheetFor.g; })[0]||null;
@@ -14977,13 +15029,12 @@ document.addEventListener("click",function(e){
     lastSheet=""; renderSheet(); refresh(); return; }
   if (act==="gear-off"){ var og=S.gear.filter(function(x){ return x.id===+a.dataset.g; })[0]; if (og){ og.on=0; delete og.at; gearChanged(); } heroBack(sheetFor.back); refresh(); return; }
   if (act==="forge-gem"){ forgeGem=a.dataset.v; lastSheet=""; renderSheet(); return; }
+  if (act==="as-start"){ var asg=forgeGear(); if (!asg) return; if (S.autoStar){ toast("Auto-strike is already running on a piece"); return; } asStart(asg); lastSheet=""; renderSheet(); return; }
+  if (act==="as-stop"){ asEnd("stopped", false); return; }
   if (act==="forge-n"){ forgeN=+a.dataset.v; lastSheet=""; renderSheet(); return; }
   if (act==="forge-strike"){
-    var sg=forgeGear(); if (!sg || sg.stars>=GEAR_MAX[sg.tier]) return;
-    var gk="gem"+forgeGem, gn=Math.max(1,Math.min(4,forgeN)); if ((S.items[gk]||0)<gn) return;
-    var chance=gemChance(sg,forgeGem,gn); S.items[gk]-=gn; gearChanged(); // the stars change either way below
-    if (Math.random()*100<chance){ sg.stars++; if (sg.stars>=11){ S.starLog=(S.starLog||[]).filter(function(e){ return e.at>Date.now()-HOUR; }); S.starLog.push({at:Date.now(), st:sg.stars, nm:(sg.nm?sg.nm+' ('+TIERS[GEAR_TIERS[sg.tier]].name+' '+slotOf(sg).name+')':gearTypeName(sg))}); } forgeLog.unshift('<b class="okc">Success!</b> Now '+sg.stars+' star'+(sg.stars>1?'s':'')+' ('+Math.round(chance)+'% roll).'); }
-    else { var from=sg.stars; sg.stars=failTo(from); forgeLog.unshift('<b class="badc">Failed</b> at '+Math.round(chance)+'%. '+(sg.stars===from?'No stars lost.':'Dropped from '+from+' to '+sg.stars+'.')); }
+    var sg=forgeGear(); if (!sg || (S.autoStar&&S.autoStar.gid===sg.id)) return;
+    if (!forgeStrike(sg, forgeGem, forgeN, "")) return;
     lastSheet=""; renderSheet(); tickText(); save(); lastView=""; renderView(true); return;
   }
   if (act==="gear-upgrade"){
@@ -15388,6 +15439,7 @@ document.addEventListener("input",function(e){ markDirty();
   if (e.target.id==="wgap"){ waveDraft.gap=Math.max(0,+e.target.value||0); updateWaveInfo(); }
   if (e.target.id==="hname" && sheetFor && sheetFor.kind==="hero"){ var rh=heroById(sheetFor.id); if (rh && rh.tier!=="historic" && !rh.fixedName){ var nv=e.target.value.replace(/\s+/g," ").trim(); if (rh.tier==="queen"){ nv=nv.replace(/^queen\s+/i,""); rh.name=nv?"Queen "+nv:rh.name; } else rh.name=nv||rh.name; var hh2=document.getElementById("hname-h"); if (hh2) hh2.textContent=rh.name; save(); } }
   if (e.target.id==="gname"){ var ng=forgeGear(); if (ng){ ng.nm=e.target.value.replace(/\s+/g," ").trim().slice(0,28)||undefined; if (!ng.nm) delete ng.nm; save(); } }
+  if (e.target.dataset.asd!=null && ASD){ var ak=e.target.dataset.asd; if (ak==="two") ASD.two=e.target.checked; else if (ak==="g1"||ak==="g2") ASD[ak]=e.target.value; else ASD[ak]=+e.target.value; EDITING=null; lastSheet=""; renderSheet(); return; }
   if (e.target.dataset.gsn!=null && sheetFor && sheetFor.kind==="hero"){ var nh=heroById(sheetFor.id); if (nh){ nh.gearSetNames=nh.gearSetNames||[]; nh.gearSetNames[+e.target.dataset.gsn]=e.target.value.replace(/\s+/g," ").trim().slice(0,24); save(); } }
   if (e.target.dataset && e.target.dataset.wct && sheetFor && sheetFor.kind==="wc"){ var wcp2=wcById(sheetFor.id); if (wcp2){ var wpart=e.target.dataset.wct.split(":"), wdr=wcDraftOf(wcp2), wv=wdr.waves[+wpart[0]];
       if (wv){ wv.t[+wpart[1]]=Math.max(0,Math.floor(+e.target.value||0)); var wtot=document.getElementById("wctot-"+wpart[0]); if (wtot) wtot.textContent=fmt(wv.t.reduce(function(a2,b2){ return a2+b2; },0))+" / "+fmt(armyCap()); var wwhy=document.getElementById("wcwhy"); if (wwhy) wwhy.textContent=wcWhy(wcp2,wdr); } } }
