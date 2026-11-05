@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.51";
+window.IBORY_V="0.2.52";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1379,7 +1379,7 @@ dialog::backdrop{background:rgba(10,12,10,.5)}
 .mtogs select,.mtogs input{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;padding:0;cursor:pointer}
 .mtogs .mhero{flex:1 1 0;min-width:110px;padding-inline-start:5px}.mhero .hport{width:24px!important;height:24px!important;border-radius:50%}.mhn{overflow:hidden;text-overflow:ellipsis;min-width:0}.mhero .dur{font-size:.74rem;font-weight:500}
 .mdd{color:var(--muted);font-size:.75rem;margin-inline-start:auto}.mnoh{display:inline-flex}.mnoh svg{width:20px;height:20px;color:var(--muted)}
-.mpills{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.mpills span{background:var(--panel2);border-radius:10px;padding:5px 2px;text-align:center;font-size:.68rem;color:var(--muted);line-height:1.25;min-width:0}.mpills b{display:block;color:var(--ink);font-size:.88rem;white-space:nowrap}
+.mpills{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.8fr) minmax(0,1.3fr) minmax(0,.95fr);gap:6px}.mpills span{background:var(--panel2);border-radius:10px;padding:5px 2px;text-align:center;font-size:.68rem;color:var(--muted);line-height:1.25;min-width:0}.mpills b{display:block;color:var(--ink);font-size:.88rem;white-space:nowrap}
 .msh #marchinfo{margin:-4px 2px 0;font-size:.8rem}.msh #marchinfo:empty,.msh #marchprev:empty{display:none}
 .mgo{display:flex;gap:8px}.mgo .btn{flex:1 1 auto;min-width:0;line-height:1.15}.mgo .btn.ghost{flex:0 0 auto;white-space:nowrap}
 .tgc.tgi{display:inline-flex;align-items:center;gap:3px;padding:1px 8px 1px 3px}.tgc.tgi .iic{width:18px;height:18px;image-rendering:pixelated} /* 0.2.50: Army, Goals, Barracks, unit sheet */
@@ -1710,7 +1710,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.51";
+var APP_VERSION = "0.2.52";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -5545,10 +5545,13 @@ function marchWhy(){
   }
   return "";
 }
-// 0.2.50: the march screen's four stat pills (troops / army limit, travel, rations, landing time) and one short note line for the mission
+// 0.2.50: the march screen's stat pills (troops / army limit, travel, rations) and one short note line for the mission. 0.2.52 (Cody): troops, food, then travel (to the second) and landing time side by side
+// 0.2.52 (Cody): a re-render keeps a sideways-scrolling chip row where it was (march presets, the Army tab's cities), instead of jumping back to the start
+function keepX(sel, fn){ var el=document.querySelector(sel), x=el?el.scrollLeft:0; fn(); var put=function(){ var n=document.querySelector(sel); if (n && x) n.scrollLeft=x; }; put(); if (x) requestAnimationFrame(put); }
+function fmtTx(ms){ var s=Math.max(0,Math.ceil(ms/1000)), h=Math.floor(s/3600); return h ? h+"h "+String(Math.floor(s%3600/60)).padStart(2,"0")+"m "+String(s%60).padStart(2,"0")+"s" : fmtT(ms); } // 0.2.52: to the second, hours too
 function mClock(ms){ return new Date(Date.now()+ms).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"}); }
 function mPills(n, cap, travel, food, land){ var el=document.getElementById("mpills"); if (!el) return;
-  var h='<span><b>'+fmt(n)+'</b>/ '+fmt(cap)+' troops</span><span><b>'+(travel>0?fmtTc(travel):'—')+'</b>travel</span><span><b>'+(food==null?'—':fmt(food))+'</b>food</span><span><b>'+(land==="now"?'now':land>0?mClock(land):'—')+'</b>lands</span>';
+  var h='<span><b>'+fmt(n)+'</b>/ '+fmt(cap)+' troops</span><span><b>'+(food==null?'—':fmt(food))+'</b>food</span><span><b>'+(travel>0?fmtTx(travel):'—')+'</b>travel</span><span><b>'+(land==="now"?'now':land>0?mClock(land):'—')+'</b>lands</span>';
   if (el.innerHTML!==h) el.innerHTML=h; }
 function updateMarchInfo(){
   var el=document.getElementById("marchinfo"), b=document.getElementById("marchgo"); if (!el) return;
@@ -5631,7 +5634,7 @@ function marchSheet(){
   if (tg.length) h+='<div class="mtogs">'+tg.join("")+'</div>';
   h+='<div class="mpills" id="mpills"></div><p class="dur" id="marchinfo"></p><div id="marchprev"></div>';
   var friendlyM = d.mission==="transport" || d.mission==="reinforce" || d.mission==="scout" || d.mission==="allyguard" || d.mission==="hide" || d.mission==="arena" || d.mission==="rally" || d.mission==="wd";
-  h+='<div class="mgo"><button class="btn" data-act="march-go" id="marchgo">March</button>'+(friendlyM||(q&&q.k==="wiz")?'':'<button class="btn ghost" data-act="march-preview">Preview battle</button>')+'</div></div>';
+  h+='<div class="mgo">'+(friendlyM||(q&&q.k==="wiz")?'':'<button class="btn ghost" data-act="march-preview">Preview battle</button>')+'<button class="btn" data-act="march-go" id="marchgo">March</button></div></div>'; // 0.2.52 (Cody): March on the right
   return h;
 }
 function previewMarch(){
@@ -15843,7 +15846,7 @@ document.addEventListener("click",function(e){
       var urB=urT?document.querySelector('#view [data-tech="'+urq.slice(2)+'"]'):null, urR=urB&&(urB.closest(".tech")||urB); if (urR) urR.scrollIntoView({block:"center"}); }
     else openSheet({kind:"plot",w:"in",i:urI}); return; }
   if (act==="army-all"){ ARMYALL=true; lastView=""; renderView(true); return; }
-  if (act==="army-city"){ var aci=+a.dataset.ci; ARMYALL=false; if (aci!==S.cur && S.cities[aci]){ ARMYB=-1; FARMV=-1; farmArmed=false; MAPFARM=-1; S.cur=aci; mv.init=false; selTile=null; var cnm=document.getElementById("cityname"); if (cnm) cnm.textContent=S.name; toast("Now viewing "+S.name); } lastView=""; refresh(); return; }
+  if (act==="army-city"){ var aci=+a.dataset.ci; ARMYALL=false; if (aci!==S.cur && S.cities[aci]){ ARMYB=-1; FARMV=-1; farmArmed=false; MAPFARM=-1; S.cur=aci; mv.init=false; selTile=null; var cnm=document.getElementById("cityname"); if (cnm) cnm.textContent=S.name; toast("Now viewing "+S.name); } keepX("#view .acities", function(){ lastView=""; refresh(); }); return; } // 0.2.52: the city row stays where it was
   if (act==="city-v"){ CITYV=a.dataset.v||""; arrange=null; lastView=""; renderView(true); window.scrollTo({top:0}); return; }
   if (act==="army-v"){ ARMYV=a.dataset.v||""; ARMYB=-1; lastView=""; renderView(true); window.scrollTo({top:0}); return; }
   if (act==="bar-hub"){ ARMYB=-1; lastView=""; renderView(true); return; }
@@ -16187,7 +16190,7 @@ document.addEventListener("click",function(e){
     farmArmed=false; S.presets.forEach(function(pr,pi){ pr.farm=[]; pr.idx=0; pr.auto=false; delete farmMsg[C().id+":"+pi]; }); toast("Every farm list in "+S.name+" is cleared"); lastView=""; refresh(); return; }
   if (act==="farm-clear"){ var fc2=S.presets[+a.dataset.p]; fc2.farm=[]; fc2.idx=0; fc2.auto=false; lastSheet=""; renderSheet(); save(); return; }
   if (act==="march-preset"){ var mp=presetsOf(a.dataset.m)[+a.dataset.p], mav=draftAvail(); marchDraft.t=mp.t.map(function(n,i){ return Math.min(n,mav[i]); }); marchDraft.pk=(a.dataset.m?"m":"f")+a.dataset.p; // 0.2.33 (Cody): light the preset you picked
-    var mh=presetHero(mp); marchDraft.hero = marchDraft.from ? marchDraft.hero : (mh && !mh.away && !seatLocked(mh) ? mh.id : 0); marchDraft.preview=""; lastSheet=""; renderSheet(); return; }
+    var mh=presetHero(mp); marchDraft.hero = marchDraft.from ? marchDraft.hero : (mh && !mh.away && !seatLocked(mh) ? mh.id : 0); marchDraft.preview=""; keepX("#sheetbody .mpres", function(){ lastSheet=""; renderSheet(); }); return; }
   if (act==="waves-mode"){ waveDraft.mode=a.dataset.v; lastSheet=""; renderSheet(); return; }
   if (act==="waves-fill"){ var wpl=wavePlan(), ws=document.getElementById("wstart"), we=document.getElementById("wevery"); waveDraft.start=ws?ws.value:waveDraft.start; waveDraft.every=Math.max(0,Math.floor(+(we?we.value:waveDraft.every)||0));
     var w0=wvParse(waveDraft.start); if (w0==null){ toast("Pick the first landing time"); return; }
