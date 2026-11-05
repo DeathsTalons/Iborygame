@@ -3412,7 +3412,7 @@ var PAINT={k:"", n:0}, DECO_N=1; // painting: tap tiles to place the chosen deco
 function paintOne(tid){ var D=decoS(), k=PAINT.k; if (!k || !decoOwn(k)) { PAINT.k=""; PAINT.n=0; return false; }
   if (!DECOS[k].pack && !DECOS[k].unl){ D.inv[k]--; if (!D.inv[k]) delete D.inv[k]; }
   var L0=(D.at[tid]=D.at[tid]||[]); if (DECOS[k].road){ for (var ri=L0.length-1; ri>=0; ri--) if (decoIsRoad(L0[ri])) L0.splice(ri,1); L0.unshift(k); } else if (DECOS[k].wall){ for (var wi=L0.length-1; wi>=0; wi--) if (decoIsWall(L0[wi])) L0.splice(wi,1); L0.push(k); }
-  else if (DECOS[k].bg){ for (var bi=L0.length-1; bi>=0; bi--) if (decoIsBg(L0[bi])) L0.splice(bi,1); L0.unshift(k); miniDirty=true; } else L0.push(k); /* one road a tile, always at the back */ PAINT.n--; if (PAINT.n<=0 || !decoOwn(k)){ PAINT.k=""; PAINT.n=0; toastQ("Done placing"); }
+  else if (DECOS[k].bg){ for (var bi=L0.length-1; bi>=0; bi--) if (decoIsBg(L0[bi])) L0.splice(bi,1); L0.unshift(k); miniDirty=true; } else L0.push(k); /* one road a tile, always at the back */ PAINT.n--; if (PAINT.n<=0 || !decoOwn(k)){ PAINT.k=""; PAINT.n=0; toast("Done placing"); }
   save(); paintBar(); drawMap(); return true; }
 /* clearing decorations (0.1.165): tap two corners, see the box, then Clear. Event pieces go back to the bag; pack pieces are unlocks and just come off */
 var CLR={on:false, a:"", b:""};
@@ -3441,7 +3441,7 @@ function decoHitsAt(fx, fy){ var out=[], seen={}, near=[];
   near.forEach(function(hh){ var key=hh.tid+"/"+hh.i; if (!seen[key]){ seen[key]=1; hh.near=1; out.push(hh); } }); // then every other piece whose picture box you tapped inside (you hit a see-through bit of it)
   var tid=Math.floor(fx)+","+Math.floor(fy); (S.deco&&S.deco.at[tid]||[]).forEach(function(e,j){ if ((decoIsRoad(e)||decoIsBg(e)) && !seen[tid+"/"+j]) out.push({tid:tid, i:j, k:String(e).split("|")[0]}); }); // flat ground pieces sit on the tapped tile itself
   return out; }
-function decoPickTap(fx, fy){ var hs=decoHitsAt(fx, fy); if (!hs.length){ toastQ("No decorations there"); return; } DPICK.x=fx; DPICK.y=fy; openSheet({kind:"decopick"}); }
+function decoPickTap(fx, fy){ var hs=decoHitsAt(fx, fy); if (!hs.length){ toast("No decorations there"); return; } DPICK.x=fx; DPICK.y=fy; openSheet({kind:"decopick"}); }
 function decoPickSheet(){ try { drawMap(); } catch(e){} var hs=decoHitsAt(DPICK.x, DPICK.y);
   var h='<div class="head"><span class="ico">'+ICON.crest+'</span><div style="flex:1"><h2>Decorations here</h2><div class="sub">front to back, where you tapped</div></div><button class="btn ghost small" data-act="close" aria-label="Close">\u2715</button></div>';
   if (!hs.length) return h+'<p class="dur">Nothing left here.</p>';
@@ -3476,7 +3476,7 @@ function paintBar(){ var el=document.getElementById("paintbar"); if (!el) return
   var ph='<span>'+decoIcon(PAINT.k,22)+'</span><span style="flex:1">Tap tiles to place <b>'+esc(DECOS[PAINT.k].n)+'</b>'+(PAINT.n===Infinity?'':': '+PAINT.n+' left')+'</span><button class="btn small" data-act="paint-stop">Done</button>';
   if (el._h!==ph){ el.innerHTML=ph; el._h=ph; } el.hidden=false; }
 function decoBuy(pid){ if (cosBusy) return; if (!cbOn()){ toast("Sign in to your cloud save first (Settings)"); return; } cosBusy=true; var pk=DSHOP.filter(function(x){ return x.id===pid; })[0];
-  alPost("/cos/buy",{item:"decopack:"+pid}).then(function(d){ cosBusy=false; if (d && d.ok){ COS=d.state; toastQ((pk?pk.name:"Pack")+" unlocked"+(d.already?"":"!")); } else toast((d&&d.error)||"Couldn\u2019t buy that"); lastSheet=""; renderSheet(); renderTileInfo(); })
+  alPost("/cos/buy",{item:"decopack:"+pid}).then(function(d){ cosBusy=false; if (d && d.ok){ COS=d.state; toast((pk?pk.name:"Pack")+" unlocked"+(d.already?"":"!")); } else toast((d&&d.error)||"Couldn\u2019t buy that"); lastSheet=""; renderSheet(); renderTileInfo(); })
     .catch(function(){ cosBusy=false; toast("Can\u2019t reach the server"); }); }
 function decoRoll(r){ var ks=Object.keys(DECOS).filter(function(k){ return DECOS[k].r===r; }); return ks[Math.floor(Math.random()*ks.length)]; }
 function decoDrops(q, drops){ var L=q.L||1, got=[], pick=function(w){ var u=Math.random(), r=u<w[0]?1:u<w[0]+w[1]?2:3; got.push(decoRoll(r)); };
@@ -5279,7 +5279,7 @@ function occupyFlats(){
     launchMarch(q.id,"occupy",pr.t.slice(),phid,{}); sent++;
   }
   if (sent){ save(); var nt=sent<o.n ? (why?"stopped: "+why : list.length<want?"only "+list.length+" free in reach" : free<o.n?"you only had "+free+" free marches" : room<o.n?"room to hold "+room : "") : "";
-    toastQ("Sent "+sent+" "+(sent===1?"army":"armies")+" to occupy level "+o.lvl+" flats"+(nt?" ("+nt+")":"")); }
+    toast("Sent "+sent+" "+(sent===1?"army":"armies")+" to occupy level "+o.lvl+" flats"+(nt?" ("+nt+")":"")); }
   else toast("Nothing sent: "+(why||"no flats"));
   lastView=""; refresh();
 }
@@ -5687,7 +5687,7 @@ function sendMarch(){
     for (var hi=0;hi<12;hi++) S.troops[hi]-=hd.t[hi];
     S.marches.push({id:S.nextMarchId++, city:C().id, food:0, tile:homeTileId(), mission:"hide", cargo:{}, t:hd.t.slice(), hero:hh?hh.id:0, dep:S.gt, arr:S.gt, travel:0, phase:"stay", loot:{}});
     if (hh) hh.away=true;
-    toastQ(fmt(sumT(hd.t))+" troops slipped into the woods"); closeSheet(); refresh(); return; }
+    toast(fmt(sumT(hd.t))+" troops slipped into the woods"); closeSheet(); refresh(); return; }
   var d=marchDraft, q=TILE_BY[d.tile], tm=draftTravel(), food=marchFood(d.t,d.mission,tm), dcamp=draftCamp();
   achStore().tiles += tdist(q);
   S.res.food-=food; var ek=ensKey(d.ensign); if (ek && S.items[ek]>0) S.items[ek]--; else ek="";
@@ -5701,7 +5701,7 @@ function sendMarch(){
   if (d.keep && KEEP_MISSIONS[d.mission]) S.marches[S.marches.length-1].keep=1;
   if (d.rep && !dcamp && (d.mission==="attack"||d.mission==="conquer")){ var rm=S.marches[S.marches.length-1]; rm.rep=true; rm.rsl=!!d.repl; rm.t0=d.t.slice(); rm.hero0=hero?hero.id:0; }
   if (HOLD_MISSIONS[d.mission]) holdTile(q.id, S.gt, S.gt+tm);
-  toastQ((d.mission==="transport"?"Caravan heading to ":d.mission==="reinforce"?"Reinforcements heading to ":d.mission==="station"?"Troops heading to camp at ":"Army marching on ")+(dcamp?"":"")+tileName(q)+", arrives in "+fmtT(realMs(tm)));
+  toast((d.mission==="transport"?"Caravan heading to ":d.mission==="reinforce"?"Reinforcements heading to ":d.mission==="station"?"Troops heading to camp at ":"Army marching on ")+(dcamp?"":"")+tileName(q)+", arrives in "+fmtT(realMs(tm)));
   closeSheet(); refresh();
 }
 
@@ -5915,7 +5915,7 @@ function achCheck(){
   if (Date.now()-ACH_AT<2000) return ACH_TOT;
   ACH_AT=Date.now();
   var a=achStore(), n=0; a.seen=a.seen||{};
-  ACH.forEach(function(x){ var t=achTier(x); n+=t; if ((a.seen[x.k]||0)<t){ a.seen[x.k]=t; if (!a.quiet) toastQ("Achievement: "+x.name+" "+ROMAN[t-1]+" \u2014 "+x.buff+" +"+t+"%"); } });
+  ACH.forEach(function(x){ var t=achTier(x); n+=t; if ((a.seen[x.k]||0)<t){ a.seen[x.k]=t; if (!a.quiet) toast("Achievement: "+x.name+" "+ROMAN[t-1]+" \u2014 "+x.buff+" +"+t+"%"); } });
   if (a.quiet) delete a.quiet; // the first pass after loading an old save credits silently; after that, speak up
   return (ACH_TOT=n);
 }
@@ -5973,7 +5973,7 @@ function lbAutoJoin(){
   if (S.lb && S.lb.on===false && !S.lb.optedOut) S.lb.optedOut=true; // left before auto-joining existed: respect it
   if (S.lb) return;
   S.lb={id:lbHex(16), token:lbHex(16), on:true, nameAuto:true}; S.lb.name=lbAutoName(); save();
-  setTimeout(function(){ toastQ("You\u2019re on the Ibory high scores as "+S.lb.name+". Tap the trophy to see them, or to leave."); },1200);
+  setTimeout(function(){ toast("You\u2019re on the Ibory high scores as "+S.lb.name+". Tap the trophy to see them, or to leave."); },1200);
 }
 function lbStats(){
   var hero=0, heroName="", heroStats=[], heroId=0; function seeHero(h){ if ((h.level||0)>hero || ((h.level||0)===hero && hero>0 && hs(h,"atk")>heroStats[1])){ hero=h.level||0; heroName=h.name||""; heroId=h.id||0; heroStats=[Math.floor(hs(h,"pol")||0),Math.floor(hs(h,"atk")||0),Math.floor(hs(h,"int")||0)]; } }
@@ -6026,13 +6026,13 @@ function wcShown(){ return !S.mpLocked && S.wcOn!==false; }
 // An account an admin removed from the high scores is locked to single player: the server refuses it alliances, invasions, PvP and world chat.
 // The server says so ({locked:1}) and the phone switches those features off until the account is restored (the next score save clears it).
 function mpLock(){ if (S.mpLocked) return; S.mpLocked=1; S.cities.forEach(function(c){ c.alAcad=false; c.alBld=0; }); S.alAcad=false; S.alBld=0; if (S.pvp) { try { pvClear(); } catch(e){} } save(); lastSheet=""; lastView=""; try { renderDock(); refresh(); } catch(e){} toast("This account is locked to single player"); }
-function mpUnlock(){ if (!S.mpLocked) return; S.mpLocked=0; save(); lastSheet=""; lastView=""; try { renderDock(); refresh(); } catch(e){} toastQ("Multiplayer is available to this account again"); }
+function mpUnlock(){ if (!S.mpLocked) return; S.mpLocked=0; save(); lastSheet=""; lastView=""; try { renderDock(); refresh(); } catch(e){} toast("Multiplayer is available to this account again"); }
 var MP_ACTS={"wd-matk":"Attacking a server-map monster", "al-create":"Founding an alliance", "al-apply":"Applying to an alliance", "iv-optin":"Joining invasions", "iv-find":"Launching an invasion", "pv-create":"Starting a PvP match", "pv-join":"Joining a PvP match"};
 var mpPending=null, mpGraceAsked=false;
 function mpGo(why){ if (!S.mp){ S.mp=true; S.mpWhy=why||"chose"; S.mpAt=Date.now(); save(); lbData={}; lbLastSync=0; mpListMe(); } mpTell(); }
 function mpListMe(){ // going multiplayer puts you on the multiplayer high scores (unless an admin removed you)
   if (!LB_URL || navigator.webdriver) return;
-  if (!S.lb){ lbAutoJoin(); } else if (S.lb.on===false && !S.lb.removed){ S.lb.on=true; S.lb.optedOut=false; save(); toastQ("You\u2019re on the multiplayer high scores"); }
+  if (!S.lb){ lbAutoJoin(); } else if (S.lb.on===false && !S.lb.removed){ S.lb.on=true; S.lb.optedOut=false; save(); toast("You\u2019re on the multiplayer high scores"); }
   lbSync(true); }
 function mpTell(){ if (S.mp && !S.mpSent && cbOn()) alPost("/me/mp",{why:S.mpWhy||"chose"}).then(function(d){ if (d && d.ok){ S.mpSent=1; save(); } }).catch(function(){}); }
 function mpInAlliance(){ return !!(alMine() || S.alMember); }
@@ -6103,7 +6103,7 @@ function alApplyHelps(hp){
   hp.mine.forEach(function(p){ var had=S.alHelped[p.ref]||0; if (p.helps<had) had=0; var add=p.helps-had; if (add<=0) return; S.alHelped[p.ref]=p.helps;
     var j=byRef[p.ref]; if (!j) return; var cut=add*(hp.helpSec||60)*1000*S.speed; j.job.end=Math.max(S.gt, j.job.end-cut); if (j.job.start>j.job.end) j.job.start=j.job.end; got+=add; what.push(j.label); });
   Object.keys(S.alHelped).forEach(function(k){ if (!byRef[k]) delete S.alHelped[k]; });
-  if (got){ toastQ("Your alliance helped "+got+" time"+(got>1?"s":"")+": "+what.slice(0,3).join(", ")+(what.length>3?"\u2026":"")); if (advance(Date.now())) flushFinished(); save(); refresh(); }
+  if (got){ toast("Your alliance helped "+got+" time"+(got>1?"s":"")+": "+what.slice(0,3).join(", ")+(what.length>3?"\u2026":"")); if (advance(Date.now())) flushFinished(); save(); refresh(); }
 }
 function alTick(){
   if (document.hidden){ // 0.1.204: in the background, keep an eye on rallies (only with phone notifications on, and only while the phone lets the app run)
@@ -6129,7 +6129,7 @@ function alTick(){
 setInterval(alTick, 1000);
 function alRender(){ if (tab==="guild") renderView(); tickText(); if (sheetFor && sheetFor.kind==="player") renderSheet(); } // 0.2.50: a profile shows the alliance's rank and admin buttons
 function alDo(path, body, okMsg, after){
-  alPost(path, body||{}).then(function(d){ if (d.error){ ALS.msg=""; toast(d.error); return; } if (okMsg) toastQ(okMsg); ALS.armed=null; if (after) after(d);
+  alPost(path, body||{}).then(function(d){ if (d.error){ ALS.msg=""; toast(d.error); return; } if (okMsg) toast(okMsg); ALS.armed=null; if (after) after(d);
     var fe=document.activeElement; if (fe && fe.id!=="alchatin" && fe.blur) fe.blur(); lastView=""; ALS.last=0; alSync(); if (path==="/al/create"||path==="/al/apply"||path==="/al/unapply"||path==="/al/leave"||path==="/al/disband") alList(); })
     .catch(function(){ toast("Couldn\u2019t reach the server. Check your connection."); });
 }
@@ -6393,7 +6393,7 @@ function tpApply(tr){ // shipments that have landed go into your first city, onc
   tr.in.forEach(function(x){ if (x.arrive>now) return; ack.push(x.id); if (S.alTradeDone.indexOf(x.id)>=0) return; S.alTradeDone.push(x.id);
     withCity(0,function(){ RES.forEach(function(k){ S.res[k]=(S.res[k]||0)+Math.max(0,+(x.res&&x.res[k])||0); }); }); got.push(x); });
   if (S.alTradeDone.length>300) S.alTradeDone=S.alTradeDone.slice(-300);
-  if (got.length){ toastQ(got.length===1?"Resources from "+got[0].from+" arrived in "+S.cities[0].name:got.length+" shipments arrived in "+S.cities[0].name); save(); }
+  if (got.length){ toast(got.length===1?"Resources from "+got[0].from+" arrived in "+S.cities[0].name:got.length+" shipments arrived in "+S.cities[0].name); save(); }
   if (ack.length) alPost("/al/trade/got",{ids:ack}).catch(function(){});
 }
 function tpResTxt(r){ return RES.filter(function(k){ return r&&r[k]; }).map(function(k){ return fmt(r[k])+' '+k; }).join(', ')||'nothing'; }
@@ -6433,7 +6433,7 @@ function tpSend(){
   var back=function(){ withCity(ci,function(){ RES.forEach(function(k){ S.res[k]+=res[k]; }); }); save(); };
   withCity(ci,function(){ RES.forEach(function(k){ S.res[k]-=res[k]; }); }); save(); TP.busy=true; lastView=""; renderView(true);
   alPost("/al/trade/send",{to:TP.to, res:res}).then(function(d){ TP.busy=false;
-    if (d.error){ back(); toast(d.error); } else { TP.res={}; toastQ("Sent to "+TP.to+": "+tpResTxt(d.got)+" lands in "+fmtT(d.travel)); ALS.last=0; alSync(); }
+    if (d.error){ back(); toast(d.error); } else { TP.res={}; toast("Sent to "+TP.to+": "+tpResTxt(d.got)+" lands in "+fmtT(d.travel)); ALS.last=0; alSync(); }
     lastView=""; renderView(true); }).catch(function(){ TP.busy=false; back(); toast("Couldn’t reach the server"); lastView=""; renderView(true); });
 }
 /* ---------- alliance reinforcements: send troops to a member's city; they defend it with their own research and hero ---------- */
@@ -6473,10 +6473,10 @@ function rfSend(){
   var back=function(){ withCity(ci,function(){ t.forEach(function(n,i){ S.troops[i]+=n; }); }); if (hh) hh.away=false; save(); };
   withCity(ci,function(){ t.forEach(function(n,i){ S.troops[i]-=n; }); }); if (hh) hh.away=true; save(); RF.busy=true; lastView=""; renderView(true);
   alPost("/al/reinf/send",{to:RF.to, city:RF.city, from:S.cities[ci].id, t:t, side:side}).then(function(r){ RF.busy=false;
-    if (r.error){ back(); toast(r.error); } else { RF.t={}; S.alRfHero=S.alRfHero||{}; if (hid) S.alRfHero[r.id]=hid; save(); toastQ("Reinforcements on their way to "+RF.to+": they arrive in "+fmtT(r.travel)); ALS.last=0; alSync(); }
+    if (r.error){ back(); toast(r.error); } else { RF.t={}; S.alRfHero=S.alRfHero||{}; if (hid) S.alRfHero[r.id]=hid; save(); toast("Reinforcements on their way to "+RF.to+": they arrive in "+fmtT(r.travel)); ALS.last=0; alSync(); }
     lastView=""; renderView(true); }).catch(function(){ RF.busy=false; back(); toast("Couldn’t reach the server"); lastView=""; renderView(true); });
 }
-function rfMove(path, id){ alPost(path,{id:+id}).then(function(r){ if (r.error) toast(r.error); else toastQ(path==="/al/reinf/recall"?"Recalled: they’re heading home":"Sent home"); ALS.last=0; alSync(); }).catch(function(){ toast("Couldn’t reach the server"); }); }
+function rfMove(path, id){ alPost(path,{id:+id}).then(function(r){ if (r.error) toast(r.error); else toast(path==="/al/reinf/recall"?"Recalled: they’re heading home":"Sent home"); ALS.last=0; alSync(); }).catch(function(){ toast("Couldn’t reach the server"); }); }
 function allyRepHtml(r){ // reinforcements in a defense report: each owner on their own
   if (!r.allies || !r.allies.length) return '';
   return r.allies.map(function(a){ var lost=0; for (var i=0;i<12;i++) lost+=(a.sent[i]||0)-(a.left[i]||0);
@@ -6650,10 +6650,10 @@ function alBoxMove(dir){
     for (var k1 in amt) S.alBox[k1]=(S.alBox[k1]||0)-amt[k1];
     S.alBoxOut=S.alBoxOut||[]; S.alBoxOut.push({id:Date.now().toString(36)+Math.floor(Math.random()*1e4), city:C().id, amt:amt, at:Date.now()+AL_BOX_OUT_MS});
     ALB={food:"",lumber:"",stone:"",iron:"",gold:""}; if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
-    save(); toastQ("On its way: "+fmt(tot)+" reaches "+S.name+" in 30 minutes"); lastView=""; refresh(); return; }
+    save(); toast("On its way: "+fmt(tot)+" reaches "+S.name+" in 30 minutes"); lastView=""; refresh(); return; }
   for (var k2 in amt){ S.res[k2]-=dir*amt[k2]; S.alBox[k2]=(S.alBox[k2]||0)+dir*amt[k2]; }
   ALB={food:"",lumber:"",stone:"",iron:"",gold:""}; if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
-  save(); toastQ("Stored "+fmt(tot)+" in your Warehouse box"); lastView=""; refresh();
+  save(); toast("Stored "+fmt(tot)+" in your Warehouse box"); lastView=""; refresh();
 }
 var AL_BOX_OUT_MS=30*60000;
 function alBoxOutTick(){ var L=S.alBoxOut; if (!L || !L.length) return; var now=Date.now(), ch=false;
@@ -6786,13 +6786,13 @@ function sarSummon(type, lv){
   else { if (A.day!==gameDay()){ A.day=gameDay(); A.used=0; } A.used++; }
   var now=Date.now(); A.n=(A.n||0)+1;
   A.live.push({id:A.n, type:type, lv:lv, by:myName()||"You", at:now, ends:now+SAR.window, joins:[]});
-  save(); toastQ("A level "+lv+" "+T.n+" is in the Arena: you have "+Math.round(SAR.window/60000)+" minutes to march"); lastView=""; refresh();
+  save(); toast("A level "+lv+" "+T.n+" is in the Arena: you have "+Math.round(SAR.window/60000)+" minutes to march"); lastView=""; refresh();
 }
 function sarUpgrade(){
   var A=sarState(); if (A.up || A.lv>=SAR.maxLv) return; var to=A.lv+1, need=sarBuildNeed(to);
   var short=RES.filter(function(k){ return (S.res[k]||0)<need; }); if (short.length){ toast("Needs "+fmt(need)+" of each resource in "+S.name); return; }
   RES.forEach(function(k){ S.res[k]-=need; }); A.up={to:to, end:Date.now()+sarBuildMs(to)};
-  save(); toastQ((to===1?"Building":"Upgrading")+" the Monster Arena: "+fmtT(sarBuildMs(to))); lastView=""; refresh();
+  save(); toast((to===1?"Building":"Upgrading")+" the Monster Arena: "+fmtT(sarBuildMs(to))); lastView=""; refresh();
 }
 function soloArenaHtml(){
   var A=sarState(), C0=sarCat(), mon=sarMon(), now=Date.now(), mine=(S.alArena||[]).filter(function(m){ return m.aid==="solo"; }), h='', live=arLive(), full=(S.alArena||[]).length>=SAR.slots;
@@ -6986,7 +6986,7 @@ function arSend(){
     if (hero) hero.away=true;
     sc.joins.push({ref:ref, t:t, side:side, arrive:arr});
     S.alArena=S.alArena||[]; S.alArena.push({ref:ref, aid:"solo", mid:sc.id, city:cid, hero:hero?hero.id:0, t:t, dep:Date.now(), arrive:arr, travel:trv, ends:sc.ends, st:"out", keep:d.keep?1:0});
-    save(); toastQ("Marching to the Arena: arrives in "+fmtT(trv)); closeSheet(); lastView=""; refresh(); return;
+    save(); toast("Marching to the Arena: arrives in "+fmtT(trv)); closeSheet(); lastView=""; refresh(); return;
   }
   ALS.arSending=true; var gb=document.getElementById("marchgo"); if (gb) gb.disabled=true;
   alPost("/al/arena/join",{mid:d.mid, ref:ref, t:t, side:side, speed:alSpeed(d.hero)}).then(function(r){ ALS.arSending=false;
@@ -6995,7 +6995,7 @@ function arSend(){
     withCity(ci,function(){ for (var i=0;i<12;i++) S.troops[i]=Math.max(0,S.troops[i]-t[i]); if (ens && S.items[ens]>0) S.items[ens]--; });
     if (hero) hero.away=true;
     S.alArena=S.alArena||[]; S.alArena.push({ref:ref, aid:ALS.aid, mid:r.mid, city:cid, hero:hero?hero.id:0, t:t, dep:Date.now(), arrive:r.arrive, travel:r.travel, ends:r.ends, st:"out", keep:d.keep?1:0});
-    save(); toastQ("Marching to the Arena: arrives in "+fmtT(r.arrive-Date.now())); closeSheet(); lastView=""; refresh(); ALS.last=0; alSync(); })
+    save(); toast("Marching to the Arena: arrives in "+fmtT(r.arrive-Date.now())); closeSheet(); lastView=""; refresh(); ALS.last=0; alSync(); })
     .catch(function(){ ALS.arSending=false; if (gb) gb.disabled=false; toast("Couldn’t reach the server. Check your connection."); });
 }
 /* ---------- Alliance rallies (0.1.131): call the alliance onto a level 10 NPC city (any time since 0.2.9) or a historic city (once a day since 0.2.9, resets at midnight Eastern) on your map.
@@ -7070,7 +7070,7 @@ function ryCall(){ var q=TILE_BY[sheetFor.tile]; if (!q || RYS.sending) return; 
   var body={x:q.x, y:q.y, tname:tileName(q), k:rk, L:q.L, B:{t:b.t, f:b.f, wall:b.wall, r:b.r, am:b.am||1, fb:b.fb||1, hint:b.hint||0}, H:hh?{t:hh.t, f:hh.f}:{t:b.t, f:b.f}, f0:f0, rt:realMs(RT), mins:mins, from:S.cities[fci].name, trv:ryTrv(fci,q,ryFastHero(fci,q))};
   RYS.sending=true; lastSheet=""; renderSheet();
   alPost("/al/rally/call", body).then(function(r){ RYS.sending=false; if (r.error){ toast(r.error); lastSheet=""; renderSheet(); return; }
-    ryLocks().push({rid:r.rid, tile:q.id, aid:ALS.aid, at:Date.now(), k:rk}); save(); closeSheet(); toastQ("The alliance is called! The waves leave in "+fmtT(r.hitAt-Date.now())); ALS.sub="rally"; ALS.last=0;
+    ryLocks().push({rid:r.rid, tile:q.id, aid:ALS.aid, at:Date.now(), k:rk}); save(); closeSheet(); toast("The alliance is called! The waves leave in "+fmtT(r.hitAt-Date.now())); ALS.sub="rally"; ALS.last=0;
     if (RYS.sendToo) ALS.onSync=function(){ if (ryById(r.rid) && !sheetFor) openMarch(homeTileId(),"rally",r.rid); }; // 0.1.237: once the sync lists the new rally, open your own march to it
     alSync(); lastView=""; refresh(); })
     .catch(function(){ RYS.sending=false; toast("Couldn\u2019t reach the server"); lastSheet=""; renderSheet(); }); }
@@ -7099,7 +7099,7 @@ function rySend(){
     var ci=cityIndex(cid); withCity(ci,function(){ for (var i=0;i<12;i++) S.troops[i]=Math.max(0,S.troops[i]-t[i]); if (ens && S.items[ens]>0) S.items[ens]--; });
     if (hero) hero.away=true;
     S.alRally=S.alRally||[]; var Rj=ryById(r.rid); S.alRally.push({ref:ref, aid:ALS.aid, rid:r.rid, city:cid, hero:hero?hero.id:0, t:t, dep:Date.now(), arrive:r.arrive, travel:r.travel, hitAt:r.hitAt, st:"out", keep:d.keep?1:0, tile:Rj&&Rj.mine&&Rj.x!=null?Rj.x+","+Rj.y:null, from:Rj&&Rj.from||""}); // 0.1.216: your own rally's target is on your map: draw the march there
-    save(); toastQ("Marching to the rally: arrives in "+fmtT(r.arrive-Date.now())); closeSheet(); lastView=""; refresh(); ALS.last=0; alSync(); })
+    save(); toast("Marching to the rally: arrives in "+fmtT(r.arrive-Date.now())); closeSheet(); lastView=""; refresh(); ALS.last=0; alSync(); })
     .catch(function(){ RYS.sending=false; if (gb) gb.disabled=false; toast("Couldn\u2019t reach the server. Check your connection."); });
 }
 function ryStatus(m){ var now=Date.now(); return m.st==="back" ? 'coming home, '+fmtT(Math.max(0,m.home-now)) : now<m.arrive ? 'arrives in '+fmtT(m.arrive-now) : now<m.hitAt ? 'waiting at the rally point' : m.land ? 'on the road to the target, lands in '+fmtT(Math.max(0,m.land-now)) : 'on the road to the target'; }
@@ -7382,7 +7382,7 @@ function awApply(rows){
 }
 function awTrainOn(){ return S.awTrain && S.awTrain>Date.now(); }
 function awDo(path, body, ok){ if (AWS.posting) return; AWS.posting=true;
-  return alPost(path, body||{}).then(function(r){ AWS.posting=false; if (r.error){ toast(r.error); return r; } if (ok) toastQ(ok); AWS.last=0; awSync(); return r; })
+  return alPost(path, body||{}).then(function(r){ AWS.posting=false; if (r.error){ toast(r.error); return r; } if (ok) toast(ok); AWS.last=0; awSync(); return r; })
     .catch(function(){ AWS.posting=false; toast("Couldn’t reach the server"); return {error:"net"}; }); }
 function awTroops(t){ var p=[]; (t||[]).forEach(function(n,i){ if (n) p.push(fmt(n)+" "+uname(i,n)); }); return p.join(", ")||"none"; }
 function awAgo(t){ var s=Math.max(0,(Date.now()-t)/1000); return s<60?'just now':s<3600?Math.floor(s/60)+' min ago':Math.floor(s/3600)+' h ago'; }
@@ -7491,14 +7491,14 @@ function awAct(act, a){
     var short=withCity(gi,function(){ return t.some(function(n,i){ return n>S.troops[i]; }); }); if (short){ toast("Not enough troops in "+S.cities[gi].name); return true; }
     var cid=S.cities[gi].id, back=function(){ withCity(cityIndex(cid),function(){ t.forEach(function(n,i){ S.troops[i]+=n; }); }); save(); };
     withCity(gi,function(){ t.forEach(function(n,i){ S.troops[i]-=n; }); }); save();
-    alPost("/aw/give",{to:AWS.give.to, city:cid, t:t}).then(function(r){ if (r.error){ back(); toast(r.error); return; } AWS.give.t={}; toastQ("Given to "+(AWS.give.to==="wall"?"the wall":AWS.give.to)); AWS.last=0; awSync(); })
+    alPost("/aw/give",{to:AWS.give.to, city:cid, t:t}).then(function(r){ if (r.error){ back(); toast(r.error); return; } AWS.give.t={}; toast("Given to "+(AWS.give.to==="wall"?"the wall":AWS.give.to)); AWS.last=0; awSync(); })
       .catch(function(){ back(); toast("Couldn’t reach the server"); }); return true; }
   if (act==="aw-take"){ awDo("/aw/take",{id:+a.dataset.id}, "Taken back: they’re on their way home"); return true; }
   if (act==="aw-scout"){ awDo("/aw/scout",{target:a.dataset.t}, "Scouted"); return true; }
   if (act==="aw-aim"){ AWS.atk.target=a.dataset.t; AWS.atk.t={}; lastView=""; renderView(true); return true; }
   if (act==="aw-attack"){ var at=awT(AWS.atk.t); awDo("/aw/attack",{target:AWS.atk.target, t:at}, "Marching!").then(function(r){ if (r && !r.error){ AWS.atk.t={}; } }); return true; }
   if (act==="aw-wall" || act==="aw-wallback"){ awDo("/aw/wall",{t:awT(AWS.wall.t), back:act==="aw-wallback"}, act==="aw-wall"?"Troops are on the wall":"Troops are off the wall").then(function(r){ if (r && !r.error) AWS.wall.t={}; }); return true; }
-  if (act==="aw-console"){ var pick=a.dataset.pick; awDo("/aw/console",{id:+a.dataset.id, pick:pick}).then(function(r){ if (r && r.ok){ if (pick==="train"){ S.awTrain=r.until; save(); toastQ("Drill Sergeants: troops train 15% faster for 7 days"); } else toastQ("Field Surgeons: ready for your next war"); } }); return true; }
+  if (act==="aw-console"){ var pick=a.dataset.pick; awDo("/aw/console",{id:+a.dataset.id, pick:pick}).then(function(r){ if (r && r.ok){ if (pick==="train"){ S.awTrain=r.until; save(); toast("Drill Sergeants: troops train 15% faster for 7 days"); } else toast("Field Surgeons: ready for your next war"); } }); return true; }
   if (act==="aw-ww"){ var rp=d.war&&d.war.reps[+a.dataset.i]; if (rp&&rp.cap) rpOpenCap(rp.cap, {sub:rp.from+" vs "+rp.target, mine:rp.ours?"A":"D"}); return true; }
   return false;
 }
@@ -8009,7 +8009,7 @@ function worldHtml(){ if (!alOn()) return '<div class="section"><h3>Server map</
   if (!WDS.d && !WDS.busy) wdFetch();
   return '<div class="section"><div class="shead"><h3>Server map</h3>'+(WDS.d&&WDS.d.me.on?'<span class="badge">You’re on it</span>':'')+'</div><div id="wdwrap">'+worldInner()+'</div></div>'; }
 function worldSheet(){ return '<div class="head"><span class="ico">'+ICON.crest+'</span><div style="flex:1"><h2>Server map</h2><div class="sub">One world for every multiplayer player</div></div><button class="btn ghost small" data-act="close" aria-label="Close">✕</button></div>'+worldHtml(); }
-function wdAfter(d, ok){ WDS.acting=false; WDS.armed=""; WDS.armOff=null; if (d.error){ toast(d.error); wdPaint(); return; } if (ok) toastQ(ok); WDS.at=0; wdFetch(); }
+function wdAfter(d, ok){ WDS.acting=false; WDS.armed=""; WDS.armOff=null; if (d.error){ toast(d.error); wdPaint(); return; } if (ok) toast(ok); WDS.at=0; wdFetch(); }
 function wdJoin(quiet){ if (WDS.acting) return; if (!cbOn()){ if (!quiet) toast("Sign in to your cloud save first"); return; } WDS.acting=true; wdPaint();
   var b=wdCapBody(); b.lid=lbOn()?S.lb.id:undefined; b.lt=lbOn()?S.lb.token:undefined;
   alPost("/wd/join", b).then(function(d){ if (!d.error){ S.wdOn=true; S.wdCap=b.cap.id; save(); WDS.z=0; } if (quiet && d.error){ WDS.acting=false; WDS.err=d.error; wdPaint(); return; } wdAfter(d, d.error||d.already?"":"Your capital is on the server map"); })
@@ -8059,7 +8059,7 @@ function wdAct(act, a, e){
     alPost("/wd/claim",{slot:si}).then(function(d){ wdAfter(d, d.error?"":"Your alliance is on its new slot"); }).catch(function(){ WDS.acting=false; toast("Couldn’t reach the server. Check your connection."); wdPaint(); }); return true; }
   if (act==="wd-tp"){ var tk="tp"+a.dataset.x+","+a.dataset.y; if (WDS.armed!==tk){ WDS.armed=tk; wdPaint(); return true; } wdTeleport({x:+a.dataset.x, y:+a.dataset.y}, "Your capital moved to ("+a.dataset.x+", "+a.dataset.y+")"); return true; }
   if (act==="wd-home"){ if (WDS.armed!=="home"){ WDS.armed="home"; wdPaint(); return true; } wdTeleport({home:1}, "Your capital is back on your alliance map"); return true; }
-  if (act==="wd-set"){ if (a.dataset.v==="on"){ if (S.wdOn) return true; if (!S.mp){ mpPending=null; openSheet({kind:"mpwarn", act:"wd-join"}); return true; } wdJoin(); toastQ("Joining the server map…"); return true; }
+  if (act==="wd-set"){ if (a.dataset.v==="on"){ if (S.wdOn) return true; if (!S.mp){ mpPending=null; openSheet({kind:"mpwarn", act:"wd-join"}); return true; } wdJoin(); toast("Joining the server map…"); return true; }
     if (S.wdOn) openSheet({kind:"wdleave"}); return true; }
   if (act==="wd-leave-ok"){ closeSheet(); wdLeave(false); return true; }
   return false; }
@@ -8245,7 +8245,7 @@ function wbSheet(){ var v=sheetFor.v, d=WDS.d||{}, R=d.royal||{}, X='<button cla
     return h; }
   return head("Server map")+'<button class="closebtn" data-act="close">Close</button>'; }
 function wbDo(path, body, ok, after){ if (WDS.acting) return; WDS.acting=true;
-  alPost(path, body).then(function(r){ WDS.acting=false; if (r.error){ toast(r.error); return; } if (ok) toastQ(ok); if (after) after(r); WB.reAt=Date.now(); WDS.busy=false; WDS.at=0; wdFetch(); lastSheet=""; if (sheetFor) renderSheet(); })
+  alPost(path, body).then(function(r){ WDS.acting=false; if (r.error){ toast(r.error); return; } if (ok) toast(ok); if (after) after(r); WB.reAt=Date.now(); WDS.busy=false; WDS.at=0; wdFetch(); lastSheet=""; if (sheetFor) renderSheet(); })
     .catch(function(){ WDS.acting=false; toast("Couldn’t reach the server. Check your connection."); }); }
 function wbChatLoad(){ COC.last=0; coSync(); } // 0.2.50: coalition chat lives in the chat panel now (coSync)
 setInterval(function(){ if (!document.hidden && sheetFor && sheetFor.kind==="wb" && sheetFor.v==="coal" && WDS.d && WDS.d.coal && Date.now()-WB.chatAt>8000){ WB.chatAt=Date.now(); wbChatLoad(); } }, 2000);
@@ -8286,7 +8286,7 @@ function wbAct(act, a){
   if (act==="wb-say"){ var si=document.getElementById("wbsay"), tx=si?si.value.trim():""; if (!tx) return true; si.value="";
     alPost("/wd/co/say",{text:tx}).then(function(r){ if (r.error){ toast(r.error); si.value=tx; return; } WB.chat=r.lines||WB.chat; lastSheet=""; renderSheet(); var el=document.getElementById("wbchat"); if (el) el.scrollTop=el.scrollHeight; }); return true; }
   return false; }
-document.addEventListener("change", function(e){ if (e.target && e.target.id==="wbnews"){ S.wdNews=!!e.target.checked; save(); pushSync(true); toastQ(S.wdNews?"You’ll be told when the Throne or a building changes hands (with phone notifications on)":"No more server-map news on your phone"); } });
+document.addEventListener("change", function(e){ if (e.target && e.target.id==="wbnews"){ S.wdNews=!!e.target.checked; save(); pushSync(true); toast(S.wdNews?"You’ll be told when the Throne or a building changes hands (with phone notifications on)":"No more server-map news on your phone"); } });
 document.addEventListener("keydown", function(e){ if (e.key==="Enter" && e.target && e.target.id==="wbsay"){ e.preventDefault(); wbAct("wb-say", e.target); } });
 // the Fortune blessing: a 5% chance a won fight's drops come twice
 (function(){ var f0=winDrops; winDrops=function(q){ var luck=!!(S.wdOn && S.wdBuf && S.wdBuf.b_luck && Math.random()<S.wdBuf.b_luck), it=luck?JSON.parse(JSON.stringify(S.items)):null, md=luck?JSON.parse(JSON.stringify(S.medals)):null, r=f0(q);
@@ -8352,7 +8352,7 @@ function wdSend(){ var d=marchDraft; if (wdWhy(sumT(d.t)) || WDS.sending) return
     withCity(ci,function(){ for (var i=0;i<12;i++) S.troops[i]=Math.max(0,S.troops[i]-t[i]); if (ens && S.items[ens]>0) S.items[ens]--; }); // a March Size item is spent, as for any march
     if (hero) hero.away=true;
     S.wdM=S.wdM||[]; S.wdM.push({ref:ref, rid:r.rid||W.rid, city:cid, hero:hero?hero.id:0, t:t, dep:Date.now(), st:"out", L:tg?tg.L:0, tk:W.kind==="b"?W.tk:(tg&&tg.r&&tg.r.tk)||"mon", name:W.kind==="b"?(tg?tg.name:""):(tg&&tg.r&&tg.r.tname)||""});
-    save(); toastQ(W.kind==="join"?"Marching to the rally":W.mins?"Rally called: it leaves in "+W.mins+" minutes":"Marching: it lands in "+fmtT(Math.max(0,(r.hit||Date.now())-Date.now())));
+    save(); toast(W.kind==="join"?"Marching to the rally":W.mins?"Rally called: it leaves in "+W.mins+" minutes":"Marching: it lands in "+fmtT(Math.max(0,(r.hit||Date.now())-Date.now())));
     closeSheet(); WDS.at=0; wdFetch(); lastView=""; refresh(); })
     .catch(function(){ WDS.sending=false; if (gb) gb.disabled=false; toast("Couldn’t reach the server. Check your connection."); }); }
 // results: each of my marches learns what came back; it's taken home when it gets there (troops, wounded to the Medic Camp, rewards)
@@ -8512,7 +8512,7 @@ function abuseSend(){ var sf=sheetFor; if (!sf || sf.kind!=="abuse" || sf.busy) 
   var body={ch:sf.ch, why:w?w.value:"other", note:n?n.value.trim():""}; if (sf.ch==="p") body.k=sf.k||sf.nm; else body.id=+sf.id;
   var blockToo=sf.ch==="d" && bl && bl.checked; sf.busy=true; lastSheet=""; renderSheet();
   alPost("/rep/send",body).then(function(d){ sf.busy=false; if (d.error){ toast(d.error); lastSheet=""; renderSheet(); return; }
-    closeSheet(); RXSEL=""; rxRefresh(); toastQ("Reported. Thanks: the admin will take a look."); if (blockToo && DMS.open) dmBlock(true); })
+    closeSheet(); RXSEL=""; rxRefresh(); toast("Reported. Thanks: the admin will take a look."); if (blockToo && DMS.open) dmBlock(true); })
   .catch(function(){ sf.busy=false; toast("Couldn’t reach the server"); lastSheet=""; renderSheet(); }); }
 /* ---------- deleting your account (0.1.257): needs the password; the game on this device stays and keeps playing single player ---------- */
 function cbDelSheet(){ var sf=sheetFor;
@@ -8556,7 +8556,7 @@ var CPIC={busy:false};
 function chatPicPick(tgt){ if (!cbOn()){ toast("Sign in to your cloud save first"); return; } if (tgt!=="al" && dockCh==="dm" && !DMS.open){ toast("Open a conversation first"); return; }
   var fi=document.createElement("input"); fi.type="file"; fi.accept="image/*"; fi.style.display="none"; document.body.appendChild(fi);
   fi.addEventListener("change", function(){ var f=fi.files&&fi.files[0]; fi.remove(); if (f) chatPicSend(tgt, f); }); fi.click(); }
-function chatPicUpload(tgt, blob, type){ CPIC.busy=true; toastQ("Sending the picture\u2026");
+function chatPicUpload(tgt, blob, type){ CPIC.busy=true; toast("Sending the picture\u2026");
   return fetch(LB_URL+"/img/up?ch="+chatTgtCh(tgt), {method:"POST", headers:{"Content-Type":type, "X-Name":S.cloud.name, "X-Token":S.cloud.token}, body:blob})
     .then(function(r){ return r.json().catch(function(){ return {error:"Server error "+r.status}; }); })
     .then(function(d){ CPIC.busy=false; if (d.error || !d.id){ toast(d.error||"Couldn\u2019t send the picture"); return; } chatSendText(tgt, LB_URL+"/img/"+d.id); })
@@ -8673,7 +8673,7 @@ function dmSend(){ var i=document.getElementById("dockin"); if (!i || !DMS.open)
     var l=d.line; DMS.open={k:l.k, name:l.name}; if (!l.id) DMS.last=0; else if (!DMS.lines.some(function(x){ return x.id===l.id; })){ DMS.lines.push(l); if (l.id>DMS.top) DMS.top=l.id; } renderDock(); })
   .catch(function(){ toast("Couldn’t reach the server"); i.value=t; }); }
 function dmWith(k, name){ DMS.open={k:k||"", name:name}; dockCh="dm"; dockOpen=true; dockSave(); renderDock(); if (DMS.open.k) dmMarkRead(DMS.open.k); setTimeout(function(){ var i=document.getElementById("dockin"); if (i) i.focus(); var b=document.getElementById("dkmsgs"); if (b) b.scrollTop=b.scrollHeight; },60); DMS.last=0; }
-function dmBlock(on){ var o=DMS.open; if (!o) return; alPost("/dm/block",{k:o.k||undefined, to:o.name, on:!!on}).then(function(d){ if (d.error){ toast(d.error); return; } toastQ(on?o.name+" is blocked: you won’t see their messages":o.name+" is unblocked"); DMS.last=0; dmSync(); }).catch(function(){ toast("Couldn’t reach the server"); }); }
+function dmBlock(on){ var o=DMS.open; if (!o) return; alPost("/dm/block",{k:o.k||undefined, to:o.name, on:!!on}).then(function(d){ if (d.error){ toast(d.error); return; } toast(on?o.name+" is blocked: you won’t see their messages":o.name+" is unblocked"); DMS.last=0; dmSync(); }).catch(function(){ toast("Couldn’t reach the server"); }); }
 function dmHtml(){
   if (DMS.open){ var o=DMS.open, th=dmThread(o), blk=o.k&&dmBlocked(o.k);
     return '<div class="farmadd" style="justify-content:space-between;margin:0 0 6px"><button class="link" data-act="dm-back">‹ All messages</button><b>'+esc(o.name)+'</b><button class="link" data-act="dm-block" data-on="'+(blk?0:1)+'">'+(blk?'Unblock':'Block')+'</button></div>'+
@@ -8879,7 +8879,7 @@ function nameSave(v, from){ // change the in-game name on the server, then every
   alPost("/me/rename",{display:v}).then(function(d){ CB.busy=false;
     if (!d || !d.ok){ cbUi((d&&d.error)||"Couldn\u2019t change the name"); toast((d&&d.error)||"Couldn\u2019t change the name"); return; }
     S.cloud.info=S.cloud.info||{}; S.cloud.info.display=d.display; S.cloud.info.renamed=d.renamed||Date.now(); S.cloud.display=d.display; S.nameOneAsked=1; save();
-    nameFollow(); cbUi("", true); if (from==="one") closeSheet(); toastQ("You\u2019re now "+d.display+" everywhere"); lbData={}; lbLastSync=0; lbSync(true); lastView=""; lastSheet=""; refresh(); renderSheet();
+    nameFollow(); cbUi("", true); if (from==="one") closeSheet(); toast("You\u2019re now "+d.display+" everywhere"); lbData={}; lbLastSync=0; lbSync(true); lastView=""; lastSheet=""; refresh(); renderSheet();
   }).catch(function(){ CB.busy=false; cbUi("Couldn\u2019t reach the server. Check your connection."); });
 }
 // After the update that made one name everywhere: a signed-in player whose lord's name or boards name differed from the account name gets one free pick.
@@ -8936,7 +8936,7 @@ function cbSave(auto, opt){
     return fetch(LB_URL+"/backup/save",{method:"POST", cache:"no-store", keepalive:!!opt.leaving && pk.body.length<60000, headers:hd, body:pk.body});
   }).then(function(r){ return r.json().then(function(d){ return {st:r.status, d:d}; }); }).then(function(o){
     CB.busy=false;
-    if (o.d && o.d.ok){ if (withStats) S.cloud.statsAt=Date.now(); S.cloud.last=o.d.info.latest.at; S.cloud.rev=o.d.info.rev||0; S.cloud.info=o.d.info; if (o.d.info.display) S.cloud.display=o.d.info.display; nameOneNote(); setTimeout(nameOneMaybe, 1500); CB.found=null; CB.conflict=null; save(); if (!auto){ toastQ("Backed up to the cloud"); cbUi("Backed up.", true); } else cbUi(""); return; }
+    if (o.d && o.d.ok){ if (withStats) S.cloud.statsAt=Date.now(); S.cloud.last=o.d.info.latest.at; S.cloud.rev=o.d.info.rev||0; S.cloud.info=o.d.info; if (o.d.info.display) S.cloud.display=o.d.info.display; nameOneNote(); setTimeout(nameOneMaybe, 1500); CB.found=null; CB.conflict=null; save(); if (!auto){ toast("Backed up to the cloud"); cbUi("Backed up.", true); } else cbUi(""); return; }
     if (o.st===409 && o.d && o.d.conflict && o.d.info && o.d.info.dev && o.d.info.dev===cbDev() && !opt.again){ // 0.1.170: the newer save is this device's own (it saved while being put away and never heard back): catch up and save again
       S.cloud.rev=o.d.info.rev||0; save(); setTimeout(function(){ cbSave(auto, {force:true, again:true}); }, 300); return; }
     if (o.st===409 && o.d && o.d.conflict){ // another device saved since: don't overwrite it, ask which game to keep
@@ -9348,9 +9348,9 @@ function wcFinish(p,res){
   for (var g=got; g<rating; g++){ var rw=p.rewards[g]; RES.forEach(function(k2){ S.res[k2]+=rw.res[k2]||0; }); for (var it in rw.items) S.items[it]=(S.items[it]||0)+rw.items[it]; for (var md in (rw.medals||{})){ S.medals[md]=(S.medals[md]||0)+rw.medals[md]; achMedal(md, rw.medals[md]); } paid.push(WC_NAMES[p.goals.length===1?0:g]+": "+rewardText(rw)); }
   if (rating>got) st.got[p.id]=rating;
   res.rating=rating; res.paid=paid; wcOut[p.id]=res; save();
-  if (paid.length) toastQ("War College: "+(p.goals.length===1?"puzzle solved":WC_NAMES[rating-1])+"! Rewards added to "+S.name+".");
-  else if (def) toastQ(won?"Held, losing "+fmt(lost)+" prestige"+(rating?"":". Not enough for a rating yet"):"The city fell");
-  else toastQ(won?"Won, losing "+fmt(lost)+(rating?"":". Not enough for a rating yet"):"The defenders held");
+  if (paid.length) toast("War College: "+(p.goals.length===1?"puzzle solved":WC_NAMES[rating-1])+"! Rewards added to "+S.name+".");
+  else if (def) toast(won?"Held, losing "+fmt(lost)+" prestige"+(rating?"":". Not enough for a rating yet"):"The city fell");
+  else toast(won?"Won, losing "+fmt(lost)+(rating?"":". Not enough for a rating yet"):"The defenders held");
   lastSheet=""; renderSheet(); lastView="";
 }
 // 0.2.4: the War College is a hub. Tiles per tier, grouped by kind; a tier opens its own page with the puzzles and its rules in a dropdown.
@@ -10637,13 +10637,13 @@ function heroImageFromFile(h, f){
   img.onload=function(){ try { var c=document.createElement("canvas"); c.width=c.height=96; var g=c.getContext("2d"), s=Math.min(img.width,img.height);
       g.fillStyle="#fff"; g.fillRect(0,0,96,96); g.drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,96,96);
       var d=c.toDataURL("image/jpeg",0.8); himgSet(h,d); h.pic=Date.now(); save(); lastSheet=""; renderSheet(); lastView=""; refresh();
-      if (cbOn()) alPost("/me/heroimg",{hid:h.id, img:d}).then(function(r){ if (r.error) toast(r.error); else toastQ("Picture saved: everyone can see it"); }).catch(function(){ toastQ("Saved here; it goes to the server next time you’re online"); h.picPending=1; save(); });
-      else toastQ("Picture saved on this device (sign in to a cloud save to share it)"); }
+      if (cbOn()) alPost("/me/heroimg",{hid:h.id, img:d}).then(function(r){ if (r.error) toast(r.error); else toast("Picture saved: everyone can see it"); }).catch(function(){ toast("Saved here; it goes to the server next time you’re online"); h.picPending=1; save(); });
+      else toast("Picture saved on this device (sign in to a cloud save to share it)"); }
     catch(e){ toast("Couldn’t use that image"); } URL.revokeObjectURL(url); };
   img.onerror=function(){ URL.revokeObjectURL(url); toast("Couldn’t read that image. PNG, JPG, WebP and GIF work; for other kinds, screenshot it first"); };
   img.src=url;
 }
-function heroImageRemove(h){ himgSet(h,""); h.pic=0; delete h.picPending; save(); lastSheet=""; renderSheet(); lastView=""; refresh(); if (cbOn()) alPost("/me/heroimg",{hid:h.id, img:""}).catch(function(){}); toastQ("Picture removed"); }
+function heroImageRemove(h){ himgSet(h,""); h.pic=0; delete h.picPending; save(); lastSheet=""; renderSheet(); lastView=""; refresh(); if (cbOn()) alPost("/me/heroimg",{hid:h.id, img:""}).catch(function(){}); toast("Picture removed"); }
 // pictures picked while offline go up later
 setInterval(function(){ if (!cbOn() || document.hidden) return; var all=[]; S.cities.forEach(function(c){ (c.heroes||[]).forEach(function(h){ if (h.picPending && HIMG[h.id]) all.push(h); }); }); var h=all[0]; if (!h) return;
   alPost("/me/heroimg",{hid:h.id, img:HIMG[h.id]}).then(function(r){ if (!r.error){ delete h.picPending; save(); } }).catch(function(){}); }, 20000);
@@ -11022,10 +11022,10 @@ function gearActs(act, a){
   if (act==="arm-pick"){ var id=+a.dataset.g; if (ARM.sel[id]) delete ARM.sel[id]; else ARM.sel[id]=1; armed=null; armRe(); return true; }
   if (act==="arm-scrap"){ if (!ARM.sel) return true; if (armed!=="armscrap"){ armed="armscrap"; armRe(); return true; } armed=null;
     var ids=Object.keys(ARM.sel).map(Number), got=0, n=0; S.gear=S.gear.filter(function(g){ if (ids.indexOf(g.id)<0 || g.lock) return true; got+=GEAR_SCRAP[g.tier]+g.stars; n++; return false; });
-    S.items.gemD=(S.items.gemD||0)+got; gearChanged(); ARM.sel={}; save(); toastQ("Scrapped "+n+" piece"+(n===1?"":"s")+" for "+fmt(got)+" Delicate Gems"); armRe(); refresh(); return true; }
-  if (act==="gear-lock"){ var lg=forgeGear(); if (!lg) return true; lg.lock=!lg.lock; save(); toastQ(lg.lock?"Locked: it can’t be scrapped, and Equip best leaves it be":"Unlocked"); lastSheet=""; renderSheet(); refresh(); return true; }
+    S.items.gemD=(S.items.gemD||0)+got; gearChanged(); ARM.sel={}; save(); toast("Scrapped "+n+" piece"+(n===1?"":"s")+" for "+fmt(got)+" Delicate Gems"); armRe(); refresh(); return true; }
+  if (act==="gear-lock"){ var lg=forgeGear(); if (!lg) return true; lg.lock=!lg.lock; save(); toast(lg.lock?"Locked: it can’t be scrapped, and Equip best leaves it be":"Unlocked"); lastSheet=""; renderSheet(); refresh(); return true; }
   if (act==="gear-give"){ var gg=S.gear.filter(function(x){ return x.id===+a.dataset.g; })[0], hid=a.dataset.h==="sel"?+((document.getElementById("ggive")||{}).value||0):+a.dataset.h, gh=heroById(hid); if (!gg||!gh) return true;
-    gearGive(gg, gh, a.dataset.h==="sel"?null:a.dataset.pos); save(); toastQ(gearName(gg)+" equipped on "+gh.name); lastSheet=""; renderSheet(); refresh(); return true; }
+    gearGive(gg, gh, a.dataset.h==="sel"?null:a.dataset.pos); save(); toast(gearName(gg)+" equipped on "+gh.name); lastSheet=""; renderSheet(); refresh(); return true; }
   if (act==="gear-off2"){ var og=forgeGear(); if (og){ og.on=0; delete og.at; gearChanged(); save(); } lastSheet=""; renderSheet(); refresh(); return true; }
   return false; }
 document.addEventListener("change", function(e){ var t=e.target; if (!t) return;
@@ -11104,7 +11104,7 @@ function asStart(g){ var D=asDraft(g), steps=[{gem:D.g1, n:D.n1, to:D.to1}]; if 
   S.autoStar={gid:g.id, steps:steps, next:Date.now()+500, tries:0, ok:0, used:{D:0,F:0}, start:g.stars}; save(); }
 function asEnd(why, toastIt){ var A=S.autoStar; if (!A) return; var g=gearById(A.gid);
   var msg=(g?'Auto-strike on '+gearName(g):'Auto-strike')+': '+why+'. '+asCount(A)+'.';
-  S.autoStar=null; note("heroes", msg); if (toastIt) toastQ(msg); forgeLog.unshift(esc(msg)); save(); lastSheet=""; if (sheetFor) renderSheet(); }
+  S.autoStar=null; note("heroes", msg); if (toastIt) toast(msg); forgeLog.unshift(esc(msg)); save(); lastSheet=""; if (sheetFor) renderSheet(); }
 function asTick(){ var A=S&&S.autoStar; if (!A || saveLocked) return; var now=Date.now();
   var el=document.getElementById("asnext"); if (el) el.textContent=Math.max(0,Math.ceil((A.next-now)/1000))+"s";
   if (now<A.next) return;
@@ -11557,7 +11557,7 @@ function useBanish(){
   A.banishUntil=Math.max(A.banishUntil||0, S.gt)+7*DAY;
   if (A.bully){ var bb=bullyOf(); if (bb) bb.losses++; endBully("was banished from "+realmName()+""); }
   A_log("A Banishment Order is posted. No bully will trouble "+realmName()+" for a week.");
-  toastQ("Banished: no bullies for 7 days"); save(); lastView=""; refresh();
+  toast("Banished: no bullies for 7 days"); save(); lastView=""; refresh();
 }
 var warArmed=false;
 function warSection(){
@@ -11943,7 +11943,7 @@ function bfScoutArrive(m){
   var as=m.t[2]||0, aE=as*aMul, dE=ds*dMul, ok=aE>dE, aLost=ok?Math.min(as, Math.ceil(dE/aMul)):as;
   if (ok){ snap.at=bf.t; bf.intel=bf.intel||{}; bf.intel[key]=snap; }
   bfLog(ok ? "Your scouts report from "+bfTgtName(m)+(aLost?" ("+fmt(aLost)+" lost)":"")+"." : "Your scouts were caught at "+bfTgtName(m)+": they had "+(ds?"more scouts":"scouts")+" than you sent.");
-  if (m.p===0) toastQ(ok?"Scouts report from "+bfTgtName(m):"Scouts caught at "+bfTgtName(m));
+  if (m.p===0) toast(ok?"Scouts report from "+bfTgtName(m):"Scouts caught at "+bfTgtName(m));
   var left=as-aLost; if (left<=0) return;
   var back={id:++bf.mid, p:m.p, b:m.b, t:Z12(), dep:bf.t, back:true, scout:true, h:m.h||0}; back.t[2]=left; if (m.tp!=null) back.tp=m.tp;
   back.arr=bf.t+bfTravel(m.p, m.b, back.t, m.h?bfHeroSnap(m.h).int:null, m.tp); bf.m.push(back);
@@ -12197,7 +12197,7 @@ function surgeonHeal(before, after){
 function useSurgeon(){
   if (!(S.items.surgeon>0) || bfOn()) return;
   S.items.surgeon--; S.surgeonUntil=Math.max(S.surgeonUntil||0, S.gt)+HOUR;
-  toastQ("Surgeons ready: half your losses heal for the next hour"); save(); lastView=""; refresh();
+  toast("Surgeons ready: half your losses heal for the next hour"); save(); lastView=""; refresh();
 }
 var bfArmed=false, bfQuitArmed=false;
 /* battlefield presets: their own six, kept apart from your normal march presets */
@@ -12448,7 +12448,7 @@ function shopBuy(k){
   shopPost("buy",{item:k}).then(function(d){
     SHOP.busy=false;
     if (d.error) SHOP.err=d.error;
-    else { SHOP.st=d.state; shopApply(d.state); cosAt=0; var it=(d.state.cat||[]).filter(function(c){ return c.k===k; })[0], itD=it&&/^dragon_/.test(it.k)&&DRAGONS[it.k.slice(7)]; SHOP.msg=itD?"Bought the "+itD.name+" Dragon egg. Hatch it in the Overlook.":"Bought "+(it?it.name:"it")+"."; toastQ(SHOP.msg); }
+    else { SHOP.st=d.state; shopApply(d.state); cosAt=0; var it=(d.state.cat||[]).filter(function(c){ return c.k===k; })[0], itD=it&&/^dragon_/.test(it.k)&&DRAGONS[it.k.slice(7)]; SHOP.msg=itD?"Bought the "+itD.name+" Dragon egg. Hatch it in the Overlook.":"Bought "+(it?it.name:"it")+"."; toast(SHOP.msg); }
     lastSheet=""; renderSheet(); refresh();
   });
 }
@@ -12463,7 +12463,7 @@ function shopGift(){
   shopPost("gift",{to:to.value.trim(), item:item, qty:qty}).then(function(d){
     SHOP.busy=false;
     if (d.error) SHOP.err=d.error;
-    else { S.items[item]=have-qty; SHOP.msg="Sent "+qty+" × "+ITEMS[item].name+" to "+d.to+"."; if (SHOP.st) SHOP.st.writs=d.writs; save(); toastQ(SHOP.msg); }
+    else { S.items[item]=have-qty; SHOP.msg="Sent "+qty+" × "+ITEMS[item].name+" to "+d.to+"."; if (SHOP.st) SHOP.st.writs=d.writs; save(); toast(SHOP.msg); }
     lastSheet=""; renderSheet(); refresh();
   });
 }
@@ -12590,7 +12590,7 @@ function invApplyOne(r){
   if (S.invLog.length>12) S.invLog.length=12;
   var txt=r.cancelled ? "The invasion with "+r.opp+" was cancelled"+(r.why?": "+r.why:".")+" Nothing was lost."
     : (r.role==="invader"?"Your invasion of "+r.opp+" is over: ":r.opp+"’s invasion of "+(r.city||"your city")+" is over: ")+(r.winner===(r.role==="invader"?0:1)?"you came out ahead":"you came out behind")+". You lost "+fmt(lostN)+" troops"+(wounded?" ("+fmt(wounded)+" of them only wounded: they wait in the Medic Camp for 24 hours)":"")+", and earned "+fmt(r.marks||0)+" War Marks.";
-  note("inv", txt); toastQ(r.cancelled?"Invasion cancelled":"Invasion finished: see the Alliance tab");
+  note("inv", txt); toast(r.cancelled?"Invasion cancelled":"Invasion finished: see the Alliance tab");
 }
 // safety net: a city marked away with no invasion and no result for a long time (server reset, ledger lost) comes home
 function invRescue(){
@@ -12734,26 +12734,26 @@ function invFight(v, t){
 }
 function invOrder(o, ok){
   if (IV.busy) return; IV.busy=1;
-  invPost("order",{order:o}).then(function(j){ IV.busy=0; if (j.error){ IV.err=j.error; toast(j.error); if (j.view) invTake({view:j.view}); else { lastView=""; renderView(true); } return; } if (ok) toastQ(ok); invTake({view:j.view||(IV.st&&IV.st.inv)}); });
+  invPost("order",{order:o}).then(function(j){ IV.busy=0; if (j.error){ IV.err=j.error; toast(j.error); if (j.view) invTake({view:j.view}); else { lastView=""; renderView(true); } return; } if (ok) toast(ok); invTake({view:j.view||(IV.st&&IV.st.inv)}); });
 }
 function invAct(act, a){
   var v=IV.st&&IV.st.inv, me=v&&v.me;
   function fresh(){ IV.armed=""; IV.leaveArmed=0; }
-  if (act==="iv-optin"){ if (IV.busy||S.cities.length<2) return true; IV.busy=1; invPost("optin",{pack:invPack()}).then(function(j){ IV.busy=0; if (!j.error) toastQ("You’re in: other players can now invade you"); invTake(j); }); return true; }
-  if (act==="iv-optout"){ if (!IV.leaveArmed){ IV.leaveArmed=1; lastView=""; renderView(true); return true; } fresh(); IV.busy=1; invPost("optout").then(function(j){ IV.busy=0; if (!j.error){ IV.search=0; toastQ("You’ve left invasions"); } invTake(j); }); return true; }
+  if (act==="iv-optin"){ if (IV.busy||S.cities.length<2) return true; IV.busy=1; invPost("optin",{pack:invPack()}).then(function(j){ IV.busy=0; if (!j.error) toast("You’re in: other players can now invade you"); invTake(j); }); return true; }
+  if (act==="iv-optout"){ if (!IV.leaveArmed){ IV.leaveArmed=1; lastView=""; renderView(true); return true; } fresh(); IV.busy=1; invPost("optout").then(function(j){ IV.busy=0; if (!j.error){ IV.search=0; toast("You’ve left invasions"); } invTake(j); }); return true; }
   if (act==="iv-shop-open"){ shopOpen(); return true; }
   if (act==="iv-shop-buy"){ shopBuy(a.dataset.k); return true; }
   if (act==="iv-shop-gift"){ shopGift(); return true; }
   if (act==="iv-dg-up"){ var dt=a.dataset.t, dd=S.dragons[dt]; if (!dd) return true; var dn=(dd.lv|0||1)+1, dneed=DRAGON_STONES[dn]||0;
     if (dn>DRAGON_MAX || dn>maxB("overlook") || (S.items.dstone||0)<dneed) return true;
-    S.items.dstone-=dneed; dd.lv=dn; toastQ(DRAGONS[dt].name+" Dragon is now level "+dn); save(); lastSheet=""; refresh(); renderSheet(); return true; }
+    S.items.dstone-=dneed; dd.lv=dn; toast(DRAGONS[dt].name+" Dragon is now level "+dn); save(); lastSheet=""; refresh(); renderSheet(); return true; }
   if (act==="iv-board"){ IV.board=null; openSheet({kind:"ivboard"}); fetch(LB_URL+"/inv/board",{cache:"no-store"}).then(function(r){ return r.json(); }).then(function(d){ IV.board=d; lastSheet=""; renderSheet(); }, function(){}); return true; }
   if (act==="iv-find"){
     if (IV.busy || invWhy()) return true; var sel=document.getElementById("ivcity"), cid=sel?+sel.value:0; if (!cid) return true;
     IV.pickCity=cid; IV.searchCity=cid; IV.busy=1; IV.err="";
     invPost("launch",{pack:invPack(), city:cid}).then(function(j){ IV.busy=0;
-      if (j.matched){ IV.search=0; toastQ("Target found: your camp has landed"); return invPost("status").then(invTake); }
-      if (j.searching){ IV.search=1; IV.lastSearch=Date.now(); IV.searchInfo=j; toastQ("Searching for a target"); lastView=""; renderView(true); return; }
+      if (j.matched){ IV.search=0; toast("Target found: your camp has landed"); return invPost("status").then(invTake); }
+      if (j.searching){ IV.search=1; IV.lastSearch=Date.now(); IV.searchInfo=j; toast("Searching for a target"); lastView=""; renderView(true); return; }
       IV.err=j.error||"Couldn’t start"; if (j.view) return invTake({view:j.view}); lastView=""; renderView(true); });
     return true; }
   if (act==="iv-stop"){ IV.search=0; invPost("cancelsearch"); lastView=""; renderView(true); return true; }
@@ -12844,13 +12844,13 @@ function pvTake(v){
   PV.bf=pvBuild();
   if (!old || !pvOn()) { PV.logKey=v.log&&v.log[0]?v.log[0].t+"|"+v.log[0].s:""; return; }
   if (old.status!==v.status){
-    if (v.status==="countdown") toastQ("Both ready: the battle starts in 10 seconds");
-    else if (v.status==="live") toastQ("The battle has begun!");
-    else if (v.status==="done") toastQ("The battle is over");
-  } else if (v.status==="lobby" && v.players.length>old.players.length) toastQ(v.players[v.players.length-1].name+" joined the match");
+    if (v.status==="countdown") toast("Both ready: the battle starts in 10 seconds");
+    else if (v.status==="live") toast("The battle has begun!");
+    else if (v.status==="done") toast("The battle is over");
+  } else if (v.status==="lobby" && v.players.length>old.players.length) toast(v.players[v.players.length-1].name+" joined the match");
   else if (v.status==="lobby" && v.players.length<old.players.length) toast("Your opponent left the lobby");
   var top=v.log&&v.log[0]?v.log[0].t+"|"+v.log[0].s:"";
-  if (top && top!==PV.logKey && v.status==="live") toastQ(v.log[0].s);
+  if (top && top!==PV.logKey && v.status==="live") toast(v.log[0].s);
   PV.logKey=top;
 }
 // the view as a Battlefield: you are player 0 on the left, your opponent player 1 on the right
@@ -12906,7 +12906,7 @@ function pvClear(){ S.pvp=null; PV.v=null; PV.bf=null; PV.err=""; PV.lost=false;
 function pvOrder(o, ok, after){
   if (!pvLive() || PV.ordering) return; PV.ordering=1; // one order at a time, so a double tap can't send twice
   pvPost("order", pvWith({order:o})).then(function(j){ PV.ordering=0;
-    if (j.error) toast(j.error); else { if (ok) toastQ(ok); if (after) after(); }
+    if (j.error) toast(j.error); else { if (ok) toast(ok); if (after) after(); }
     lastView=""; lastSheet=""; refresh(); }, function(){ PV.ordering=0; });
 }
 // spoils: the single-player ladder, measured against the average of the two armies
@@ -13304,7 +13304,7 @@ function cosSync(force){
 }
 function cosBuy(kind,id){
   if (cosBusy) return; cosBusy=true; alPost("/cos/buy",{item:kind+":"+id}).then(function(d){ cosBusy=false;
-    if (d && d.ok){ COS=d.state; S.me[kind]=id; save(); profSync(); applyTheme(); toastQ("Bought "+COSM[kind][id].name+" "+kind); } else toast((d&&d.error)||"Couldn\u2019t buy that");
+    if (d && d.ok){ COS=d.state; S.me[kind]=id; save(); profSync(); applyTheme(); toast("Bought "+COSM[kind][id].name+" "+kind); } else toast((d&&d.error)||"Couldn\u2019t buy that");
     lastSheet=""; renderSheet(); }).catch(function(){ cosBusy=false; toast("Can\u2019t reach the server"); });
 }
 /* ---------- drop tables (0.1.226): live, read from the same rules and tables the game rolls with ----------
@@ -13592,7 +13592,7 @@ function meImageFromFile(f){
   img.onload=function(){
     try { var c=document.createElement("canvas"); c.width=c.height=128; var g=c.getContext("2d"), s=Math.min(img.width,img.height), sx=(img.width-s)/2, sy=(img.height-s)/2;
       g.fillStyle="#fff"; g.fillRect(0,0,128,128); g.drawImage(img,sx,sy,s,s,0,0,128,128);
-      S.me=S.me||{img:"",frame:""}; S.me.img=c.toDataURL("image/jpeg",0.82); save(); profSync(); lastSheet=""; renderSheet(); toastQ("Image saved"); }
+      S.me=S.me||{img:"",frame:""}; S.me.img=c.toDataURL("image/jpeg",0.82); save(); profSync(); lastSheet=""; renderSheet(); toast("Image saved"); }
     catch(e){ toast("Couldn’t use that image"); }
     URL.revokeObjectURL(url); };
   img.onerror=function(){ URL.revokeObjectURL(url); toast("Couldn’t read that image. PNG, JPG, WebP and GIF work; for other kinds, screenshot it first"); };
@@ -13605,7 +13605,7 @@ function claimQuest(id, quiet){ // 0.2.50: quiet = part of "Claim all", which to
   if (q.rw.res) RES.forEach(function(k){ S.res[k]+=q.rw.res[k]||0; });
   if (q.rw.items) for (var k in q.rw.items) S.items[k]=(S.items[k]||0)+q.rw.items[k];
   if (q.rw.medals) for (var m in q.rw.medals){ S.medals[m]=(S.medals[m]||0)+q.rw.medals[m]; achMedal(m, q.rw.medals[m]); }
-  if (!quiet) toastQ("Quest complete: "+q.name+". "+rewardText(q.rw));
+  if (!quiet) toast("Quest complete: "+q.name+". "+rewardText(q.rw));
   return q;
 }
 // 0.2.50: claims every ready line shown on the page (the same awards, added up), then saves once and toasts once
@@ -13614,7 +13614,7 @@ function claimAllQuests(){ var sum={res:{},items:{},medals:{}}, n=0;
     if (q.rw.res) RES.forEach(function(k){ if (q.rw.res[k]) sum.res[k]=(sum.res[k]||0)+q.rw.res[k]; });
     if (q.rw.items) for (var k in q.rw.items) sum.items[k]=(sum.items[k]||0)+q.rw.items[k];
     if (q.rw.medals) for (var m in q.rw.medals) sum.medals[m]=(sum.medals[m]||0)+q.rw.medals[m]; });
-  if (n) toastQ(n+" quests complete: "+rewardText(sum)); return n; }
+  if (n) toast(n+" quests complete: "+rewardText(sum)); return n; }
 
 /* reports */
 var LOG_CAP=5000, FULL_CAP=300, repPage=0, repQuery="";
@@ -14502,12 +14502,12 @@ function claimPkg(id, quiet){ // 0.2.50: quiet = part of "Claim all" (one save, 
   if (pk.hero==="beta") itemsNote+=" "+grantBeta();
   if (PKSEL===id) PKSEL="";
   if (quiet) return pk;
-  toastQ(pk.name+" claimed"); save(); lastView=""; refresh(); return pk;
+  toast(pk.name+" claimed"); save(); lastView=""; refresh(); return pk;
 }
 function claimAllPkgs(){ var got=[], notes=[]; // 0.2.50: every ready package at once; the same contents as claiming them one by one
   PACKAGES.forEach(function(pk){ if (pkgState(pk)!=="ready") return; if (claimPkg(pk.id, true)){ got.push(pk.name); notes.push(itemsNote); } });
   if (!got.length) return; if (got.length>1) itemsNote=notes.join(" ");
-  toastQ(got.length>1?got.length+" packages claimed":got[0]+" claimed"); lastView=""; refresh(); } /* refresh() saves */
+  toast(got.length>1?got.length+" packages claimed":got[0]+" claimed"); lastView=""; refresh(); } /* refresh() saves */
 function openMedalBox(key, all){ // 0.2.37: all = every box of this kind at once (Cody: "I've got hundreds")
   key=key||"medalbox";
   var b=MEDAL_BOXES[key]; if (!b || !(S.items[key]>0)) return;
@@ -14520,7 +14520,7 @@ function openMedalBox(key, all){ // 0.2.37: all = every box of this kind at once
   var parts=[];
   for (var k in got){ S.medals[k]=(S.medals[k]||0)+got[k]; achMedal(k, got[k]); parts.push(fmt(got[k])+" "+medalName(k)); }
   itemsNote=(times>1?fmt(times)+" boxes held ":"The "+b.name+" held ")+parts.join(", ")+".";
-  toastQ((times>1?fmt(times)+" opened: ":b.name+": ")+parts.join(", ")); save(); lastView=""; refresh();
+  toast((times>1?fmt(times)+" opened: ":b.name+": ")+parts.join(", ")); save(); lastView=""; refresh();
 }
 // 0.2.37: item icons (art/items, cut by art/tools/items.py); an item without one keeps its line drawing
 var ITEM_IMG={"_deco":"art/items/_deco.png", "_res":"art/items/_res.png", annals:"art/items/annals.png", banish:"art/items/banish.png", build50:"art/items/build50.png", codex:"art/items/codex.png", corselet:"art/items/corselet.png", corselet2:"art/items/corselet2.png", dstone:"art/items/dstone.png", ensign:"art/items/ensign.png", g_amulet:"art/items/g_amulet.png", g_armor:"art/items/g_armor.png", g_belt:"art/items/g_belt.png", g_boots:"art/items/g_boots.png", g_cloak:"art/items/g_cloak.png", g_gauntlets:"art/items/g_gauntlets.png", g_greaves:"art/items/g_greaves.png", g_helm:"art/items/g_helm.png", g_mount:"art/items/g_mount.png", g_pauldrons:"art/items/g_pauldrons.png", g_ring:"art/items/g_ring.png", g_shield:"art/items/g_shield.png", g_talisman:"art/items/g_talisman.png", g_weapon:"art/items/g_weapon.png", gemD:"art/items/gemD.png", gemF:"art/items/gemF.png", ingot:"art/items/ingot.png", marchsp:"art/items/marchsp.png", medalbox:"art/items/medalbox.png", medalbox2:"art/items/medalbox2.png", medalbox3:"art/items/medalbox3.png", mithril:"art/items/mithril.png", msize100:"art/items/msize100.png", msize50:"art/items/msize50.png", ore:"art/items/ore.png", primer:"art/items/primer.png", s15:"art/items/s15.png", s150:"art/items/s150.png", s480:"art/items/s480.png", s60:"art/items/s60.png", scale:"art/items/scale.png", script:"art/items/script.png", starmetal:"art/items/starmetal.png", surgeon:"art/items/surgeon.png", teleport:"art/items/teleport.png", tome:"art/items/tome.png", u_archer:"art/items/u_archer.png", u_ballista:"art/items/u_ballista.png", u_cataphract:"art/items/u_cataphract.png", u_catapult:"art/items/u_catapult.png", u_cavalry:"art/items/u_cavalry.png", u_pikeman:"art/items/u_pikeman.png", u_ram:"art/items/u_ram.png", u_scout:"art/items/u_scout.png", u_swordsman:"art/items/u_swordsman.png", u_transporter:"art/items/u_transporter.png", u_warrior:"art/items/u_warrior.png", u_worker:"art/items/u_worker.png", warhorn:"art/items/warhorn.png", warhorn2:"art/items/warhorn2.png"}, ITSEL="";
@@ -14643,7 +14643,7 @@ function doSpin(){
     lastPrize = awardPrize(i, roll.forced); lastPrize.i=i; S.spins++; /* 0.2.50: i = the wedge, for the hub */
     save(); refresh();
     if (roll.forced) openSheet({kind:"legend"});
-    else if (lastPrize.big) toastQ(lastPrize.txt);
+    else if (lastPrize.big) toast(lastPrize.txt);
   }, dur+80);
 }
 function doSpin10(){
@@ -14786,7 +14786,7 @@ function renderCityBar(){ // 0.2.48: the city switcher is a pop-up under the cit
 // 0.2.1: switching city. From the map, stay put: same view, same tile picked, same scroll (so "Switch to X to build here" lands on the Establish button)
 function cityGo(i, quiet){ if (!S.cities[i]) return; var cgStay=tab==="map", cgY=window.scrollY; closeSheet(); hdPopClose(); ARMYB=-1; FARMV=-1; farmArmed=false; MAPFARM=-1; S.cur=i; if (!cgStay){ mv.init=false; selTile=null; }
   document.getElementById("cityname").textContent=S.name; lastView=""; refresh();
-  if (cgStay){ window.scrollTo({top:cgY}); requestDraw(); } else window.scrollTo({top:0}); if (!quiet) toastQ("Now viewing "+S.name); }
+  if (cgStay){ window.scrollTo({top:cgY}); requestDraw(); } else window.scrollTo({top:0}); if (!quiet) toast("Now viewing "+S.name); }
 // 0.2.54 (Cody: "it was so simple and easy before"): ‹ › beside the city name, or swipe the name, steps to the next city (round the list); tap the name for the full list
 function cityStep(d){ var n=S.cities.length; if (n<2) return; var i=((S.cur+d)%n+n)%n; cityGo(i, true);
   var h=document.getElementById("cityname"); if (h){ h.classList.remove("cpin-l","cpin-r"); void h.offsetWidth; h.classList.add(d>0?"cpin-l":"cpin-r"); } }
@@ -15221,7 +15221,7 @@ function startBuild(w,i,type,quiet){
   pay(c,1);
   if (!s){ var slot={type:type,level:0}; if (w==="in") S.inside[i]=slot; else S.fields[i]=slot; }
   var tfb=timeFor(type,to); S.builds.push({where:w,idx:i,type:type,to:to,start:S.gt,end:S.gt+tfb,dur:tfb,sc:c.script||0}); // sc: the Scripts paid, given back on cancel
-  if (!quiet) toastQ((to===1?"Started building a ":"Upgrading ")+DEF[type].name+(to===1?"":" to level "+to));
+  if (!quiet) toast((to===1?"Started building a ":"Upgrading ")+DEF[type].name+(to===1?"":" to level "+to));
   return true;
 }
 function bqState(it){ // "go", "wait" or "drop"
@@ -15377,7 +15377,7 @@ function processQueues(){
 }
 function processAll(){ var keep=S.cur; for (var ci=0; ci<S.cities.length; ci++){ S.cur=ci; processQueues(); if (typeof processAuto==="function") processAuto(); } S.cur=keep; }
 function refresh(){ renderQueue(); renderView(true); renderSheet(); tickText(); save(); }
-function flushFinished(){ if (!finished.length) return; var list=shownFinished(); if (!list.length) return; toastQ(list[list.length-1]+(list.length>1?" (and "+(list.length-1)+" more)":"")); phoneNotify(list); }
+function flushFinished(){ if (!finished.length) return; var list=shownFinished(); if (!list.length) return; toast(list[list.length-1]+(list.length>1?" (and "+(list.length-1)+" more)":"")); phoneNotify(list); }
 
 document.addEventListener("click",function(e){
   if (!e.target.closest('[data-act="city-pick"],[data-act="more-open"]')){ var inPop=e.target.closest("#citybar,#morepanel"); if (!inPop || e.target.closest("[data-act]")) hdPopClose(); } // 0.2.48: a tap anywhere else (or on a choice inside) closes the city and More pop-ups
@@ -15421,7 +15421,7 @@ document.addEventListener("click",function(e){
   if (act==="doff-set"){ S.decoOff=a.dataset.v==="on"; save(); lastSheet=""; renderSheet(); miniDirty=true; drawMap(); return; }
   if (act==="nums-set"){ S.mapNums=a.dataset.v==="on"; save(); lastSheet=""; renderSheet(); drawMap(); return; }
   if (act==="pix-set"){ S.pixTiles=a.dataset.v==="on"; save(); lastSheet=""; renderSheet(); drawMap(); return; }
-  if (act==="dpick"){ DPICK.on=!DPICK.on; a.setAttribute("aria-pressed", DPICK.on?"true":"false"); toastQ(DPICK.on?"Tap a decoration to see what it is and where it\u2019s placed":"Taps pick tiles again"); return; }
+  if (act==="dpick"){ DPICK.on=!DPICK.on; a.setAttribute("aria-pressed", DPICK.on?"true":"false"); toast(DPICK.on?"Tap a decoration to see what it is and where it\u2019s placed":"Taps pick tiles again"); return; }
   if (act==="dpick-show"){ closeSheet(); MPOP.hide=false; selectTile(a.dataset.tile, true); return; }
   if (act==="deco-open"){ cosSync(); openSheet({kind:"deco", tile:a.dataset.tile}); return; }
   if (act==="deco-buy"){ decoBuy(a.dataset.pack); return; }
@@ -15430,12 +15430,12 @@ document.addEventListener("click",function(e){
   if (act==="paint-stop"){ PAINT.k=""; PAINT.n=0; paintBar(); return; }
   if (act==="clr-start"){ PAINT.k=""; PAINT.n=0; MOVE.e=""; CLR={on:true, a:a.dataset.tile||"", b:""}; closeSheet(); MPOP.hide=true; renderTileInfo(); paintBar(); drawMap(); return; }
   if (act==="deco-hide"){ var Dh=decoS(), ht=a.dataset.tile, hv=a.dataset.v; if (!Dh.hide) Dh.hide={}; if (hv==="a") delete Dh.hide[ht]; else Dh.hide[ht]=+hv; save(); lastSheet=""; renderSheet(); drawMap(); return; }
-  if (act==="clr-hide"){ var hr=clrRect(), hn=decoHideArea(hr, +a.dataset.v); CLR={on:false, a:"", b:""}; toastQ(hn?(a.dataset.v==="1"?"Hid ":"Showing ")+fmt(hn)+" tile"+(hn===1?"":"s"):"Nothing here to hide"); paintBar(); drawMap(); return; }
+  if (act==="clr-hide"){ var hr=clrRect(), hn=decoHideArea(hr, +a.dataset.v); CLR={on:false, a:"", b:""}; toast(hn?(a.dataset.v==="1"?"Hid ":"Showing ")+fmt(hn)+" tile"+(hn===1?"":"s"):"Nothing here to hide"); paintBar(); drawMap(); return; }
   if (act==="clr-stop"){ CLR={on:false, a:"", b:""}; paintBar(); drawMap(); return; }
-  if (act==="clr-go"){ var cg=decoClear(clrRect(), true); CLR={on:false, a:"", b:""}; toastQ(cg.n?"Cleared "+fmt(cg.n)+" decoration"+(cg.n===1?"":"s"):"Nothing to clear"); paintBar(); drawMap(); return; }
-  if (act==="clr-all"){ var ca=decoClear(null,false); if (!ca.n){ toastQ("Nothing to clear"); return; } if (!confirm("Clear all "+fmt(ca.n)+" decorations on your map? Event pieces go back to your bag.")) return; decoClear(null,true); toastQ("Map cleared"); lastSheet=""; renderSheet(); renderTileInfo(); drawMap(); return; }
+  if (act==="clr-go"){ var cg=decoClear(clrRect(), true); CLR={on:false, a:"", b:""}; toast(cg.n?"Cleared "+fmt(cg.n)+" decoration"+(cg.n===1?"":"s"):"Nothing to clear"); paintBar(); drawMap(); return; }
+  if (act==="clr-all"){ var ca=decoClear(null,false); if (!ca.n){ toast("Nothing to clear"); return; } if (!confirm("Clear all "+fmt(ca.n)+" decorations on your map? Event pieces go back to your bag.")) return; decoClear(null,true); toast("Map cleared"); lastSheet=""; renderSheet(); renderTileInfo(); drawMap(); return; }
   if (act==="deco-put"){ MOVE.e=""; var dk=a.dataset.k, dt=a.dataset.tile, dn=document.getElementById("decon"); if (!DECOS[dk] || !decoOwn(dk)) return;
-    if (decoOff()){ S.decoOff=false; toastQ("Decorations are shown again, so you can see what you place"); } DECO_N=dn?+dn.value:1; if (!(DECO_N>=0)) DECO_N=1;
+    if (decoOff()){ S.decoOff=false; toast("Decorations are shown again, so you can see what you place"); } DECO_N=dn?+dn.value:1; if (!(DECO_N>=0)) DECO_N=1;
     PAINT.k=dk; PAINT.n=DECO_N||Infinity; paintOne(dt);
     if (PAINT.k){ closeSheet(); MPOP.hide=true; renderTileInfo(); } else { lastSheet=""; renderSheet(); renderTileInfo(); } return; }
   if (act==="deco-layer"){ var Dl=decoS().at[a.dataset.tile]||[], li=+a.dataset.i, lj=li+(+a.dataset.d); if (lj<0||lj>=Dl.length) return; var lt=Dl[li]; Dl[li]=Dl[lj]; Dl[lj]=lt; save(); lastSheet=""; renderSheet(); drawMap(); return; }
@@ -15455,26 +15455,26 @@ document.addEventListener("click",function(e){
     if (mi<0 || mj<0 || mj>=ids.length) return; var tmp=ids[mi]; ids[mi]=ids[mj]; ids[mj]=tmp; mR.order=ids; lastView=""; refresh();
     alPost("/al/rally/order",{rid:mR.id, order:ids}).then(function(r){ if (r.error) toast(r.error); ALS.last=0; alSync(); }).catch(function(){ toast("Couldn\u2019t reach the server"); }); return; }
   if (act==="ry-recall"){ var rr=+a.dataset.rid, rref=a.dataset.ref; alPost("/al/rally/recall",{rid:rr, ref:rref}).then(function(r){ if (r.error){ toast(r.error); return; }
-      var m=(S.alRally||[]).filter(function(x){ return x.ref===rref; })[0]; if (m){ m.st="back"; m.back=m.t.slice(); m.home=r.home||Date.now(); m.recalled=1; save(); } toastQ("Recalled: heading home"); ALS.last=0; alSync(); lastView=""; refresh(); }).catch(function(){ toast("Couldn\u2019t reach the server"); }); return; }
+      var m=(S.alRally||[]).filter(function(x){ return x.ref===rref; })[0]; if (m){ m.st="back"; m.back=m.t.slice(); m.home=r.home||Date.now(); m.recalled=1; save(); } toast("Recalled: heading home"); ALS.last=0; alSync(); lastView=""; refresh(); }).catch(function(){ toast("Couldn\u2019t reach the server"); }); return; }
   if (act==="ry-time"){ var tg=wvParse(RYS.time); if (tg==null){ toast("Pick a time first"); return; } var at=Date.now()+realMs(tg-S.gt);
-    alPost("/al/rally/time",{rid:+a.dataset.rid, at:Math.round(at)}).then(function(r){ if (r.error){ toast(r.error); return; } toastQ("The waves now hit at "+wvClock(tg)); RYS.time=""; ALS.last=0; alSync(); }).catch(function(){ toast("Couldn\u2019t reach the server"); }); return; }
+    alPost("/al/rally/time",{rid:+a.dataset.rid, at:Math.round(at)}).then(function(r){ if (r.error){ toast(r.error); return; } toast("The waves now hit at "+wvClock(tg)); RYS.time=""; ALS.last=0; alSync(); }).catch(function(){ toast("Couldn\u2019t reach the server"); }); return; }
   if (act==="ry-now" || act==="ry-cancel"){ var key2=(act==="ry-now"?"rynow":"rycan")+a.dataset.rid; if (armedTile!==key2){ armedTile=key2; lastView=""; refresh(); return; } armedTile=null;
-    alPost(act==="ry-now"?"/al/rally/time":"/al/rally/cancel",{rid:+a.dataset.rid, now:1}).then(function(r){ if (r.error){ toast(r.error); return; } toastQ(act==="ry-now"?"The waves are going in!":"Rally called off: everyone is heading home"); ALS.last=0; alSync(); lastView=""; refresh(); }).catch(function(){ toast("Couldn\u2019t reach the server"); }); return; }
+    alPost(act==="ry-now"?"/al/rally/time":"/al/rally/cancel",{rid:+a.dataset.rid, now:1}).then(function(r){ if (r.error){ toast(r.error); return; } toast(act==="ry-now"?"The waves are going in!":"Rally called off: everyone is heading home"); ALS.last=0; alSync(); lastView=""; refresh(); }).catch(function(){ toast("Couldn\u2019t reach the server"); }); return; }
   if (act==="rx-tog"){ var rch=a.dataset.ch, rid=a.dataset.id, re2=a.dataset.e, mineR=(RX[rch][rid]||[]).some(function(r){ return r[0]===re2 && r[2]; }); if (a.classList.contains("rxq")) RXSEL=""; rxSend(rch, rid, re2, !mineR); return; }
   if (act==="rx-any"){ var rin=document.getElementById("rxin"), one=rxOne(rin&&rin.value); if (!one){ toast("Type one emoji (switch to your emoji keyboard)"); return; } if (rin) rin.blur(); RXSEL=""; rxSend(a.dataset.ch, a.dataset.id, one, true); return; }
   if (MP_ACTS[act] && !S.mp){ mpPending=a; openSheet({kind:"mpwarn", act:act}); return; } // multiplayer actions move you to the multiplayer high scores: ask first
-  if (act==="mp-warn-ok"){ var mpa=mpPending, mpk=sheetFor&&sheetFor.act; mpPending=null; mpGo(MP_ACTS[mpk]||"chose"); closeSheet(); toastQ("You\u2019re on the multiplayer high scores now"); if (mpa && document.contains(mpa)) mpa.click(); else if (mpk==="wd-join") wdJoin(); return; }
+  if (act==="mp-warn-ok"){ var mpa=mpPending, mpk=sheetFor&&sheetFor.act; mpPending=null; mpGo(MP_ACTS[mpk]||"chose"); closeSheet(); toast("You\u2019re on the multiplayer high scores now"); if (mpa && document.contains(mpa)) mpa.click(); else if (mpk==="wd-join") wdJoin(); return; }
   if (WDFS.on && act.slice(0,3)!=="wd-" && a.closest && a.closest("#wdview")) wdFs(false); // 0.2.21: a button that opens something else leaves full screen
   if ((act.slice(0,3)==="wd-" || act.slice(0,3)==="wb-") && wdAct(act, a, e)) return; // 0.2.17: the server map (0.2.37: wb-, its buildings, ruler and diplomacy)
   if (act==="hc-draft"){ var dr=doDraft(+a.dataset.ci, a.dataset.tile); if (dr){ flushFinished(); save(); lastView=""; refresh(); } return; } // 0.2.24; 0.2.26 one picked NPC city
   if (act==="mp-intro"){ var mpwc=document.getElementById("mpiwc"); S.mpIntro=1; S.mpOn = a.dataset.v==="on"; if (!S.mpOn && mpwc) S.wcOn=!mpwc.checked; save(); closeSheet(); lastView=""; refresh(); renderDock();
-    toastQ(S.mpOn?"Multiplayer is on. You can switch any time in Settings":"Single player it is. You can switch any time in Settings");
+    toast(S.mpOn?"Multiplayer is on. You can switch any time in Settings":"Single player it is. You can switch any time in Settings");
     if (mpNeedsGrace()) setTimeout(function(){ openSheet({kind:"mpgrace"}); },400); return; }
   if (act==="mp-set"){ if (S.mpLocked){ toast("This account is locked to single player"); return; } S.mpOn = a.dataset.v==="on"; if (!S.mpOn && S.wdOn) wdLeave(true); if (S.mpOn && !S.wdOn){ WDS.autoAt=0; WDS.at=0; } /* 0.2.21: on again: back on the map within a second */ /* 0.2.17: single player takes your capital off the server map */ if (!S.mpOn) S.cities.forEach(function(c){ c.alAcad=false; c.alBld=0; }); save(); lastSheet=""; renderSheet(); lastView=""; refresh(); renderDock(); if (!S.mpOn && mpNeedsGrace()) openSheet({kind:"mpgrace"}); return; }
   if (act==="wc-set"){ S.wcOn = a.dataset.v==="on"; save(); lastSheet=""; renderSheet(); renderDock(); return; }
-  if (act==="mp-grace-go"){ S.mpGrace=1; mpGo("alliance"); closeSheet(); toastQ("You stay in your alliance, on the multiplayer high scores"); return; }
+  if (act==="mp-grace-go"){ S.mpGrace=1; mpGo("alliance"); closeSheet(); toast("You stay in your alliance, on the multiplayer high scores"); return; }
   if (act==="mp-grace-leave"){ var ga=alMine(); if (!ga){ ALS.last=0; toast("Checking your alliance\u2026 try again in a moment"); return; }
-    var gdone=function(){ S.mpGrace=1; S.alMember=false; S.alFx={}; S.cities.forEach(function(c){ c.alAcad=false; c.alBld=0; }); save(); closeSheet(); toastQ("You left the alliance and stay on the single-player high scores"); };
+    var gdone=function(){ S.mpGrace=1; S.alMember=false; S.alFx={}; S.cities.forEach(function(c){ c.alAcad=false; c.alBld=0; }); save(); closeSheet(); toast("You left the alliance and stay on the single-player high scores"); };
     if (ga.my.rank===0){ if (ga.members.length>1){ toast("Hand the alliance to another member first (Alliance, Members), then come back"); return; } alDo("/al/disband",{},"Alliance disbanded",gdone); }
     else alDo("/al/leave",{},"You left the alliance",gdone);
     return; }
@@ -15482,7 +15482,7 @@ document.addEventListener("click",function(e){
     dockOpen=true; dockSave(); var chs=dockChans(); if (chs.indexOf(dockCh)<0 && chs.length) dockCh=chs[0]; renderDock(); if (dockCh==="world"){ WCH.last=0; wcTick(); } else ALS.last=0; var dkb0=document.getElementById("dkmsgs"); if (dkb0) dkb0.scrollTop=dkb0.scrollHeight; return; }
   if (act==="dock-ch"){ dockCh=a.dataset.ch; dockSave(); renderDock(); if (dockCh==="world"){ WCH.last=0; wcTick(); } else if (dockCh==="dm"){ DMS.last=0; } else if (dockCh==="co"){ COC.last=0; } else ALS.last=0; var dkb1=document.getElementById("dkmsgs"); if (dkb1) dkb1.scrollTop=dkb1.scrollHeight; return; }
   if (act==="dock-close"){ dockOpen=false; dockSave(); renderDock(); return; }
-  if (act==="dock-pin"){ dockPin=!dockPin; dockSave(); renderDock(); toastQ(dockPin?"Chat pinned to the bottom of every page":"Chat unpinned"); return; }
+  if (act==="dock-pin"){ dockPin=!dockPin; dockSave(); renderDock(); toast(dockPin?"Chat pinned to the bottom of every page":"Chat unpinned"); return; }
   // 0.2.50: one + for a picture or a GIF; Open coalition chat (Diplomacy) opens the panel on that tab
   if (act==="dock-plus"){ var dpp=document.getElementById("dkpop"); if (dpp){ dpp.hidden=!dpp.hidden; a.setAttribute("aria-expanded", String(!dpp.hidden)); } return; }
   if (act==="co-chat"){ closeSheet(); dockOpen=true; if (coShown()) dockCh="co"; dockSave(); COC.last=0; coSync(); renderDock(); var dkb2=document.getElementById("dkmsgs"); if (dkb2) dkb2.scrollTop=dkb2.scrollHeight; return; }
@@ -15492,7 +15492,7 @@ document.addEventListener("click",function(e){
     if (devHash(gv)===4145256078){ /* secret package: once per save */ S.secrets=S.secrets||{};
       if (S.secrets.p1){ if (gm) gm.textContent="That package was already claimed on this save."; return; }
       S.secrets.p1=1; RES.forEach(function(k){ S.res[k]+=200000; }); S.items.s15=(S.items.s15||0)+80;
-      if (gi) gi.value=""; if (gm) gm.textContent=""; save(); toastQ("Secret package! +200,000 of every resource in "+S.name+" and 80 15-minute speed-ups"); lastView=""; refresh(); }
+      if (gi) gi.value=""; if (gm) gm.textContent=""; save(); toast("Secret package! +200,000 of every resource in "+S.name+" and 80 15-minute speed-ups"); lastView=""; refresh(); }
     else if (devHash(gv)===PV_TESTER){ S.pvpTester=1; if (gi) gi.value=""; if (gm) gm.textContent=""; save(); toast("PvP Battlefield unlocked: find it in the Alliance tab"); lastView=""; refresh(); }
     else if (gm) gm.textContent="That code isn\u2019t valid.";
     return; }
@@ -15500,11 +15500,11 @@ document.addEventListener("click",function(e){
     var bob=null; try { bob=JSON.parse(localStorage.getItem(bk)); } catch(e){}
     if (!bob || !bob.v || !(bob.cities||bob.res)){ toast("That copy can\u2019t be read."); return; }
     var bns=null; try { bns=migrate(adoptPrep(bob)); } catch(e){ toast("That copy can\u2019t be opened in this version."); return; }
-    adoptMigrated(bns, function(){ saveLocked=false; loadFail=null; recoverOffer=false; }); toastQ("Safety copy restored. Welcome back, "+TITLES[S.title].name+"."); return; }
+    adoptMigrated(bns, function(){ saveLocked=false; loadFail=null; recoverOffer=false; }); toast("Safety copy restored. Welcome back, "+TITLES[S.title].name+"."); return; }
   if (act==="bk-rescue-copy"){ var rr=""; try { rr=localStorage.getItem(BK_RESCUE)||""; } catch(e){}
     try { navigator.clipboard.writeText(rr).then(function(){ toast("Copied. Send it to the developer."); },function(){ toast("This browser blocked copying."); }); } catch(e){ toast("This browser blocked copying."); } return; }
   if (act==="idb-reload"){ location.reload(); return; }
-  if (act==="bk-fresh"){ if (armed!=="bkfresh"){ armed="bkfresh"; lastSheet=""; renderSheet(); return; } armed=null; saveLocked=false; loadFail=null; save(); closeSheet(); toastQ("A new city begins. The unopened save is still kept on this device."); return; }
+  if (act==="bk-fresh"){ if (armed!=="bkfresh"){ armed="bkfresh"; lastSheet=""; renderSheet(); return; } armed=null; saveLocked=false; loadFail=null; save(); closeSheet(); toast("A new city begins. The unopened save is still kept on this device."); return; }
   if (advance(Date.now())) flushFinished(); markDirty();
   if (act==="tab" && a.dataset.tab==="guild"){ ALS.last=0; ALS.listAt=0; setTimeout(function(){ alTick(); },0); }
   if (act==="tab"){ if (bfOn()) return; closeSheet(); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); arrange=null; warArmed=false; chalArmed=false; bfArmed=false; farmArmed=false; if (a.dataset.tab!=="items") itemsNote=""; if (a.dataset.tab==="army"){ ARMYV=""; ARMYB=-1; } if (a.dataset.tab==="city") CITYV=""; tab=a.dataset.tab; lastView=""; renderView(true); window.scrollTo({top:0});
@@ -15550,19 +15550,19 @@ document.addEventListener("click",function(e){
   if (act==="lb-hsort"){ lbHSort=a.dataset.v||"lv"; if (lbData[lbKey()]){ lastSheet=""; renderSheet(); } lbFetch("hero"); return; } // 0.2.30
   if (act==="lb-mp"){ lbMpSel=+a.dataset.v; lbFetch(); return; }
   if (act==="lb-reload"){ if (lbOn()){ lbSync(true); lbBusy=true; lastSheet=""; renderSheet(); setTimeout(function(){ lbFetch(); },900); } else lbFetch(); return; } // 0.2.50: ↻ (was Refresh and Send my scores now)
-  if (act==="lb-sync"){ lbSync(true); toastQ("Scores sent"); setTimeout(function(){ lbFetch(); },1500); return; }
+  if (act==="lb-sync"){ lbSync(true); toast("Scores sent"); setTimeout(function(){ lbFetch(); },1500); return; }
   if (act==="lb-join"){ if (!cbOn()){ closeSheet(); DET.cloud=true; goPage("settings"); toast("Set up your account first"); return; } var jn=myName();
     if (jn.length<2){ lbErr="Pick a name of 2 to 20 characters."; lastSheet=""; renderSheet(); return; }
     if (S.lb && S.lb.id && S.lb.token && !S.lb.removed){ S.lb.on=true; S.lb.optedOut=false; S.lb.name=jn.slice(0,20); S.lb.nameAuto=true; S.lb.needAcct=0; } // keep the row we already have
-    else S.lb={id:lbHex(16), token:lbHex(16), name:jn.slice(0,20), on:true, nameAuto:true}; lbErr=""; save(); lbLastSync=0; lbSync(true); toastQ("You\u2019re on the high scores"); setTimeout(function(){ lbFetch("prestige"); },1500); lastSheet=""; renderSheet(); return; }
+    else S.lb={id:lbHex(16), token:lbHex(16), name:jn.slice(0,20), on:true, nameAuto:true}; lbErr=""; save(); lbLastSync=0; lbSync(true); toast("You\u2019re on the high scores"); setTimeout(function(){ lbFetch("prestige"); },1500); lastSheet=""; renderSheet(); return; }
   if (act==="lb-rename"){ if (cbOn()){ toast("Change your name in Settings"); return; } var rn=((document.getElementById("lbname")||{}).value||"").replace(/\s+/g," ").trim(); if (rn.length<2){ toast("Names need 2 to 20 characters"); return; }
-    S.lb.name=rn.slice(0,20); S.lb.nameAuto=false; save(); lbSync(true); toastQ("Name saved"); setTimeout(function(){ lbFetch(); },1500); return; }
+    S.lb.name=rn.slice(0,20); S.lb.nameAuto=false; save(); lbSync(true); toast("Name saved"); setTimeout(function(){ lbFetch(); },1500); return; }
   if (act==="nm-save"){ var nv=((document.getElementById(a.dataset.from==="one"?"onename":"dispname")||{}).value||""); nameSave(nv, a.dataset.from); return; }
-  if (act==="nm-keep"){ S.nameOneAsked=1; save(); nameFollow(); closeSheet(); lbData={}; lbLastSync=0; lbSync(true); toastQ("You\u2019re "+myName()+" everywhere"); lastView=""; refresh(); return; }
+  if (act==="nm-keep"){ S.nameOneAsked=1; save(); nameFollow(); closeSheet(); lbData={}; lbLastSync=0; lbSync(true); toast("You\u2019re "+myName()+" everywhere"); lastView=""; refresh(); return; }
   if (act==="lb-leave"){ if (armed!=="lbleave"){ armed="lbleave"; lastSheet=""; renderSheet(); return; } armed=null;
     var lv={id:S.lb.id, token:S.lb.token}; S.lb.on=false; S.lb.optedOut=true; save(); try { fetch(LB_URL+"/leave",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(lv)}); } catch(e){}
-    lbData={}; toastQ("You left the high scores"); lastSheet=""; renderSheet(); return; }
-  if (act==="gate"){ S.gate = S.gate==="closed" ? "open" : "closed"; toastQ(S.name+"\u2019s gate is "+S.gate); save(); lastView=""; refresh(); return; }
+    lbData={}; toast("You left the high scores"); lastSheet=""; renderSheet(); return; }
+  if (act==="gate"){ S.gate = S.gate==="closed" ? "open" : "closed"; toast(S.name+"\u2019s gate is "+S.gate); save(); lastView=""; refresh(); return; }
   if (act==="lang"){ if (a.dataset.v!==I18N.lang){ save(); I18N.setLang(a.dataset.v); } return; }
   if (act==="trmode"){ I18N.trMode(!I18N.trOn()); closeSheet(); return; }
   if (act==="tr-export"){ I18N.exportFixes(); return; }
@@ -15581,7 +15581,7 @@ document.addEventListener("click",function(e){
   if (act==="save-file"){
     try { var blob=new Blob([JSON.stringify(S)],{type:"application/json"}), url=URL.createObjectURL(blob), dl=document.createElement("a"), d8=new Date();
       dl.href=url; dl.download="ibory-save-"+d8.getFullYear()+"-"+String(d8.getMonth()+1).padStart(2,"0")+"-"+String(d8.getDate()).padStart(2,"0")+".json"; document.body.appendChild(dl); dl.click(); setTimeout(function(){ URL.revokeObjectURL(url); dl.remove(); },1000);
-      toastQ("Save file downloaded. Keep it in your Downloads or cloud drive."); } catch(err){ toast("This browser can\u2019t save files here. Use the save code instead."); }
+      toast("Save file downloaded. Keep it in your Downloads or cloud drive."); } catch(err){ toast("This browser can\u2019t save files here. Use the save code instead."); }
     return; }
   if (act==="load-file"){
     var fi=document.getElementById("savefile");
@@ -15593,7 +15593,7 @@ document.addEventListener("click",function(e){
           if (!ob || !ob.v || !(ob.cities||ob.res)){ toast("That file isn\u2019t an Ibory save."); return; }
           if (newerSaveWhy(ob)){ toast(newerSaveWhy(ob)); return; }
           if (!window.confirm("Replace your current game with this save file?")) return;
-          adoptState(ob); toastQ("Save loaded from file."); };
+          adoptState(ob); toast("Save loaded from file."); };
         rd.readAsText(f); }); }
     fi.click(); return; }
   if (act==="cb-signin"){ var cn=((document.getElementById("cbname")||{}).value||"").replace(/\s+/g," ").trim(), cp=(document.getElementById("cbpass")||{}).value||"";
@@ -15603,11 +15603,11 @@ document.addEventListener("click",function(e){
   if (act==="cb-pull"){ armed=null; if (sheetFor && sheetFor.kind==="cbconflict") closeSheet(); cbRestore("latest", {auto:true}); return; }
   if (act==="cb-undo"){ if (armed!=="cbundo"){ armed="cbundo"; lastSheet=""; renderSheet(); return; } armed=null; cbUndo(); return; }
   if (act==="cb-ask-yes"){ DET.cloud=true; goPage("settings"); setTimeout(function(){ var d=document.querySelector('details[data-det="cloud"]'); if (d){ d.open=true; d.scrollIntoView({block:"start"}); } var n=document.getElementById("cbname"); if (n) n.focus(); }, 120); return; }
-  if (act==="cb-ask-later"){ S.cloudAsk=Date.now()+3*DAY; save(); closeSheet(); toastQ("You can turn on cloud saves any time in Settings"); return; }
+  if (act==="cb-ask-later"){ S.cloudAsk=Date.now()+3*DAY; save(); closeSheet(); toast("You can turn on cloud saves any time in Settings"); return; }
   if (act==="cb-restore"){ var slot=a.dataset.v; if (armed!=="cbr-"+slot){ armed="cbr-"+slot; lastSheet=""; renderSheet(); return; } armed=null; cbRestore(slot); return; }
   if (act==="cb-outothers"){ if (armed!=="cboth"){ armed="cboth"; lastSheet=""; renderSheet(); return; } armed=null; if (!cbOn() || CB.busy) return; CB.busy=true; cbUi("Signing out other devices\u2026", true);
     cbPost("/backup/signout-others",{name:S.cloud.name, token:S.cloud.token}).then(function(r){ return r.json(); }).then(function(d){ CB.busy=false;
-      if (d && d.ok && d.token){ S.cloud.token=d.token; save(); toastQ("Every other device is signed out"); PUSH.ok=false; pushSync(true); /* their pushes stop too; this phone signs up again */ cbUi("Signed out everywhere else. Only this device can save to your account now.", true); }
+      if (d && d.ok && d.token){ S.cloud.token=d.token; save(); toast("Every other device is signed out"); PUSH.ok=false; pushSync(true); /* their pushes stop too; this phone signs up again */ cbUi("Signed out everywhere else. Only this device can save to your account now.", true); }
       else cbUi((d&&d.error)||"Couldn\u2019t sign out other devices"); }).catch(function(){ CB.busy=false; cbUi("Couldn\u2019t reach the backup server. Check your connection."); });
     return; }
   if (act==="cb-signout"){ if (armed!=="cbout"){ armed="cbout"; lastSheet=""; renderSheet(); return; } armed=null; pushStop(); var keepName=S.cloud&&S.cloud.name, keepDisp=cbName(); S.cloud={name:keepName, display:keepDisp}; if (S.lb && S.lb.needAcct) S.lb.needAcct=0; CB.found=null; CB.msg="Signed out. Your backups stay online."; CB.good=true; save(); lastSheet=""; renderSheet(); return; }
@@ -15617,16 +15617,16 @@ document.addEventListener("click",function(e){
     if (!obj || !obj.v || !(obj.cities||obj.res)){ document.getElementById("importmsg").textContent="That doesn\u2019t look like a save code."; return; }
     if (newerSaveWhy(obj)){ document.getElementById("importmsg").textContent=newerSaveWhy(obj); return; }
     if (armed!=="import"){ armed="import"; var keep=code; lastSheet=""; renderSheet(); var ni=document.getElementById("saveinput"); if (ni) ni.value=keep; return; }
-    armed=null; saveUi=""; adoptState(obj); toastQ("Save loaded. Welcome back, "+TITLES[S.title].name+"."); return; }
+    armed=null; saveUi=""; adoptState(obj); toast("Save loaded. Welcome back, "+TITLES[S.title].name+"."); return; }
   if (act==="reset-cancel"){ armed=null; lastSheet=""; renderSheet(); return; }
   if (act==="reset"){
     if (armed!=="reset"){ armed="reset"; lastSheet=""; renderSheet(); return; }
     var rwd=document.getElementById("resetword"); if (!rwd || rwd.value.trim().toUpperCase()!=="RESET"){ toast("Type RESET to confirm"); return; }
     bkSnapshot("pre",true);
-    S=newState(); installProxies(S); genMap(); sim=null; simOut=null; selTile=null; armed=null; lastPrize=null; document.getElementById("cityname").textContent=S.name; closeSheet(); refresh(); toastQ("A new city begins."); return;
+    S=newState(); installProxies(S); genMap(); sim=null; simOut=null; selTile=null; armed=null; lastPrize=null; document.getElementById("cityname").textContent=S.name; closeSheet(); refresh(); toast("A new city begins."); return;
   }
   if (act==="build-pick"){ sheetFor.sel=a.dataset.type; lastSheet=""; renderSheet(); return; }
-  if (act==="build-new"){ if (!startBuild(sheetFor.w,sheetFor.i,a.dataset.type)){ S.bq.push({w:sheetFor.w,i:sheetFor.i,type:a.dataset.type}); toastQ(DEF[a.dataset.type].name+" added to the build queue"); } closeSheet(); refresh(); return; }
+  if (act==="build-new"){ if (!startBuild(sheetFor.w,sheetFor.i,a.dataset.type)){ S.bq.push({w:sheetFor.w,i:sheetFor.i,type:a.dataset.type}); toast(DEF[a.dataset.type].name+" added to the build queue"); } closeSheet(); refresh(); return; }
   if (act==="tax"){ S.tax=Math.max(0,Math.min(80,S.tax+(+a.dataset.d))); save(); tickText(); lastView=""; renderView(true); return; }
   if (act==="quests"){ goPage("quests"); return; }
   if (act==="drops-open"){ openSheet({kind:"drops"}); return; }
@@ -15656,7 +15656,7 @@ document.addEventListener("click",function(e){
   if (act==="ev-intro"){ openSheet({kind:"evintro"}); return; }
   if (act==="ev-hunt"){ closeSheet(); if (tab!=="map" && !bfOn()){ tab="map"; lastView=""; renderView(true); window.scrollTo({top:0}); } return; }
   if (act==="ry-ign"){ ryIgn()[ALS.aid+":"+a.dataset.rid]=Date.now(); save(); lastSheet=""; renderSheet(); return; }
-  if (act==="ry-ign-all"){ var ign=ryIgn(); ryOpen().forEach(function(R){ ign[ALS.aid+":"+R.id]=Date.now(); }); var icut=Date.now()-3*864e5; for (var ik in ign) if (ign[ik]<icut) delete ign[ik]; save(); closeSheet(); toastQ("Ignored"); return; }
+  if (act==="ry-ign-all"){ var ign=ryIgn(); ryOpen().forEach(function(R){ ign[ALS.aid+":"+R.id]=Date.now(); }); var icut=Date.now()-3*864e5; for (var ik in ign) if (ign[ik]<icut) delete ign[ik]; save(); closeSheet(); toast("Ignored"); return; }
   if (act==="wt-open"){ openSheet({kind:"watch"}); return; }
   if (act==="wt-type"){ S.wtOff=S.wtOff||{}; S.wtOff[a.dataset.k]=wtOn(a.dataset.k)?1:0; save(); lastSheet=""; renderSheet(); return; }
   if (act==="wt-ign"){ S.wtIgn=S.wtIgn||{}; var wn=Date.now(); for (var wk in S.wtIgn) if (S.wtIgn[wk]<wn) delete S.wtIgn[wk]; if (a.dataset.v==="1") S.wtIgn[a.dataset.key]=+a.dataset.land||wn+864e5; else delete S.wtIgn[a.dataset.key]; save(); lastSheet=""; renderSheet(); return; }
@@ -15672,7 +15672,7 @@ document.addEventListener("click",function(e){
   if (act==="rf-heropick"){ openSheet({kind:"rfhero"}); return; }
   if (act==="rf-hero"){ RF.hero=+a.dataset.v; closeSheet(); lastView=""; renderView(true); return; }
   if (act==="rf-all"){ var rfi=+a.dataset.i, rfh=withCity(RF.from,function(){ return S.troops[rfi]||0; }); RF.t[rfi]=(+RF.t[rfi]||0)>=rfh?"":String(rfh); lastView=""; renderView(true); return; }
-  if (act==="rf-hasten"){ if ((S.items.marchsp||0)<=0) return; alPost("/al/reinf/hasten",{id:+a.dataset.id}).then(function(r){ if (r.error){ toast(r.error); return; } S.items.marchsp=Math.max(0,(S.items.marchsp||0)-1); save(); toastQ("March Speed-up used: half the trip left"); ALS.last=0; alSync(); }).catch(function(){ toast("Couldn\u2019t reach the server"); }); return; }
+  if (act==="rf-hasten"){ if ((S.items.marchsp||0)<=0) return; alPost("/al/reinf/hasten",{id:+a.dataset.id}).then(function(r){ if (r.error){ toast(r.error); return; } S.items.marchsp=Math.max(0,(S.items.marchsp||0)-1); save(); toast("March Speed-up used: half the trip left"); ALS.last=0; alSync(); }).catch(function(){ toast("Couldn\u2019t reach the server"); }); return; }
   if (act==="rf-recall"){ rfMove("/al/reinf/recall", a.dataset.id); return; }
   if (act==="rf-home"){ rfMove("/al/reinf/home", a.dataset.id); return; }
   if (act==="chat-older"){ if (a.dataset.ch==="world") wcOlder(); else alOlder(); return; }
@@ -15683,7 +15683,7 @@ document.addEventListener("click",function(e){
   if (act==="me-cosbuy"){ var bk=a.dataset.kind, bv=a.dataset.v; if (COSM[bk] && COSM[bk][bv]) cosBuy(bk,bv); return; }
   if (act==="me-cycle"){ S.me=S.me||{img:"",frame:""}; var cyc=[""].concat(Object.keys(FRAMES).filter(function(k){ return cosHas("frame",k); })); if (cyc.length>1){ S.me.frame=cyc[(cyc.indexOf(S.me.frame||"")+1)%cyc.length]; save(); profSync(); lastSheet=""; renderSheet(); } return; }
   if (act==="me-frame"){ S.me=S.me||{img:"",frame:""}; var mfv=a.dataset.v||""; if (!mfv || (FRAMES[mfv] && cosHas("frame",mfv))) S.me.frame=mfv; save(); profSync(); lastSheet=""; renderSheet(); return; }
-  if (act==="me-img-clear"){ S.me=S.me||{img:"",frame:""}; S.me.img=""; save(); profSync(); lastSheet=""; renderSheet(); toastQ("Image removed"); return; }
+  if (act==="me-img-clear"){ S.me=S.me||{img:"",frame:""}; S.me.img=""; save(); profSync(); lastSheet=""; renderSheet(); toast("Image removed"); return; }
   if (act==="me-img-pick"){ var mfi=document.getElementById("meimg"); if (mfi) mfi.click(); return; }
   if (act==="ach"){ goPage("ach"); return; }
   if (act==="ach-tip"){ ACHSEL=ACHSEL===a.dataset.k?"":a.dataset.k; lastSheet=""; renderSheet(); return; } // 0.2.50: a tile's goal and tiers
@@ -15740,7 +15740,7 @@ document.addEventListener("click",function(e){
     if (act==="al-view"){ alViewOpen(a.dataset.aid); return; }
     if (act==="al-box-in"){ alBoxMove(1); return; }
     if (act==="al-box-out"){ alBoxMove(-1); return; }
-    if (act==="al-box-undo"){ var bo=(S.alBoxOut||[]).filter(function(x){ return x.id===a.dataset.id; })[0]; if (!bo) return; for (var bk in bo.amt) S.alBox[bk]=(S.alBox[bk]||0)+bo.amt[bk]; S.alBoxOut=S.alBoxOut.filter(function(x){ return x!==bo; }); save(); toastQ("Put back in your box"); lastView=""; refresh(); return; }
+    if (act==="al-box-undo"){ var bo=(S.alBoxOut||[]).filter(function(x){ return x.id===a.dataset.id; })[0]; if (!bo) return; for (var bk in bo.amt) S.alBox[bk]=(S.alBox[bk]||0)+bo.amt[bk]; S.alBoxOut=S.alBoxOut.filter(function(x){ return x!==bo; }); save(); toast("Put back in your box"); lastView=""; refresh(); return; }
     if (act==="al-arena-go" && soloArOn()){ closeSheet(); tab="alliance"; KGV="arena"; lastView=""; refresh(); window.scrollTo({top:0}); return; }
     if (act==="al-arena-go"){ closeSheet(); tab="guild"; ALS.sub="rally"; lastView=""; refresh(); window.scrollTo({top:0}); ALS.last=0; alSync(); return; } // 0.2.4: monster fights are joined from Rallies (the Arena page only summons)
     if (act==="al-arena-send"){ var smid=+a.dataset.mid; if (!arById(smid)){ toast("The window has closed"); return; } openMarch(homeTileId(),"arena",smid); return; }
@@ -15749,27 +15749,27 @@ document.addEventListener("click",function(e){
     if (act==="al-send"){ alSend(); return; }
     if (act==="al-medalmax"){ var mk=a.dataset.k, mm=((alMine().econ||{}).mem||{})[mk]||{room:0}; MEMD[mk]=String(Math.min(S.medals[mk]||0, mm.room||0)); var mip=document.querySelector('[data-almed="'+mk+'"]'); if (mip) mip.value=MEMD[mk]; return; }
     if (act==="al-medal"){ var gk=a.dataset.k, gn=Math.max(0,Math.floor(+MEMD[gk]||0)); if (!gn){ toast("Type how many medals to give"); return; } if (gn>(S.medals[gk]||0)){ toast("You don\u2019t have that many "+medalName(gk)+" medals"); return; } if (ALS.donating) return; ALS.donating=true;
-      alPost("/al/medal",{k:gk, n:gn}).then(function(d){ ALS.donating=false; if (d.error){ toast(d.error); return; } var tk=Math.max(0,Math.min(gn,+d.took||0)); S.medals[gk]=Math.max(0,(S.medals[gk]||0)-tk); MEMD[gk]=""; save(); toastQ("Gave "+fmt(tk)+" "+medalName(gk)+" medals"+(tk<gn?" (the monument only had room for that many)":"")+". Thank you!"); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); ALS.last=0; alSync(); refresh(); })
+      alPost("/al/medal",{k:gk, n:gn}).then(function(d){ ALS.donating=false; if (d.error){ toast(d.error); return; } var tk=Math.max(0,Math.min(gn,+d.took||0)); S.medals[gk]=Math.max(0,(S.medals[gk]||0)-tk); MEMD[gk]=""; save(); toast("Gave "+fmt(tk)+" "+medalName(gk)+" medals"+(tk<gn?" (the monument only had room for that many)":"")+". Thank you!"); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); ALS.last=0; alSync(); refresh(); })
         .catch(function(){ ALS.donating=false; toast("Couldn\u2019t reach the server"); }); return; }
     if (act==="al-sanc-light"){ var lon=a.dataset.on==="1", lw=a.dataset.which; alDo("/al/sanc/light",{which:lw, on:lon}, lon?(lw==="d"?"The Halo of Fortune is shining":"The Guardian\u2019s Wings are spread"):"Put out: the gems are saved"); return; }
     if (act==="al-ars-up"){ alDo("/al/ars/up",{slot:+a.dataset.slot, kind:a.dataset.kind},a.dataset.kind==="star"?"Star added":a.dataset.kind==="tier"?"Raised a tier":"Forged"); return; }
     if (act==="al-ars-give"){ var ag={}, any2=0; for (var mk2 in ARS_MN){ var av2=Math.max(0,Math.floor(+ARSD[mk2]||0)); if (av2>(S.items[mk2]||0)){ toast("You don\u2019t have that many "+ARS_MN[mk2]); return; } ag[mk2]=av2; any2+=av2; }
       if (!any2){ toast("Type how many to give"); return; } if (ALS.donating) return; ALS.donating=true;
-      alPost("/al/ars/give",{mats:ag}).then(function(d){ ALS.donating=false; if (d.error){ toast(d.error); return; } var tk=d.took||{}; for (var k3 in tk) S.items[k3]=Math.max(0,(S.items[k3]||0)-(tk[k3]||0)); ARSD={}; save(); toastQ("Given to the Arsenal. Thank you!"); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); ALS.last=0; alSync(); refresh(); })
+      alPost("/al/ars/give",{mats:ag}).then(function(d){ ALS.donating=false; if (d.error){ toast(d.error); return; } var tk=d.took||{}; for (var k3 in tk) S.items[k3]=Math.max(0,(S.items[k3]||0)-(tk[k3]||0)); ARSD={}; save(); toast("Given to the Arsenal. Thank you!"); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); ALS.last=0; alSync(); refresh(); })
         .catch(function(){ ALS.donating=false; toast("Couldn\u2019t reach the server"); }); return; }
     if (act==="al-sanc-give"){ var gd2=Math.max(0,Math.floor(+SANCD.d||0)), gf2=Math.max(0,Math.floor(+SANCD.f||0)); if (gd2>(S.items.gemD||0) || gf2>(S.items.gemF||0)){ toast("You don\u2019t have that many gems"); return; }
       if (!gd2 && !gf2){ toast("Type how many gems to offer"); return; } if (ALS.donating) return; ALS.donating=true;
       alPost("/al/sanc/give",{d:gd2, f:gf2}).then(function(d){ ALS.donating=false; if (d.error){ toast(d.error); return; } var tk=d.took||{d:0,f:0}; S.items.gemD=Math.max(0,(S.items.gemD||0)-tk.d); S.items.gemF=Math.max(0,(S.items.gemF||0)-tk.f); SANCD={d:"",f:""}; save();
-        toastQ("Offered "+[tk.d?fmt(tk.d)+" Delicate":"", tk.f?fmt(tk.f)+" Flawless":""].filter(Boolean).join(" and ")+" Gems"); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); ALS.last=0; alSync(); refresh(); })
+        toast("Offered "+[tk.d?fmt(tk.d)+" Delicate":"", tk.f?fmt(tk.f)+" Flawless":""].filter(Boolean).join(" and ")+" Gems"); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); ALS.last=0; alSync(); refresh(); })
         .catch(function(){ ALS.donating=false; toast("Couldn\u2019t reach the server"); }); return; }
     if (act==="al-medalpick"){ alDo("/al/medalpick",{k:a.dataset.k, tier:+a.dataset.t, p:+a.dataset.p},"Perk chosen"); return; }
     if (act==="al-start"){ alDo("/al/start",{kind:a.dataset.kind, key:a.dataset.key},"Started"); return; }
     if (act==="al-donate"){ var dg={}, any=false; for (var dk in ALD){ var dv=Math.max(0,Math.floor(+ALD[dk]||0)); if (dv>Math.floor(S.res[dk])){ toast("You don\u2019t have that much "+RNAME[dk].toLowerCase()); return; } dg[dk]=dv; if (dv) any=true; }
       if (!any){ toast("Type how much to donate"); return; } if (ALS.donating) return; ALS.donating=true;
-      alPost("/al/donate",{res:dg}).then(function(d){ ALS.donating=false; if (d.error){ toast(d.error); return; } for (var k in dg) S.res[k]-=dg[k]; ALD={food:"",lumber:"",stone:"",iron:"",gold:""}; save(); toastQ("Donated. Thank you!"); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); ALS.last=0; alSync(); refresh(); })
+      alPost("/al/donate",{res:dg}).then(function(d){ ALS.donating=false; if (d.error){ toast(d.error); return; } for (var k in dg) S.res[k]-=dg[k]; ALD={food:"",lumber:"",stone:"",iron:"",gold:""}; save(); toast("Donated. Thank you!"); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); ALS.last=0; alSync(); refresh(); })
         .catch(function(){ ALS.donating=false; toast("Couldn\u2019t reach the server"); }); return; }
-    if (act==="al-lendacad"){ var lci=+a.dataset.ci; withCity(lci,function(){ if (!S.alAcad && S.research){ toast("Finish or cancel this city\u2019s research first"); return; } S.alAcad=!S.alAcad; toastQ(S.alAcad?S.name+"\u2019s Academy now works for the alliance":S.name+"\u2019s Academy is back to its own research"); }); save(); lastView=""; renderView(true); processAll(); renderQueue(); return; }
-    if (act==="al-lendbld"){ var bci=+a.dataset.ci, bn=+a.dataset.n; withCity(bci,function(){ if (S.builds.length>BUILDERS-bn){ toast("Those builders are busy here"); return; } S.alBld=bn; toastQ(bn?bn+" builder"+(bn>1?"s":"")+" from "+S.name+" now work"+(bn>1?"":"s")+" for the alliance":S.name+"\u2019s builders are back home"); }); save(); lastView=""; renderView(true); processAll(); renderQueue(); return; }
+    if (act==="al-lendacad"){ var lci=+a.dataset.ci; withCity(lci,function(){ if (!S.alAcad && S.research){ toast("Finish or cancel this city\u2019s research first"); return; } S.alAcad=!S.alAcad; toast(S.alAcad?S.name+"\u2019s Academy now works for the alliance":S.name+"\u2019s Academy is back to its own research"); }); save(); lastView=""; renderView(true); processAll(); renderQueue(); return; }
+    if (act==="al-lendbld"){ var bci=+a.dataset.ci, bn=+a.dataset.n; withCity(bci,function(){ if (S.builds.length>BUILDERS-bn){ toast("Those builders are busy here"); return; } S.alBld=bn; toast(bn?bn+" builder"+(bn>1?"s":"")+" from "+S.name+" now work"+(bn>1?"":"s")+" for the alliance":S.name+"\u2019s builders are back home"); }); save(); lastView=""; renderView(true); processAll(); renderQueue(); return; }
     if (act==="al-tree"){ ALS.uTree=a.dataset.v; ALS.uSel=""; lastView=""; refresh(); return; }
     if (act==="al-tsel"){ ALS.uSel=a.dataset.key; lastView=""; refresh(); var td=document.querySelector(".tdetail"); if (td && td.getBoundingClientRect().top>window.innerHeight-80) td.scrollIntoView({block:"nearest", behavior:"smooth"}); return; }
     if (act==="al-zoom"){ var zi2=AL_ZOOMS.indexOf(alZ())-(+a.dataset.d), nz=AL_ZOOMS[Math.max(0,Math.min(AL_ZOOMS.length-1,zi2))]; if (nz===alZ()) return;
@@ -15785,7 +15785,7 @@ document.addEventListener("click",function(e){
     if (act==="al-move"){ ALS.moving={what:a.dataset.what, who:a.dataset.who}; lastView=""; renderView(true); return; }
     if (act==="al-movecancel"){ ALS.moving=null; lastView=""; renderView(true); return; }
     if (act==="al-movehere"){ alDo("/al/move",{what:"me", x:+a.dataset.x, y:+a.dataset.y},"Your kingdom moved"); return; }
-    if (act==="al-help"){ if (ALS.helping) return; ALS.helping=true; alPost("/al/help",{}).then(function(d){ ALS.helping=false; if (d.error) toast(d.error); else toastQ(d.helped?"You helped "+d.helped+" project"+(d.helped>1?"s":""):"Nothing to help right now"); ALS.last=0; alSync(); }).catch(function(){ ALS.helping=false; toast("Couldn\u2019t reach the server"); }); return; }
+    if (act==="al-help"){ if (ALS.helping) return; ALS.helping=true; alPost("/al/help",{}).then(function(d){ ALS.helping=false; if (d.error) toast(d.error); else toast(d.helped?"You helped "+d.helped+" project"+(d.helped>1?"s":""):"Nothing to help right now"); ALS.last=0; alSync(); }).catch(function(){ ALS.helping=false; toast("Couldn\u2019t reach the server"); }); return; }
     if (act==="al-create"){ var an=document.getElementById("alname"), at2=document.getElementById("altag"), ad=document.getElementById("aldesc");
       alDo("/al/create",{alName:an?an.value:"", tag:at2?at2.value:"", desc:ad?ad.value:"", lid:lbOn()?S.lb.id:undefined, lt:lbOn()?S.lb.token:undefined},"Alliance founded"); return; }
     if (act==="al-apply"){ var am=document.getElementById("alappmsg"); alDo("/al/apply",{aid:a.dataset.aid, msg:am?am.value:"", lid:lbOn()?S.lb.id:undefined, lt:lbOn()?S.lb.token:undefined},"Application sent"); return; }
@@ -15812,10 +15812,10 @@ document.addEventListener("click",function(e){
     var tgk=sheetFor.gk||"tg", TL=gLines(tgk), tli=sheetFor.l, TLn=TL[tli]; if (!TLn){ closeSheet(); return; }
     if (act==="tg-move"){ var tu=+a.dataset.u, tp=TLn.o.indexOf(tu), tq=tp+(+a.dataset.d); if (tp<0 || tq<0 || tq>=TLn.o.length) return; TLn.o[tp]=TLn.o[tq]; TLn.o[tq]=tu; }
     else if (act==="tg-lmove"){ var tj=tli+(+a.dataset.d); if (tj<0 || tj>=TL.length) return; TL[tli]=TL[tj]; TL[tj]=TLn; sheetFor.l=tj; }
-    else if (act==="tg-dup"){ TL.splice(tli+1,0,{t:TLn.t.slice(), o:TLn.o.slice(), b:TLn.b}); sheetFor.l=tli+1; toastQ("Line copied below"); }
+    else if (act==="tg-dup"){ TL.splice(tli+1,0,{t:TLn.t.slice(), o:TLn.o.slice(), b:TLn.b}); sheetFor.l=tli+1; toast("Line copied below"); }
     else if (act==="tg-del"){ if (armed!=="tgdel"){ armed="tgdel"; lastSheet=""; renderSheet(); return; } armed=null; TL.splice(tli,1); save(); closeSheet(); lastView=""; renderView(true); processQueues(); return; }
     else if (act==="tg-apply"){ var tsi=document.getElementById("tgstr"), tpr=gParse(tgk, tsi?tsi.value:""), tmsg=document.getElementById("tgmsg");
-      if (tpr.error){ if (tmsg) tmsg.textContent=tpr.error; return; } TLn.t=tpr.t; TLn.o=tpr.o; toastQ("Line "+(tli+1)+" set"); }
+      if (tpr.error){ if (tmsg) tmsg.textContent=tpr.error; return; } TLn.t=tpr.t; TLn.o=tpr.o; toast("Line "+(tli+1)+" set"); }
     armed=null; save(); processQueues(); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); lastSheet=""; renderSheet(); lastView=""; renderView(true); return; }
   if (act==="goal-move"){
     var gu=+a.dataset.u, dir=+a.dataset.d, ord=goalOrder(), at=ord.indexOf(gu);
@@ -15827,35 +15827,35 @@ document.addEventListener("click",function(e){
     S.gorder=ord; save(); lastView=""; renderView(true); return;
   }
   if (act==="craft-stat"){ if (STATN[a.dataset.v]) craftStat=a.dataset.v; lastView=""; renderView(true); if (sheetFor){ lastSheet=""; renderSheet(); } return; }
-  if (act==="craft"){ craftTier=0; if (craftWhy(0)) return; S.items[MAT[0]]-=MAT_NEED[0]; var cg=makeGear(0,a.dataset.slot,craftStat); toastQ("Crafted a "+gearName(cg)); save(); lastView=""; renderView(true); return; }
+  if (act==="craft"){ craftTier=0; if (craftWhy(0)) return; S.items[MAT[0]]-=MAT_NEED[0]; var cg=makeGear(0,a.dataset.slot,craftStat); toast("Crafted a "+gearName(cg)); save(); lastView=""; renderView(true); return; }
   if (act==="demolish"){
     var dc=ctxPlot(); if (!dc || demolishWhy(dc.w,dc.i)) return;
     if (armed!=="demolish"){ armed="demolish"; lastSheet=""; renderSheet(); lastView=""; renderView(true); return; }
     armed=null; var ds=getSlot(dc.w,dc.i), dn=DEF[ds.type].name;
     if (dc.w==="in") S.inside[dc.i]=null; else S.fields[dc.i]=null;
     S.bq=S.bq.filter(function(it){ return !(it.w===dc.w && it.i===dc.i); });
-    closeSheet(); if (tab==="bldg"){ tab="city"; pg=null; } lastView=""; toastQ(dn+" demolished"); refresh(); return;
+    closeSheet(); if (tab==="bldg"){ tab="city"; pg=null; } lastView=""; toast(dn+" demolished"); refresh(); return;
   }
-  if (act==="queue-up"){ var qc=ctxPlot(), qs=getSlot(qc.w,qc.i); if (qs){ S.bq.push({w:qc.w,i:qc.i,type:qs.type}); toastQ(DEF[qs.type].name+" upgrade queued"); } processQueues(); lastSheet=""; refresh(); return; }
+  if (act==="queue-up"){ var qc=ctxPlot(), qs=getSlot(qc.w,qc.i); if (qs){ S.bq.push({w:qc.w,i:qc.i,type:qs.type}); toast(DEF[qs.type].name+" upgrade queued"); } processQueues(); lastSheet=""; refresh(); return; }
   if (act==="bq-up"||act==="bq-down"||act==="rq-up"||act==="rq-down"){ var qa=act.charAt(0)==="b"?S.bq:S.rq, qk=+a.dataset.k, qj=act.slice(3)==="up"?qk-1:qk+1; if (qj>=0 && qj<qa.length && qk>=0 && qk<qa.length){ var qt=qa[qk]; qa[qk]=qa[qj]; qa[qj]=qt; save(); refresh(); } return; }
   if (act==="bq-remove"){ S.bq.splice(+a.dataset.k,1); refresh(); return; }
-  if (act==="rq-add"){ S.rq.push(a.dataset.tech); toastQ(TECH[a.dataset.tech].name+" queued"); processQueues(); refresh(); return; }
+  if (act==="rq-add"){ S.rq.push(a.dataset.tech); toast(TECH[a.dataset.tech].name+" queued"); processQueues(); refresh(); return; }
   if (act==="rq-remove"){ S.rq.splice(+a.dataset.k,1); refresh(); return; }
   if (act==="upgrade"){ var uc=ctxPlot(), s=getSlot(uc.w,uc.i); if (s && !upgradeWhy(s.type,s.level)) startBuild(uc.w,uc.i,s.type); closeSheet(); refresh(); return; }
   if (act==="cancel-build" && S.builds[+a.dataset.slot]){
     var bs=+a.dataset.slot, b=S.builds[bs], bc=costFor(b.type,b.to); bc.script = b.sc!=null ? b.sc : (b.to===10 ? 1 : 0); pay(bc,-1); // 0.2.9: give back the Scripts actually paid (builds started before 0.2.9 paid none past 10)
     if (b.to===1 && b.where!=="th" && b.where!=="wall"){ if (b.where==="in") S.inside[b.idx]=null; else S.fields[b.idx]=null; }
-    S.builds.splice(bs,1); toastQ("Construction cancelled. Resources returned."); refresh(); return;
+    S.builds.splice(bs,1); toast("Construction cancelled. Resources returned."); refresh(); return;
   }
   if (act==="research" && S.alAcad){ toast("This Academy is working for the alliance. Bring it back from the Alliance tab first."); return; }
   if (act==="research"){
     var k=a.dataset.tech, to=(S.techG[k]||0)+1, c=techCost(k,to);
     if (S.research || S.cities.some(function(c){ return c.research && c.research.tech===k; }) || to>techMax(k) || missing(techReqs(k,to)).length || !afford(c)) return;
     pay(c,1); S.research={tech:k,to:to,start:S.gt,end:S.gt+techTime(k,to)};
-    toastQ("Researching "+TECH[k].name+" level "+to); refresh(); return;
+    toast("Researching "+TECH[k].name+" level "+to); refresh(); return;
   }
   if (act==="cancel-research" && S.research){
-    pay(techCost(S.research.tech,S.research.to),-1); S.research=null; toastQ("Research cancelled. Resources returned."); refresh(); return;
+    pay(techCost(S.research.tech,S.research.to),-1); S.research=null; toast("Research cancelled. Resources returned."); refresh(); return;
   }
   if (act==="speedup" && a.dataset.target==="build"){ var fb=S.builds[+a.dataset.slot];
     if (fb && realMs(fb.end-S.gt)<=FREE_MS){ fb.end=S.gt; if (fb.start>fb.end) fb.start=fb.end; if (advance(Date.now())) flushFinished(); refresh(); return; } }
@@ -15872,14 +15872,14 @@ document.addEventListener("click",function(e){
       var urB=urT?document.querySelector('#view [data-tech="'+urq.slice(2)+'"]'):null, urR=urB&&(urB.closest(".tech")||urB); if (urR) urR.scrollIntoView({block:"center"}); }
     else openSheet({kind:"plot",w:"in",i:urI}); return; }
   if (act==="army-all"){ ARMYALL=true; lastView=""; renderView(true); return; }
-  if (act==="army-city"){ var aci=+a.dataset.ci; ARMYALL=false; if (aci!==S.cur && S.cities[aci]){ ARMYB=-1; FARMV=-1; farmArmed=false; MAPFARM=-1; S.cur=aci; mv.init=false; selTile=null; var cnm=document.getElementById("cityname"); if (cnm) cnm.textContent=S.name; toastQ("Now viewing "+S.name); } keepX("#view .acities", function(){ lastView=""; refresh(); }); return; } // 0.2.52: the city row stays where it was
+  if (act==="army-city"){ var aci=+a.dataset.ci; ARMYALL=false; if (aci!==S.cur && S.cities[aci]){ ARMYB=-1; FARMV=-1; farmArmed=false; MAPFARM=-1; S.cur=aci; mv.init=false; selTile=null; var cnm=document.getElementById("cityname"); if (cnm) cnm.textContent=S.name; toast("Now viewing "+S.name); } keepX("#view .acities", function(){ lastView=""; refresh(); }); return; } // 0.2.52: the city row stays where it was
   if (act==="city-v"){ CITYV=a.dataset.v||""; arrange=null; lastView=""; renderView(true); window.scrollTo({top:0}); return; }
   if (act==="army-v"){ ARMYV=a.dataset.v||""; ARMYB=-1; lastView=""; renderView(true); window.scrollTo({top:0}); return; }
   if (act==="bar-hub"){ ARMYB=-1; lastView=""; renderView(true); return; }
   if (act==="bq-unit"){ BQD.u=+a.dataset.unit; lastView=""; renderView(true); return; } // 0.2.50: the Barracks page picks a unit from tiles, not a dropdown
   if (act==="bq-max"){ BQD.n=String(maxTrain(BQD.u)); lastView=""; renderView(true); return; }
   if (act==="bq-train"){ var bqn=Math.floor(+BQD.n||0), busy0=!!trainingAt(ARMYB); if (!trainOn(BQD.u,bqn,ARMYB)){ toast(trainOnWhy(BQD.u,bqn,ARMYB)||"Can\u2019t train that"); return; }
-    toastQ((busy0?"Queued ":"Training ")+fmt(bqn)+" "+uname(BQD.u,bqn)+" in "+barracksName(ARMYB)); BQD.n=""; save(); lastView=""; refresh(); return; }
+    toast((busy0?"Queued ":"Training ")+fmt(bqn)+" "+uname(BQD.u,bqn)+" in "+barracksName(ARMYB)); BQD.n=""; save(); lastView=""; refresh(); return; }
   if (act==="train-max"){ var ui=+a.dataset.unit; trainAmt[ui]=maxTrain(ui); var inp=document.getElementById("tr-amt-"+ui); if (inp) inp.value=trainAmt[ui]; updateTrainRow(ui); return; }
   if (act==="train-by"){ var bu=+a.dataset.unit; trainAmt[bu]=+a.dataset.n||0; var bin=document.getElementById("tr-amt-"+bu); if (bin) bin.value=trainAmt[bu]; updateTrainRow(bu);
     var bb=document.getElementById(a.dataset.mode==="one"?"tr-btn-"+bu:"tr-"+a.dataset.mode+"-"+bu); if (bb && bb.focus) bb.focus(); return; }
@@ -15889,31 +15889,31 @@ document.addEventListener("click",function(e){
   if (act==="train"){
     var tu=+a.dataset.unit, tn=Math.floor(trainAmt[tu]||0);
     if (!startTrain(tu,tn)) return;
-    trainAmt[tu]=0; toastQ("Training "+fmt(tn)+" "+uname(tu,tn)); save(); lastView=""; refresh(); trainSheetRe(tu); return;
+    trainAmt[tu]=0; toast("Training "+fmt(tn)+" "+uname(tu,tn)); save(); lastView=""; refresh(); trainSheetRe(tu); return;
   }
   if (act==="train-split"){
     var su=+a.dataset.unit, sn=Math.floor(trainAmt[su]||0), sm=a.dataset.mode==="all"?"all":"idle", nb=startTrainSplit(su,sn,sm); if (!nb) return;
-    trainAmt[su]=0; toastQ("Training "+fmt(sn)+" "+uname(su,sn)+" across "+nb+" barracks"); save(); lastView=""; refresh(); trainSheetRe(su); return;
+    trainAmt[su]=0; toast("Training "+fmt(sn)+" "+uname(su,sn)+" across "+nb+" barracks"); save(); lastView=""; refresh(); trainSheetRe(su); return;
   }
   if (act==="cancel-q"){
     var qt=S.train[+a.dataset.ti]; if (!qt || !qt.q) return;
     pay(qt.paid,-1); S.pop += U[qt.u].pop*qt.n; S.train=S.train.filter(function(x){return x!==qt;});
-    toastQ("Queued training cancelled. Resources returned."); save(); lastView=""; refresh(); return;
+    toast("Queued training cancelled. Resources returned."); save(); lastView=""; refresh(); return;
   }
   if (act==="cancel-train"){
     var cs=+a.dataset.slot, ct=trainingAt(cs); if (!ct) return;
     var rc=ct.paid||{}; if (!ct.paid) for (var rk in U[ct.u].cost) rc[rk]=U[ct.u].cost[rk]*ct.n;
     pay(rc,-1); S.pop += U[ct.u].pop*ct.n; S.train=S.train.filter(function(x){return x!==ct;}); promoteQueue(cs);
-    toastQ("Training cancelled. Resources returned."); refresh(); return;
+    toast("Training cancelled. Resources returned."); refresh(); return;
   }
-  if (act==="rankup"){ var nr=RANKS[S.rank+1]; if (!nr || !allMet(reqChecks(nr,false))) return; payQuest(nr); S.rank++; addPrestigeFlat(nr.prest); toastQ("Promoted to "+nr.name); refresh(); return; }
-  if (act==="titleup"){ var nt=TITLES[S.title+1]; if (!nt || !allMet(reqChecks(nt,true))) return; payQuest(nt); S.title++; addPrestigeFlat(nt.award); toastQ("You are now "+nt.name+". "+nt.cities+" cities allowed."); refresh(); return; }
+  if (act==="rankup"){ var nr=RANKS[S.rank+1]; if (!nr || !allMet(reqChecks(nr,false))) return; payQuest(nr); S.rank++; addPrestigeFlat(nr.prest); toast("Promoted to "+nr.name); refresh(); return; }
+  if (act==="titleup"){ var nt=TITLES[S.title+1]; if (!nt || !allMet(reqChecks(nt,true))) return; payQuest(nt); S.title++; addPrestigeFlat(nt.award); toast("You are now "+nt.name+". "+nt.cities+" cities allowed."); refresh(); return; }
   if (act==="npc-place"){
     var pt=a.dataset.tile, pq=TILE_BY[pt], pl=+(document.getElementById("placelvl")||{}).value||PLACE_LV;
     if (!pq || !VTYPES[pq.k] || S.map.owned[pt] || placeLeft()<1) return;
     if (!S.map.placed || S.map.placed.day!==gameDay()) S.map.placed={day:gameDay(),n:0};
     S.map.placed.n++; delete S.map.flat[pt]; delete S.map.hit[pt]; delete S.map.loy[pt]; S.map.npc[pt]=pl; miniDirty=true;
-    toastQ("A level "+pl+" NPC city rises at ("+pq.x+", "+pq.y+")"); refresh(); return;
+    toast("A level "+pl+" NPC city rises at ("+pq.x+", "+pq.y+")"); refresh(); return;
   }
   if (act==="npc-make"){
     var mt=a.dataset.tile, mq=TILE_BY[mt];
@@ -15923,14 +15923,14 @@ document.addEventListener("click",function(e){
     var ml=S.map.ownedL[mt]||mq.L;
     campRecall(campAt(mt)); delete S.map.owned[mt]; delete S.map.ownedL[mt]; delete S.map.hit[mt]; delete S.map.loy[mt]; delete S.map.flat[mt];
     S.map.npc[mt]=ml; mq.k="npc"; mq.L=ml; miniDirty=true;
-    toastQ("A level "+ml+" NPC city now stands at ("+mq.x+", "+mq.y+")"); refresh(); return;
+    toast("A level "+ml+" NPC city now stands at ("+mq.x+", "+mq.y+")"); refresh(); return;
   }
   if (act==="npc-demolish"){
     var dt=a.dataset.tile, dq=TILE_BY[dt]; if (dq.k!=="npc" && dq.k!=="ai") return;
     if (armedTile!==dt){ armedTile=dt; renderTileInfo(); return; }
     armedTile=null; delete S.map.npc[dt]; delete S.map.hit[dt]; delete S.map.loy[dt]; S.map.flat[dt]=true;
     dq.k="flat"; dq.L=dayLevel(dq); miniDirty=true;
-    toastQ("Demolished. It\u2019s a level "+dq.L+" flat today."); refresh(); return;
+    toast("Demolished. It\u2019s a level "+dq.L+" flat today."); refresh(); return;
   }
   if (act==="city-move"){ var cmi=+a.dataset.city, cmj=cmi+(+a.dataset.d); if (cmj<0 || cmj>=S.cities.length) return; // reorder cities: everything stored refers to cities by id, only the viewed index moves with it
     var cmId=C().id, tmpc=S.cities[cmi]; S.cities[cmi]=S.cities[cmj]; S.cities[cmj]=tmpc; S.cur=cityIndex(cmId); if (S.pvp) S.pvp.ci=null; TP.from=0; RF.from=0;
@@ -15940,7 +15940,7 @@ document.addEventListener("click",function(e){
     if (!gc || giftWhy(gc) || !gally) return;
     if (armedTile!=="gift"+gid){ armedTile="gift"+gid; renderTileInfo(); var gs2=document.getElementById("giftally"); if (gs2) gs2.value=gally; return; }
     armedTile=null; var gname=gc.name, got=giftCity(gid, gally);
-    if (got){ document.getElementById("cityname").textContent=S.name; toastQ(gname+" given away: +"+fmt(got)+" reputation"); save(); lastView=""; selectTile(gally); refresh(); }
+    if (got){ document.getElementById("cityname").textContent=S.name; toast(gname+" given away: +"+fmt(got)+" reputation"); save(); lastView=""; selectTile(gally); refresh(); }
     return;
   }
   if (act==="city-abandon"){
@@ -15969,13 +15969,13 @@ document.addEventListener("click",function(e){
     // 0.1.217: the city becomes an NPC city of its Town Hall level (1 to 10), with a full garrison: undo an accidental capture, or raise an NPC city of your own
     var tq=TILE_BY[ac.x+","+ac.y], nL=Math.max(1,Math.min(10,ac.th||1)); delete S.map.flat[tq.id]; S.map.npc[tq.id]=nL; delete S.map.hit[tq.id]; delete S.map.loy[tq.id]; if (S.map.intel) delete S.map.intel[tq.id]; tq.k="npc"; delete tq.city; tq.L=nL;
     var viewingId=C().id; S.cities.splice(ai,1); S.cur = viewingId===aid ? 0 : cityIndex(viewingId);
-    miniDirty=true; document.getElementById("cityname").textContent=S.name; lastView=""; reconcileHeroes(); toastQ(ac.name+" was abandoned: it\u2019s a level "+nL+" NPC city now. Its troops, heroes and marches went to "+tc.name+"."); refresh(); return;
+    miniDirty=true; document.getElementById("cityname").textContent=S.name; lastView=""; reconcileHeroes(); toast(ac.name+" was abandoned: it\u2019s a level "+nL+" NPC city now. Its troops, heroes and marches went to "+tc.name+"."); refresh(); return;
   }
-  if (act==="bm-add"){ var bl=bmList(); if (bl.length>=BM_MAX){ toast("Bookmarks are full ("+BM_MAX+"). Remove one first."); return; } if (!bmAt(a.dataset.tile)) bl.push({id:a.dataset.tile, n:""}); save(); renderTileInfo(); bmRefresh(); toastQ("Bookmarked"); return; }
-  if (act==="bm-del"){ S.bm=bmList().filter(function(b){ return b.id!==a.dataset.tile; }); save(); renderTileInfo(); bmRefresh(); toastQ("Bookmark removed"); return; }
+  if (act==="bm-add"){ var bl=bmList(); if (bl.length>=BM_MAX){ toast("Bookmarks are full ("+BM_MAX+"). Remove one first."); return; } if (!bmAt(a.dataset.tile)) bl.push({id:a.dataset.tile, n:""}); save(); renderTileInfo(); bmRefresh(); toast("Bookmarked"); return; }
+  if (act==="bm-del"){ S.bm=bmList().filter(function(b){ return b.id!==a.dataset.tile; }); save(); renderTileInfo(); bmRefresh(); toast("Bookmark removed"); return; }
   if (act==="bm-go"){ mapGo(a.dataset.tile); return; }
   if (act==="held-open"){ openSheet({kind:"held"}); return; }
-  if (act==="held-release"){ var hrt=a.dataset.tile; campRecall(campAt(hrt)); var hrq=TILE_BY[hrt]; delete S.map.owned[hrt]; delete S.map.ownedL[hrt]; if (hrq && VTYPES[hrq.k]) hrq.L=dayLevel(hrq); miniDirty=true; save(); toastQ("Valley released"); lastSheet=""; renderSheet(); refresh(); return; } // 0.2.50: Release lives in the held list now (the fold under the map is gone); same as act "release"
+  if (act==="held-release"){ var hrt=a.dataset.tile; campRecall(campAt(hrt)); var hrq=TILE_BY[hrt]; delete S.map.owned[hrt]; delete S.map.ownedL[hrt]; if (hrq && VTYPES[hrq.k]) hrq.L=dayLevel(hrq); miniDirty=true; save(); toast("Valley released"); lastSheet=""; renderSheet(); refresh(); return; } // 0.2.50: Release lives in the held list now (the fold under the map is gone); same as act "release"
   if (act==="held-go"){ var hgt=a.dataset.tile; closeSheet(); if (tab!=="map" && !bfOn()){ tab="map"; lastView=""; renderView(true); } setTimeout(function(){ mapGo(hgt); }, 60); return; }
   if (act==="mpop-close"){ MPOP.hide=true; mapPop(); return; }
   if (act==="mpop-more"){ // 0.2.9: open Tile details if it's shut, then scroll to it once it has laid out (and leave full screen first)
@@ -15999,15 +15999,15 @@ document.addEventListener("click",function(e){
   if (act==="gear-best-cancel"){ armed=null; lastSheet=""; renderSheet(); return; }
   if (act==="gear-best-go"){ var bh=heroById(sheetFor.id), bst=a.dataset.stat, bfree=a.dataset.free==="1"; if (!bh || !STATN[bst]) return; armed=null;
     var br=equipBest(bh,bst,bfree), btk=Object.keys(br.took).map(function(n){ return br.took[n]+" from "+n; });
-    toastQ(br.changed ? bh.name+": best "+(bfree?"unworn ":"")+STATN[bst]+" gear on ("+br.changed+" piece"+(br.changed===1?"":"s")+" changed"+(btk.length?", took "+btk.join(", "):"")+")" : bh.name+" already wears the best "+(bfree?"unworn ":"")+STATN[bst]+" gear");
+    toast(br.changed ? bh.name+": best "+(bfree?"unworn ":"")+STATN[bst]+" gear on ("+br.changed+" piece"+(br.changed===1?"":"s")+" changed"+(btk.length?", took "+btk.join(", "):"")+")" : bh.name+" already wears the best "+(bfree?"unworn ":"")+STATN[bst]+" gear");
     save(); lastSheet=""; renderSheet(); refresh(); return; }
-  if (act==="gear-unequip"){ var uh=heroById(sheetFor.id); if (!uh) return; var un=unequipAll(uh); toastQ(un?uh.name+": took off "+un+" piece"+(un===1?"":"s"):"Nothing to take off"); save(); lastSheet=""; renderSheet(); refresh(); return; }
+  if (act==="gear-unequip"){ var uh=heroById(sheetFor.id); if (!uh) return; var un=unequipAll(uh); toast(un?uh.name+": took off "+un+" piece"+(un===1?"":"s"):"Nothing to take off"); save(); lastSheet=""; renderSheet(); refresh(); return; }
   if (act==="gset-save"){ var sh=heroById(sheetFor.id), si=+a.dataset.i; if (!sh) return;
     if (gearSetOf(sh,si) && armed!=="gsave"+si){ armed="gsave"+si; lastSheet=""; renderSheet(); return; }
-    armed=null; var sn=saveGearSet(sh,si); toastQ(gearSetName(sh,si)+" saved ("+sn+" piece"+(sn===1?"":"s")+")"); save(); lastSheet=""; renderSheet(); return; }
+    armed=null; var sn=saveGearSet(sh,si); toast(gearSetName(sh,si)+" saved ("+sn+" piece"+(sn===1?"":"s")+")"); save(); lastSheet=""; renderSheet(); return; }
   if (act==="gset-load"){ var lh=heroById(sheetFor.id); if (!lh) return; var lr=loadGearSet(lh,+a.dataset.i); if (!lr) return;
     var tk=Object.keys(lr.took).map(function(n){ return lr.took[n]+" from "+n; });
-    toastQ(lr.moved?gearSetName(lh,+a.dataset.i)+" equipped"+(tk.length?", took "+tk.join(", "):"")+(lr.gone?" ("+lr.gone+" scrapped piece"+(lr.gone===1?"":"s")+" skipped)":""):"Already wearing "+gearSetName(lh,+a.dataset.i));
+    toast(lr.moved?gearSetName(lh,+a.dataset.i)+" equipped"+(tk.length?", took "+tk.join(", "):"")+(lr.gone?" ("+lr.gone+" scrapped piece"+(lr.gone===1?"":"s")+" skipped)":""):"Already wearing "+gearSetName(lh,+a.dataset.i));
     save(); lastSheet=""; renderSheet(); refresh(); return; }
   if (act==="gear-pick"){ forgeLog=[]; openSheet({kind:"gearpick",hero:sheetFor.id,slot:a.dataset.slot,back:sheetFor.id,backScroll:sheetBody.scrollTop}); return; }
   if (act==="gear-on"){ var eg=S.gear.filter(function(x){ return x.id===+a.dataset.g; })[0];
@@ -16016,8 +16016,8 @@ document.addEventListener("click",function(e){
     if (!sheetFor || sheetFor.kind!=="gearpick" || craftWhy(0)) return;
     var chr=heroById(sheetFor.hero), cps=posInfo(sheetFor.slot); if (!chr) return;
     S.items[MAT[0]]-=MAT_NEED[0]; var ng=makeGear(0,cps.type,craftStat); save();
-    if (a.dataset.wear){ S.gear.forEach(function(x){ if (x!==ng && x.on===sheetFor.hero && posOf(x)===sheetFor.slot){ x.on=0; delete x.at; } }); ng.on=sheetFor.hero; ng.at=sheetFor.slot; gearChanged(); toastQ("Crafted and equipped a "+gearName(ng)); }
-    else toastQ("Crafted a "+gearName(ng));
+    if (a.dataset.wear){ S.gear.forEach(function(x){ if (x!==ng && x.on===sheetFor.hero && posOf(x)===sheetFor.slot){ x.on=0; delete x.at; } }); ng.on=sheetFor.hero; ng.at=sheetFor.slot; gearChanged(); toast("Crafted and equipped a "+gearName(ng)); }
+    else toast("Crafted a "+gearName(ng));
     lastSheet=""; renderSheet(); refresh(); return; }
   if (act==="gear-off"){ var og=S.gear.filter(function(x){ return x.id===+a.dataset.g; })[0]; if (og){ og.on=0; delete og.at; gearChanged(); } heroBack(sheetFor.back); refresh(); return; }
   if (act==="forge-gem"){ forgeGem=a.dataset.v; lastSheet=""; renderSheet(); return; }
@@ -16034,13 +16034,13 @@ document.addEventListener("click",function(e){
     if (armed!=="upg"){ armed="upg"; lastSheet=""; renderSheet(); return; }
     armed=null; var oldn=gearName(ug); upgradeGear(ug);
     forgeLog.unshift(esc(oldn)+" reforged into a "+esc(gearName(ug))+" ("+ug.stars+" star"+(ug.stars===1?"":"s")+")"); // 0.2.35: gear names are typed by the player
-    toastQ("Upgraded to "+gearName(ug)); save(); lastSheet=""; renderSheet(); lastView=""; refresh(); return;
+    toast("Upgraded to "+gearName(ug)); save(); lastSheet=""; renderSheet(); lastView=""; refresh(); return;
   }
   if (act==="gear-scrap"){
     if (armed!=="scrap"){ armed="scrap"; lastSheet=""; renderSheet(); return; }
     var xg=S.gear.filter(function(x){ return x.id===sheetFor.g; })[0]; if (!xg || xg.lock) return;
     var got=GEAR_SCRAP[xg.tier]+xg.stars; S.items.gemD=(S.items.gemD||0)+got; S.gear=S.gear.filter(function(x){ return x!==xg; });
-    if (sheetFor.back==="armory") openSheet({kind:"armory"}); else closeSheet(); toastQ("Scrapped for "+got+" Delicate Gems"); refresh(); return;
+    if (sheetFor.back==="armory") openSheet({kind:"armory"}); else closeSheet(); toast("Scrapped for "+got+" Delicate Gems"); refresh(); return;
   }
   if (act==="teleport"){
     var tt=a.dataset.tile, tq=TILE_BY[tt];
@@ -16052,7 +16052,7 @@ document.addEventListener("click",function(e){
     armedTile=null; var tpTurned=tpTurnBack(C().id); var oldId=C().x+","+C().y; S.map.flat[oldId]=true; if (HC_AT[oldId]) S.map.hcTaken[oldId]=true;
     delete S.map.flat[tt]; delete S.map.npc[tt]; delete S.map.hit[tt]; delete S.map.loy[tt];
     C().x=tq.x; C().y=tq.y; S.items.teleport--; miniDirty=true; selTile=tt;
-    centerOn(tq.x,tq.y); toastQ(S.name+" has moved to ("+tq.x+", "+tq.y+")"+(tpTurned?"; "+tpTurned+" march"+(tpTurned>1?"es":"")+" heading here turned back home":"")); save(); refresh(); return;
+    centerOn(tq.x,tq.y); toast(S.name+" has moved to ("+tq.x+", "+tq.y+")"+(tpTurned?"; "+tpTurned+" march"+(tpTurned>1?"es":"")+" heading here turned back home":"")); save(); refresh(); return;
   }
   if (act==="taunt"){ if (!tauntsLeft()){ toast("You have talked enough trash today"); return; } var o=TAUNTS.slice().sort(function(){ return Math.random()-0.5; }).slice(0,3); openSheet({kind:"taunt",tile:a.dataset.tile,opts:o}); return; }
   if (act==="taunt-send"){
@@ -16085,30 +16085,30 @@ document.addEventListener("click",function(e){
   if (act==="march-repeat"){
     var rpm=S.marches.filter(function(x){ return x.id===+a.dataset.m; })[0]; if (!rpm) return;
     rpm.rep=!rpm.rep; if (rpm.rep){ rpm.t0=rpm.t0||rpm.t.slice(); rpm.hero0=rpm.hero0!=null?rpm.hero0:(rpm.hero||0); }
-    toastQ(rpm.rep?"This march will repeat":"Repeat off"); save(); renderMarchStrip(); lastView=""; refresh(); return; }
+    toast(rpm.rep?"This march will repeat":"Repeat off"); save(); renderMarchStrip(); lastView=""; refresh(); return; }
   if (act==="km-mltog"){ kmlOpen=!kmlOpen; var kel=document.getElementById("kmml"); if (kel) kel.dataset.sig=""; renderMarchStrip(); return; }
   if (act==="march-recall" || act==="march-hasten"){
     var mm=S.marches.filter(function(x){ return x.id===+a.dataset.m; })[0]; if (!mm) return;
     withCity(cityIndex(mm.city), function(){
       if (act==="march-hasten"){
         if (!(S.items.marchsp>0) || mm.phase==="wait") return;
-        if (mm.timed && mm.phase==="out"){ toastQ("Timed waves land at their set time"); return; }
+        if (mm.timed && mm.phase==="out"){ toast("Timed waves land at their set time"); return; }
         S.items.marchsp--; if (mm.phase==="out") mm.arr=S.gt+(mm.arr-S.gt)/2; else mm.ret=S.gt+(mm.ret-S.gt)/2;
-        toastQ("March hastened: half the remaining time"); return;
+        toast("March hastened: half the remaining time"); return;
       }
       mm.rep=false; // recalling a repeating march ends the repeat
       var refund={}; RES.forEach(function(k){ refund[k]=(mm.cargo&&mm.cargo[k])||0; }); if (mm.mission==="found") RES.forEach(function(k){ refund[k]+=10000; });
       if (mm.phase==="wait"){
         for (var i=0;i<12;i++) S.troops[i]+=mm.t[i]; RES.forEach(function(k){ S.res[k]+=refund[k]; }); S.res.food+=mm.food||0;
         var wh=mm.hero?heroById(mm.hero):null; if (wh) wh.away=false; if (mm.ensign){ var rk=ensKey(mm.ensign); S.items[rk]=(S.items[rk]||0)+1; }
-        S.marches=S.marches.filter(function(x){ return x!==mm; }); toastQ("Wave cancelled; troops and rations returned");
+        S.marches=S.marches.filter(function(x){ return x!==mm; }); toast("Wave cancelled; troops and rations returned");
       } else if (mm.phase==="stay" && mm.mission==="hide"){
         for (var hj=0;hj<12;hj++) S.troops[hj]+=mm.t[hj]; S.marches=S.marches.filter(function(x){ return x!==mm; }); reconcileHeroes();
-        toastQ("Troops back from the woods");
+        toast("Troops back from the woods");
       } else if (mm.phase==="stay"){
-        mm.phase="back"; mm.bs=S.gt; mm.ret=S.gt+mm.travel; mm.loot={}; toastQ((mm.mission==="station"?"Camp packed up":"Guards recalled")+", home in "+fmtT(realMs(mm.travel)));
+        mm.phase="back"; mm.bs=S.gt; mm.ret=S.gt+mm.travel; mm.loot={}; toast((mm.mission==="station"?"Camp packed up":"Guards recalled")+", home in "+fmtT(realMs(mm.travel)));
       } else if (mm.phase==="out"){
-        mm.phase="back"; mm.bs=S.gt; mm.ret=S.gt+Math.max(1,Math.min(S.gt-mm.dep, mm.reach?mm.travel:Infinity)); mm.loot=refund; toastQ("Army turned back, home in "+fmtT(realMs(mm.ret-S.gt))); // a timed wave waiting at the target walks back the whole way
+        mm.phase="back"; mm.bs=S.gt; mm.ret=S.gt+Math.max(1,Math.min(S.gt-mm.dep, mm.reach?mm.travel:Infinity)); mm.loot=refund; toast("Army turned back, home in "+fmtT(realMs(mm.ret-S.gt))); // a timed wave waiting at the target walks back the whole way
       }
     });
     save(); refresh(); return;
@@ -16119,7 +16119,7 @@ document.addEventListener("click",function(e){
   if (act==="use-surgeon"){ useSurgeon(); return; }
   if (act==="use-buff"){ var bk=a.dataset.k; if (!(S.items[bk]>0)) return; S.items[bk]--; var horn=bk.indexOf("warhorn")===0, fld=horn?"hornUntil":"corsUntil", pw=horn?"hornPow":"corsPow", on=horn?hornOn():corsOn(), v2=(bk==="warhorn2"||bk==="corselet2")?0.4:BUFF_ITEM;
     S[pw]=Math.max(on?(S[pw]||BUFF_ITEM):0, v2); S[fld]=Math.max(S[fld]||0, S.gt)+BUFF_ITEM_MS;
-    toastQ(horn?"War Horn: +"+Math.round(S[pw]*100)+"% attack for 24 hours":"Corselets: +"+Math.round(S[pw]*100)+"% defense for 24 hours"); save(); lastView=""; refresh(); return; }
+    toast(horn?"War Horn: +"+Math.round(S[pw]*100)+"% attack for 24 hours":"Corselets: +"+Math.round(S[pw]*100)+"% defense for 24 hours"); save(); lastView=""; refresh(); return; }
   if (act==="heal-wounded"){ var hw=healWounded(); toast(hw.healed?"Healed "+fmt(hw.healed)+" troops for "+healTxt(hw.spent):"Not enough resources to heal anyone"); save(); lastView=""; refresh(); return; }
   if (act==="bf-enter"){ if (bfWhy()) return; var bc=document.getElementById("bfcity"), b0=document.getElementById("bfally0"), b1=document.getElementById("bfally1");
     var ci=bc?+bc.value:S.cur, al=[b0&&b0.value, b1&&b1.value];
@@ -16135,14 +16135,14 @@ document.addEventListener("click",function(e){
   if (act==="bf-recall" && pvOn()){ pvOrder({type:"withdraw", b:+a.dataset.b}, "Withdrawing your troops"); return; }
   if (act==="bf-mrecall" && pvOn()){ pvOrder({type:"recall", id:+a.dataset.m}, "March turned back"); return; }
   if (act==="bf-hasten" && pvOn()){ pvOrder({type:"hasten", id:+a.dataset.m}, "March hastened: half the remaining time"); return; }
-  if (act==="bf-recall"){ if (bfOn() && bfRecall(0,+a.dataset.b)) { toastQ("Withdrawing your troops"); lastView=""; refresh(); } return; }
-  if (act==="bf-mrecall"){ if (bfOn() && bfRecallMarch(+a.dataset.m)){ toastQ("March turned back"); lastView=""; refresh(); } return; }
+  if (act==="bf-recall"){ if (bfOn() && bfRecall(0,+a.dataset.b)) { toast("Withdrawing your troops"); lastView=""; refresh(); } return; }
+  if (act==="bf-mrecall"){ if (bfOn() && bfRecallMarch(+a.dataset.m)){ toast("March turned back"); lastView=""; refresh(); } return; }
   if (act==="bf-usepre"){ if (!bfAny()) return; var upr=bfPresets()[+a.dataset.i]; if (!upr) return; bfDraft=bfPresetDraft(upr, BF().p[0]); bfSimTxt="";
     var uph=bfPresetHero(upr); if (uph===null) toast("That preset\u2019s hero is out leading a march"); else bfDraftHero=uph; if (!sumT(bfDraft)) toast("Nothing in reserve for that preset"); lastSheet=""; renderSheet(); return; }
   if (act==="bfpre-open"){ openSheet({kind:"bfpre"}); return; }
   if (act==="bfpre-tab"){ bfPreSel=+a.dataset.i; lastSheet=""; renderSheet(); return; }
   if (act==="bfpre-clear"){ bfPresets()[bfPreSel].t=Z12(); save(); lastSheet=""; renderSheet(); return; }
-  if (act==="bf-hasten"){ var bm=BF().m.filter(function(x){ return x.id===+a.dataset.m && x.p===0; })[0]; if (!bm || !(S.items.marchsp>0)) return; S.items.marchsp--; bm.arr=BF().t+(bm.arr-BF().t)/2; toastQ("March hastened: half the remaining time"); lastView=""; refresh(); return; }
+  if (act==="bf-hasten"){ var bm=BF().m.filter(function(x){ return x.id===+a.dataset.m && x.p===0; })[0]; if (!bm || !(S.items.marchsp>0)) return; S.items.marchsp--; bm.arr=BF().t+(bm.arr-BF().t)/2; toast("March hastened: half the remaining time"); lastView=""; refresh(); return; }
   if (act==="bf-quit"){ if (!bfOn()) return; if (!bfQuitArmed){ bfQuitArmed=true; lastView=""; renderView(true); return; } bfQuitArmed=false; bfEnd("quit"); flushFinished(); save(); lastView=""; refresh(); return; }
   if (act==="bf-fill"){ var me0=BF().p[0]; if (a.dataset.v==="none") bfDraft=Z12(); else if (a.dataset.v==="scouts"){ bfDraft=Z12(); bfDraft[2]=Math.min(me0.reserve[2], bfCap(me0)); } else bfDraft=bfPick(me0, bfCap(me0), 1); bfSimTxt=""; lastSheet=""; renderSheet(); return; }
   if (act==="bf-sim"){ var me1=BF().p[0], sb=sheetFor.b, AA=me1.heroes?bfSide(me1, bfHeroSnap(bfDraftHero)):bfSide(me1); AA.troops=(bfDraft||Z12()).slice(); var sr=SIM.fight(AA, bfDefender(BF().b[sb]));
@@ -16154,10 +16154,10 @@ document.addEventListener("click",function(e){
     var pcd=(PV.code||"").replace(/[^A-Z0-9]/g,""); if (pcd.length!==6){ PV.err="Match codes are 6 letters and numbers"; lastView=""; refresh(); return; }
     pvStart("join", {code:pcd, snap:psn, rid:pvId().id, rtok:pvId().token, lid:S.lb&&S.lb.id, cn:cbOn()?S.cloud.name:undefined, ct:cbOn()?S.cloud.token:undefined}, pci); return; }
   if (act==="pv-board"){ pvBoardLoad(true); openSheet({kind:"pvboard"}); return; }
-  if (act==="pv-newid"){ S.pvpId=null; pvId(); PV.idClash=false; PV.err=""; PV.board.at=0; save(); toastQ("Fresh PvP rating: you start again at 1,000"); lastView=""; refresh(); return; }
+  if (act==="pv-newid"){ S.pvpId=null; pvId(); PV.idClash=false; PV.err=""; PV.board.at=0; save(); toast("Fresh PvP rating: you start again at 1,000"); lastView=""; refresh(); return; }
   if (act==="pv-ready"){ if (!pvOn() || !PV.v) return; var prm=PV.v.players[PV.v.me]||{}; pvPost("ready", pvWith({ready:!prm.ready})).then(function(j){ PV.err=j.error||""; lastView=""; refresh(); }); return; }
   if (act==="pv-leave"){ if (!pvOn()) return; if (!PV_LEAVE_ARMED){ PV_LEAVE_ARMED=true; lastView=""; renderView(true); return; }
-    pvPost("leave", pvKey()).then(function(j){ if (j.error && j._st!==404 && j._st!==403){ PV_LEAVE_ARMED=false; toast(j.error); lastView=""; refresh(); return; } pvClear(); toastQ("You left the match"); save(); refresh(); }); return; }
+    pvPost("leave", pvKey()).then(function(j){ if (j.error && j._st!==404 && j._st!==403){ PV_LEAVE_ARMED=false; toast(j.error); lastView=""; refresh(); return; } pvClear(); toast("You left the match"); save(); refresh(); }); return; }
   if (act==="pv-drop"){ if (!pvOn()) return; var pdk=pvKey(); pvClear(); save(); refresh(); pvPost("leave", pdk); return; }
   if (act==="pv-copy"){ var pcc=S.pvp&&S.pvp.code; if (!pcc) return; try { navigator.clipboard.writeText(pcc).then(function(){ toast("Code copied: "+pcc); }, function(){ toast("Your code: "+pcc); }); } catch(e2){ toast("Your code: "+pcc); } return; }
   if (act==="pv-forfeit"){ if (!pvLive()) return; if (!PV.quitArmed){ PV.quitArmed=true; lastView=""; renderView(true); return; } PV.quitArmed=false; pvOrder({type:"forfeit"}, "You retreated"); return; }
@@ -16165,7 +16165,7 @@ document.addEventListener("click",function(e){
   if (act==="pv-collect"){ pvCollect(); refresh(); return; }
   if (act==="bf-go"){ var gscout=sheetFor.tp!=null||bfMode==="scout", gd=(bfDraft||Z12()).slice(); if (gscout) gd=gd.map(function(n,i){ return i===2?n:0; });
     if (pvOn()){ var pvt=sheetFor.tp!=null; pvOrder(gscout?{type:"send", scout:true, b:pvt?0:sheetFor.b, tp:pvt?1-PV.v.me:undefined, t:gd, hero:bfDraftHero||0}:{type:"send", b:sheetFor.b, t:gd, hero:bfDraftHero||0}, gscout?"Scouts sent":"March sent", function(){ closeSheet(); bfDraft=null; bfDraftHero=null; }); return; }
-    if (bfSend(0, sheetFor.tp!=null?0:sheetFor.b, gd, false, gscout?{scout:true, tp:sheetFor.tp, hero:bfDraftHero||0}:{hero:bfDraftHero||0})){ toastQ(gscout?"Scouts sent":"March sent"); closeSheet(); bfDraft=null; bfDraftHero=null; lastView=""; refresh(); }
+    if (bfSend(0, sheetFor.tp!=null?0:sheetFor.b, gd, false, gscout?{scout:true, tp:sheetFor.tp, hero:bfDraftHero||0}:{hero:bfDraftHero||0})){ toast(gscout?"Scouts sent":"March sent"); closeSheet(); bfDraft=null; bfDraftHero=null; lastView=""; refresh(); }
     else toast("Couldn\u2019t send that march"); return; }
   if (act==="chal-go"){ var pick=document.getElementById("chalpick"), rid=pick?+pick.value:null; if (rid==null || chalWhy(rid)) return;
     if (!chalArmed){ chalArmed=true; lastView=""; renderView(true); var pk=document.getElementById("chalpick"); if (pk) pk.value=String(rid); return; }
@@ -16173,7 +16173,7 @@ document.addEventListener("click",function(e){
   if (act==="chal-forecast"){ var fc=chalById(+a.dataset.c); if (!fc || fc.phase!=="prep") return; var fr=chalSiegeFight(fc, chalArmy(fc)), left=sumT(fr.attacker);
     chalForecast[fc.id]={win:fr.result===1, txt: fr.result===1 ? "If they marched now, they would take it with about "+fmt(roughN(left))+" troops to spare." : "If they marched now, the garrison would hold. Keep them there."};
     lastView=""; renderView(true); return; }
-  if (act==="force-update"){ save(); toastQ("Updating\u2026");
+  if (act==="force-update"){ save(); toast("Updating\u2026");
     var done=function(){ location.reload(); };
     var go=function(){ var p1 = ("serviceWorker" in navigator) ? navigator.serviceWorker.getRegistrations().then(function(rs){ return Promise.all(rs.map(function(r){ return r.unregister(); })); }) : Promise.resolve();
       p1.then(function(){ return window.caches ? caches.keys().then(function(ks){ return Promise.all(ks.map(function(k){ return caches.delete(k); })); }) : 0; })
@@ -16184,36 +16184,36 @@ document.addEventListener("click",function(e){
   if (act==="rep-share-copy"){ var su=document.getElementById("shareurl"); if (su){ su.select(); shareCopy(su.value); } return; }
   if (act==="rep-fav"){ if (!sheetFor || sheetFor.kind!=="report") return; var fc=sheetFor.c, on=!fc.fav;
     if (on) fc.fav=1; else delete fc.fav; if (sheetFor.rep){ if (on) sheetFor.rep.fav=1; else delete sheetFor.rep.fav; }
-    toastQ(on?"Report saved. It won\u2019t roll off, and it\u2019s under \u2605 Saved.":"Report unsaved"); save(); lastSheet=""; renderSheet(); fillRepList(true); return; }
+    toast(on?"Report saved. It won\u2019t roll off, and it\u2019s under \u2605 Saved.":"Report unsaved"); save(); lastSheet=""; renderSheet(); fillRepList(true); return; }
   if (act==="rep-cat"){ if (a.dataset.go){ tab="reports"; setTabs(); } REPV=a.dataset.v||""; REPF="all"; repPage=0; repQuery=""; lastView=""; renderView(true); window.scrollTo({top:0}); return; }
   if (act==="rep-sub"){ REPF=a.dataset.v; repPage=0; lastView=""; renderView(true); return; }
   if (act==="rep-fx"){ var fk=a.dataset.k; if (REPX[fk]) delete REPX[fk]; else REPX[fk]=1; fillRepList(); return; }
-  if (act==="rep-readall"){ var rcat=REPV||"all"; S.log.forEach(function(c){ if (repNew(c) && repInCat(c,rcat)) c.rd=1; }); var rn0=repUnread(REPV||undefined); REPRD++; save(); if (REPV) fillRepList(true); else { lastView=""; renderView(true); } setTabs(); toastQ(rn0?"Every report marked read":"Nothing new to mark"); return; } // 0.2.11: from the Reports hub too
+  if (act==="rep-readall"){ var rcat=REPV||"all"; S.log.forEach(function(c){ if (repNew(c) && repInCat(c,rcat)) c.rd=1; }); var rn0=repUnread(REPV||undefined); REPRD++; save(); if (REPV) fillRepList(true); else { lastView=""; renderView(true); } setTabs(); toast(rn0?"Every report marked read":"Nothing new to mark"); return; } // 0.2.11: from the Reports hub too
   if (act==="rep-page"){ repPage=Math.max(0,repPage+(+a.dataset.d)); fillRepList(); window.scrollTo({top:0}); return; }
   if (act==="arrange"){ arrange = (arrange && arrange.w===a.dataset.aw) ? null : {w:a.dataset.aw, sel:null}; lastView=""; renderView(true); return; }
   if (act==="preset-edit"){ openSheet({kind:"preset",p:+a.dataset.p,m:a.dataset.m?1:0}); return; }
-  if (act==="preset-copy"){ var cpp=presetsOf(a.dataset.m)[+a.dataset.p]; if (!cpp || !presetTotal(cpp)) return; presetClip={name:cpp.name, t:cpp.t.slice(), hero:cpp.hero, stopOnLoss:cpp.stopOnLoss, noCap:!!cpp.noCap, m:!!a.dataset.m}; toastQ("Copied "+cpp.name+"; Paste it onto another preset"); lastView=""; refresh(); return; }
+  if (act==="preset-copy"){ var cpp=presetsOf(a.dataset.m)[+a.dataset.p]; if (!cpp || !presetTotal(cpp)) return; presetClip={name:cpp.name, t:cpp.t.slice(), hero:cpp.hero, stopOnLoss:cpp.stopOnLoss, noCap:!!cpp.noCap, m:!!a.dataset.m}; toast("Copied "+cpp.name+"; Paste it onto another preset"); lastView=""; refresh(); return; }
   if (act==="preset-paste"){ var ppp=presetsOf(a.dataset.m)[+a.dataset.p]; if (!ppp || !presetClip) return;
     ppp.t=presetClip.t.slice(); if (!a.dataset.m && !presetClip.m){ ppp.stopOnLoss=presetClip.stopOnLoss; ppp.noCap=presetClip.noCap; } ppp.hero=(presetClip.hero>0 && !C().heroes.some(function(x){ return x.id===presetClip.hero; })) ? 0 : presetClip.hero; // farm settings only travel farm to farm; the hero comes along when this city has it
-    toastQ("Pasted "+presetClip.name+" onto "+ppp.name); save(); lastView=""; refresh(); return; }
-  if (act==="preset-auto"){ var pa=S.presets[+a.dataset.p]; pa.auto=!pa.auto; toastQ(pa.name+(pa.auto?" is auto-farming":" stopped")); processAuto(); refresh(); return; }
+    toast("Pasted "+presetClip.name+" onto "+ppp.name); save(); lastView=""; refresh(); return; }
+  if (act==="preset-auto"){ var pa=S.presets[+a.dataset.p]; pa.auto=!pa.auto; toast(pa.name+(pa.auto?" is auto-farming":" stopped")); processAuto(); refresh(); return; }
   if (act==="mpop-farm"){ var mfs=document.getElementById("mpfarmsel"); if (mfs) MPOPFARM=+mfs.value; var mfp=S.presets[MPOPFARM], mft=a.dataset.tile; if (!mfp || !mft) return; var mfi=mfp.farm.indexOf(mft);
-    if (mfi>=0){ mfp.farm.splice(mfi,1); if (mfp.idx>=mfp.farm.length) mfp.idx=0; toastQ("Removed from "+mfp.name); } else { mfp.farm.push(mft); toastQ("Added to "+mfp.name+"\u2019s farm list ("+mfp.farm.length+")"); }
+    if (mfi>=0){ mfp.farm.splice(mfi,1); if (mfp.idx>=mfp.farm.length) mfp.idx=0; toast("Removed from "+mfp.name); } else { mfp.farm.push(mft); toast("Added to "+mfp.name+"\u2019s farm list ("+mfp.farm.length+")"); }
     renderTileInfo(); mapFarmRefresh(); mapPop(); save(); return; }
   if (act==="farm-toggle"){ var fp=S.presets[+a.dataset.p], ft=a.dataset.tile, fi=fp.farm.indexOf(ft);
-    if (fi>=0){ fp.farm.splice(fi,1); toastQ("Removed from "+fp.name); } else { fp.farm.push(ft); toastQ("Added to "+fp.name+"\u2019s farm list ("+fp.farm.length+")"); }
+    if (fi>=0){ fp.farm.splice(fi,1); toast("Removed from "+fp.name); } else { fp.farm.push(ft); toast("Added to "+fp.name+"\u2019s farm list ("+fp.farm.length+")"); }
     renderTileInfo(); mapFarmRefresh(); save(); return; }
   if (act==="farm-remove"){ var fr=S.presets[+a.dataset.p]; fr.farm.splice(+a.dataset.k,1); if (fr.idx>=fr.farm.length) fr.idx=0; lastSheet=""; renderSheet(); if (tab==="farms"){ lastView=""; renderView(true); } mapFarmRefresh(); save(); return; }
   if (act==="farm-mode"){ var fmp=+a.dataset.p, fpr=S.presets[fmp], fmm=a.dataset.m; farmArmed=false;
     if (fmm==="off"){ fpr.farmMode=null; delete farmMsg[C().id+":"+fmp]; }
-    else { fpr.farmMode=fmm; farmRebuild([fmp]); var fmsg=farmMsg[C().id+":"+fmp]; if (fmsg&&fmsg.bad) toast(fpr.name+": "+fmsg.t); }
+    else { fpr.farmMode=fmm; farmRebuild([fmp]); var fmsg=farmMsg[C().id+":"+fmp]; if (fmsg) toast(fpr.name+": "+fmsg.t); }
     lastView=""; refresh(); return; }
-  if (act==="farm-refill"){ var frp=+a.dataset.p, frr=S.presets[frp]; if (!frr.farmMode) return; farmArmed=false; farmRebuild([frp]); var frm=farmMsg[C().id+":"+frp]; if (frm&&frm.bad) toast(frr.name+": "+frm.t); lastView=""; refresh(); return; }
+  if (act==="farm-refill"){ var frp=+a.dataset.p, frr=S.presets[frp]; if (!frr.farmMode) return; farmArmed=false; farmRebuild([frp]); var frm=farmMsg[C().id+":"+frp]; if (frm) toast(frr.name+": "+frm.t); lastView=""; refresh(); return; }
   if (act==="farm-refill-all"){ var fpis=[]; S.presets.forEach(function(pr,pi){ if (pr.farmMode) fpis.push(pi); }); if (!fpis.length) return; farmArmed=false;
     var fres=farmRebuild(fpis), fn=0, fok=0; fpis.forEach(function(pi){ if (!fres[pi].why){ fok++; fn+=fres[pi].ids.length; } });
-    toastQ("Rebuilt "+fok+" of "+fpis.length+" lists, "+fmt(fn)+" NPCs in all"); lastView=""; refresh(); return; }
+    toast("Rebuilt "+fok+" of "+fpis.length+" lists, "+fmt(fn)+" NPCs in all"); lastView=""; refresh(); return; }
   if (act==="farm-clear-all"){ if (!farmArmed){ farmArmed=true; lastView=""; renderView(true); return; }
-    farmArmed=false; S.presets.forEach(function(pr,pi){ pr.farm=[]; pr.idx=0; pr.auto=false; delete farmMsg[C().id+":"+pi]; }); toastQ("Every farm list in "+S.name+" is cleared"); lastView=""; refresh(); return; }
+    farmArmed=false; S.presets.forEach(function(pr,pi){ pr.farm=[]; pr.idx=0; pr.auto=false; delete farmMsg[C().id+":"+pi]; }); toast("Every farm list in "+S.name+" is cleared"); lastView=""; refresh(); return; }
   if (act==="farm-clear"){ var fc2=S.presets[+a.dataset.p]; fc2.farm=[]; fc2.idx=0; fc2.auto=false; lastSheet=""; renderSheet(); save(); return; }
   if (act==="march-preset"){ var mp=presetsOf(a.dataset.m)[+a.dataset.p], mav=draftAvail(); marchDraft.t=mp.t.map(function(n,i){ return Math.min(n,mav[i]); }); marchDraft.pk=(a.dataset.m?"m":"f")+a.dataset.p; // 0.2.33 (Cody): light the preset you picked
     var mh=presetHero(mp); marchDraft.hero = marchDraft.from ? marchDraft.hero : (mh && !mh.away && !seatLocked(mh) ? mh.id : 0); marchDraft.preview=""; keepX("#sheetbody .mpres", function(){ lastSheet=""; renderSheet(); }); return; }
@@ -16226,9 +16226,9 @@ document.addEventListener("click",function(e){
   if (act==="waves-open"){ waveDraft={tile:a.dataset.tile, n:[0,0,0,0,0,0,0,0,0,0], gap:1, mission:"attack"}; openSheet({kind:"waves"}); return; }
   if (act==="waves-go"){ var pl=wavePlan(); if (pl.why) return; var wq=TILE_BY[waveDraft.tile];
     if (pl.clock){ pl.list.forEach(function(w){ var lm=launchMarch(waveDraft.tile, waveDraft.mission, w.t, w.hero, {label:w.pi}); lm.reach=lm.arr; lm.arr=w.arr; lm.timed=1; });
-      toastQ(pl.list.length+" wave"+(pl.list.length>1?"s":"")+" on the way to "+tileName(wq)+": first lands at "+wvClock(pl.first)); closeSheet(); refresh(); return; }
+      toast(pl.list.length+" wave"+(pl.list.length>1?"s":"")+" on the way to "+tileName(wq)+": first lands at "+wvClock(pl.first)); closeSheet(); refresh(); return; }
     pl.list.forEach(function(w){ launchMarch(waveDraft.tile, waveDraft.mission, w.t, w.hero, {dep:w.dep, label:w.pi}); var lm=S.marches[S.marches.length-1]; lm.arr=w.arr; });
-    toastQ(pl.list.length+" wave"+(pl.list.length>1?"s":"")+" set to land on "+tileName(wq)+" starting in "+fmtT(realMs(pl.first-S.gt))); closeSheet(); refresh(); return; }
+    toast(pl.list.length+" wave"+(pl.list.length>1?"s":"")+" set to land on "+tileName(wq)+" starting in "+fmtT(realMs(pl.first-S.gt))); closeSheet(); refresh(); return; }
   if (act==="march-open"){ openMarch(a.dataset.tile, a.dataset.mission); return; }
   if (act==="march-help"){ MHELP=!MHELP; lastSheet=""; renderSheet(); return; } // 0.2.50: the march screen's ?
   if (act==="march-max"){ var mu=+a.dataset.unit, room=armyCap(marchDraft.ensign, marchDraft.hero?heroById(marchDraft.hero):null)-marchDraft.t.reduce(function(x,y,k){ return x+(k===mu?0:y); },0), mall=Math.max(0,Math.min(draftAvail()[mu],room)); marchDraft.t[mu]=(marchDraft.t[mu]===mall && mall>0)?0:mall; /* 0.2.50: a unit tile; tapping it again when it's all sent clears it */ var mi=sheetBody.querySelector('[data-march="'+mu+'"]'); if (mi) mi.value=marchDraft.t[mu]; marchDraft.preview=""; updateMarchInfo(); return; }
@@ -16236,7 +16236,7 @@ document.addEventListener("click",function(e){
   if (act==="cargo-fill"){ var rk=a.dataset.res, room=marchCap(marchDraft.t)-cargoTotal()+(marchDraft.cargo[rk]||0);
     marchDraft.cargo[rk]=Math.max(0,Math.min(Math.floor(S.res[rk]), room)); var ci=sheetBody.querySelector('[data-cargo="'+rk+'"]'); if (ci) ci.value=marchDraft.cargo[rk]; updateMarchInfo(); return; }
   if (act==="march-go"){ sendMarch(); return; }
-  if (act==="release"){ campRecall(campAt(a.dataset.tile)); var rq=TILE_BY[a.dataset.tile]; delete S.map.owned[a.dataset.tile]; delete S.map.ownedL[a.dataset.tile]; if (rq && VTYPES[rq.k]) rq.L=dayLevel(rq); miniDirty=true; toastQ("Valley released"); refresh(); return; }
+  if (act==="release"){ campRecall(campAt(a.dataset.tile)); var rq=TILE_BY[a.dataset.tile]; delete S.map.owned[a.dataset.tile]; delete S.map.ownedL[a.dataset.tile]; if (rq && VTYPES[rq.k]) rq.L=dayLevel(rq); miniDirty=true; toast("Valley released"); refresh(); return; }
   if (act==="map-sim"){
     var mq=TILE_BY[a.dataset.tile], mc=needScout(mq)?intelOf(mq):current(mq); if (!mc){ toast("Scout it first: you don\u2019t know what\u2019s defending it"); return; } if (!sim) initSim();
     simWaveReset(); sim.def.preset="custom"; sim.def.t=mc.t.slice(); sim.def.f=mc.f.slice(); sim.def.wall=mc.wall; // 0.2.50 (Cody): only the target is filled in; your side stays as you left it (My army fills it)
@@ -16246,11 +16246,11 @@ document.addEventListener("click",function(e){
   if (act==="fort-max"){ var fi=+a.dataset.f; fortAmt[fi]=fortMax(fi); var fin=document.getElementById("ft-amt-"+fi); if (fin) fin.value=fortAmt[fi]; updateFortRow(fi); return; }
   if (act==="fort-build"){ var fb2=+a.dataset.f, fn=Math.floor(fortAmt[fb2]||0); if (fortWhy(fb2,fn)) return;
     var fc={}; for (var fk in FORTS[fb2].cost) fc[fk]=FORTS[fb2].cost[fk]*fn; pay(fc,1);
-    S.fortQ={f:fb2,n:fn,start:S.gt,end:S.gt+fortTime(fb2)*fn}; fortAmt[fb2]=0; toastQ("Building "+fmt(fn)+" "+FORTS[fb2].name); lastView=""; refresh(); return; }
-  if (act==="cancel-fort" && S.fortQ){ var cq=S.fortQ, rc2={}; for (var ck2 in FORTS[cq.f].cost) rc2[ck2]=FORTS[cq.f].cost[ck2]*cq.n; pay(rc2,-1); S.fortQ=null; toastQ("Fortification work cancelled. Resources returned."); refresh(); return; }
+    S.fortQ={f:fb2,n:fn,start:S.gt,end:S.gt+fortTime(fb2)*fn}; fortAmt[fb2]=0; toast("Building "+fmt(fn)+" "+FORTS[fb2].name); lastView=""; refresh(); return; }
+  if (act==="cancel-fort" && S.fortQ){ var cq=S.fortQ, rc2={}; for (var ck2 in FORTS[cq.f].cost) rc2[ck2]=FORTS[cq.f].cost[ck2]*cq.n; pay(rc2,-1); S.fortQ=null; toast("Fortification work cancelled. Resources returned."); refresh(); return; }
   if (act==="sim-mydef"){ var md=wallHero(); if (!sim) initSim(); simWaveReset(); sim.def={preset:"custom", t:S.gate==="closed"?[0,0,0,0,0,0,0,0,0,0,0,0]:S.troops.slice(), f:S.forts.slice(), wall:S.wall||0, r:simResearch(), hatk:hsB(md,"atk",1), hint:hsB(md,"int",1), life:setLife(md,1), eng:S.tech.engineering||0};
-    simOut=null; lastView=""; renderView(true); toastQ("Loaded "+S.name+"\u2019s defenses"); return; }
-  if (act==="sim-opt-stop"){ loStop(); loUi(false); toastQ("Optimizing stopped"); return; }
+    simOut=null; lastView=""; renderView(true); toast("Loaded "+S.name+"\u2019s defenses"); return; }
+  if (act==="sim-opt-stop"){ loStop(); loUi(false); toast("Optimizing stopped"); return; }
   if (act==="sim-opt"){
     if (LO){ toast("Already optimizing"); return; }
     var oA=simSide(sim.atk,false), oT=sumT(oA.troops); if (!oT){ toast("Add some attacking troops first"); return; }
@@ -16263,9 +16263,9 @@ document.addEventListener("click",function(e){
     loStart({mkA:function(t){ return {troops:t, research:oA.research, hero:oA.hero, life_modifier:oA.life_modifier, attack_modifier:oA.attack_modifier}; },
       D:oD, total:oT, main:oM, avail:oAv, goal:LOW.goal, base:oA.troops.slice(),
       onTick:function(pc){ loUi(true, pc); },
-      onDone:function(res){ sim.atk.t=res.best.t.slice(); loRes=res; simShow="lo"; if (tab==="war"){ lastView=""; renderView(true); if (!sheetFor) openSheet({kind:"simres"}); } loUi(false); toastQ("Layers optimized"); } });
+      onDone:function(res){ sim.atk.t=res.best.t.slice(); loRes=res; simShow="lo"; if (tab==="war"){ lastView=""; renderView(true); if (!sheetFor) openSheet({kind:"simres"}); } loUi(false); toast("Layers optimized"); } });
     return; }
-  if (act==="sim-opt-save"){ var lp=document.getElementById("lopre"), lv0=lp?String(lp.value):"m0", pr=presetsOf(lv0.charAt(0)==="m")[+lv0.slice(1)||0]; if (!pr || !loRes) return; pr.t=loRes.best.t.slice(); save(); toastQ("Saved to "+pr.name); return; }
+  if (act==="sim-opt-save"){ var lp=document.getElementById("lopre"), lv0=lp?String(lp.value):"m0", pr=presetsOf(lv0.charAt(0)==="m")[+lv0.slice(1)||0]; if (!pr || !loRes) return; pr.t=loRes.best.t.slice(); save(); toast("Saved to "+pr.name); return; }
   if (act==="bf-opt"){
     if (LO){ loStop(); bfSimTxt="Stopped."; lastSheet=""; renderSheet(); return; }
     if (!bfOn() || !sheetFor || sheetFor.kind!=="bfsend" || sheetFor.b<0) return;
@@ -16287,8 +16287,8 @@ document.addEventListener("click",function(e){
     for (var wj=0;wj<12;wj++){ la1+=A1.troops[wj]-r1.attacker[wj]; ld1+=D1.troops[wj]-r1.defender[wj]; }
     SIMW.log.push({won:r1.result===1, la:la1, ld:ld1}); SIMW.n=SIMW.log.length+1;
     sim.def.preset="custom"; sim.def.t=r1.defender.map(function(n){ return Math.max(0,Math.round(n)); }); sim.def.f=r1.forts.map(function(n){ return Math.max(0,Math.round(n)); });
-    simOut=null; closeSheet(); lastView=""; renderView(true); window.scrollTo({top:0}); toastQ("Wave "+SIMW.n+": the enemy is what\u2019s left"); return; }
-  if (act==="sim-restart"){ if (SIMW.start){ sim.def.t=SIMW.start.t.slice(); sim.def.f=SIMW.start.f.slice(); sim.def.preset=SIMW.start.preset; } simWaveReset(); simOut=null; lastView=""; renderView(true); toastQ("Back to the first wave"); return; }
+    simOut=null; closeSheet(); lastView=""; renderView(true); window.scrollTo({top:0}); toast("Wave "+SIMW.n+": the enemy is what\u2019s left"); return; }
+  if (act==="sim-restart"){ if (SIMW.start){ sim.def.t=SIMW.start.t.slice(); sim.def.f=SIMW.start.f.slice(); sim.def.preset=SIMW.start.preset; } simWaveReset(); simOut=null; lastView=""; renderView(true); toast("Back to the first wave"); return; }
   if (act==="sim-show"){ if (simOut||loRes) openSheet({kind:"simres"}); return; } // 0.2.50: the War Room's last result, again
   if (act==="sim-ed"){ SIMED=!SIMED; lastView=""; renderView(true); return; }
   if (act==="sim-loskip"){ var lsu=+a.dataset.u; if (LOW.skip[lsu]) delete LOW.skip[lsu]; else LOW.skip[lsu]=1; S.loSkip=LOW.skip; save(); a.classList.toggle("on",!LOW.skip[lsu]); a.setAttribute("aria-pressed",!LOW.skip[lsu]); return; } // the optimizer's unit toggles
@@ -16302,12 +16302,12 @@ document.addEventListener("click",function(e){
     S.items[it]--;
     if (it==="build50") job.end -= Math.max(0, job.end-S.gt)*0.5; else job.end -= ITEMS[it].min*60000*S.speed;
     if (job.end < job.start) job.start = job.end;
-    if (advance(Date.now())) flushFinished(); else toastQ(it==="build50"?"Construction time halved":"Timer cut by "+ITEMS[it].name.split(" ")[0]);
+    if (advance(Date.now())) flushFinished(); else toast(it==="build50"?"Construction time halved":"Timer cut by "+ITEMS[it].name.split(" ")[0]);
     if (!jobFor(sheetFor) || !hasSpeedups(sheetFor.target==="build")) closeSheet();
     refresh(); return;
   }
   if (act==="wall-up"){ if (upgradeWhy("walls",S.wall||0)) return; startBuild("wall",0,"walls"); save(); lastView=""; refresh(); return; }
-  if (act==="wall-queue"){ if ((S.bq||[]).some(function(q){ return q.w==="wall"; })) return; S.bq.push({w:"wall",i:0,type:"walls"}); toastQ("Walls upgrade queued"); processQueues(); save(); lastView=""; refresh(); return; }
+  if (act==="wall-queue"){ if ((S.bq||[]).some(function(q){ return q.w==="wall"; })) return; S.bq.push({w:"wall",i:0,type:"walls"}); toast("Walls upgrade queued"); processQueues(); save(); lastView=""; refresh(); return; }
   if (act==="claim-pkg"){ claimPkg(a.dataset.pkg); return; }
   if (act==="rep-fit"){ repFit=!repFit; lastSheet=""; renderSheet(); return; }
   if (act==="map-mode"){ var wm=a.dataset.v==="world"; if (wm===mapWorldOn()) return; S.mapMode=wm?"world":"kingdom"; save(); lastView=""; renderView(true); window.scrollTo({top:0});
@@ -16329,56 +16329,56 @@ document.addEventListener("click",function(e){
     S.wheelLog.unshift("Legendary hero "+lh.name); S.wheelLog=S.wheelLog.slice(0,8);
     lastPrize={big:true,tier:"legendary",txt:msg};
     if (!S.pendingLegend) closeSheet();
-    toastQ(msg); refresh(); return;
+    toast(msg); refresh(); return;
   }
   if (act==="spin10"){ doSpin10(); return; }
   if (act==="hero"){ openSheet({kind:"hero",id:+a.dataset.id}); return; }
   if (act==="ah-open"){ openSheet({kind:"allheroes", keepScroll:sheetFor&&sheetFor.kind==="hero"&&sheetFor.back==="ah"?AH_SCROLL:null}); return; }
   if (act==="ah-hero"){ var ahc=+a.dataset.city, ahid=+a.dataset.id; AH_SCROLL=sheetBody.scrollTop; // open the hero on his own city, so offices and gear work on the right city
-    if (ahc!==S.cur && S.cities[ahc]){ S.cur=ahc; MAPFARM=-1; mv.init=false; document.getElementById("cityname").textContent=S.name; selTile=null; lastView=""; refresh(); toastQ("Now viewing "+S.name); }
+    if (ahc!==S.cur && S.cities[ahc]){ S.cur=ahc; MAPFARM=-1; mv.init=false; document.getElementById("cityname").textContent=S.name; selTile=null; lastView=""; refresh(); toast("Now viewing "+S.name); }
     openSheet({kind:"hero", id:ahid, back:"ah"}); return; }
   if (act==="wh-pick"){ openSheet({kind:"whpick"}); return; }
-  if (act==="wh-set"){ var whh=heroById(+a.dataset.id); if (!whh || whh.away || seatLocked(whh)) return; S.wallHero=whh.id; save(); closeSheet(); lastView=""; refresh(); toastQ(whh.name+" now holds the walls of "+S.name); return; }
+  if (act==="wh-set"){ var whh=heroById(+a.dataset.id); if (!whh || whh.away || seatLocked(whh)) return; S.wallHero=whh.id; save(); closeSheet(); lastView=""; refresh(); toast(whh.name+" now holds the walls of "+S.name); return; }
   if (act==="hero-recmode"){ HREC_MODE=a.dataset.m==="pvp"?"pvp":"rec"; lastSheet=""; renderSheet(); return; }
   if (act==="hsort"){ var hs0=C().heroSort=C().heroSort||{a:"level",b:"atk"}; if (hs0.a!==a.dataset.k){ hs0.b=hs0.a; hs0.a=a.dataset.k; } save(); lastView=""; renderView(true); return; } // 0.2.49: sort chips on the Heroes tab
   if (act==="off-help"){ OFFHELP=!OFFHELP; lastView=""; renderView(true); return; }
   if (act==="ry-rep-retry"){ var rrp=S.reports.filter(function(x){ return x.id===+a.dataset.id; })[0]; if (rrp){ delete RYREP[rrp.aid+"/"+rrp.rid]; ryRepFetch(rrp); lastSheet=""; renderSheet(); } return; } // 0.2.50
   if (act==="dg-hatch"){ var ht=a.dataset.t; if (!DRAGONS[ht] || !S.dragonEggs || !S.dragonEggs[ht] || (S.dragons&&S.dragons[ht])) return; var hrow=a.closest(".dgrow"); if (hrow) hrow.classList.add("hatching"); a.disabled=true; // 0.2.51: the egg wobbles and cracks, then the dragon is yours
-    setTimeout(function(){ delete S.dragonEggs[ht]; S.dragons[ht]={lv:1}; save(); toastQ("Your "+DRAGONS[ht].name+" Dragon hatched!"); lastSheet=""; renderSheet(); lastView=""; refresh(); }, 900); return; }
-  if (act==="hero-fav"){ var fh=heroById(+a.dataset.id); if (fh){ fh.fav=!fh.fav; save(); lastSheet=""; renderSheet(); lastView=""; refresh(); toastQ(fh.fav?fh.name+" is a favourite":fh.name+" is no longer a favourite"); } return; }
+    setTimeout(function(){ delete S.dragonEggs[ht]; S.dragons[ht]={lv:1}; save(); toast("Your "+DRAGONS[ht].name+" Dragon hatched!"); lastSheet=""; renderSheet(); lastView=""; refresh(); }, 900); return; }
+  if (act==="hero-fav"){ var fh=heroById(+a.dataset.id); if (fh){ fh.fav=!fh.fav; save(); lastSheet=""; renderSheet(); lastView=""; refresh(); toast(fh.fav?fh.name+" is a favourite":fh.name+" is no longer a favourite"); } return; }
   if (act==="hero-pic"){ var hfi=document.getElementById("heroimgf"); if (hfi) hfi.click(); return; }
   if (act==="hero-picdel"){ var hpd=heroById(sheetFor&&sheetFor.id); if (hpd) heroImageRemove(hpd); return; }
   if (act==="hero-auto"){ var ha=heroById(sheetFor&&sheetFor.id); if (!ha) return; var hd=HAD[ha.id]||ha.auto||{pol:0,atk:0,int:0}, nr={pol:Math.max(0,Math.min(9,+hd.pol||0)), atk:Math.max(0,Math.min(9,+hd.atk||0)), int:Math.max(0,Math.min(9,+hd.int||0))};
     if (!(nr.pol+nr.atk+nr.int)){ toast("Set at least one number above 0"); return; } ha.auto=nr; ha.autoAcc={pol:0,atk:0,int:0}; delete HAD[ha.id]; var spent=heroAuto(ha); save(); lastSheet=""; renderSheet(); lastView=""; refresh();
-    toastQ("Auto level-up on ("+nr.pol+" : "+nr.atk+" : "+nr.int+")"+(spent?", "+spent+" point"+(spent>1?"s":"")+" spent now":"")); return; }
-  if (act==="hero-autooff"){ var ho=heroById(sheetFor&&sheetFor.id); if (ho){ delete ho.auto; delete ho.autoAcc; save(); lastSheet=""; renderSheet(); lastView=""; refresh(); toastQ("Auto level-up off"); } return; }
-  if (act==="ptall"){ var ha=heroById(sheetFor.id); if (ha && ha.pts>0){ var np=ha.pts; ha[a.dataset.stat]+=np; ha.pts=0; toastQ("+"+np+" "+STATN[a.dataset.stat]+" for "+ha.name); save(); } refresh(); return; }
+    toast("Auto level-up on ("+nr.pol+" : "+nr.atk+" : "+nr.int+")"+(spent?", "+spent+" point"+(spent>1?"s":"")+" spent now":"")); return; }
+  if (act==="hero-autooff"){ var ho=heroById(sheetFor&&sheetFor.id); if (ho){ delete ho.auto; delete ho.autoAcc; save(); lastSheet=""; renderSheet(); lastView=""; refresh(); toast("Auto level-up off"); } return; }
+  if (act==="ptall"){ var ha=heroById(sheetFor.id); if (ha && ha.pts>0){ var np=ha.pts; ha[a.dataset.stat]+=np; ha.pts=0; toast("+"+np+" "+STATN[a.dataset.stat]+" for "+ha.name); save(); } refresh(); return; }
   if (act==="pt"){ var hh=heroById(sheetFor.id); if (hh && hh.pts>0){ hh[a.dataset.stat]++; hh.pts--; } refresh(); return; }
   if (act==="office"||act==="mayor"){ var role=a.dataset.role||"mayor", oh=heroById(sheetFor.id); if (!oh) return; if (oh.away){ toast("That hero is away on a march"); return; }
     OFFICES.forEach(function(o){ if (S[o[0]]===oh.id) S[o[0]]=null; }); var prev=officer(role); if (prev) prev.autoSeat=false; S[role]=oh.id; oh.autoSeat=false; // a hand pick is locked
-    var ofl=OFFICES.filter(function(o){ return o[0]===role; })[0]; toastQ(oh.name+" is now "+(ofl?ofl[1].toLowerCase():role)+(role!=="wallHero"?" (a seat you pick is locked: no marches, and auto-fill leaves it alone)":"")); save(); lastSheet=""; refresh(); return; }
+    var ofl=OFFICES.filter(function(o){ return o[0]===role; })[0]; toast(oh.name+" is now "+(ofl?ofl[1].toLowerCase():role)+(role!=="wallHero"?" (a seat you pick is locked: no marches, and auto-fill leaves it alone)":"")); save(); lastSheet=""; refresh(); return; }
   if (act==="off-open"){ openSheet({kind:"offpick", role:a.dataset.role}); return; }
   if (act==="off-set"){ var orl=a.dataset.role, ohh=heroById(+a.dataset.id); if (!ohh) return; if (ohh.away){ toast("That hero is away on a march"); return; }
     OFFICES.forEach(function(o){ if (S[o[0]]===ohh.id) S[o[0]]=null; }); var oprev=officer(orl); if (oprev) oprev.autoSeat=false; S[orl]=ohh.id; ohh.autoSeat=false;
-    var ofx=OFFICES.filter(function(o){ return o[0]===orl; })[0]; toastQ(ohh.name+" is now "+(ofx?ofx[1].toLowerCase():orl)); autoOffices(); save(); lastSheet=""; refresh(); return; }
-  if (act==="off-clear"){ var orc=a.dataset.role, och=seatHolder(orc); S[orc]=null; if (och){ och.autoSeat=false; toastQ(och.name+" stepped down"); } autoOffices(); save(); lastSheet=""; refresh(); return; }
+    var ofx=OFFICES.filter(function(o){ return o[0]===orl; })[0]; toast(ohh.name+" is now "+(ofx?ofx[1].toLowerCase():orl)); autoOffices(); save(); lastSheet=""; refresh(); return; }
+  if (act==="off-clear"){ var orc=a.dataset.role, och=seatHolder(orc); S[orc]=null; if (och){ och.autoSeat=false; toast(och.name+" stepped down"); } autoOffices(); save(); lastSheet=""; refresh(); return; }
   if (act==="unoffice"||act==="unmayor"){ OFFICES.forEach(function(o){ if (S[o[0]]===sheetFor.id) S[o[0]]=null; }); var uh=heroById(sheetFor.id); if (uh) uh.autoSeat=false; autoOffices(); save(); lastSheet=""; refresh(); return; }
   if (act==="tome"){
     var bkk=a.dataset.book||"tome", th=heroById(sheetFor.id); if (!th || !(S.items[bkk]>0)) return;
     S.items[bkk]--; var up=giveXp(th, ITEMS[bkk].xp);
-    toastQ(up ? th.name+" reached level "+th.level : th.name+" gained "+fmt(ITEMS[bkk].xp)+" experience"); refresh(); return;
+    toast(up ? th.name+" reached level "+th.level : th.name+" gained "+fmt(ITEMS[bkk].xp)+" experience"); refresh(); return;
   }
   if (act==="tome-all" || act==="tome-every"){ // 0.1.238
     var tha=heroById(sheetFor.id); if (!tha) return;
     if (act==="tome-every" && armed!=="tomeevery"){ armed="tomeevery"; lastSheet=""; renderSheet(); return; } armed=null;
     var rb=readBooks(tha, act==="tome-all"?[a.dataset.book]:XP_BOOKS); if (!rb[0]){ toast("No books to read"); return; }
-    toastQ(tha.name+" read "+rb[0]+" book"+(rb[0]===1?"":"s")+" (+"+fmt(rb[2])+" experience)"+(rb[1]?" and reached level "+tha.level:"")); refresh(); return;
+    toast(tha.name+" read "+rb[0]+" book"+(rb[0]===1?"":"s")+" (+"+fmt(rb[2])+" experience)"+(rb[1]?" and reached level "+tha.level:"")); refresh(); return;
   }
   if (act==="respec"){
     var rh=heroById(sheetFor.id); if (!rh || !heroSpent(rh)) return;
     if (respecWait(rh)>0){ toast(rh.name+" can reset points once a day. Back in "+fmtT(respecWait(rh))); return; }
     if (armed!=="respec"){ armed="respec"; lastSheet=""; renderSheet(); return; }
-    armed=null; var back=respecHero(rh); toastQ(rh.name+": "+back+" point"+(back>1?"s":"")+" back to spend"); save(); lastSheet=""; refresh(); return;
+    armed=null; var back=respecHero(rh); toast(rh.name+": "+back+" point"+(back>1?"s":"")+" back to spend"); save(); lastSheet=""; refresh(); return;
   }
   if (act==="dismiss"){
     if (armed!=="dismiss"){ armed="dismiss"; lastSheet=""; renderSheet(); return; }
@@ -16389,20 +16389,20 @@ document.addEventListener("click",function(e){
     S.heroes=S.heroes.filter(function(x){ return x.id!==sheetFor.id; });
     S.gear.forEach(function(g){ if (g.on===sheetFor.id) g.on=0; }); gearChanged();
     OFFICES.forEach(function(o){ if (S[o[0]]===sheetFor.id) S[o[0]]=null; });
-    closeSheet(); toastQ(dh.name+" has left the city"); refresh(); return;
+    closeSheet(); toast(dh.name+" has left the city"); refresh(); return;
   }
   if (act==="hire"){
     var id=+a.dataset.id, o=S.innOffers.filter(function(x){return x.id===id;})[0];
     if (!o || S.heroes.length>=hallCap() || S.res.gold<hireCost(o)) return;
     S.res.gold-=hireCost(o); S.heroes.push(o); S.innOffers=S.innOffers.filter(function(x){return x.id!==id;});
-    toastQ(o.name+" joined your hall"); refresh(); return;
+    toast(o.name+" joined your hall"); refresh(); return;
   }
   if (act==="reroll"){ if (S.res.gold<200) return; S.res.gold-=200; rollInn(); refresh(); return; }
   if (act==="welcome"){
     var wid=+a.dataset.id, wh=S.waiting.filter(function(x){return x.id===wid;})[0];
     if (!wh || S.heroes.length>=hallCap()) return;
     S.heroes.push(wh); S.waiting=S.waiting.filter(function(x){return x.id!==wid;});
-    toastQ(wh.name+" joined your hall"); refresh(); return;
+    toast(wh.name+" joined your hall"); refresh(); return;
   }
   if (act==="sendaway"){ var sid=+a.dataset.id; S.waiting=S.waiting.filter(function(x){return x.id!==sid;}); refresh(); return; }
   if (act==="mkt-side"){ mkt.side=a.dataset.v; lastView=""; renderView(true); return; }
@@ -16413,8 +16413,8 @@ document.addEventListener("click",function(e){
   }
   if (act==="trade"){
     var qt=mktQuote(); if (!qt.ok) return; qbump("trades");
-    if (mkt.side==="sell"){ S.res[mkt.res]-=mkt.amt; S.res.gold+=qt.gold; toastQ("Sold "+fmt(mkt.amt)+" "+mkt.res+" for "+fmt(qt.gold)+" gold"); }
-    else { S.res.gold-=qt.gold; S.res[mkt.res]+=mkt.amt; toastQ("Bought "+fmt(mkt.amt)+" "+mkt.res+" for "+fmt(qt.gold)+" gold"); }
+    if (mkt.side==="sell"){ S.res[mkt.res]-=mkt.amt; S.res.gold+=qt.gold; toast("Sold "+fmt(mkt.amt)+" "+mkt.res+" for "+fmt(qt.gold)+" gold"); }
+    else { S.res.gold-=qt.gold; S.res[mkt.res]+=mkt.amt; toast("Bought "+fmt(mkt.amt)+" "+mkt.res+" for "+fmt(qt.gold)+" gold"); }
     tickText(); updateMarket(); save(); return;
   }
 });
@@ -16507,10 +16507,10 @@ document.addEventListener("change",function(e){ markDirty();
   if (e.target.id==="ivsafe"){ var sv=+e.target.value; e.target.blur(); invPost("setsafe",{hours:sv}).then(function(j){ if (!j.error) toast("Cooldown after being invaded: "+(sv>=168?sv/24+" days":sv+" hours")); invTake(j); }); return; }
   if (e.target.dataset && e.target.dataset.loskip!=null){ var lsk=+e.target.dataset.loskip; if (e.target.checked) delete LOW.skip[lsk]; else LOW.skip[lsk]=1; S.loSkip=LOW.skip; save(); var lsum=e.target.closest("details"); if (lsum){ var off=LO_TYPES.filter(function(i){ return LOW.skip[i]; }); lsum.querySelector("summary").textContent="Layers may use: "+(off.length?"all but "+off.map(function(i){ return U[i].name; }).join(", "):"every troop"); } return; }
   if (e.target.id==="pvcity2" && pvOn() && PV.v && PV.v.status==="lobby"){ var pnc=+e.target.value; e.target.blur(); S.pvp.ci=pnc; save();
-    pvPost("snap", pvWith({snap:pvSnap(pnc)})).then(function(j){ PV.err=j.error||""; if (!j.error) toastQ("Bringing "+S.cities[pnc].name); lastView=""; refresh(); }); return; }
+    pvPost("snap", pvWith({snap:pvSnap(pnc)})).then(function(j){ PV.err=j.error||""; if (!j.error) toast("Bringing "+S.cities[pnc].name); lastView=""; refresh(); }); return; }
   if (e.target.id==="bfhero" && bfAny()){ bfDraftHero=+e.target.value; bfSimTxt=""; lastSheet=""; renderSheet(); }
-  if (e.target.dataset && e.target.dataset.bforder!=null && bfOn()){ var op=BF().p[+e.target.dataset.bforder]; if (op && op.kind==="ally"){ op.order=e.target.value; op.nextAt=Math.min(op.nextAt||0, BF().t+3000); toastQ(op.name+": "+e.target.options[e.target.selectedIndex].text.toLowerCase()); } }
-  if (e.target.dataset && e.target.dataset.bffavor!=null && bfOn()){ var fp=BF().p[+e.target.dataset.bffavor]; if (fp && fp.kind==="ally"){ fp.favor=e.target.value; toastQ(fp.name+" will favor "+e.target.options[e.target.selectedIndex].text.toLowerCase()); } }
+  if (e.target.dataset && e.target.dataset.bforder!=null && bfOn()){ var op=BF().p[+e.target.dataset.bforder]; if (op && op.kind==="ally"){ op.order=e.target.value; op.nextAt=Math.min(op.nextAt||0, BF().t+3000); toast(op.name+": "+e.target.options[e.target.selectedIndex].text.toLowerCase()); } }
+  if (e.target.dataset && e.target.dataset.bffavor!=null && bfOn()){ var fp=BF().p[+e.target.dataset.bffavor]; if (fp && fp.kind==="ally"){ fp.favor=e.target.value; toast(fp.name+" will favor "+e.target.options[e.target.selectedIndex].text.toLowerCase()); } }
   if (e.target.id==="m-res"){ mkt.res=e.target.value; updateMarket(); }
   if (e.target.dataset && e.target.dataset.note){ S.notifOff=S.notifOff||{}; if (e.target.checked) delete S.notifOff[e.target.dataset.note]; else S.notifOff[e.target.dataset.note]=1; save(); lastSheet=""; renderSheet(); if (PUSH_KINDS[e.target.dataset.note]) pushSync(); }
   if (e.target.id==="nt-phone"){
@@ -16524,8 +16524,8 @@ document.addEventListener("change",function(e){ markDirty();
   if (e.target.id==="autoheal"){ S.autoHeal=e.target.checked; if (S.autoHeal) autoHealStep(); save(); processQueues(); lastView=""; refresh(); }
   if (e.target.id==="autofort"){ S.autoFort=e.target.checked; save(); processQueues(); lastView=""; refresh(); }
   if (e.target.id==="automayor"){ S.autoMayor=e.target.checked; autoOffices(); save(); lastView=""; refresh(); }
-  if (e.target.dataset.farmkind!=null){ var fkp=+e.target.dataset.farmkind, fkr=S.presets[fkp]; fkr.farmKind=e.target.value==="val"?"val":null; if (fkr.farmMode){ farmRebuild([fkp]); var fkm=farmMsg[C().id+":"+fkp]; if (fkm&&fkm.bad) toast(fkr.name+": "+fkm.t); } lastView=""; refresh(); return; } // 0.2.23
-  if (e.target.dataset.farmlvl!=null){ var flp=+e.target.dataset.farmlvl, flr=S.presets[flp]; flr.farmLevel=+e.target.value||null; if (flr.farmMode){ farmRebuild([flp]); var flm=farmMsg[C().id+":"+flp]; if (flm&&flm.bad) toast(flr.name+": "+flm.t); } lastView=""; refresh(); return; }
+  if (e.target.dataset.farmkind!=null){ var fkp=+e.target.dataset.farmkind, fkr=S.presets[fkp]; fkr.farmKind=e.target.value==="val"?"val":null; if (fkr.farmMode){ farmRebuild([fkp]); var fkm=farmMsg[C().id+":"+fkp]; if (fkm) toast(fkr.name+": "+fkm.t); } lastView=""; refresh(); return; } // 0.2.23
+  if (e.target.dataset.farmlvl!=null){ var flp=+e.target.dataset.farmlvl, flr=S.presets[flp]; flr.farmLevel=+e.target.value||null; if (flr.farmMode){ farmRebuild([flp]); var flm=farmMsg[C().id+":"+flp]; if (flm) toast(flr.name+": "+flm.t); } lastView=""; refresh(); return; }
   if (e.target.id==="phero"){ sheetPreset().hero=+e.target.value; save(); }
   if (e.target.id==="pstop"){ S.presets[sheetFor.p].stopOnLoss=e.target.checked; save(); }
   if (e.target.id==="pnocap"){ S.presets[sheetFor.p].noCap=e.target.checked; save(); }
@@ -16534,7 +16534,7 @@ document.addEventListener("change",function(e){ markDirty();
   if (e.target.id==="wmis"){ waveDraft.mission=e.target.value; updateWaveInfo(); }
   if (e.target.dataset && e.target.dataset.dgset){ var gt=e.target.dataset.dgset, gid=+e.target.value;
     allHeroes().forEach(function(x){ if (x.h.dragon===gt) delete x.h.dragon; });
-    if (gid){ var gh=heroById(gid); if (gh){ if (gh.dragon && gh.dragon!==gt) toastQ(gh.name+" put "+DRAGONS[gh.dragon].name+" down for "+DRAGONS[gt].name); gh.dragon=gt; } }
+    if (gid){ var gh=heroById(gid); if (gh){ if (gh.dragon && gh.dragon!==gt) toast(gh.name+" put "+DRAGONS[gh.dragon].name+" down for "+DRAGONS[gt].name); gh.dragon=gt; } }
     save(); lastSheet=""; renderSheet(); }
   if (e.target.id==="mensign"){ var ev=e.target.value; marchDraft.ensign=(ev && (S.items[ev]||0)>0)?ev:""; e.target.blur(); lastSheet=""; renderSheet(); } // 0.2.50: the chips show the pick, so the screen redraws
   if (e.target.id==="marchhero"){ marchDraft.hero=+e.target.value; marchDraft.preview=""; e.target.blur(); lastSheet=""; renderSheet(); }
@@ -16549,13 +16549,12 @@ document.addEventListener("change",function(e){ markDirty();
   if (e.target.id==="meimg"){ var mf0=e.target.files&&e.target.files[0]; e.target.value=""; meImageFromFile(mf0); return; }
   if (e.target.id==="cbdelpass" && sheetFor && sheetFor.kind==="cbdel"){ sheetFor.pw=e.target.value; return; }
   if (e.target.id==="rysend"){ RYS.sendToo=e.target.checked; return; }
-  if (e.target.id==="dockpin"){ dockPin=e.target.checked; dockSave(); renderDock(); toastQ(dockPin?"Chat pinned: it shows as a bar at the bottom on other pages":"Chat unpinned"); }
+  if (e.target.id==="dockpin"){ dockPin=e.target.checked; dockSave(); renderDock(); toast(dockPin?"Chat pinned: it shows as a bar at the bottom on other pages":"Chat unpinned"); }
   if (e.target.id==="marchfrom"){ marchDraft.from=e.target.value||""; marchDraft.t=[0,0,0,0,0,0,0,0,0,0,0,0]; var mfc=draftCamp(); marchDraft.hero = mfc ? (mfc.hero||0) : ((marchHeroes()[0]||{}).id||0); marchDraft.preview=""; e.target.blur(); lastSheet=""; renderSheet(); }
   if (e.target.id==="npcsel"){ setPreset(e.target.value); lastView=""; renderView(true); }
 });
 
 var toastEl=document.getElementById("toast"), toastTimer;
-function toastQ(){} // 0.2.54: "you just did a thing" messages stay quiet; toast() is for errors, blockers and news you would miss
 function toast(msg){ toastEl.textContent=msg; toastEl.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(function(){ toastEl.classList.remove("show"); },3400); }
 
 /* ---------- the move to iborygame.com (0.1.258): the old GitHub address says where to go and how to bring the game along ---------- */
@@ -16581,11 +16580,11 @@ window.addEventListener("resize", function(){ if (sheetFor && sheetFor.kind==="r
 if (window.visualViewport) window.visualViewport.addEventListener("resize",function(){ if (tab==="map") requestDraw(); });
 document.addEventListener("scroll",function(){ if (tab==="map") requestDraw(); },{passive:true});
 advance(Date.now());
-if (finished.length){ var awayL=shownFinished(); if (awayL.length) toastQ("Finished while you were away: "+awayL.slice(0,4).join(", ")+(awayL.length>4?", and more":"")); }
+if (finished.length){ var awayL=shownFinished(); if (awayL.length) toast("Finished while you were away: "+awayL.slice(0,4).join(", ")+(awayL.length>4?", and more":"")); }
 refresh();
 // tell the player once about conquered cities that were filled in by the 0.1.19 fix
 function capFixToast(){ if (!S.capFixed || !S.capFixed.length) return; var cf=S.capFixed; delete S.capFixed; save();
-  toastQ("Conquered cities fixed: "+cf.map(function(x){ return x.name+" got "+x.n+" building"+(x.n>1?"s":"")+" at level "+x.L; }).join("; ")+"."); }
+  toast("Conquered cities fixed: "+cf.map(function(x){ return x.name+" got "+x.n+" building"+(x.n>1?"s":"")+" at level "+x.L; }).join("; ")+"."); }
 setTimeout(capFixToast, 1500);
 if (COMP_H){ save(); setTimeout(function compShow(){ if (sheetFor){ setTimeout(compShow, 3000); return; }
   var why=COMP_0222&&!COMP_0214&&!COMP_0218 ? "Sorry about the short nights: with small training batches, the catch-up on opening used to stop an hour or two into the night, and the rest of the night trained nothing. That\u2019s fixed, and your game has just run 8 extra hours to make up for it: buildings, research, training and your farm presets all kept going."
