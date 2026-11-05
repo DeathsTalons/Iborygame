@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.50";
+window.IBORY_V="0.2.51";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1583,6 +1583,19 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 }
 @media (max-width:370px){ .ledger .res b.long{font-size:.64rem;letter-spacing:-.03em} }
 /* 0.2.50 CSS E: pact, chat */
+.dgimg{image-rendering:pixelated;object-fit:contain;flex:none}
+.dgrow{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.dgrow .dgimg{width:64px;height:64px}.dgrow .dgtxt{display:flex;flex-direction:column;gap:2px;min-width:0}.dgrow .dgtxt b{font-family:var(--display)}
+.dgrow .dgoff{opacity:.35;filter:grayscale(.6)}
+.dgrow.hatching .dgegg{animation:dgwob .9s ease-in-out}
+@keyframes dgwob{0%{transform:rotate(0)}15%{transform:rotate(-12deg)}30%{transform:rotate(10deg)}45%{transform:rotate(-8deg)}60%{transform:rotate(6deg) scale(1.05)}80%{transform:scale(1.25);opacity:.9}100%{transform:scale(1.5);opacity:0}}
+.gearrow.dgown{grid-template-columns:72px minmax(0,1fr) auto;column-gap:10px}.gearrow.dgown .dgbig{width:72px;height:72px;grid-row:1/5;align-self:start}
+.gearrow.dgshop{grid-template-columns:52px minmax(0,1fr) auto;column-gap:10px}.gearrow.dgshop .dgshopimg{width:52px;height:52px;grid-row:1/4;align-self:start}
+.gearrow.dgown>[style*=grid-column],.gearrow.dgshop>[style*=grid-column]{grid-column:2/-1!important}
+.hdgimg{width:34px;height:34px;vertical-align:middle;margin-right:4px}
+
+.mpmon{width:46px;height:41px;object-fit:contain;flex:none;margin:-6px 6px -6px -2px}.mpt .mpmon+b{flex:1;align-self:center;text-align:start;margin:0}
+.dmonpic{text-align:center;margin:4px 0 2px}.dmonpic img{width:168px;height:150px;object-fit:contain}
 #chatdock.open .dkpanel{display:flex;flex-direction:column;max-height:45vh;max-height:45dvh} /* 0.2.50: the open chat takes at most about 45% of the screen */
 #chatdock #dkmsgs{flex:1 1 auto;min-height:72px;max-height:none}
 .dkhead{gap:6px;flex:none}.dktabs{min-width:0;gap:3px;overflow-x:auto;scrollbar-width:none}.dktabs::-webkit-scrollbar{display:none}.dktabs .chipbtn{flex:none;padding:0 6px;height:30px;font-size:.8rem}
@@ -1697,7 +1710,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.50";
+var APP_VERSION = "0.2.51";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -2809,7 +2822,7 @@ function beaconText(L){ return L>=9?"exact armies, plan and enemy research":L>=7
 var BREQ={beacon:function(){ return [["walls",1]]; },townhall:function(L){ return L>=3?[["walls",L-2]]:[]; }, walls:function(){ return [["quarry",2],["workshop",1]]; },
   workshop:function(){ return [["forge",2]]; }, forge:function(){ return [["ironmine",2]]; }, stable:function(){ return [["farm",5]]; },
   barracks:function(){ return [["rally",1]]; }, academy:function(){ return [["townhall",2]]; }, feasting:function(){ return [["inn",1]]; }, market:function(){ return [["warehouse",1]]; }};
-function buildReqWhy(type,to){ if (type==="overlook" && !dragonsOwned().length) return "Needs a dragon (War Marks shop)"; var f=BREQ[type]; if (!f) return ""; var m=missing(f(to)); return m.length ? "Needs "+m.map(reqName).join(" and ") : ""; }
+function buildReqWhy(type,to){ if (type==="overlook" && !dragonsOwned().length && !eggsOwned().length) return "Needs a dragon egg (War Marks shop)"; var f=BREQ[type]; if (!f) return ""; var m=missing(f(to)); return m.length ? "Needs "+m.map(reqName).join(" and ") : ""; }
 function reqMet(r){ return r[0].indexOf("t:")===0 ? (S.tech[r[0].slice(2)]||0)>=r[1] : r[0]==="workshop" ? maxB("workshop")>=r[1] : bLevel(r[0])>=r[1]; } // 0.2.6: one Workshop in any city covers every city (siege engines, walls)
 function missing(reqs){ return reqs.filter(function(r){ return !reqMet(r); }); }
 function reqName(r){ return (r[0].indexOf("t:")===0 ? TECH[r[0].slice(2)].name : DEF[r[0]].name)+" "+r[1]+(r[0]==="workshop"?" (any city)":""); }
@@ -3459,12 +3472,17 @@ function decoDrops(q, drops){ var L=q.L||1, got=[], pick=function(w){ var u=Math
   else if (L===2){ pick([0.7,0.3]); }
   else { pick([0.5,0.4]); pick([0.5,0.4]); if (Math.random()<0.2) got.push(decoRoll(3)); }
   var D=decoS(); got.forEach(function(k){ D.inv[k]=(D.inv[k]||0)+1; drops.push(DECOS[k].e+" "+DECOS[k].n+" ("+DECO_RAR[DECOS[k].r].toLowerCase()+" decoration)"); }); }
+var DMON_PER={14:3, 16:4, 18:5};
+// 0.2.51: pictures for the daily monsters. The Hydra idles (16 frames of 112x100, cut from the x256 hydra spritesheet Cody sent, facing 210 degrees, with its shadow).
+// 0.2.51: drawn twice the tile's size, after the tiles (so the tiles around don't cover them). Every kind has a picture now.
+var DMON_ART={hydra:{src:"art/mon-hydra-idle.png", w:112, h:100, n:16, still:"art/mon-hydra.png"}, troll:{src:"art/mon-troll-idle.png", w:97, h:109, n:6, ms:160, still:"art/mon-troll.png", px:1}, behemoth:{src:"art/mon-behemoth-idle.png", w:128, h:87, n:7, ms:140, still:"art/mon-behemoth.png", px:1}, wyvern:{src:"art/mon-wyvern.png", w:77, h:57, n:1, still:"art/mon-wyvern.png", px:1}}, DMON_IMG={}, DMON_LIST=[]; // Troll: the cave troll Cody sent (idle, 6 frames); Behemoth: his behemoth (side walk, 7 frames); Wyvern: a red pixel wyvern from his dragon set
+function dmonImg(k){ var a=DMON_ART[k]; if (!a) return null; var c=DMON_IMG[k]; if (c) return c.ok?c.im:null; var im=new Image(); DMON_IMG[k]={im:im}; im.onload=function(){ DMON_IMG[k].ok=true; try { requestDraw(); } catch(e){} }; im.src=a.src; return null; }
 function ensureMonsters(){
   var day=gameDay(); if (!S.map.monsters) S.map.monsters={day:-1,list:[]};
   if (S.map.monsters.day===day) return;
   var list=[], kinds=["wyvern","troll","hydra","behemoth"]; // 0.2.36: the event monsters are in MONSTERS too, and were picked here by mistake
-  S.cities.forEach(function(c){ if (c.fieldCap!==14) return;
-    for (var n=0, tries=0; n<3 && tries<200; tries++){
+  S.cities.forEach(function(c){ var per=DMON_PER[c.fieldCap]||0; if (!per) return; // 0.2.51 (Cody): a level 14 historic city draws 3 a day, a 16 draws 4, Atlantis (18) 5
+    for (var n=0, tries=0; n<per && tries<200; tries++){
       var u=function(k){ return hash3(c.x*31+tries, c.y*17+n*7+k, S.map.seed+day*131+c.id); };
       var x=c.x+Math.round((u(1)-0.5)*24), y=c.y+Math.round((u(2)-0.5)*24); if (x<0||y<0||x>=MAPW||y>=MAPH) continue;
       var id=x+","+y; if (list.some(function(m){ return m.id===id; })) continue;
@@ -4075,7 +4093,7 @@ function captureCity(q, troops){
     nc.fieldCap=L; nc.th=L; nc.wall=L; while (nc.inside.length<cityPlots(nc)) nc.inside.push(null); ["farm","sawmill","quarry","ironmine"].forEach(function(t,i){ nc.fields[i]={type:t,level:L}; }); // 0.1.204: and walls at its level too // a historic city: Town Hall and one field of each kind at its level, the rest empty (0.1.194: the Town Hall used to start at 1)
   }
   S.cities.push(nc); delete S.map.hit[q.id]; delete S.map.loy[q.id]; delete S.map.npc[q.id];
-  if (nc.fieldCap===14 && S.map.monsters){ S.map.monsters.day=-1; }
+  if (DMON_PER[nc.fieldCap] && S.map.monsters){ S.map.monsters.day=-1; } // 0.2.51: 16s and Atlantis draw them too
   q.k="home"; q.city=nc.id; q.L=0; miniDirty=true;
   return nc;
 }
@@ -4965,11 +4983,11 @@ function mapBlit(c){ var O=MAPOC; if (!O.ok || !O.cv) return false; var dpr=wind
   g.drawImage(O.cv, sx, sy, sw, sh, 0, 0, c.width, c.height); g.imageSmoothingEnabled=true; return true; }
 function mapOcRender(c){ var W=c.clientWidth||360, H=c.clientHeight||360, dpr=Math.min(2, window.devicePixelRatio||1), m=Math.round(Math.min(300, 0.4*Math.max(W,H))), z=mv.z;
   if (!MAPOC.cv) MAPOC.cv=document.createElement("canvas");
-  var sx=mv.x, sy=mv.y, keep=[DECO_ANIM, DECO_HITS, EVM_VIS, VAMP_LIST, WIZ_VIS]; MAPOC.ok=false;
+  var sx=mv.x, sy=mv.y, keep=[DECO_ANIM, DECO_HITS, EVM_VIS, VAMP_LIST, WIZ_VIS, DMON_LIST]; MAPOC.ok=false;
   mv.x-=m/z; mv.y-=m/z;
   try { drawMapCore(c, {cv:MAPOC.cv, W:W+2*m, H:H+2*m, dpr:dpr}); MAPOC.ok=true; MAPOC.ox=mv.x; MAPOC.oy=mv.y; MAPOC.zo=z; MAPOC.sc=dpr; MAPOC.W=W; MAPOC.H=H; }
   catch(e){ MAPOC.ok=false; }
-  finally { mv.x=sx; mv.y=sy; DECO_ANIM=keep[0]; DECO_HITS=keep[1]; EVM_VIS=keep[2]; VAMP_LIST=keep[3]; WIZ_VIS=keep[4]; }
+  finally { mv.x=sx; mv.y=sy; DECO_ANIM=keep[0]; DECO_HITS=keep[1]; EVM_VIS=keep[2]; VAMP_LIST=keep[3]; DMON_LIST=keep[5]; WIZ_VIS=keep[4]; }
   MAPOC.key=mapOcKey(c); }
 function mapOcSoon(c){ var k=mapOcKey(c); if ((MAPOC.ok && MAPOC.key===k) || MAPOC.pk===k) return; clearTimeout(MAPOC.t); MAPOC.pk=k; // animation redraws of the same view don't push it back
   MAPOC.t=setTimeout(function(){ MAPOC.pk=""; var c2=document.getElementById("mapc"); if (!c2 || drag || document.hidden || mapOcKey(c2)!==k) return; mapOcRender(c2); }, 400); }
@@ -4989,7 +5007,7 @@ function drawMapCore(c, OV){
   var detail=z>=18, fs=Math.max(8,Math.min(12,Math.round(z*0.38)));
   g.font="700 "+fs+"px Cinzel, Georgia, serif"; g.textAlign="center"; g.textBaseline="middle";
   var myCity=myLook("city"), myMarch=myLook("march"), numOk=mapNums();
-  EVM_VIS=false; VAMP_LIST=[];
+  EVM_VIS=false; VAMP_LIST=[]; DMON_LIST=[];
   for (var ty=y0; ty<=y1; ty++) for (var tx=x0; tx<=x1; tx++){ try {
     var q=tileAt(tx,ty), x=(tx-mv.x)*z, y=(ty-mv.y)*z;
     if (decoHid(q)){ hideDraw(g, q, tx, ty, x, y, z); continue; }
@@ -5014,6 +5032,9 @@ function drawMapCore(c, OV){
       if (detail && numOk){ var vt=String(q.L), vbw=Math.max(12,vt.length*7+6), vbx=x+z-vbw-1, vby=y+z-14; g.fillStyle="rgba(20,16,12,.78)"; g.fillRect(vbx,vby,vbw,13); g.save(); g.font="700 10px sans-serif"; g.fillStyle="#f6ecd4"; g.textAlign="center"; g.textBaseline="middle"; ctext(g,0,vt,vbx+vbw/2,vby+7); g.restore(); } }
     else if (q.k==="monster" && q.ev){ g.fillStyle="#2a1636"; g.fillRect(x,y,z,z); var pr=z*0.32; g.fillStyle="#f07d1a"; g.beginPath(); g.ellipse(x+z/2,y+z*0.55,pr*1.15,pr,0,0,Math.PI*2); g.fill(); g.fillStyle="#3c6b1e"; g.fillRect(x+z/2-z*0.04,y+z*0.55-pr-z*0.1,z*0.08,z*0.12);
       if (detail){ g.fillStyle="#2a1636"; numOk&&ctext(g,0,q.L,x+z/2,y+z*0.58); } }
+    else if (q.k==="monster" && !q.ev && z>=8 && dmonImg(q.mon)){ // 0.2.51: a daily monster with its own picture, idling
+      var da=DMON_ART[q.mon], df=da.n>1?Math.floor(Date.now()/(da.ms||120)+tx*3+ty*5)%da.n:0; if (da.n>1) EVM_VIS=true;
+      g.fillStyle="#5b2a6e"; g.fillRect(x,y,z,z); DMON_LIST.push([q.mon, df, x, y, detail&&numOk?q.L:0]); } // the figure (and its level) go on after every tile, twice the tile's size
     else if (q.k==="monster"){ g.fillStyle="#5b2a6e"; g.fillRect(x,y,z,z);
       if (detail){ var u5=z/30; g.fillStyle="#e7c6f5"; g.beginPath(); g.moveTo(x+6*u5,y+22*u5); g.lineTo(x+10*u5,y+8*u5); g.lineTo(x+15*u5,y+14*u5); g.lineTo(x+20*u5,y+8*u5); g.lineTo(x+24*u5,y+22*u5); g.fill(); g.fillStyle="#fff"; numOk&&ctext(g,0,q.L,x+z/2,y+z*0.8); } }
     else if (q.k==="ai"){ var hitA=S.map.hit[q.id] && (S.gt-S.map.hit[q.id].at)<24*3.6e6; g.fillStyle=hitA?"#4f7c78":"#2c6763"; g.fillRect(x,y,z,z);
@@ -5067,6 +5088,8 @@ function drawMapCore(c, OV){
         else { var ex=(dx-mv.x+0.5+c*0.42)*z, ey=(dy-mv.y+0.5+c*0.24)*z; g.font=dfs+"px sans-serif"; ctext(g,0,dd.e,ex,ey); decoHitAdd(dx+","+dy, e[4][di], dk[0], ex-dfs/2, ey-dfs/2, dfs, dfs, null, false, z); } } });
     g.imageSmoothingEnabled=smooth; g.font="700 "+fs+"px Cinzel, Georgia, serif"; }
   if (!hcDone){ try { hcBigDraw(g, x0, y0, x1, y1, z); } catch(e){} } // no decorations drawn (none, or zoomed far out)
+  try { DMON_LIST.forEach(function(v){ var da=DMON_ART[v[0]], im=dmonImg(v[0]); if (!im) return; var sc=Math.min(z*2.3/da.w, z*2.1/da.h), w=da.w*sc, h=da.h*sc, sm=g.imageSmoothingEnabled; if (da.px) g.imageSmoothingEnabled=false; g.drawImage(im, v[1]*da.w, 0, da.w, da.h, v[2]+(z-w)/2, v[3]+z*0.92-h, w, h); g.imageSmoothingEnabled=sm;
+      if (v[4]){ var dt=String(v[4]), dbw=Math.max(12,dt.length*7+6), dbx=v[2]+z-dbw-1, dby=v[3]+z-14; g.fillStyle="rgba(20,16,12,.78)"; g.fillRect(dbx,dby,dbw,13); g.save(); g.font="700 10px sans-serif"; g.fillStyle="#f6ecd4"; g.textAlign="center"; g.textBaseline="middle"; ctext(g,0,dt,dbx+dbw/2,dby+7); g.restore(); } }); } catch(e){} // 0.2.51: the daily monsters, twice the tile's size
   try { VAMP_LIST.forEach(function(v){ vampFrame(g, v[0], v[1], v[2], v[3], z, v[4]); }); if (VAMP_FX.length && z>=8) vampFxDraw(g, x0, y0, x1, y1, z); } catch(e){}
   try { if (z>=4) wizDraw(g, x0, y0, x1, y1, z); else WIZ_VIS=false; } catch(e){}
   if (MOVE.e){ var mxy=MOVE.tid.split(","); g.strokeStyle="#e8b84a"; g.lineWidth=2.5; if (g.setLineDash) g.setLineDash([5,4]); g.strokeRect((+mxy[0]-mv.x)*z+1.5,(+mxy[1]-mv.y)*z+1.5,z-3,z-3); if (g.setLineDash) g.setLineDash([]); }
@@ -5309,7 +5332,7 @@ function mapPop(){ var el=document.getElementById("mappop"); if (!el) return;
     btns.push({o:99, h:'<button class="btn ghost" data-act="teleport" data-tile="'+q.id+'"'+(tpn?'':' disabled')+'>'+(armedTile==="tp"+q.id?'Tap again to teleport':'Teleport ('+tpn+')')+'</button>'}); }
   var bm=bmAt(q.id);
   var loyH=""; if ((q.k==="npc"||q.k==="hc"||q.k==="ai") && !S.map.owned[q.id]){ var lv=Math.floor(loyOf(q)); loyH='<span class="mploy'+(lv<=30?' low':lv<70?' mid':'')+'" title="Loyalty: at 0 a win takes the city">Loyalty '+lv+'</span>'; } // 0.1.190
-  var ph='<div class="mpt"><b>'+esc(tileName(q))+'</b>'+loyH+'<button class="mpx" data-act="mpop-close" aria-label="Close">\u00d7</button></div><div class="dur">'+mapPopInfo(q)+'</div>'+
+  var ph='<div class="mpt">'+(q.k==="monster"&&!q.ev&&DMON_ART[q.mon]?'<img class="mpmon" src="'+DMON_ART[q.mon].still+'" alt=""'+(DMON_ART[q.mon].px?' style="image-rendering:pixelated"':'')+'>':'')+'<b>'+esc(tileName(q))+'</b>'+loyH+'<button class="mpx" data-act="mpop-close" aria-label="Close">\u00d7</button></div><div class="dur">'+mapPopInfo(q)+'</div>'+
     '<div class="mpb">'+btns.map(function(x){ return x.h; }).join("")+'<button class="btn ghost" data-act="'+(bm?'bm-del':'bm-add')+'" data-tile="'+q.id+'" aria-label="'+(bm?'Remove bookmark':'Bookmark')+'">'+(bm?'\u2605':'\u2606')+'</button><button class="btn ghost mpbrush'+(S.deco&&S.deco.at[q.id]&&S.deco.at[q.id].length?' on':'')+'" data-act="deco-open" data-tile="'+q.id+'" aria-label="Decorate this tile" title="Decorate"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M20.7 3.3a1 1 0 0 0-1.4 0L11 11.6l1.4 1.4 8.3-8.3a1 1 0 0 0 0-1.4z" fill="currentColor"/><path d="M9.6 13c-1.8 0-3.1 1.3-3.3 3-.2 1.4-.9 2.3-2.3 2.8 1 .9 2.4 1.2 3.9 1.2 2.6 0 4.6-1.8 4.6-4.1 0-.5-.1-1-.3-1.4z" fill="currentColor"/></svg></button><button class="btn ghost" data-act="mpop-more">Details</button></div>'+mpopFarmHtml(q);
   if (el._h!==ph){ el.innerHTML=ph; el._h=ph; var fsel=el.querySelector("#mpfarmsel"); if (fsel) fsel.addEventListener("change", function(){ MPOPFARM=+fsel.value; el._h=""; mapPop(); }); } el.hidden=false; mapPopPos(); }
 // 0.2.9: add the tile to a farm preset from the popup: pick the preset, then Add (Remove when it's already on that list)
@@ -5415,7 +5438,7 @@ function renderTileInfoBase(){
   if (q.k==="npc"||q.k==="hc"||q.k==="ai") h+='<p class="hint">Loyalty '+Math.round(loyOf(q))+' of 100. '+(q.k==="hc"?'Every attack you win knocks off 3 until it is down to 10, then 1 a hit, so about 40 wins in quick succession take the city. It holds for an hour after your last win, then recovers 10 per hour. You need room in your title for another city.':'Every attack you win knocks off 10. It holds for an hour after your last win, then recovers 10 per hour, so 10 wins in quick succession takes the city, if your title has room for another.')+
     (q.k==="ai"?' A conquered lord\u2019s city comes with its buildings and fields at Town Hall level, plus its research.':q.k==="hc"?' A conquered historic city starts empty inside, with one of each resource field at level '+q.L+' (and room to build them that high).':' A conquered NPC city comes with one of every building, its walls and twelve fields at level '+q.L+'.')+'</p>';
   if (q.k==="monster" && q.ev) h+='<p class="hint">A '+esc(evNow()?evNow().name:"holiday")+' monster. It stays until it\u2019s slain or the event ends, and counts toward the event track. Slay it for '+vampSpoils(VAMP_K[q.mon]||q.L).replace(/^A /,"a ")+', and the first one of each level unlocks it as a decoration for good (place it as often as you like).</p>';
-  else if (q.k==="monster") h+='<p class="hint">Drawn to your level 14 historic city, it leaves at the end of the day. Slay it for Flawless Gems and a '+Math.round(lootChance(q,"scale")*100)+'% chance at a Dragon Scale, the material for Mythic gear (the tier above Legendary).</p>';
+  else if (q.k==="monster") h+=(DMON_ART[q.mon]?'<div class="dmonpic"><img src="'+DMON_ART[q.mon].still+'" alt="'+esc(MONSTERS[q.mon]||"")+'"'+(DMON_ART[q.mon].px?' style="image-rendering:pixelated"':'')+'></div>':'')+'<p class="hint">Drawn to your historic city, it leaves at the end of the day. Slay it for Flawless Gems and a '+Math.round(lootChance(q,"scale")*100)+'% chance at a Dragon Scale, the material for Mythic gear (the tier above Legendary).</p>';
   if (VTYPES[q.k] && !S.map.owned[q.id] && placeLeft()>0) h+='<div class="farmadd"><span class="dur">Place an NPC city here ('+placeLeft()+' left today):</span><select id="placelvl">'+[1,2,3,4,5,6,7,8,9,10].map(function(n){ return '<option value="'+n+'"'+(n===PLACE_LV?' selected':'')+'>Level '+n+'</option>'; }).join("")+'</select><button class="btn small" data-act="npc-place" data-tile="'+q.id+'">Place</button></div>';
   if (q.k==="npc"||q.k==="ai") h+='<p class="hint">'+(q.k==="ai"?'An AI lord':'An NPC')+' only drops medals and items if its troop garrison is full when you hit it; otherwise you get just its resources. Let it recover before you hit it again.</p>';
   if (q.k==="npc") h+='<p class="hint">Demolishing turns it back into a flat, so you can occupy that flat on a better day and establish a higher level NPC city.</p>';
@@ -5731,6 +5754,10 @@ function dgFx(h,def){ var o={atk:0,int:0,life:0,spd:0,size:0}, d=dragonOf(h); if
 function hsB(h,k,def){ var v=hs(h,k)+(h ? dgFx(h,def)[k]||0 : 0); return (def && k==="atk" && h) ? v*(1+alFx("whero")) : v; } // War Memorial: Wall Captain
 function dragonHero(t){ var f=null; S.cities.forEach(function(c){ (c.heroes||[]).forEach(function(h){ if (h.dragon===t) f=h; }); }); (S.heroes||[]).forEach(function(h){ if (h.dragon===t) f=h; }); return f; }
 function dragonsOwned(){ return Object.keys(S.dragons||{}).filter(function(t){ return DRAGONS[t]; }); }
+// 0.2.51 (Cody): dragons come as eggs. The shop gives an egg; it waits in the Overlook until you tap Hatch. Pictures: Cody's dragon and egg sets.
+function eggsOwned(){ return Object.keys(S.dragonEggs||{}).filter(function(t){ return DRAGONS[t] && !(S.dragons&&S.dragons[t]); }); }
+function dgImg(t, cls){ return '<img class="'+(cls||'dgimg')+'" src="art/dg-'+t+'.png" alt="">'; }
+function eggImg(t, cls){ return '<img class="'+(cls||'dgimg')+'" src="art/egg-'+t+'.png" alt="">'; }
 function gearById(id){ for (var i=0;i<S.gear.length;i++) if (S.gear[i].id===id) return S.gear[i]; return null; }
 function wearPiece(g,hid,pos){ S.gear.forEach(function(x){ if (x!==g && x.on===hid && posOf(x)===pos){ x.on=0; delete x.at; } }); g.on=hid; g.at=pos; gearChanged(); }
 function gearRank(a,b){ return gearVal(b)-gearVal(a) || b.tier-a.tier || b.stars-a.stars; }
@@ -9841,7 +9868,7 @@ function migrate(s){
       var nw=histStats(i), ol=h.base||histStats(i,true); ["pol","atk","int"].forEach(function(k){ var d=nw[k]-ol[k]; if (d>0) h[k]=(h[k]||0)+d; }); h.base={pol:Math.max(nw.pol,ol.pol), atk:Math.max(nw.atk,ol.atk), int:Math.max(nw.int,ol.int)}; }); }); }
   if (s.notifOff && s.notifOff.build && s.notifOff.fort===undefined) s.notifOff.fort=true; // 0.1.110: fortifications got their own notification switch; anyone who had silenced "buildings and fortifications" keeps both silenced
   if (!s.alMember && Array.isArray(s.cities)) s.cities.forEach(function(cc){ cc.alAcad=false; cc.alBld=0; }); // 0.1.88: lending can only exist inside an alliance; this frees builders and Academies stuck as "lent" after leaving or switching off multiplayer
-  s.dragons=s.dragons||{}; s.shopSeen=s.shopSeen||[]; s.giftSeen=s.giftSeen||[];
+  s.dragons=s.dragons||{}; s.dragonEggs=s.dragonEggs||{}; s.shopSeen=s.shopSeen||[]; s.giftSeen=s.giftSeen||[];
   if (Array.isArray(s.cities)) s.cities.forEach(function(cc){ if (Array.isArray(cc.mpresets)) return; // 0.2.4: march presets split from farm presets; each city's start as copies of its presets (troops, hero, name)
     cc.mpresets=(cc.presets||[]).slice(0,NPRESETS).map(function(p,i){ return {name:p.name||("March "+(i+1)), t:(p.t||[]).slice(0,12).concat([0,0,0,0,0,0,0,0,0,0,0,0]).slice(0,12), hero:p.hero||0}; });
     while (cc.mpresets.length<NPRESETS) cc.mpresets.push({name:"March "+(cc.mpresets.length+1), t:[0,0,0,0,0,0,0,0,0,0,0,0], hero:0}); });
@@ -10917,7 +10944,7 @@ function heroMidMore(hr){ var need=xpNeed(hr.level), top=hr.level>=HERO_MAX, f=t
 /* 0.2.45: the rest of the hero inside the gear box: salary, what the stats do */
 function heroDollFoot(hr){ var need=xpNeed(hr.level), top=hr.level>=HERO_MAX, f=top?1:Math.max(0,Math.min(1,hr.xp/Math.max(1,need))), hdg=dragonOf(hr);
   var h='<div class="dfoot">'+ // 0.2.49: the paragraph went (salary is under the name; auto level-up is explained in "What the stats do")
-    (hdg?'<p class="dur" style="margin:0"><b style="color:'+hdg.def.col+'">'+hdg.def.name+' Dragon</b>, level '+hdg.lv+': '+dragonBuffTxt(hdg.t,hdg.lv)+'. Change it in the Overlook.</p>':'');
+    (hdg?'<p class="dur" style="margin:0">'+dgImg(hdg.t,'dgimg hdgimg')+'<b style="color:'+hdg.def.col+'">'+hdg.def.name+' Dragon</b>, level '+hdg.lv+': '+dragonBuffTxt(hdg.t,hdg.lv)+'. Change it in the Overlook.</p>':'');
   h+='<details class="det" data-det="hstats"'+(DET.hstats?' open':'')+'><summary><b>What the stats do</b></summary><div class="gearlist">'+[["atk","Attack","Training speed as trainer, +0.5% troop attack per point in battle"],["int","Intelligence","Research speed as researcher; in battle every troop gets +1 life per point, and marches 1% faster per point"],["pol","Politics","Production and building speed as mayor"]].map(function(st){ return '<div class="gearrow"><span class="gn"><b>'+st[1]+' '+fmt(hs(hr,st[0]))+'</b>'+(gearBonus(hr,st[0])?' <span class="dur">('+hr[st[0]]+' + '+gearBonus(hr,st[0])+' gear)</span>':'')+'<div class="dur">'+st[2]+'</div></span></div>'; }).join("")+'</div>'+
     '<p class="dur" style="margin:6px 0 0">As mayor: production +'+pct(hs(hr,"pol")*0.003)+', buildings '+pct(1-1/(1+hs(hr,"pol")/200))+' faster, population grows '+pct(hs(hr,"pol")/400)+' faster. As trainer: training '+pct(1-Math.pow(0.9975,hs(hr,"atk")))+' faster. As researcher: research '+pct(1-1/(1+hs(hr,"int")/200))+' faster.</p>'+
     '<p class="dur" style="margin:4px 0 0">Auto level-up puts each point the hero earns into Attack, Intelligence and Politics by its ratio (2 : 1 : 0 = two Attack for every Intelligence); turning it on spends the unused points now.</p></details>';
@@ -12352,12 +12379,13 @@ function allHeroes(){ var out=[]; S.cities.forEach(function(c,ci){ (c.heroes||[]
 function dragonBuffTxt(t,lv){ var D=DRAGONS[t], o=[]; for (var k in D.fx){ var v=D.fx[k]*lv; o.push(k==="spd"?"march speed +"+v+"%":k==="atk"?"attack +"+v+"%":k==="int"?"defense +"+v+"%":k==="life"?"troop life +"+v+"%":"march size +"+v+"%"); } return o.join(", ")+(D.def?" (defending and reinforcing only)":""); }
 function overlookHtml(){
   var cap=Math.min(DRAGON_MAX, maxB("overlook")), stones=S.items.dstone||0, heroes=allHeroes();
-  var h='<div class="h3">Dragons</div><p class="hint">Each dragon rides with one hero and gives that hero its gifts: bonuses to the troops they lead, how fast they march, or how big a march can be. Dragons grow with Dragon Stones, up to this Overlook’s level ('+cap+'). You have <b>'+fmt(stones)+'</b> stone'+(stones===1?'':'s')+'. Dragons and stones are bought in the <button class="link" data-act="iv-shop-open">War Marks shop</button>.</p><div class="gearlist">';
+  var h='<div class="h3">Dragons</div><p class="hint">Each dragon rides with one hero and gives that hero its gifts: bonuses to the troops they lead, how fast they march, or how big a march can be. Dragons grow with Dragon Stones, up to this Overlook’s level ('+cap+'). You have <b>'+fmt(stones)+'</b> stone'+(stones===1?'':'s')+'. Dragon eggs and stones are bought in the <button class="link" data-act="iv-shop-open">War Marks shop</button>.</p><div class="gearlist">';
   Object.keys(DRAGONS).forEach(function(t){
     var D=DRAGONS[t], d=S.dragons[t];
-    if (!d){ h+='<div class="gearrow"><span class="gn" style="color:'+D.col+'">'+D.name+' Dragon</span><span class="gb dur">not yours yet</span><span class="dur" style="grid-column:1/-1">'+D.txt+'</span></div>'; return; }
+    if (!d && S.dragonEggs && S.dragonEggs[t]){ h+='<div class="dgrow egg">'+eggImg(t,'dgimg dgegg')+'<div class="dgtxt"><b style="color:'+D.col+'">'+D.name+' Dragon egg</b><span class="dur">'+D.txt+'</span></div><button class="btn small" data-act="dg-hatch" data-t="'+t+'">Hatch</button></div>'; return; } // 0.2.51
+    if (!d){ h+='<div class="dgrow none">'+eggImg(t,'dgimg dgoff')+'<div class="dgtxt"><b style="color:'+D.col+'">'+D.name+' Dragon</b><span class="dur">'+D.txt+'. Its egg is in the War Marks shop.</span></div></div>'; return; }
     var lv=Math.min(DRAGON_MAX,d.lv|0||1), cur=dragonHero(t), nxt=lv+1, need=DRAGON_STONES[nxt]||0, why=lv>=DRAGON_MAX?"Top level":nxt>cap?"Needs Overlook "+nxt:stones<need?"Needs "+need+" stone"+(need===1?"":"s"):"";
-    h+='<div class="gearrow"><span class="gn" style="color:'+D.col+'">'+D.name+' Dragon</span><span class="gb">Level '+lv+' / '+DRAGON_MAX+'</span><span class="dur" style="grid-column:1/-1">'+dragonBuffTxt(t,lv)+(lv<DRAGON_MAX?' → level '+nxt+': '+dragonBuffTxt(t,nxt):'')+'</span>'+
+    h+='<div class="gearrow dgown">'+dgImg(t,'dgimg dgbig')+'<span class="gn" style="color:'+D.col+'">'+D.name+' Dragon</span><span class="gb">Level '+lv+' / '+DRAGON_MAX+'</span><span class="dur" style="grid-column:1/-1">'+dragonBuffTxt(t,lv)+(lv<DRAGON_MAX?' → level '+nxt+': '+dragonBuffTxt(t,nxt):'')+'</span>'+
       '<span style="grid-column:1/-1"><select data-dgset="'+t+'" aria-label="Hero for '+D.name+'"><option value="0">No hero</option>'+heroes.map(function(x){ return '<option value="'+x.h.id+'"'+(cur&&cur.id===x.h.id?' selected':'')+'>'+esc(x.h.name)+' (Lv '+x.h.level+', '+esc(x.city)+')'+(x.h.dragon&&x.h.dragon!==t?' – has a dragon':'')+'</option>'; }).join("")+'</select></span>'+
       '<span class="btnrow" style="grid-column:1/-1;margin-top:4px"><button class="btn small" data-act="iv-dg-up" data-t="'+t+'"'+(why?' disabled':'')+'>'+(why||('Level up ('+need+' stone'+(need===1?'':'s')+')'))+'</button></span></div>';
   });
@@ -12374,7 +12402,7 @@ function shopPost(path, body){
 }
 function shopGrant(g){
   if (!g) return;
-  if (g.dragon && DRAGONS[g.dragon] && !S.dragons[g.dragon]) S.dragons[g.dragon]={lv:1};
+  if (g.dragon && DRAGONS[g.dragon] && !S.dragons[g.dragon]){ S.dragonEggs=S.dragonEggs||{}; S.dragonEggs[g.dragon]=1; note("items", "A "+DRAGONS[g.dragon].name+" Dragon egg is waiting in your Overlook. Tap Hatch when you\u2019re ready."); } // 0.2.51: an egg
   if (g.item) S.items[g.item]=(S.items[g.item]||0)+(g.qty||1);
 }
 // each purchase and gift is applied once (the ids are remembered in the save), then acknowledged so the server stops sending it
@@ -12382,7 +12410,7 @@ function shopApply(st){
   var ids=[], gids=[];
   (st.pending||[]).forEach(function(p){ if (S.shopSeen.indexOf(p.id)<0){ shopGrant(p.grant); S.shopSeen.push(p.id); } ids.push(p.id); });
   (st.gifts||[]).forEach(function(g){ if (S.giftSeen.indexOf(g.id)<0){ S.items[g.item]=(S.items[g.item]||0)+g.qty; S.giftSeen.push(g.id); note("items",String(g.from||"")+" sent you "+fmt(g.qty)+" × "+((ITEMS[g.item]||{}).name||g.item)); } gids.push(g.id); });
-  (st.dragons||[]).forEach(function(t){ if (DRAGONS[t] && !S.dragons[t]) S.dragons[t]={lv:1}; }); // a restored older save still has the dragons you paid for
+  (st.dragons||[]).forEach(function(t){ if (DRAGONS[t] && !S.dragons[t]){ S.dragonEggs=S.dragonEggs||{}; S.dragonEggs[t]=1; } }); // a restored older save still has the dragons you paid for (as an egg, if it never hatched here)
   if (S.shopSeen.length>300) S.shopSeen=S.shopSeen.slice(-300);
   if (S.giftSeen.length>300) S.giftSeen=S.giftSeen.slice(-300);
   S.warMarks=st.balance;
@@ -12403,7 +12431,7 @@ function shopBuy(k){
   shopPost("buy",{item:k}).then(function(d){
     SHOP.busy=false;
     if (d.error) SHOP.err=d.error;
-    else { SHOP.st=d.state; shopApply(d.state); cosAt=0; var it=(d.state.cat||[]).filter(function(c){ return c.k===k; })[0]; SHOP.msg="Bought "+(it?it.name:"it")+"."; toast(SHOP.msg); }
+    else { SHOP.st=d.state; shopApply(d.state); cosAt=0; var it=(d.state.cat||[]).filter(function(c){ return c.k===k; })[0], itD=it&&/^dragon_/.test(it.k)&&DRAGONS[it.k.slice(7)]; SHOP.msg=itD?"Bought the "+itD.name+" Dragon egg. Hatch it in the Overlook.":"Bought "+(it?it.name:"it")+"."; toast(SHOP.msg); }
     lastSheet=""; renderSheet(); refresh();
   });
 }
@@ -12434,8 +12462,9 @@ function shopSheet(){
   groups.forEach(function(g){
     h+='<div class="section" style="margin-top:10px"><h3>'+esc(g[0])+'</h3><div class="gearlist">'+g[1].map(function(c){
       var why=c.owned?"Owned":c.lim&&c.left<1?"Sold out this week":st.balance<c.cost?"Need "+fmt(c.cost-st.balance)+" more":"";
-      return '<div class="gearrow"><span class="gn">'+esc(c.name)+(c.qty>1?' <span class="dur">×'+c.qty+'</span>':'')+'</span><span class="gb">'+fmt(c.cost)+'</span>'+
-        (c.desc?'<span class="dur" style="grid-column:1/-1">'+esc(c.desc)+(c.lim?' ('+c.left+' of '+c.lim.n+' left this week)':'')+'</span>':'')+
+      var dgt=/^dragon_/.test(c.k)?c.k.slice(7):"", dgD=DRAGONS[dgt]; // 0.2.51: a dragon is sold as its egg
+      return '<div class="gearrow'+(dgD?' dgshop':'')+'">'+(dgD?eggImg(dgt,'dgimg dgshopimg'):'')+'<span class="gn">'+(dgD?esc(dgD.name+' Dragon egg'):esc(c.name))+(c.qty>1?' <span class="dur">×'+c.qty+'</span>':'')+'</span><span class="gb">'+fmt(c.cost)+'</span>'+
+        (c.desc?'<span class="dur" style="grid-column:1/-1">'+esc(c.desc)+(dgD?' Hatch it in the Overlook when you like.':'')+(c.lim?' ('+c.left+' of '+c.lim.n+' left this week)':'')+'</span>':'')+
         '<span class="btnrow" style="grid-column:1/-1;margin-top:4px"><button class="btn small" data-act="iv-shop-buy" data-k="'+c.k+'"'+(why||SHOP.busy?' disabled':'')+'>'+(why||'Buy')+'</button></span></div>'; }).join("")+'</div></div>';
   });
   var gi=(st.giftable||[]).filter(function(k){ return (S.items[k]||0)>0 && ITEMS[k]; });
@@ -16285,6 +16314,8 @@ document.addEventListener("click",function(e){
   if (act==="hsort"){ var hs0=C().heroSort=C().heroSort||{a:"level",b:"atk"}; if (hs0.a!==a.dataset.k){ hs0.b=hs0.a; hs0.a=a.dataset.k; } save(); lastView=""; renderView(true); return; } // 0.2.49: sort chips on the Heroes tab
   if (act==="off-help"){ OFFHELP=!OFFHELP; lastView=""; renderView(true); return; }
   if (act==="ry-rep-retry"){ var rrp=S.reports.filter(function(x){ return x.id===+a.dataset.id; })[0]; if (rrp){ delete RYREP[rrp.aid+"/"+rrp.rid]; ryRepFetch(rrp); lastSheet=""; renderSheet(); } return; } // 0.2.50
+  if (act==="dg-hatch"){ var ht=a.dataset.t; if (!DRAGONS[ht] || !S.dragonEggs || !S.dragonEggs[ht] || (S.dragons&&S.dragons[ht])) return; var hrow=a.closest(".dgrow"); if (hrow) hrow.classList.add("hatching"); a.disabled=true; // 0.2.51: the egg wobbles and cracks, then the dragon is yours
+    setTimeout(function(){ delete S.dragonEggs[ht]; S.dragons[ht]={lv:1}; save(); toast("Your "+DRAGONS[ht].name+" Dragon hatched!"); lastSheet=""; renderSheet(); lastView=""; refresh(); }, 900); return; }
   if (act==="hero-fav"){ var fh=heroById(+a.dataset.id); if (fh){ fh.fav=!fh.fav; save(); lastSheet=""; renderSheet(); lastView=""; refresh(); toast(fh.fav?fh.name+" is a favourite":fh.name+" is no longer a favourite"); } return; }
   if (act==="hero-pic"){ var hfi=document.getElementById("heroimgf"); if (hfi) hfi.click(); return; }
   if (act==="hero-picdel"){ var hpd=heroById(sheetFor&&sheetFor.id); if (hpd) heroImageRemove(hpd); return; }
