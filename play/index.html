@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.57";
+window.IBORY_V="0.2.58";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1597,6 +1597,56 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 @keyframes cpinl{from{opacity:.2;transform:translateX(18px)}to{opacity:1;transform:none}}@keyframes cpinr{from{opacity:.2;transform:translateX(-18px)}to{opacity:1;transform:none}}
 
 .mpop.dock{left:6px;right:6px;top:auto;bottom:6px;width:auto;max-width:none;max-height:min(50%,280px);overflow-y:auto;overscroll-behavior:contain} /* 0.2.53: docked, never moves */
+/* 0.2.58: the tile pop-up (Cody's pick, C): title row with fixed icon buttons, a line with where it is and the farm chip, and one bar
+   of icon tiles with the main action filling the rest at the bottom right */
+.mpop .mpt{align-items:center;gap:4px}.mpop .mpt b{flex:1 1 auto;min-width:0}.mpop .mploy{margin-left:0}
+.mpop .mpic{display:flex;align-items:center;flex:none;margin-inline-end:-6px}
+.mpop .mpx{width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:8px;padding:0;color:var(--muted)}
+.mpop .mpx.mpbm{margin-left:0;padding:0}.mpop .mpx.on,.mpop .mpx.mpbm.on{color:var(--brass)}.mpop .mpx.mpbm.on svg{fill:currentColor}
+.mpop .mpsub{display:flex;align-items:center;justify-content:space-between;gap:4px 8px;flex-wrap:wrap;margin-top:-1px}
+.mpop .mpsub>.dur{min-width:0}
+.mpop .mpfarm{display:inline-flex;align-items:center;height:30px;margin:0;border:1px solid var(--line);border-radius:15px;background:var(--panel2);overflow:hidden;max-width:100%}
+.mpop .mpfarm select{border:0;background:transparent;font-size:.8rem;font-weight:700;padding:0 2px 0 10px;min-height:0;height:100%;width:auto;max-width:160px;color:var(--ink);box-shadow:none}
+.mpop .mpfadd{flex:none;border:0;border-inline-start:1px solid var(--line);background:transparent;color:var(--brass);width:32px;height:100%;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+.mpop .mpfarm.on{border-color:var(--brass)}.mpop .mpfarm.on .mpfadd{background:var(--brass-soft)}
+.mpop .mpbar{display:flex;gap:5px;margin-top:8px;align-items:stretch}
+.mpop .mpt2{position:relative;flex:0 1 52px;min-width:40px;width:auto;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:10px;font:700 .68rem var(--body);line-height:1;padding:0;cursor:pointer}
+.mpop .mpt2 span{max-width:100%;padding:0 2px;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mpop .mpt2:disabled{opacity:.45;cursor:not-allowed}
+.mpop .mpbadge{position:absolute;top:3px;inset-inline-end:5px;font-style:normal;font-size:.64rem;color:var(--brass)}
+.mpop .mppri{flex:1 1 auto;min-width:72px;overflow:hidden;height:52px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:1.02rem;border-radius:11px;padding:0 10px;white-space:nowrap}
+.mpop .mppri span{overflow:hidden;text-overflow:ellipsis}
+.mpop{container-type:inline-size}
+@container (max-width:290px){ .mpop .mppri svg{display:none} .mpop .mppri{padding:0 6px} .mpop .mpt2{font-size:.6rem} .mpop .mpt2 span{padding:0 1px} }
+/* 0.2.58: the map page facelift: tile details right under the map, a strip with valleys held and Hide troops, tidier bookmarks and Occupy flats */
+.tinfo{margin-top:10px}
+.tcard{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.tcard .tch{display:flex;align-items:baseline;gap:4px 8px;flex-wrap:wrap}.tcard .tch b{font:700 1.02rem var(--display);overflow-wrap:anywhere}.tcard .tch .dur{font-size:.84rem}
+.tcard .tbm{display:flex;align-items:center;gap:6px;color:var(--brass);margin-top:6px}.tcard .tbm svg{fill:currentColor;flex:none}.tcard .tbm input{flex:1;min-width:0;height:32px;font-size:.88rem;margin:0}
+.tcard .tfacts{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:.88rem;line-height:1.32}
+.tcard .tfacts li{position:relative;padding-inline-start:12px}.tcard .tfacts li::before{content:"";position:absolute;inset-inline-start:2px;top:.56em;width:4px;height:4px;border-radius:2px;background:var(--brass)}
+.tcard .tsec{margin-top:10px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.tcard .tsec span{text-transform:none;letter-spacing:0;font-weight:500;margin-inline-start:4px}
+.tcard .us{display:flex;flex-wrap:wrap;gap:4px;margin:5px 0 0}.tcard .us span{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:2px 7px;font-size:.84rem;white-space:nowrap}
+.tcard .ctiles{margin-top:5px}.tcard .ctiles div{background:var(--panel)}
+.tcard .tnote,.tcard .tnone{font-size:.84rem;margin:4px 0 0}.tcard .why{margin:6px 0 0}
+.tcard .farmadd{margin-top:6px}.tcard .dmonpic{margin-top:6px}
+.tcard .tmore{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.tcard .tryc{margin-top:8px;align-items:center}
+.mapstrip{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;flex-wrap:wrap}.mapstrip #mapstat{white-space:nowrap}
+.mapstrip .bmjump{flex:0 0 auto;width:auto;max-width:96px;margin:0 0 0 auto;padding:6px 24px 6px 10px;font-weight:700;color:var(--brass)}
+.mcard>summary .dur{font-weight:500}
+.bmsort{margin-top:10px}.bmsort button{padding:7px 8px}
+.bmlist{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.bmrow{display:flex;align-items:stretch;gap:6px}
+.bmgo{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:9px;text-align:start;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;color:var(--ink);font:inherit;cursor:pointer}
+.bmgo>svg{color:var(--brass);fill:var(--brass);flex:none}
+.bmn{display:flex;flex-direction:column;min-width:0}.bmn b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bmn .dur{font-size:.8rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bmx{flex:0 0 42px;background:transparent;border:1px solid var(--line);border-radius:10px;color:var(--muted);display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+.bmtip{margin:8px 0 0;font-size:.8rem}
+.occgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) 64px;gap:6px;margin-top:10px}.occgrid select{padding-inline:8px 24px}
+.occgrid label{display:flex;flex-direction:column;gap:3px;min-width:0}.occgrid .dur{font-size:.76rem}.occgrid select,.occgrid input{width:100%;min-width:0;margin:0}
+#occsec #occpreset{margin:8px 0 6px}
+.mhold{margin:10px 0 0}.mhold button{padding:9px 8px}.mholdn{margin:5px 0 4px;font-size:.84rem}
 .mapview #mappop:not([hidden])~#minic{display:none}
 .dgimg{image-rendering:pixelated;object-fit:contain;flex:none}
 .dgrow{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
@@ -1725,7 +1775,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.56";
+var APP_VERSION = "0.2.58";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -4842,17 +4892,16 @@ var HC_COL={12:"#8e2b2b",14:"#6b3a8f",16:"#23508c",18:"#c9a227"};
 function viewMap(){
   var opts='<option value="npc">NPC city</option><option value="ai">AI lord</option><option value="hc">Historic city</option>'+Object.keys(VTYPES).map(function(k){ return '<option value="'+k+'">'+VTYPES[k].name+'</option>'; }).join("");
   var lv='<option value="0">Any level</option>'; for (var i=1;i<=10;i++) lv+='<option value="'+i+'">Level '+i+'</option>'; [12,14,16,18].forEach(function(i){ lv+='<option value="'+i+'">Level '+i+'</option>'; });
-  // 0.2.50: one toolbar row (name, ⌂, coordinates, ⛶); the farm list row only when a list exists; the overview in the map's corner,
-  // the decoration picker in the full-screen bar; the gesture hint is gone. The valleys-held link sits by Hide troops in the woods.
-  return '<div class="btnrow maptop"><button class="btn ghost small" style="flex:0 0 auto" data-act="march-open" data-tile="'+homeTileId()+'" data-mission="hide">Hide troops in the woods</button>'+bmJumpHtml()+'<button class="link dur" id="mapstat" data-act="held-open" title="See every valley and flat you hold"></button></div>'+
-    '<div class="section"><div class="maptools"><h3 id="realmh">'+esc(realmName())+'</h3><button class="btn ghost small" data-act="map-home" aria-label="My city" title="My city">\u2302</button><span class="dur" id="mapcoord"></span><button class="btn ghost small" data-act="map-fs" title="Full screen" aria-label="Full screen">\u26f6</button></div>'+
+  // 0.2.58 (Cody: the valleys-held line pushed the map off the top): the map card comes first. Its toolbar is the name, the bookmarks
+  // ⌂, coordinates and ⛶; under the map, the picked tile's details, then a strip with valleys held, the bookmarks jump (★ n) and Hide troops.
+  return '<div class="section mapcard"><div class="maptools"><h3 id="realmh">'+esc(realmName())+'</h3><button class="btn ghost small" data-act="map-home" aria-label="My city" title="My city">⌂</button><span class="dur" id="mapcoord"></span><button class="btn ghost small" data-act="map-fs" title="Full screen" aria-label="Full screen">⛶</button></div>'+
     '<div id="mapfarmbox">'+mapFarmHtml()+'</div>'+
     '<div class="mapview'+(MAPFS.on?' fs'+(MAPFS.rot?' rot':''):'')+'" id="mapview"><canvas id="mapc" aria-label="Map. Drag to pan, tap a tile to see it."></canvas><div class="mpop" id="mappop" hidden></div><div class="wdml kml" id="kmml" hidden></div><div class="paintbar" id="paintbar" hidden></div>'+
       '<canvas id="minic" width="'+MAPW+'" height="'+MAPH+'" aria-label="Overview map. Tap to jump there."></canvas>'+
-      '<div class="mapfsbar"><button class="btn small dpickbtn" data-act="dpick" aria-pressed="'+(DPICK.on?'true':'false')+'" title="Tap decorations instead of tiles" aria-label="Pick decorations"><img src="'+ITEM_IMG._deco+'" alt=""></button><button class="btn small" data-act="map-home" aria-label="My city">\u2302</button><button class="btn small" data-act="map-rot" aria-label="Turn sideways">\u27f3</button><button class="btn small" data-act="map-fs" aria-label="Leave full screen">\u2715</button></div></div>'+
-    '<div id="mapglance" class="glance"></div></div>'+
-    '<div id="bmpanel">'+bmPanel()+'</div>'+occPanel()+
-    '<details class="section det" id="tidet" data-det="tileinfo"'+(DET.tileinfo?' open':'')+(selTile?'':' hidden')+'><summary><b>Tile details</b> <span class="dur" id="tisum"></span></summary><div id="tileinfo"></div></details><div id="marchbox"></div>';
+      '<div class="mapfsbar"><button class="btn small dpickbtn" data-act="dpick" aria-pressed="'+(DPICK.on?'true':'false')+'" title="Tap decorations instead of tiles" aria-label="Pick decorations"><img src="'+ITEM_IMG._deco+'" alt=""></button><button class="btn small" data-act="map-home" aria-label="My city">⌂</button><button class="btn small" data-act="map-rot" aria-label="Turn sideways">⟳</button><button class="btn small" data-act="map-fs" aria-label="Leave full screen">✕</button></div></div>'+
+    '<div id="tileinfo" class="tinfo"'+(selTile?'':' hidden')+'></div>'+
+    '<div class="mapstrip"><button class="link" id="mapstat" data-act="held-open" title="See every valley and flat you hold"></button>'+bmJumpHtml()+'<button class="btn ghost small" data-act="march-open" data-tile="'+homeTileId()+'" data-mission="hide">Hide troops in the woods</button></div></div>'+
+    '<div id="bmpanel">'+bmPanel()+'</div>'+occPanel()+'<div id="marchbox"></div>';
 }
 /* 0.1.243: show one preset's farm list on the map: every target outlined and numbered in farm order, and dotted on the overview.
    Per city (presets are), kept for the session only. */
@@ -5317,11 +5366,11 @@ function occPanel(){
   for (var i=1;i<=10;i++) lv+='<option value="'+i+'"'+(o.lvl===i?' selected':'')+'>Level '+i+'</option>';
   S.mpresets.forEach(function(p,pi){ pp+='<option value="'+pi+'"'+(o.p===pi?' selected':'')+'>'+(pi+1)+'. '+esc(p.name)+(presetTotal(p)?'':' (empty)')+'</option>'; });
   var hh=pr.hero===HERO_BEST?"Best attack (free hero)":pr.hero===HERO_FAST?"Fastest (free hero)":pr.hero===HERO_ANY?"Any free hero":pr.hero>0?(heroById(pr.hero)?esc(heroById(pr.hero).name):"a hero who is gone"):"No hero";
-  return '<details class="section det" id="occsec" data-det="occ"'+(DET.occ?' open':'')+'><summary><b>Occupy flats</b> <span class="dur">'+esc(S.name)+'</span></summary>'+
-    '<p class="hint">Finds the nearest free flats of the level you pick and sends the chosen preset to occupy each one. It stops when it runs out of free marches, room to hold, troops, rations or heroes, or if the preset would lose.</p>'+
-    '<div class="farmadd"><label class="dur" for="occlvl">Flat level</label><select id="occlvl">'+lv+'</select><label class="dur" for="occpre">March preset</label><select id="occpre">'+pp+'</select><label class="dur" for="occn">Take</label><input type="number" id="occn" min="1" max="'+Math.max(1,rallyLv())+'" value="'+o.n+'" style="width:4.5em"></div>'+
-    '<p class="dur" id="occpreset" style="margin:4px 0">'+(presetTotal(pr)?presetSummary(pr)+'. Hero: '+hh+'.':'This march preset has no troops. Edit it at the Rally Spot.')+'</p>'+
-    '<div class="act"><span class="dur" id="occinfo">'+occInfoText()+'</span><button class="btn" data-act="occ-go">Occupy flats</button></div></details>';
+  return '<details class="section det mcard" id="occsec" data-det="occ"'+(DET.occ?' open':'')+'><summary><b>Occupy flats</b> <span class="dur">from '+esc(S.name)+'</span></summary>'+ // 0.2.58: three fields in a row, then what goes and the button
+    '<div class="occgrid"><label><span class="dur">Flat level</span><select id="occlvl">'+lv+'</select></label><label><span class="dur">March preset</span><select id="occpre">'+pp+'</select></label><label><span class="dur">How many</span><input type="number" id="occn" min="1" max="'+Math.max(1,rallyLv())+'" value="'+o.n+'"></label></div>'+
+    '<p class="dur" id="occpreset">'+(presetTotal(pr)?presetSummary(pr)+'. Hero: '+hh+'.':'This march preset has no troops. Edit it at the Rally Spot.')+'</p>'+
+    '<div class="act"><span class="dur" id="occinfo">'+occInfoText()+'</span><button class="btn" data-act="occ-go">Occupy flats</button></div>'+
+    '<p class="dur bmtip">Sends the preset to the nearest free flats of that level, one march each. Stops when marches, room, troops, food or heroes run out, or if it would lose.</p></details>';
 }
 function occupyFlats(){
   var o=occSet(), pr=S.mpresets[o.p], rl=rallyLv();
@@ -5366,30 +5415,29 @@ function bmList(){ return S.bm||(S.bm=[]); }
 function bmAt(id){ var l=bmList(); for (var i=0;i<l.length;i++) if (l[i].id===id) return l[i]; return null; }
 function bmTile(b){ var xy=b.id.split(","); return tileAt(+xy[0],+xy[1]); }
 var bmSort="near";
-function bmPanel(){ var l=bmList(); if (!l.length) return '';
+function bmPanel(){ var l=bmList(); if (!l.length) return ''; // 0.2.58: one row a bookmark (tap it to go there, × to remove), sorting as a two-way switch
   var rows=l.map(function(b,i){ var q=bmTile(b); return {b:b,i:i,q:q,d:q.k==="home"&&q.city===C().id?0:tdist(q)}; });
   if (bmSort==="near") rows.sort(function(a,b){ return a.d-b.d; });
-  var h='<details class="det section" data-det="bm"'+(DET.bm!==false?' open':'')+'><summary><b>Bookmarks</b> <span class="dur">'+l.length+(l.length>=BM_MAX?' (full)':'')+'</span></summary>'+
-    '<div class="btnrow" style="margin:6px 0"><button class="btn ghost small'+(bmSort==="near"?' on':'')+'" data-act="bm-sort" data-s="near">Nearest first</button><button class="btn ghost small'+(bmSort==="added"?' on':'')+'" data-act="bm-sort" data-s="added">Order added</button></div>';
+  var h='<details class="det section mcard" data-det="bm"'+(DET.bm!==false?' open':'')+'><summary><b>Bookmarks</b> <span class="dur">'+l.length+(l.length>=BM_MAX?' (full)':'')+'</span></summary>'+
+    '<div class="speeds bmsort"><button data-act="bm-sort" data-s="near" aria-pressed="'+(bmSort==="near")+'">Nearest</button><button data-act="bm-sort" data-s="added" aria-pressed="'+(bmSort==="added")+'">Newest last</button></div><div class="bmlist">';
   rows.forEach(function(r){ var b=r.b, q=r.q;
-    h+='<div class="bq"><span><button class="link strong" data-act="bm-go" data-tile="'+b.id+'">'+esc(b.n||tileName(q))+'</button> <span class="dur">('+q.x+', '+q.y+')'+(b.n?' '+esc(tileName(q)):'')+(r.d?', '+r.d.toFixed(1)+' tiles':'')+'</span></span>'+
-      '<div class="qacts"><button class="link" data-act="bm-go" data-tile="'+b.id+'">Show</button><button class="link" data-act="bm-del" data-tile="'+b.id+'">Remove</button></div></div>'; });
-  return h+'<p class="hint" style="margin-top:6px">Tap a tile, then \u2606 Bookmark on its card. Type a label there too. They show as a gold \u2605 on the map and a dot on the overview, and are shared by all your cities.</p></details>'; }
+    h+='<div class="bmrow"><button class="bmgo" data-act="bm-go" data-tile="'+b.id+'">'+mpIc("star",16)+'<span class="bmn"><b>'+esc(b.n||tileName(q))+'</b><span class="dur">('+q.x+', '+q.y+')'+(b.n?' \u00b7 '+esc(tileName(q)):'')+(r.d?' \u00b7 '+r.d.toFixed(1)+' tiles':'')+'</span></span></button>'+
+      '<button class="bmx" data-act="bm-del" data-tile="'+b.id+'" aria-label="Remove bookmark">'+mpIc("close",16)+'</button></div>'; });
+  return h+'</div><p class="dur bmtip">Star a tile from its pop-up. Shared by all your cities.</p></details>'; }
 function bmRefresh(){ var el=document.getElementById("bmpanel"); if (el){ el.innerHTML=bmPanel(); wireDetails(el); } var bj=document.getElementById("bmjump"), nh=bmJumpHtml();
-  if (bj) { if (nh) bj.outerHTML=nh; else bj.remove(); } else if (nh){ var hb=document.querySelector('[data-mission="hide"]'); if (hb && hb.parentNode) hb.insertAdjacentHTML("afterend", nh); } requestDraw(); }
-function bmCard(){ var el=document.getElementById("tileinfo"); if (!el || !selTile) return; var hd=el.querySelector(".shead"); if (!hd) return;
-  var b=bmAt(selTile), wrap=document.createElement("div"); wrap.className="bmcard"; wrap.style.cssText="flex-basis:100%;display:flex;gap:6px;align-items:center;margin-top:4px";
-  wrap.innerHTML=b ? '<button class="btn ghost small" data-act="bm-del" data-tile="'+selTile+'">\u2605 Bookmarked</button><input type="text" id="bm-label" maxlength="40" value="'+esc(b.n||"")+'" placeholder="Label (optional)" aria-label="Bookmark label" style="flex:1;min-width:0">'
-    : '<button class="btn ghost small" data-act="bm-add" data-tile="'+selTile+'">\u2606 Bookmark</button>';
-  hd.style.flexWrap="wrap"; hd.appendChild(wrap); }
+  if (bj) { if (nh) bj.outerHTML=nh; else bj.remove(); } else if (nh){ var rh=document.getElementById("mapstat"); if (rh) rh.insertAdjacentHTML("afterend", nh); } requestDraw(); }
+function bmCard(){ var el=document.getElementById("tileinfo"); if (!el || !selTile) return; var hd=el.querySelector(".tch"); if (!hd) return; // 0.2.58: only a label box, once it's bookmarked (the star is on the pop-up)
+  var b=bmAt(selTile); if (!b) return; var wrap=document.createElement("label"); wrap.className="tbm";
+  wrap.innerHTML=mpIc("star",15)+'<input type="text" id="bm-label" maxlength="40" value="'+esc(b.n||"")+'" placeholder="Bookmark label" aria-label="Bookmark label">';
+  hd.parentNode.insertBefore(wrap, hd.nextSibling); }
 /* 0.2.28: while a dropdown in the panel is open nothing in the panel changes. 0.2.24 held the panel's body, but the Bookmark button was still
    added on every tick (a growing pile of them), and on Android the moving content closed the level picker as it opened. */
-function renderTileInfo(){ if (renderTileInfoBase()===false){ try { mapPop(); } catch(e){} return; } try { tileGlance(); } catch(e){} try { var td=document.getElementById("tidet"), ts=document.getElementById("tisum"); if (td){ td.hidden=!selTile; if (ts){ var tq=selTile&&TILE_BY[selTile]; ts.textContent=tq?tileName(tq)+" ("+tq.x+", "+tq.y+")":""; } } } catch(e){} try { bmCard(); } catch(e){} try { ryCard(); } catch(e){} try { mapPop(); } catch(e){} }
+function renderTileInfo(){ if (renderTileInfoBase()===false){ try { mapPop(); } catch(e){} return; } try { bmCard(); } catch(e){} try { ryCard(); } catch(e){} try { mapPop(); } catch(e){} }
 /* ---------- map popup (0.1.135): tap a tile and its basics and main buttons open right on the map ---------- */
 var MPOP={hide:false};
 var MPOP_ACTS={attack:1, scout:2, occupy:3, conquer:4, found:5, transport:6, reinforce:7, allyguard:8, station:9};
 function bmJumpHtml(){ var l=bmList(); if (!l.length) return '';
-  return '<select class="bmjump" id="bmjump" aria-label="Go to a bookmark"><option value="">\u2605 '+l.length+'</option>'+l.map(function(b){ var q=bmTile(b); return '<option value="'+b.id+'">'+esc(b.n||tileName(q))+' ('+q.x+', '+q.y+')</option>'; }).join("")+'</select>'; }
+  return '<select class="bmjump" id="bmjump" aria-label="Go to a bookmark" title="Bookmarks"><option value="">\u2605 '+l.length+'</option>'+l.map(function(b){ var q=bmTile(b); return '<option value="'+b.id+'">'+esc(b.n||tileName(q))+' ('+q.x+', '+q.y+')</option>'; }).join("")+'</select>'; }
 function mapGo(id){ var xy=String(id).split(","), q=tileAt(+xy[0],+xy[1]); MPOP.hide=false; selectTile(q.id,true); var mv2=document.getElementById("mapview"); if (mv2 && mv2.scrollIntoView) mv2.scrollIntoView({behavior:"smooth",block:"center"}); }
 function mapPopInfo(q){ var bits=['('+q.x+', '+q.y+')'], cur;
   if (q.k!=="home") bits.push(tdist(q).toFixed(1)+' tiles');
@@ -5402,51 +5450,69 @@ function mapPopInfo(q){ var bits=['('+q.x+', '+q.y+')'], cur;
   if (q.k==="ai" && isAlly(q.id)) bits.push('your ally');
   if (ryLocked(q.id)) bits.push('alliance rally on it');
   return bits.join(' \u00b7 '); }
+/* 0.2.58 (Cody picked layout C): one fixed bar along the bottom. The title row has the name, loyalty, then decorate, bookmark and close
+   in fixed spots; the line under it has where it is and the farm-list chip; the bar has small icon tiles and the main action (Attack, or
+   the tile's own main thing) filling the rest, always bottom right. Valleys and flats have no Occupy here: Attack's march screen has Raid
+   or Take and hold. */
+var MPI={
+  scout:'<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
+  rally:'<path d="M4 10v4h3l8 4V6l-8 4z"/><path d="M18 9.5a4 4 0 0 1 0 5"/>',
+  found:'<path d="M4 20V9h3v2h3V9h4v2h3V9h3v11z"/><path d="M10 20v-4h4v4"/>',
+  teleport:'<ellipse cx="12" cy="12" rx="5.5" ry="8.5"/><path d="M12 7v10M9 12h6"/>',
+  home:'<path d="M4 11 12 4l8 7"/><path d="M6 10v10h12V10"/>',
+  transport:'<path d="M3 15h13l3-6H8"/><circle cx="8" cy="19" r="1.6"/><circle cx="16" cy="19" r="1.6"/><path d="M3 15 5 6"/>',
+  reinforce:'<path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6z"/>',
+  attack:'<path d="M14.5 3H21v6.5L10 20.5 3.5 14z"/><path d="M6 17 3 20"/>',
+  camp:'<path d="M3 20 12 5l9 15z"/><path d="M12 20v-6"/>',
+  conquer:'<path d="M5 21V4"/><path d="M5 4h12l-3 4 3 4H5"/>',
+  build:'<path d="M4 20V10l8-6 8 6v10z"/><path d="M9 20v-6h6v6"/>',
+  brush:'<path d="M20 4 11 13"/><path d="M9.5 13.5c-2 0-3.5 1.4-3.5 3.3 0 1.4-.8 2.2-2 2.7 3.6 1.2 7.5.2 7.5-3.3"/>',
+  star:'<path d="m12 3.5 2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/>',
+  close:'<path d="M6 6l12 12M18 6 6 18"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>', check:'<path d="m5 12 5 5 9-10"/>'
+};
+function mpIc(k, s){ return '<svg viewBox="0 0 24 24" width="'+(s||18)+'" height="'+(s||18)+'" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+MPI[k]+'</svg>'; }
+var MPOP_LBL={scout:["Scout","scout"], found:["Found","found"], transport:["Send","transport"], reinforce:["Reinforce","reinforce"], allyguard:["Reinforce","reinforce"], station:["Camp","camp"], conquer:["Conquer","conquer"]};
 function mapPop(){ var el=document.getElementById("mappop"); if (!el) return;
   if (!selTile || MPOP.hide){ el.hidden=true; el._seen=null; return; }
   if (editingIn(el) && !el.hidden) return; // 0.2.24: a dropdown in the popup stays open
   var q=TILE_BY[selTile]; if (!q){ el.hidden=true; return; }
-  var btns=[], seen={}; document.querySelectorAll('#tileinfo [data-act="march-open"], #tileinfo [data-act="city-go"], #tileinfo [data-act="npc-make"]').forEach(function(b){ var m=b.dataset.act==="city-go"?"city":b.dataset.act==="npc-make"?"npcmake":b.dataset.mission, key=m+(b.dataset.city||"");
-    if (seen[key] || (m!=="city" && m!=="npcmake" && !MPOP_ACTS[m])) return; seen[key]=1; btns.push({o:m==="city"||m==="npcmake"?0:MPOP_ACTS[m], h:'<button class="btn'+(btns.length?' ghost':'')+'" data-act="'+b.dataset.act+'"'+(b.dataset.tile?' data-tile="'+b.dataset.tile+'"':'')+(b.dataset.mission?' data-mission="'+b.dataset.mission+'"':'')+(b.dataset.city?' data-city="'+b.dataset.city+'"':'')+(b.disabled?' disabled':'')+'>'+esc(b.textContent)+'</button>'}); });
-  btns.sort(function(a,b){ return a.o-b.o; });
-  try { if (ryOn() && ryTargetOk(q) && !ryLocked(q.id) && ryMineN()<RY_MAX_MINE){ if (!ryWait(q.k)) btns.push({o:50, h:'<button class="btn ghost" data-act="ry-callopen" data-tile="'+q.id+'">\u2694 Call the alliance</button>'}); } } catch(e){} // only while the call is free (a historic city once a day; NPC 10s, wizards and monsters any time)
-  if (q.k==="flat" && !S.map.owned[q.id] && (!C().fieldCap || hasHC(16))){ var tpn=S.items.teleport||0; // teleport this city onto an empty flat
-    btns.push({o:99, h:'<button class="btn ghost" data-act="teleport" data-tile="'+q.id+'"'+(tpn?'':' disabled')+'>Teleport ('+tpn+')</button>'}); } // 0.2.55: one tap (the second-tap label grew the button and shoved the row about)
-  var bm=bmAt(q.id);
+  var acts=[], seen={}; document.querySelectorAll('#tileinfo [data-act="march-open"], #tileinfo [data-act="city-go"], #tileinfo [data-act="npc-make"]').forEach(function(b){ var m=b.dataset.act==="city-go"?"city":b.dataset.act==="npc-make"?"npcmake":b.dataset.mission, key=m+(b.dataset.city||"");
+    if (seen[key] || (m!=="city" && m!=="npcmake" && !MPOP_ACTS[m]) || m==="occupy") return; seen[key]=1;
+    acts.push({m:m, o:m==="city"||m==="npcmake"?0:MPOP_ACTS[m], attrs:' data-act="'+b.dataset.act+'"'+(b.dataset.tile?' data-tile="'+b.dataset.tile+'"':'')+(b.dataset.mission?' data-mission="'+b.dataset.mission+'"':'')+(b.dataset.city?' data-city="'+b.dataset.city+'"':'')+(b.disabled?' disabled':'')}); });
+  acts.sort(function(a,b){ return a.o-b.o; });
+  var pri=null; ["attack","city","npcmake"].some(function(m){ for (var i=0;i<acts.length;i++) if (acts[i].m===m){ pri=acts.splice(i,1)[0]; return true; } return false; });
+  if (!pri && acts.length && /reinforce|allyguard|transport/.test(acts[0].m)) pri=acts.shift();
+  var tiles=acts.map(function(a){ var L=MPOP_LBL[a.m]||[a.m,"info"]; return '<button class="mpt2"'+a.attrs+'>'+mpIc(L[1],19)+'<span>'+L[0]+'</span></button>'; });
+  try { if (ryOn() && ryTargetOk(q) && !ryLocked(q.id) && ryMineN()<RY_MAX_MINE && !ryWait(q.k)) tiles.push('<button class="mpt2" data-act="ry-callopen" data-tile="'+q.id+'">'+mpIc("rally",19)+'<span>Rally</span></button>'); } catch(e){} // only while the call is free (a historic city once a day; NPC 10s, wizards and monsters any time)
+  if (q.k==="flat" && !S.map.owned[q.id] && (!C().fieldCap || hasHC(16))){ var tpn=S.items.teleport||0; // teleport this city onto an empty flat: one tap (0.2.55)
+    tiles.push('<button class="mpt2" data-act="teleport" data-tile="'+q.id+'"'+(tpn?'':' disabled')+' aria-label="Teleport ('+tpn+' left)">'+mpIc("teleport",19)+'<span>Teleport</span><i class="mpbadge">'+tpn+'</i></button>'); }
+  tiles.push('<button class="mpt2" data-act="mpop-more">'+mpIc("info",19)+'<span>Details</span></button>');
+  var priH='';
+  if (pri){ var pl=pri.m==="attack"?["Attack","attack"]:pri.m==="city"?["Go to city","home"]:pri.m==="npcmake"?["Build NPC city","build"]:(MPOP_LBL[pri.m]||[pri.m,"info"]);
+    priH='<button class="btn mppri"'+pri.attrs+'>'+mpIc(pl[1],20)+'<span>'+pl[0]+'</span></button>'; }
+  var bm=bmAt(q.id), dec=S.deco&&S.deco.at[q.id]&&S.deco.at[q.id].length;
   var loyH=""; if ((q.k==="npc"||q.k==="hc"||q.k==="ai") && !S.map.owned[q.id]){ var lv=Math.floor(loyOf(q)); loyH='<span class="mploy'+(lv<=30?' low':lv<70?' mid':'')+'" title="Loyalty: at 0 a win takes the city">Loyalty '+lv+'</span>'; } // 0.1.190
-  var ph='<div class="mpt">'+(q.k==="monster"&&!q.ev&&DMON_ART[q.mon]?'<img class="mpmon" src="'+DMON_ART[q.mon].still+'" alt=""'+(DMON_ART[q.mon].px?' style="image-rendering:pixelated"':'')+'>':'')+'<b>'+esc(tileName(q))+'</b>'+loyH+'<button class="mpx mpbm'+(bm?' on':'')+'" data-act="'+(bm?'bm-del':'bm-add')+'" data-tile="'+q.id+'" aria-label="'+(bm?'Remove bookmark':'Bookmark')+'" title="'+(bm?'Remove bookmark':'Bookmark')+'">'+(bm?'\u2605':'\u2606')+'</button><button class="mpx" data-act="mpop-close" aria-label="Close">\u00d7</button></div><div class="dur">'+mapPopInfo(q)+'</div>'+
-    '<div class="mpb">'+btns.map(function(x){ return x.h; }).join("")+'<button class="btn ghost mpbrush'+(S.deco&&S.deco.at[q.id]&&S.deco.at[q.id].length?' on':'')+'" data-act="deco-open" data-tile="'+q.id+'" aria-label="Decorate this tile" title="Decorate"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M20.7 3.3a1 1 0 0 0-1.4 0L11 11.6l1.4 1.4 8.3-8.3a1 1 0 0 0 0-1.4z" fill="currentColor"/><path d="M9.6 13c-1.8 0-3.1 1.3-3.3 3-.2 1.4-.9 2.3-2.3 2.8 1 .9 2.4 1.2 3.9 1.2 2.6 0 4.6-1.8 4.6-4.1 0-.5-.1-1-.3-1.4z" fill="currentColor"/></svg></button><button class="btn ghost" data-act="mpop-more">Details</button></div>'+mpopFarmHtml(q);
+  var ph='<div class="mpt">'+(q.k==="monster"&&!q.ev&&DMON_ART[q.mon]?'<img class="mpmon" src="'+DMON_ART[q.mon].still+'" alt=""'+(DMON_ART[q.mon].px?' style="image-rendering:pixelated"':'')+'>':'')+'<b>'+esc(tileName(q))+'</b>'+loyH+
+    '<span class="mpic"><button class="mpx mpbrush'+(dec?' on':'')+'" data-act="deco-open" data-tile="'+q.id+'" aria-label="Decorate this tile" title="Decorate">'+mpIc("brush",19)+'</button>'+
+    '<button class="mpx mpbm'+(bm?' on':'')+'" data-act="'+(bm?'bm-del':'bm-add')+'" data-tile="'+q.id+'" aria-label="'+(bm?'Remove bookmark':'Bookmark')+'" title="'+(bm?'Remove bookmark':'Bookmark')+'">'+mpIc("star",19)+'</button>'+
+    '<button class="mpx" data-act="mpop-close" aria-label="Close">'+mpIc("close",19)+'</button></span></div>'+
+    '<div class="mpsub"><span class="dur">'+mapPopInfo(q)+'</span>'+mpopFarmHtml(q)+'</div>'+
+    '<div class="mpbar">'+tiles.join("")+priH+'</div>';
   if (el._h!==ph){ el.innerHTML=ph; el._h=ph; var fsel=el.querySelector("#mpfarmsel"); if (fsel) fsel.addEventListener("change", function(){ MPOPFARM=+fsel.value; el._h=""; mapPop(); }); } el.hidden=false; mapPopPos(); }
-// 0.2.9: add the tile to a farm preset from the popup: pick the preset, then Add (Remove when it's already on that list)
+// 0.2.9: add the tile to a farm preset from the popup. 0.2.58: a chip by the coordinates: the list to use, then + to add (✓ when it's on it; tap to take it off)
 var MPOPFARM=0;
 function mpopFarmHtml(q){ if (!document.querySelector('#tileinfo [data-act="farm-toggle"]') || !S.presets || !S.presets.length) return '';
   if (MPOPFARM>=S.presets.length) MPOPFARM=0; var on=S.presets[MPOPFARM].farm.indexOf(q.id)>=0;
-  return '<div class="mpfarm"><select id="mpfarmsel" aria-label="Farm preset">'+S.presets.map(function(pr,pi){ var has=pr.farm.indexOf(q.id)>=0; return '<option value="'+pi+'"'+(pi===MPOPFARM?' selected':'')+'>'+(pi+1)+'. '+esc(pr.name)+(has?' \u2713':'')+' ('+pr.farm.length+')</option>'; }).join("")+'</select>'+
-    '<button class="btn ghost" data-act="mpop-farm" data-tile="'+q.id+'">'+(on?'Remove':'Add')+'</button></div>'; }
+  return '<span class="mpfarm'+(on?' on':'')+'"><select id="mpfarmsel" aria-label="Farm list">'+S.presets.map(function(pr,pi){ var has=pr.farm.indexOf(q.id)>=0; return '<option value="'+pi+'"'+(pi===MPOPFARM?' selected':'')+'>Farm '+(pi+1)+'. '+esc(pr.name)+(has?' ✓':'')+'</option>'; }).join("")+'</select>'+
+    '<button class="mpfadd" data-act="mpop-farm" data-tile="'+q.id+'" aria-label="'+(on?'Take it off this farm list':'Add it to this farm list')+'">'+mpIc(on?"check":"plus",16)+'</button></span>'; }
 function mapPopPos(){ var el=document.getElementById("mappop"), c=document.getElementById("mapc"); if (!el || el.hidden || !c || !selTile) return; var q=TILE_BY[selTile]; if (!q) return;
   // 0.2.53 (Cody: "it jumps around a lot, especially when you click teleport"): the pop-up sits docked along the bottom of the map and never moves.
   // When you pick a tile, the map shifts once (only if needed) so that tile shows above it; the overview map hides while it's open.
   el.classList.add("dock"); el.style.left=""; el.style.top="";
   if (el._seen!==selTile){ el._seen=selTile; var H=c.clientHeight, z=mv.z, h=el.offsetHeight||120, py=(q.y-mv.y)*z, room=H-h-10;
     if (room>z && (py<4 || py+z>room)){ mv.y=q.y+0.5-room/(2*z); clampView(); try { requestDraw(); } catch(e){} } } }
-// 0.2.9: what the picked tile holds and carries, in the box beside the overview: defenders, loot and its one key fact; "All details" opens the full card
-function tileGlance(){ var el=document.getElementById("mapglance"); if (!el) return;
-  var q=selTile && TILE_BY[selTile], h;
-  if (!q) h=''; // 0.2.50: empty until a tile is picked (the "Tap a tile" line is gone)
-  else { h='<div class="gl-h">'+esc(tileName(q))+' <span class="dur">('+q.x+', '+q.y+')</span></div>';
-    try {
-      if (q.k==="home") h+='<p class="hint">One of your cities.</p>';
-      else { var cur=current(q), intel=needScout(q)?intelOf(q):null, shown=intel||cur;
-        if (needScout(q) && !intel) h+='<div class="gl-t">Defenders</div><p class="hint">Unknown. Scout it first.</p>';
-        else if (shown && shown.t){ var tS=intel && intel.inf<3 ? intel.t.map(roughN) : shown.t, fS=(q.k==="npc"||q.k==="hc"||q.k==="ai") ? (intel && intel.inf<3 ? null : shown.f) : null;
-          h+='<div class="gl-t">Defenders</div>'+troopRows(tS, fS, shown.wall); }
-        var rs=(!needScout(q)||intel) && shown && shown.res;
-        if (rs) h+='<div class="gl-t">Loot</div><div class="gl-res">'+RES.map(function(k){ var n=intel?roughN(intel.res[k]):rs[k]; return n>0 ? '<span title="'+RNAME[k]+'">'+ICON[k]+fmt(n)+'</span>' : ''; }).join("")+'</div>';
-        if (VTYPES[q.k] && VTYPES[q.k].res) h+='<p class="hint">Hold it for +'+pct(VALLEY_BONUS*q.L)+' '+VTYPES[q.k].res+'.</p>';
-      }
-    } catch(e){}
-    h+='<button class="link" data-act="mpop-more">All details \u2193</button>'; }
-  if (el._h!==h){ el.innerHTML=h; el._h=h; } }
 // 0.2.24: a dropdown or box in use inside a panel that redraws every tick (the place-an-NPC level, the ally to give a city to) closed as you opened it
 var PLACE_LV=10; // 0.2.36: the level picked in "Place an NPC city here" (the panel redraws every second and used to draw the dropdown back at 10 the moment a pick was made)
 document.addEventListener("change", function(e){ if (e.target && e.target.id==="placelvl") PLACE_LV=Math.max(1, Math.min(10, +e.target.value||10)); }, true);
@@ -5462,90 +5528,96 @@ function editingIn(el){ return !!(el && EDITING && el.contains(EDITING)); }
 // 0.2.26: Draft from an NPC city's own panel, one button for each historic city of yours that can reach it today
 function draftTileBtns(q){ var n=sumT(draftTake(current(q))); if (!n) return ''; return S.cities.map(function(c,ci){ if (!draftReady(c) || !draftOk(c,q)) return '';
   return '<button class="btn ghost" data-act="hc-draft" data-ci="'+ci+'" data-tile="'+q.id+'">Draft '+fmt(n)+' into '+esc(c.name)+'</button>'; }).join(""); }
+/* 0.2.58: Tile details sit right under the map, cut down to what the pop-up doesn't already show: facts in short lines, defenders and
+   loot, and only the actions the pop-up has no room for. The pop-up's own buttons (Attack, Scout, Found city, Send, Reinforce, switch
+   city, establish an NPC city, the farm lists) stay in a hidden row here: the pop-up builds its bar from them. */
+function tiFact(t){ return '<li>'+t+'</li>'; }
+function tiActsHidden(h){ return h ? '<div class="tiacts" hidden>'+h+'</div>' : ''; }
+function tiMore(h){ return h ? '<div class="tmore">'+h+'</div>' : ''; }
+function tiDefenders(q, intel, shown){ var h='';
+  if (needScout(q) && !intel) return '<div class="tsec">Defenders</div><p class="dur tnone">Unknown until you scout it.</p>';
+  if (intel) shown=intel;
+  h+='<div class="tsec">Defenders'+(intel?' <span>scouted '+fmtT(realMs(S.gt-intel.at))+' ago'+(intel.inf<3?', rough':'')+'</span>':'')+'</div>';
+  var tS=intel && intel.inf<3 ? intel.t.map(roughN) : shown.t, fS=(q.k==="npc"||q.k==="hc"||q.k==="ai") ? (intel && intel.inf<3 ? null : shown.f) : null;
+  h+=troopRows(tS, fS, shown.wall);
+  if (intel && intel.inf>=6) h+='<p class="dur tnote">Research: '+["archery","horseback_riding","iron_working","medicine","compass"].map(function(k){ return k.replace("_"," ")+" "+(intel.r[k]||0); }).join(", ")+'. Hero +'+Math.round(((intel.am||1)-1)*100)+'% attack, '+(intel.hint||0)+' Int.</p>';
+  return h; }
+function tiLoot(q, intel, cur){ if (needScout(q) && !intel) return ''; var r=intel?intel.res:cur.res; if (!r) return '';
+  var t=repResTiles(r, !!intel); return t ? '<div class="tsec">Loot</div>'+t : ''; }
 function renderTileInfoBase(){
   var el=document.getElementById("tileinfo"); if (!el) return;
-  if (!selTile){ el.innerHTML=''; return; }
+  if (!selTile){ el.innerHTML=''; el.hidden=true; return; }
+  el.hidden=false;
   if (editingIn(el) && el.dataset.tile===selTile) return false; // wait until they're done with it (false: nothing else may touch the panel either)
   el.dataset.tile=selTile;
-  var q=TILE_BY[selTile], h='<div class="section"><div class="shead"><h3>'+esc(tileName(q))+'</h3><span class="dur">('+q.x+', '+q.y+')'+(q.k!=="home"?', '+tdist(q).toFixed(1)+' tiles away':'')+'</span></div>';
+  var q=TILE_BY[selTile], f=[], hid='', more='', body='';
+  var head='<div class="tch"><b>'+esc(tileName(q))+'</b><span class="dur">('+q.x+', '+q.y+')'+(q.k!=="home"?' · '+tdist(q).toFixed(1)+' tiles':'')+'</span></div>';
+  function out(){ el.innerHTML='<div class="tcard">'+head+(f.length?'<ul class="tfacts">'+f.join("")+'</ul>':'')+body+tiMore(more)+tiActsHidden(hid)+'</div>'; }
   if (q.k==="home"){
-    var hc=S.cities[cityIndex(q.city)], canAb = S.cities.length>1 && !hc.fieldCap, abBtn = canAb ? '<button class="btn ghost danger" data-act="city-abandon" data-city="'+hc.id+'">'+(armedTile==="ab"+hc.id?"Tap again to abandon "+esc(hc.name):"Abandon city")+'</button>' : '';
-    var abNote = canAb ? '<p class="hint" style="margin-top:6px">Abandoning turns it into a level '+Math.max(1,Math.min(10,hc.th||1))+' NPC city (its Town Hall level), with a full garrison. Its troops, wounded, heroes and marches move to your nearest city, and troops still in training are refunded there. Its buildings and resources are lost.</p>' : (hc.fieldCap ? '<p class="hint" style="margin-top:6px">Historic cities can\u2019t be abandoned, but you can give one to an ally.</p>' : '');
+    var hc=S.cities[cityIndex(q.city)], canAb=S.cities.length>1 && !hc.fieldCap;
+    if (q.city===C().id) f.push(tiFact('The city you’re viewing. Armies march from here.'));
+    else { f.push(tiFact('One of your cities.'));
+      hid+='<button class="btn" data-act="city-go" data-city="'+cityIndex(q.city)+'">Switch to this city</button><button class="btn ghost" data-act="march-open" data-tile="'+q.id+'" data-mission="transport">Send resources</button><button class="btn ghost" data-act="march-open" data-tile="'+q.id+'" data-mission="reinforce">Reinforce</button>'; }
+    if (canAb){ more+='<button class="btn ghost small danger" data-act="city-abandon" data-city="'+hc.id+'">'+(armedTile==="ab"+hc.id?"Tap again to abandon "+esc(hc.name):"Abandon city")+'</button>';
+      body+='<p class="dur tnote">Abandoned, it becomes a level '+Math.max(1,Math.min(10,hc.th||1))+' NPC city. Troops, heroes and marches move to your nearest city; buildings and resources are lost.</p>'; }
     if (hc.fieldCap){ var gw=giftWhy(hc), gr=GIFT_REP[hc.fieldCap]||GIFT_REP[12];
-      abNote+='<div class="section" style="margin-top:8px"><h3>Give to an ally</h3><p class="hint">Hand '+esc(hc.name)+' to an ally as one of their cities, for <b>+'+fmt(gr)+' reputation</b>. Everything in it goes with it: troops, resources and buildings. Its heroes come home to wait at your gate.</p>'+
+      body+='<div class="tsec">Give to an ally <span>+'+fmt(gr)+' reputation</span></div><p class="dur tnote">Historic cities can’t be abandoned. Everything in it goes with it; its heroes come home.</p>'+
         (gw?'<p class="why">'+gw+'</p>':'<div class="farmadd"><select id="giftally">'+allyTiles().map(function(aq){ return '<option value="'+aq.id+'">'+esc(aq.ai.name)+'</option>'; }).join("")+'</select>'+
-        '<button class="btn'+(armedTile==="gift"+hc.id?' danger':'')+'" data-act="city-gift" data-city="'+hc.id+'">'+(armedTile==="gift"+hc.id?'Tap again to give it away':'Give city')+'</button></div>')+'</div>'; }
-    if (q.city===C().id){ el.innerHTML=h+'<p class="hint">The city you\u2019re viewing. Armies march from here.</p>'+(abBtn?'<div class="btnrow" style="margin-top:8px">'+abBtn+'</div>':'')+abNote+'</div>'; return; }
-    else el.innerHTML=h+'<p class="hint">One of your cities. Send resources (the escort returns) or reinforce it (troops and a hero stay).</p><div class="btnrow" style="margin-top:8px"><button class="btn" data-act="city-go" data-city="'+cityIndex(q.city)+'">Switch to this city</button><button class="btn ghost" data-act="march-open" data-tile="'+q.id+'" data-mission="transport">Send resources</button><button class="btn ghost" data-act="march-open" data-tile="'+q.id+'" data-mission="reinforce">Reinforce</button>'+abBtn+'</div>'+abNote+'</div>';
-    return;
-  }
-  if (q.k==="wiz"){ el.innerHTML=h+wizInfoHtml(q)+'</div>'; return; }
+        '<button class="btn small'+(armedTile==="gift"+hc.id?' danger':'')+'" data-act="city-gift" data-city="'+hc.id+'">'+(armedTile==="gift"+hc.id?'Tap again to give it away':'Give city')+'</button></div>'); }
+    out(); return; }
+  if (q.k==="wiz"){ var wh=wizInfoHtml(q), wre=/<div class="btnrow"[^>]*><button class="btn" data-act="march-open"[^>]*>[^<]*<\/button><\/div>/;
+    var wm=wh.match(wre); if (wm){ hid+=wm[0]; wh=wh.replace(wre,''); } body+=wh; out(); return; }
   var owned=!!S.map.owned[q.id];
   if (owned){
     var holder=S.cities[cityIndex(S.map.owned[q.id])], mine=S.map.owned[q.id]===C().id, camp=campAt(q.id, S.map.owned[q.id]), ch=camp&&camp.hero?heroById(camp.hero):null;
-    var campH = camp ? '<div class="h3" style="margin-top:6px">Camp</div><p>'+fmt(sumT(camp.t))+' troops: '+troopList(camp.t)+(ch?'. Led by '+esc(ch.name):'')+'.</p><p class="hint">To attack from here, open any target and pick this camp under \u201cMarch from\u201d. Marches from a camp travel from this tile, come back to it, and send their plunder home. Only the army that took the tile holds the camp: nobody can join it. Camps show on the map.</p>'+
-        (mine?'<div class="btnrow"><button class="btn ghost" data-act="march-recall" data-m="'+camp.id+'">Pack up the camp</button></div>':'')
-      : '';
-    if (q.k==="flat"){
-      h+='<p>Held by '+esc(holder.name)+'. Its level is locked at '+q.L+' while you hold it.</p>'+
-        '<p class="hint">Establish a level '+q.L+' NPC city here to farm. It costs 10k of each resource from '+esc(holder.name)+', and the flat is released.</p>'+
-        '<div class="btnrow" style="margin-top:8px">'+(mine?'<button class="btn" data-act="npc-make" data-tile="'+q.id+'">Establish level '+q.L+' NPC city</button>':'<button class="btn" data-act="city-go" data-city="'+cityIndex(holder.id)+'">Switch to '+esc(holder.name)+' to build here</button>')+
-        '<button class="btn ghost" data-act="release" data-tile="'+q.id+'">Release flat</button></div>'+campH+'</div>';
-    } else h+='<p>Held by '+esc(holder.name)+': +'+pct(VALLEY_BONUS*q.L)+' '+VTYPES[q.k].res+' production. Its level is locked at '+q.L+' while you hold it.</p><div class="btnrow" style="margin-top:8px"><button class="btn ghost" data-act="release" data-tile="'+q.id+'">Release valley</button></div>'+campH+'</div>';
-    el.innerHTML=h; return;
-  }
-  if (q.k==="allycity"){ var pq2=TILE_BY[q.ally]; el.innerHTML=h+'<p class="hint">A city founded by your ally '+esc(pq2&&pq2.ai?pq2.ai.name:"")+'. Allies grow faster, found new cities and set up their own NPC farms.</p><div class="btnrow"><button class="btn ghost" data-act="goto-tile" data-tile="'+q.ally+'">Show '+esc(pq2&&pq2.ai?pq2.ai.name:"the ally")+'</button></div></div>'; return; }
+    f.push(tiFact('Held by '+esc(holder.name)+(VTYPES[q.k].res?': +'+pct(VALLEY_BONUS*q.L)+' '+VTYPES[q.k].res:'')+'. Level locked at '+q.L+'.'));
+    if (q.k==="flat"){ f.push(tiFact('Build a level '+q.L+' NPC city here to farm: 10k of each resource, and the flat is released.'));
+      hid+=mine?'<button class="btn" data-act="npc-make" data-tile="'+q.id+'">Build NPC city</button>':'<button class="btn" data-act="city-go" data-city="'+cityIndex(holder.id)+'">Switch to '+esc(holder.name)+'</button>'; }
+    more+='<button class="btn ghost small" data-act="release" data-tile="'+q.id+'">'+(q.k==="flat"?'Release flat':'Release valley')+'</button>';
+    if (camp){ body+='<div class="tsec">Camp'+(ch?' <span>led by '+esc(ch.name)+'</span>':'')+'</div><p class="tnote">'+fmt(sumT(camp.t))+' troops: '+troopList(camp.t)+'.</p><p class="dur tnote">Pick this camp under “March from” to attack from here; plunder goes home.</p>';
+      if (mine) more+='<button class="btn ghost small" data-act="march-recall" data-m="'+camp.id+'">Pack up the camp</button>'; }
+    out(); return; }
+  if (q.k==="allycity"){ var pq2=TILE_BY[q.ally]; f.push(tiFact('Founded by your ally '+esc(pq2&&pq2.ai?pq2.ai.name:"")+'.'));
+    more+='<button class="btn ghost small" data-act="goto-tile" data-tile="'+q.ally+'">Show '+esc(pq2&&pq2.ai?pq2.ai.name:"the ally")+'</button>'; out(); return; }
   if (q.k==="ai" && isAlly(q.id)){ var acur=current(q);
-    el.innerHTML=h+'<p><span class="okc">Your ally.</span> Town Hall '+q.ai.th+', '+fmt(sumT(acur.t))+' troops, research around level '+q.ai.tech+'.</p>'+troopRows(acur.t, acur.f, acur.wall)+
-      '<div class="btnrow" style="margin-top:8px"><button class="btn" data-act="march-open" data-tile="'+q.id+'" data-mission="allyguard">Reinforce</button><button class="btn ghost" data-act="march-open" data-tile="'+q.id+'" data-mission="transport">Send resources</button><button class="btn ghost" data-act="tab" data-tab="alliance">Pact</button></div></div>'; return; }
-  if (q.k==="npc" && S.alliance && S.alliance.farms[q.id]){ var fq=TILE_BY[S.alliance.farms[q.id]]; el.innerHTML=h+'<p class="hint">A level '+q.L+' NPC farm kept by your ally '+esc(fq&&fq.ai?fq.ai.name:"")+'. Hands off.</p></div>'; return; }
-  var cur=current(q);
+    f.push(tiFact('<span class="okc">Your ally.</span> Town Hall '+q.ai.th+' · '+fmt(sumT(acur.t))+' troops · research ~'+q.ai.tech+'.'));
+    body+='<div class="tsec">Troops</div>'+troopRows(acur.t, acur.f, acur.wall);
+    hid+='<button class="btn" data-act="march-open" data-tile="'+q.id+'" data-mission="allyguard">Reinforce</button><button class="btn ghost" data-act="march-open" data-tile="'+q.id+'" data-mission="transport">Send resources</button>';
+    more+='<button class="btn ghost small" data-act="tab" data-tab="alliance">Pact</button>'; out(); return; }
+  if (q.k==="npc" && S.alliance && S.alliance.farms[q.id]){ var fq=TILE_BY[S.alliance.farms[q.id]]; f.push(tiFact('A farm kept by your ally '+esc(fq&&fq.ai?fq.ai.name:"")+'. Hands off.')); out(); return; }
+  var cur=current(q), intel=needScout(q)?intelOf(q):null;
   if (q.k==="chal"){ var cC=chalById(q.cid), cB=cC&&rosterById(cC.rid), cF=cB&&friendOf(cB);
-    if (cC) h+='<p class="hint">'+(q.seat ? esc(cB.name)+' took this historic city and holds it harder than its old garrison did: more troops, heavier fortifications, a fiercer hero. Break the garrison to defeat them, then conquer the empty city.' :
-      'Part of '+esc(cB.name)+'\u2019s host, massing to march on the historic city at ('+cC.target.replace(",",", ")+') in '+fmtT(realMs(cC.siegeAt-S.gt))+'. Every troop you kill here is one fewer in the siege. Raze the city and its troops are gone for good.')+(cF?' <span style="color:var(--brass)">'+esc(cF.note)+'</span>':'')+'</p>'; }
-  if (q.k==="war"){ var wE=W().enemies[q.eid], wb2=rosterById(wE.rid), wf=friendOf(wb2); h+='<p class="hint">'+esc(wb2.name)+'\u2019s war camp: level '+wE.wall+' walls, full fortifications, a hero with '+wE.hero[0]+' Attack. Its field army is out raiding; the garrison rebuilds a little each day. Take the camp to knock '+esc(wb2.name)+' out of the war. Every troop you kill here scores.'+(wf?' <span style="color:var(--brass)">'+esc(wf.note)+'</span>':'')+'</p>'; }
-  if (q.k==="bully"){ var bb2=bullyOf(), B2=S.alliance.bully; h+='<p class="hint">'+(bb2?esc(bb2.name)+'\u2019s stronghold: a fortified city with level '+B2.wall+' walls, a full set of fortifications and a hero with '+B2.hero[0]+' Attack. Its field army is out raiding your allies; the garrison stays home and nothing rebuilds while the bully is here, so you can wear it down over several attacks. Taking it ends the event for a large chunk of pact reputation, its treasury, rare books and materials.':'')+'</p>'; }
-  if (q.k==="hc") h+='<p class="hint">Today\u2019s garrison mix: '+comboText(q)+'. It changes daily. Historic cities recover within an hour, and are led by a powerful hero ('+HC_SET[q.L].hero[0]+' Attack, '+HC_SET[q.L].hero[1]+' Intelligence).'+
-    (hcHeroPreview(q)?' '+(q.L===12?'A historic hero':'The historic hero '+hcHeroPreview(q))+' is held here and joins whoever breaks its loyalty.':'')+'</p>';
-  var intel=needScout(q)?intelOf(q):null, shown=cur;
-  if (needScout(q) && !intel) h+='<div class="h3" style="margin-top:6px">Defenders</div><p class="hint">Unknown. Send scouts to see its army, fortifications and stockpile.</p>';
-  else {
-    if (intel){ shown=intel; h+='<div class="h3" style="margin-top:6px">Defenders <span class="dur" style="font:400 .8rem var(--body)">(scouted '+fmtT(realMs(S.gt-intel.at))+' ago'+(intel.inf<3?', rough counts':'')+')</span></div>'; }
-    else h+='<div class="h3" style="margin-top:6px">Defenders</div>';
-    var tShow = intel && intel.inf<3 ? intel.t.map(roughN) : shown.t, fShow = (q.k==="npc"||q.k==="hc"||q.k==="ai") ? (intel && intel.inf<3 ? null : shown.f) : null;
-    h+=troopRows(tShow, fShow, shown.wall);
-    if (intel && intel.inf>=6) h+='<p class="hint">Research: '+["archery","horseback_riding","iron_working","medicine","compass"].map(function(k){ return k.replace("_"," ")+" "+(intel.r[k]||0); }).join(", ")+'. Leading hero adds +'+Math.round(((intel.am||1)-1)*100)+'% attack and '+(intel.hint||0)+' Intelligence.</p>';
-  }
+    if (cC) f.push(tiFact((q.seat ? esc(cB.name)+' holds this historic city with a tougher garrison. Break it, then conquer the empty city.' : 'Part of '+esc(cB.name)+'’s host, marching on ('+cC.target.replace(",",", ")+') in '+fmtT(realMs(cC.siegeAt-S.gt))+'. Every troop killed here is one fewer in the siege.')+(cF?' <span style="color:var(--brass)">'+esc(cF.note)+'</span>':''))); }
+  if (q.k==="war"){ var wE=W().enemies[q.eid], wb2=rosterById(wE.rid), wf=friendOf(wb2);
+    f.push(tiFact(esc(wb2.name)+'’s war camp: wall '+wE.wall+', full fortifications, hero '+wE.hero[0]+' Attack. Take it to knock them out of the war; every kill scores.'+(wf?' <span style="color:var(--brass)">'+esc(wf.note)+'</span>':''))); }
+  if (q.k==="bully"){ var bb2=bullyOf(), B2=S.alliance.bully; if (bb2) f.push(tiFact(esc(bb2.name)+'’s stronghold: wall '+B2.wall+', full fortifications, hero '+B2.hero[0]+' Attack. Nothing rebuilds while it stands. Taking it ends the event for reputation, its treasury, books and materials.')); }
+  if (q.k==="npc"||q.k==="hc"||q.k==="ai") f.push(tiFact('Loyalty <b>'+Math.round(loyOf(q))+'</b> · '+(q.k==="hc"?'each win −3 (−1 under 10)':'each win −10')+'; a win at 0 conquers it. Recovers 10 an hour, an hour after your last win.'));
+  if (q.k==="hc"){ f.push(tiFact('Garrison today: '+comboText(q)+'. Hero '+HC_SET[q.L].hero[0]+' Attack, '+HC_SET[q.L].hero[1]+' Int.'));
+    if (hcHeroPreview(q)) f.push(tiFact((q.L===12?'A historic hero':'The historic hero '+hcHeroPreview(q))+' joins whoever breaks its loyalty.')); }
   if (q.k==="ai"){ var iq=aiIQ(q), angry=S.aiWar.some(function(w){ return w.ai===q.id; });
-    h+='<div class="taunt"><span>IQ <b>'+iq+'</b> ('+({low:"dim",mid:"sharp enough",high:"dangerous"})[iqBand(iq)]+')</span>'+(angry?'<span class="badc">Already coming for you</span>':'<span class="btnrow"><button class="btn ghost small" data-act="ally-invite" data-tile="'+q.id+'">Invite to your pact</button><button class="btn ghost small danger" data-act="taunt" data-tile="'+q.id+'"'+(tauntsLeft()?'':' disabled')+'>Talk trash ('+tauntsLeft()+' left today)</button></span>')+'</div>'; }
-  if (q.k==="ai") h+='<p class="hint">A '+q.ai.pers.n.toLowerCase()+' with Town Hall '+q.ai.th+' and research around level '+q.ai.tech+'. Growing '+(q.ai.rate<0.7?'slowly':q.ai.rate<1.1?'steadily':'quickly')+'. AI lords never attack unless you provoke them; they slowly grow, train and hoard. Troops you kill return over a game day, and their stockpile refills over two.</p>';
-  if (q.k==="npc"||q.k==="hc"||q.k==="ai") h+='<p class="hint">Loyalty '+Math.round(loyOf(q))+' of 100. '+(q.k==="hc"?'Every attack you win knocks off 3 until it is down to 10, then 1 a hit, so about 40 wins in quick succession take the city. It holds for an hour after your last win, then recovers 10 per hour. You need room in your title for another city.':'Every attack you win knocks off 10. It holds for an hour after your last win, then recovers 10 per hour, so 10 wins in quick succession takes the city, if your title has room for another.')+
-    (q.k==="ai"?' A conquered lord\u2019s city comes with its buildings and fields at Town Hall level, plus its research.':q.k==="hc"?' A conquered historic city starts empty inside, with one of each resource field at level '+q.L+' (and room to build them that high).':' A conquered NPC city comes with one of every building, its walls and twelve fields at level '+q.L+'.')+'</p>';
-  if (q.k==="monster" && q.ev) h+='<p class="hint">A '+esc(evNow()?evNow().name:"holiday")+' monster. It stays until it\u2019s slain or the event ends, and counts toward the event track. Slay it for '+vampSpoils(VAMP_K[q.mon]||q.L).replace(/^A /,"a ")+', and the first one of each level unlocks it as a decoration for good (place it as often as you like).</p>';
-  else if (q.k==="monster") h+=(DMON_ART[q.mon]?'<div class="dmonpic"><img src="'+DMON_ART[q.mon].still+'" alt="'+esc(MONSTERS[q.mon]||"")+'"'+(DMON_ART[q.mon].px?' style="image-rendering:pixelated"':'')+'></div>':'')+'<p class="hint">Drawn to your historic city, it leaves at the end of the day. Slay it for Flawless Gems and a '+Math.round(lootChance(q,"scale")*100)+'% chance at a Dragon Scale, the material for Mythic gear (the tier above Legendary).</p>';
-  if (VTYPES[q.k] && !S.map.owned[q.id] && placeLeft()>0) h+='<div class="farmadd"><span class="dur">Place an NPC city here ('+placeLeft()+' left today):</span><select id="placelvl">'+[1,2,3,4,5,6,7,8,9,10].map(function(n){ return '<option value="'+n+'"'+(n===PLACE_LV?' selected':'')+'>Level '+n+'</option>'; }).join("")+'</select><button class="btn small" data-act="npc-place" data-tile="'+q.id+'">Place</button></div>';
-  if (q.k==="npc"||q.k==="ai") h+='<p class="hint">'+(q.k==="ai"?'An AI lord':'An NPC')+' only drops medals and items if its troop garrison is full when you hit it; otherwise you get just its resources. Let it recover before you hit it again.</p>';
-  if (q.k==="npc") h+='<p class="hint">Demolishing turns it back into a flat, so you can occupy that flat on a better day and establish a higher level NPC city.</p>';
-  if (q.k==="flat" && (S.items.teleport||0)>0 && (!C().fieldCap || hasHC(16))) h+='<div class="btnrow" style="margin:6px 0"><button class="btn" data-act="teleport" data-tile="'+q.id+'">Teleport '+esc(S.name)+' here ('+S.items.teleport+' left)</button></div><p class="hint">The whole city moves: buildings, troops, heroes and held valleys. Its old tile becomes a flat.</p>';
-  if (VTYPES[q.k]) h+='<p class="hint">Unheld valleys and flats gain a level every day at midnight Eastern time, and drop back to level 1 after level 10 (next in '+fmtT(realMs(msToNewDay()))+'). Holding one, or keeping it on a farm preset, locks its level.'+(q.k==="flat"?' Occupy this flat to establish an NPC city of its level here.':'')+'</p>';
+    f.push(tiFact(esc(q.ai.pers.n)+' · Town Hall '+q.ai.th+' · research ~'+q.ai.tech+' · growing '+(q.ai.rate<0.7?'slowly':q.ai.rate<1.1?'steadily':'quickly')+' · IQ <b>'+iq+'</b> ('+({low:"dim",mid:"sharp enough",high:"dangerous"})[iqBand(iq)]+')'+(angry?' · <span class="badc">coming for you</span>':'')));
+    if (!angry) more+='<button class="btn ghost small" data-act="ally-invite" data-tile="'+q.id+'">Invite to your pact</button><button class="btn ghost small danger" data-act="taunt" data-tile="'+q.id+'"'+(tauntsLeft()?'':' disabled')+'>Talk trash ('+tauntsLeft()+')</button>'; }
+  if (q.k==="monster" && q.ev) f.push(tiFact(esc(evNow()?evNow().name:"Holiday")+' monster: '+vampSpoils(VAMP_K[q.mon]||q.L).replace(/^A /,"a ")+'. Your first of each level unlocks it as a decoration.'));
+  else if (q.k==="monster"){ if (DMON_ART[q.mon]) body+='<div class="dmonpic"><img src="'+DMON_ART[q.mon].still+'" alt="'+esc(MONSTERS[q.mon]||"")+'"'+(DMON_ART[q.mon].px?' style="image-rendering:pixelated"':'')+'></div>';
+    f.push(tiFact('Drawn to your historic city; leaves at the end of the day. Drops Flawless Gems, '+Math.round(lootChance(q,"scale")*100)+'% chance of a Dragon Scale.')); }
+  if (VTYPES[q.k]){ if (VTYPES[q.k].res) f.push(tiFact('Hold it for <b>+'+pct(VALLEY_BONUS*q.L)+' '+VTYPES[q.k].res+'</b> ('+ownedIds().length+' / '+S.th+' held).'));
+    else f.push(tiFact('Found a city here, or hold it to build an NPC city (cities '+S.cities.length+' / '+capText()+').'));
+    f.push(tiFact('Levels up in '+fmtT(realMs(msToNewDay()))+'; back to 1 after 10. Holding it or farming it locks the level.')); }
   var hh=S.map.hit[q.id], since=hh?S.gt-hh.at:Infinity;
-  if (hh && VTYPES[q.k] && since<REGEN_R) h+='<p class="hint">Its troops are back at full strength. Loot refilling: <b>'+Math.floor(since/REGEN_R*100)+'%</b>, full in '+fmtT(realMs(REGEN_R-since))+'.</p>';
-  else if (hh && q.k==="npc" && since<REGEN_R) h+='<p class="hint">Recovering from your last attack. Troops '+(since<REGEN_T?'<b>'+Math.floor(since/REGEN_T*100)+'%</b> back, full in '+fmtT(realMs(REGEN_T-since)):'<b>fully back</b>')+'. Loot <b>'+Math.floor(since/REGEN_R*100)+'%</b>, full in '+fmtT(realMs(REGEN_R-since))+'.</p>';
-  if (!needScout(q) || intel) h+='<div class="h3" style="margin-top:8px">Resources</div><div class="us">'+RES.map(function(k){ return '<span>'+RNAME[k]+' <b>'+fmt(intel?roughN(intel.res[k]):cur.res[k])+'</b></span>'; }).join("")+'</div>';
-  if (VTYPES[q.k]){
-    h+= VTYPES[q.k].res ? '<p class="hint" style="margin-top:6px">Hold it for +'+pct(VALLEY_BONUS*q.L)+' '+VTYPES[q.k].res+' production. You can hold up to '+S.th+' valleys (your Town Hall level); you have '+ownedIds().length+'. Tick \u201cStay and make camp\u201d when you occupy to keep the army here as a base to attack from.</p>'
-      : '<p class="hint" style="margin-top:6px">Flats give no bonus, but they\u2019re where new cities are founded. Beat the defenders with a Found City march and your army becomes the new city\u2019s garrison. Costs 10k of each resource. Cities: '+S.cities.length+' of '+capText()+' allowed by your title.</p>';
-  }
-  var mw=medalWeights(q), mtot=mw.reduce(function(a,b){ return a+b; },0), ml=[]; mw.forEach(function(x,i){ if (x>0) ml.push([x,MEDALS[i][1]]); }); ml.sort(function(a,b){ return b[0]-a[0]; });
-  if (ml.length) h+='<p class="hint">Medals are rare: under 1% of victories drop one. Here it would most likely be '+ml.map(function(m){ return m[1]; }).join(", ")+'.</p>';
-  h+='<div class="btnrow" style="margin-top:10px"><button class="btn" data-act="march-open" data-tile="'+q.id+'" data-mission="attack">Attack</button><button class="btn ghost" data-act="march-open" data-tile="'+q.id+'" data-mission="scout">Scout</button>'+
-    (VTYPES[q.k] ? '<button class="btn ghost" data-act="march-open" data-tile="'+q.id+'" data-mission="occupy">Occupy</button>' : '')+
+  if (hh && VTYPES[q.k] && since<REGEN_R) f.push(tiFact('Loot refilling: <b>'+Math.floor(since/REGEN_R*100)+'%</b>, full in '+fmtT(realMs(REGEN_R-since))+'.'));
+  else if (hh && q.k==="npc" && since<REGEN_R) f.push(tiFact('Recovering: troops '+(since<REGEN_T?'<b>'+Math.floor(since/REGEN_T*100)+'%</b>':'<b>back</b>')+', loot <b>'+Math.floor(since/REGEN_R*100)+'%</b> (full in '+fmtT(realMs(REGEN_R-since))+').'));
+  if (q.k==="npc"||q.k==="ai") f.push(tiFact('Medals and items only drop at a full garrison.'));
+  var mw=medalWeights(q), ml=[]; mw.forEach(function(x,i){ if (x>0) ml.push([x,MEDALS[i][1]]); }); ml.sort(function(a,b){ return b[0]-a[0]; });
+  if (ml.length) f.push(tiFact('Medals (rare): '+ml.map(function(m){ return m[1]; }).join(", ")+'.'));
+  body+=tiDefenders(q, intel, cur)+tiLoot(q, intel, cur);
+  if (VTYPES[q.k] && !S.map.owned[q.id] && placeLeft()>0) body+='<div class="tsec">Place an NPC city <span>'+placeLeft()+' left today</span></div><div class="farmadd"><select id="placelvl" aria-label="Level">'+[1,2,3,4,5,6,7,8,9,10].map(function(n){ return '<option value="'+n+'"'+(n===PLACE_LV?' selected':'')+'>Level '+n+'</option>'; }).join("")+'</select><button class="btn small" data-act="npc-place" data-tile="'+q.id+'">Place</button></div>';
+  more+='<button class="btn ghost small" data-act="map-sim" data-tile="'+q.id+'">Simulate</button><button class="btn ghost small" data-act="waves-open" data-tile="'+q.id+'">Timed waves</button>'+
+    ((q.k==="npc"||q.k==="hc") ? draftTileBtns(q).replace(/class="btn ghost"/g,'class="btn ghost small"') : '')+
+    ((q.k==="npc"||q.k==="ai") ? '<button class="btn ghost small danger" data-act="npc-demolish" data-tile="'+q.id+'">'+(armedTile===q.id?"Tap again to demolish":"Demolish")+'</button>' : '');
+  hid+='<button class="btn" data-act="march-open" data-tile="'+q.id+'" data-mission="attack">Attack</button><button class="btn ghost" data-act="march-open" data-tile="'+q.id+'" data-mission="scout">Scout</button>'+
     (q.k==="flat" ? '<button class="btn ghost" data-act="march-open" data-tile="'+q.id+'" data-mission="found">Found city</button>' : '')+
-    ((q.k==="npc"||q.k==="hc") ? draftTileBtns(q) : '')+
-    ((q.k==="npc"||q.k==="ai") ? '<button class="btn ghost danger" data-act="npc-demolish" data-tile="'+q.id+'">'+(armedTile===q.id?"Tap again to demolish":"Demolish")+'</button>' : '')+
-    '<button class="btn ghost" data-act="map-sim" data-tile="'+q.id+'">Simulate</button><button class="btn ghost" data-act="waves-open" data-tile="'+q.id+'">Timed waves</button></div>'+
-    '<div class="farmadd"><span class="dur">Add to farm list:</span><span class="farmgrid">'+S.presets.map(function(pr,pi){ var on=pr.farm.indexOf(q.id)>=0; return '<button class="chipbtn'+(on?' on':'')+'" data-act="farm-toggle" data-p="'+pi+'" data-tile="'+q.id+'" title="'+esc(pr.name)+'" aria-pressed="'+on+'">'+(pi+1)+'</button>'; }).join("")+'</span></div></div>';
-  el.innerHTML=h;
+    '<span class="farmgrid">'+S.presets.map(function(pr,pi){ var on=pr.farm.indexOf(q.id)>=0; return '<button class="chipbtn'+(on?' on':'')+'" data-act="farm-toggle" data-p="'+pi+'" data-tile="'+q.id+'" aria-pressed="'+on+'">'+(pi+1)+'</button>'; }).join("")+'</span>';
+  out();
 }
 function renderMarchBox(){
   var el=document.getElementById("marchbox"); if (!el) return;
@@ -5585,7 +5657,8 @@ function repScoutUnits(t, forts, wall){ var h='';
 function mapDynamic(){ renderTileInfo(); renderMarchBox(); drawMap(); var oi=document.getElementById("occinfo"); if (oi) oi.textContent=occInfoText(); }
 function freeHeroes(){ return S.heroes.filter(function(h){ return !h.away && !seatLocked(h); }); }
 function marchHeroes(){ return freeHeroes().sort(function(a,b){ return hs(b,"atk")-hs(a,"atk") || b.level-a.level; }); }
-function openMarch(tile, mission, mid){
+var OCC_PREF={}; // 0.2.58: Raid it / Take and hold, remembered for the session per kind of valley (and flats)
+function openMarch(tile, mission, mid){ var oq=TILE_BY[tile]; if (mission==="attack" && oq && VTYPES[oq.k] && !S.map.owned[tile] && OCC_PREF[oq.k]) mission="occupy";
   var friendly = mission==="transport" || mission==="reinforce" || mission==="hide";
   marchDraft={tile:tile, mission:mission, t:[0,0,0,0,0,0,0,0,0,0,0,0], hero: friendly ? 0 : ((marchHeroes()[0]||{}).id||0), preview:"", cargo:{food:0,lumber:0,stone:0,iron:0,gold:0}};
   if (mission==="arena") marchDraft.mid=mid||0;
@@ -5658,7 +5731,7 @@ function updateMarchInfo(){
   if (mc) mc.textContent=fmt(cargoTotal())+" / "+fmt(lc);
   var food=d.mission==="hide"?0:marchFood(d.t,d.mission,tm);
   mPills(n, cap, d.mission==="hide"?0:realMs(tm), food, d.mission==="hide"?"now":realMs(tm));
-  var why=marchWhy(); b.disabled=!!why; b.textContent= why || (d.mission==="hide"?"Hide them":d.mission==="allyguard"?"Send guards":d.mission==="scout"?"Send scouts":d.mission==="conquer"?"March to conquer":d.mission==="transport"?"Send resources":d.mission==="reinforce"?"Send reinforcements":d.mission==="occupy"?"March to occupy":d.mission==="found"?"March to found city (10k each)":"March to attack");
+  var why=marchWhy(); b.disabled=!!why; b.textContent= why || (d.mission==="hide"?"Hide them":d.mission==="allyguard"?"Send guards":d.mission==="scout"?"Send scouts":d.mission==="conquer"?"March to conquer":d.mission==="transport"?"Send resources":d.mission==="reinforce"?"Send reinforcements":d.mission==="occupy"?"Attack and hold":d.mission==="found"?"March to found city (10k each)":"March to attack");
   var pv=document.getElementById("marchprev"); if (pv) pv.innerHTML=d.preview;
 }
 /* 0.2.50 (Cody: "i love the plan, its perfect, but only march presets set in the rally hall should show up, no farm presets"): the march screen
@@ -5688,6 +5761,9 @@ function marchSheet(){
   if ((S.mayor||S.trainer||S.researcher||S.wallHero)) help.push('<p>Your mayor, trainer, researcher and wall hero stay home to do their jobs.</p>');
   head=head+(help.length?'<button class="ofq mq'+(MHELP?' on':'')+'" data-act="march-help" aria-expanded="'+MHELP+'" aria-label="How this march works">?</button>':'')+'<button class="btn ghost small" data-act="close" aria-label="Close">✕</button></div>';
   h='<div class="msh">'+head+(help.length?'<div class="mhelp"'+(MHELP?'':' hidden')+'>'+help.join("")+'</div>':'');
+  if ((d.mission==="attack"||d.mission==="occupy") && VTYPES[q.k] && !S.map.owned[q.id]){ var hold=d.mission==="occupy"; // 0.2.58: occupy is a choice on the attack, not its own button
+    h+='<div class="speeds mhold" role="group" aria-label="After the win"><button data-act="march-hold" data-v="0" aria-pressed="'+!hold+'">Raid it</button><button data-act="march-hold" data-v="1" aria-pressed="'+hold+'">Take and hold</button></div>'+
+      '<p class="dur mholdn">'+(hold?'Your army stays to hold it \u00b7 '+Math.max(0,S.th-occRoom())+' / '+S.th+' held':'Win, take the loot, come home.')+'</p>'; }
   var any=false, av=draftAvail(), camps=CAMP_MISSIONS[d.mission]?cityCamps().filter(function(c){ return c.tile!==d.tile; }):[];
   if (camps.length) h+='<div class="mfrom"><label class="dur" for="marchfrom">From</label><select id="marchfrom"><option value="">'+esc(S.name)+' (the city)</option>'+camps.map(function(c){ var cq=TILE_BY[c.tile]; return '<option value="'+c.tile+'"'+(d.from===c.tile?' selected':'')+'>Camp at '+esc(cq?tileName(cq):c.tile)+' ('+fmt(sumT(c.t))+' troops)</option>'; }).join("")+'</select></div>';
   // only the march presets you've set (the Rally Spot's); none set, no row
@@ -7108,8 +7184,9 @@ function ryInN(){ return ryLive().filter(function(R){ return (R.marches||[]).som
 function ryMineN(){ return ryLive().filter(function(R){ return R.mine; }).length; }
 function ryTravelEst(R, hid){ hid=alPaceHero(hid); var al=alMine(), c=arCat(), M=al&&al.map; if (!c||!M||!R) return 60000; var me=alMyTile(M), host=null; (M.k||[]).forEach(function(k){ if (k.name===R.host) host=k; });
   if (R.mine) return 0; var d=me&&host?Math.hypot(me.x-host.x, me.y-host.y):5; return (c.travel0+c.travelTile*d)*1000/alSpeed(hid); } // 0.1.191: the caller's own marches are already there
-function ryCard(){ var el=document.getElementById("tileinfo"); if (!el || !selTile || !ryOn()) return; var q=TILE_BY[selTile]; if (!ryTargetOk(q)) return; var sec=el.querySelector(".section"); if (!sec) return;
-  var mine=ryMineN()>=RY_MAX_MINE, wait=ryWait(q.k), d=document.createElement("div"); d.className="btnrow"; d.style.marginTop="8px";
+function ryCard(){ var el=document.getElementById("tileinfo"); if (!el || !selTile || !ryOn()) return; var q=TILE_BY[selTile]; if (!ryTargetOk(q)) return; var sec=el.querySelector(".tcard"); if (!sec) return;
+  var mine=ryMineN()>=RY_MAX_MINE, wait=ryWait(q.k), d=document.createElement("div"); d.className="btnrow tryc";
+  if (!ryLocked(q.id) && !mine && !wait) return; // free to call: that's the Rally tile on the pop-up
   d.innerHTML=ryLocked(q.id) ? '<span class="dur">Your alliance rally is on this target'+(q.k==="wiz"||isVamp(q)?'. Join it from the Alliance tab (Rallies).':': you can still hit it yourself, and time your waves to land right after the rally (Rallies tab).')+'</span><button class="btn ghost small" data-act="al-go-rally">Open Rallies</button>'
     : mine ? '<span class="dur">You have '+RY_MAX_MINE+' rallies running, the most at once.</span>' : wait ? '<span class="dur">'+ryRule(q.k)+': your next call is in '+fmtT(wait-Date.now())+'.</span>'
     : '<button class="btn small" data-act="ry-callopen" data-tile="'+q.id+'">\u2694 Call the alliance</button><span class="dur">'+(q.k==="hc"?'Once a day':'Any time')+'. '+(q.k==="wiz"?'Everyone who gets there rolls the rewards.':isVamp(q)?'If it falls, everyone who gets there takes the spoils and the kill.':'Your alliance hits it in waves you order.')+'</span>';
@@ -16052,9 +16129,10 @@ document.addEventListener("click",function(e){
   if (act==="held-release"){ var hrt=a.dataset.tile; campRecall(campAt(hrt)); var hrq=TILE_BY[hrt]; delete S.map.owned[hrt]; delete S.map.ownedL[hrt]; if (hrq && VTYPES[hrq.k]) hrq.L=dayLevel(hrq); miniDirty=true; save(); toastQ("Valley released"); lastSheet=""; renderSheet(); refresh(); return; } // 0.2.50: Release lives in the held list now (the fold under the map is gone); same as act "release"
   if (act==="held-go"){ var hgt=a.dataset.tile; closeSheet(); if (tab!=="map" && !bfOn()){ tab="map"; lastView=""; renderView(true); } setTimeout(function(){ mapGo(hgt); }, 60); return; }
   if (act==="mpop-close"){ MPOP.hide=true; mapPop(); return; }
+  if (act==="march-hold"){ var mhd=marchDraft, mhq=mhd&&TILE_BY[mhd.tile]; if (!mhd || !mhq) return; var mhv=a.dataset.v==="1"; mhd.mission=mhv?"occupy":"attack"; if (!mhv) mhd.camp=false; OCC_PREF[mhq.k]=mhv; lastSheet=""; renderSheet(); return; }
   if (act==="mpop-more"){ // 0.2.9: open Tile details if it's shut, then scroll to it once it has laid out (and leave full screen first)
-    if (MAPFS.on) mapFs(false); DET.tileinfo=true; var mtd=document.getElementById("tidet"); if (mtd){ mtd.hidden=false; mtd.open=true; } renderTileInfo();
-    setTimeout(function(){ var t=document.getElementById("tidet"); if (t){ t.open=true; if (t.scrollIntoView) t.scrollIntoView({behavior:"smooth",block:"start"}); } }, 60); return; }
+    if (MAPFS.on) mapFs(false); renderTileInfo(); // 0.2.58: the card sits right under the map
+    setTimeout(function(){ var t=document.getElementById("tileinfo"); if (t && t.scrollIntoView) t.scrollIntoView({behavior:"smooth",block:"start"}); }, 60); return; }
   if (act==="bm-sort"){ bmSort=a.dataset.s; bmRefresh(); return; }
   if (act==="map-farmfit"){ mapFarmFit(); return; }
   if (act==="map-zoom"){ zoomTo(mv.z*(+a.dataset.z>0?1.35:1/1.35)); return; }
