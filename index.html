@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.56";
+window.IBORY_V="0.2.57";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1375,6 +1375,8 @@ dialog::backdrop{background:rgba(10,12,10,.5)}
 .mtap{display:flex;flex-direction:column;align-items:center;gap:0;background:none;border:0;padding:2px 0 0;color:var(--muted);font-size:.7rem;line-height:1.2;cursor:pointer;min-width:0;font-variant-numeric:tabular-nums}.mtap:disabled{cursor:default}
 .mtap img{width:30px;height:30px;image-rendering:pixelated}.mtap svg{width:20px;height:20px;color:var(--brass);margin:5px 0}
 .mtl input{padding:4px 5px;text-align:end;font-size:.86rem;background:var(--bg);border-radius:6px}
+.mtl input{-moz-appearance:textfield;appearance:textfield;font-variant-numeric:tabular-nums}.mtl input::-webkit-inner-spin-button,.mtl input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.mgrid.mcg .mtl{padding:3px 2px 4px}.mcg .mtl input{padding:4px 0;text-align:center;font-size:.7rem;letter-spacing:-.04em;min-width:0;width:100%} /* 0.2.57: five across, so 20000 and up still fit */
 .mtogs{display:flex;flex-wrap:wrap;gap:6px}
 .mtogs .chipbtn{position:relative;display:inline-flex;align-items:center;gap:6px;padding:0 11px;height:34px;font:600 .84rem var(--body);color:var(--ink);white-space:nowrap;min-width:0}.mtogs .chipbtn.on{color:var(--brass)}
 .mtogs select,.mtogs input{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;padding:0;cursor:pointer}
@@ -5677,13 +5679,13 @@ function marchSheet(){
   if (d.mission==="hide") help.push('<p>They slip out into the woods around the city: attackers won’t find them, and Recall brings them back instantly. They hunt for their own food. Each group takes a Rally Spot slot, like any march.</p>');
   if (d.mission==="scout") help.push('<p>Only scouts go, with a hero if you like. They win if your scouts outnumber the defender’s (each Informatics level counts for 10% more on either side, and each point of a leading hero’s Intelligence 0.5% more; the defender’s own hero counts the same way for them). Success shows its army, fortifications and stockpile: rough counts below Informatics 3, exact from 3, plus research and hero from 6. Many targets keep no scouts at all.</p>');
   if (d.mission==="allyguard") help.push('<p>Your troops stay with your ally and fight beside them when a bully attacks, until you recall them.</p>');
-  if (d.mission==="transport") help.push('<p>Troops carry it by load. Transporters hold 5,000 each; Logistics adds 10% per level. The escort comes back empty.</p>');
+  if (d.mission==="transport") help.push('<p>Troops carry it by load. Transporters hold 5,000 each; Logistics adds 10% per level. The escort comes back empty.</p><p>A hero can lead the caravan: their Intelligence, Warhorse and dragon speed it up, and they come back with the escort.</p>');
   if (d.mission==="reinforce") help.push('<p>Cargo is optional: resources go along with the reinforcement, carried by load like a resource run, but these troops and any hero stay there. A hero you send needs room in that city’s Feasting Hall.</p>');
   var rep=(d.mission==="attack"||d.mission==="conquer") && !d.from, keep=!!KEEP_MISSIONS[d.mission];
   if (rep) help.push('<p><b>↻ Repeat</b>: it goes out again with the same hero as soon as it’s home, sending whatever of the army survived. It keeps going through losses, but stops as soon as any troop type it was sent with has run out at home, if the attack fails, or if it can’t be fed or crewed. <b>Stop on losses</b> ends it after any fight that costs a troop.</p>');
   if (d.mission==="occupy") help.push('<p><b>Make camp</b>: if it wins, this army stays on the tile as a hidden base to attack from. Nobody can join it later.</p>');
   if (keep) help.push('<p><b>Save report</b>: the report goes under ★ Saved the moment it comes in'+(rep?' (every repeat’s report too)':'')+'.</p>');
-  if (d.mission!=="transport" && (S.mayor||S.trainer||S.researcher||S.wallHero)) help.push('<p>Your mayor, trainer, researcher and wall hero stay home to do their jobs.</p>');
+  if ((S.mayor||S.trainer||S.researcher||S.wallHero)) help.push('<p>Your mayor, trainer, researcher and wall hero stay home to do their jobs.</p>');
   head=head+(help.length?'<button class="ofq mq'+(MHELP?' on':'')+'" data-act="march-help" aria-expanded="'+MHELP+'" aria-label="How this march works">?</button>':'')+'<button class="btn ghost small" data-act="close" aria-label="Close">✕</button></div>';
   h='<div class="msh">'+head+(help.length?'<div class="mhelp"'+(MHELP?'':' hidden')+'>'+help.join("")+'</div>':'');
   var any=false, av=draftAvail(), camps=CAMP_MISSIONS[d.mission]?cityCamps().filter(function(c){ return c.tile!==d.tile; }):[];
@@ -5701,11 +5703,11 @@ function marchSheet(){
     RES.forEach(function(k){ h+='<div class="mtl"><button class="mtap" data-act="cargo-fill" data-res="'+k+'" title="'+RNAME[k]+'" aria-label="Fill '+RNAME[k]+' ('+fmt(S.res[k])+')">'+ICON[k]+'<span>'+fmt(S.res[k])+'</span></button><input type="number" min="0" inputmode="numeric" data-cargo="'+k+'" value="'+(d.cargo[k]||"")+'" placeholder="0" aria-label="'+RNAME[k]+'"></div>'; });
     h+='</div>';
   }
-  var dc=draftCamp(), fh=dc ? (dc.hero&&heroById(dc.hero)?[heroById(dc.hero)]:[]) : marchHeroes(), mh=d.hero?heroById(d.hero):null, st=d.mission==="scout"?"int":"atk";
-  var sel='<select id="marchhero"'+(d.mission==="transport"?' hidden':'')+' aria-label="'+(d.mission==="reinforce"?"Hero to move there":d.mission==="scout"?"Hero leading the scouts (Intelligence counts)":"Leading hero")+'"><option value="0">No hero</option>'+fh.map(function(x){ return '<option value="'+x.id+'"'+(x.id===d.hero?' selected':'')+'>'+esc(x.name)+', Lv '+x.level+', '+(st==="int"?'Int '+hs(x,"int"):'Atk '+hs(x,"atk"))+'</option>'; }).join("")+'</select>';
+  var dc=draftCamp(), fh=dc ? (dc.hero&&heroById(dc.hero)?[heroById(dc.hero)]:[]) : marchHeroes(), mh=d.hero?heroById(d.hero):null, st=d.mission==="scout"?"int":"atk", trn=d.mission==="transport";
+  if (trn) fh=fh.slice().sort(function(a,b){ return heroSpeed(b)-heroSpeed(a) || b.level-a.level; }); // 0.2.57: a hero can lead a caravan; fastest first
+  var sel='<select id="marchhero" aria-label="'+(d.mission==="reinforce"?"Hero to move there":d.mission==="scout"?"Hero leading the scouts (Intelligence counts)":trn?"Hero leading the caravan (speeds it up)":"Leading hero")+'"><option value="0">No hero</option>'+fh.map(function(x){ return '<option value="'+x.id+'"'+(x.id===d.hero?' selected':'')+'>'+esc(x.name)+', Lv '+x.level+', '+(trn?'+'+Math.round((heroSpeed(x)-1)*100)+'% speed':st==="int"?'Int '+hs(x,"int"):'Atk '+hs(x,"atk"))+'</option>'; }).join("")+'</select>';
   var tg=[];
-  if (d.mission!=="transport") tg.push('<label class="chipbtn mhero">'+(mh?heroPortrait(mh,22):'<span class="mnoh">'+ICON.crest+'</span>')+'<span class="mhn">'+(mh?esc(mh.name):'No hero')+'</span>'+'<span class="mdd">▾</span>'+sel+'</label>');
-  else h+=sel;
+  tg.push('<label class="chipbtn mhero">'+(mh?heroPortrait(mh,22):'<span class="mnoh">'+ICON.crest+'</span>')+'<span class="mhn">'+(mh?esc(mh.name):'No hero')+'</span>'+'<span class="mdd">▾</span>'+sel+'</label>');
   var tog=function(id, on, txt){ return '<label class="chipbtn mtog'+(on?' on':'')+'"><input type="checkbox" id="'+id+'"'+(on?' checked':'')+'>'+txt+'</label>'; };
   if (rep) tg.push(tog("mrep", d.rep, "↻ Repeat"));
   if (rep && d.rep) tg.push(tog("mrepl", d.repl, "Stop on losses"));
