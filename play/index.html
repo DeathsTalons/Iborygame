@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.65";
+window.IBORY_V="0.2.66";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -430,6 +430,7 @@ details.rep summary{list-style-position:outside;line-height:1.35}
 .brtiles .altile .bico{width:30px;height:30px;color:var(--brass);display:block}.brtiles .altile .bico svg{width:100%;height:100%}
 .brtiles .altile.idle{border-style:dashed}
 .bico.big{width:48px;height:48px;color:var(--brass);flex:none;display:block}.bico.big svg{width:100%;height:100%}
+.wsign{margin:0 0 10px}.wsignf{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px;margin-top:8px}.wsignf input{min-width:0}.wsignf .btn{grid-column:1/-1}
 .wcbar{display:block;height:5px;border-radius:3px;background:var(--line);overflow:hidden;margin:4px 0 2px}.wcbar i{display:block;height:100%;background:var(--brass)}
 .wctile .n small{font-size:.72rem;color:var(--muted);font-weight:500}.wctile.done{border-color:var(--brass)}.wctile.done .wcbar i{background:var(--grass)}
 .wcgh{display:flex;align-items:center;gap:7px}.wcgh svg{width:20px;height:20px;color:var(--brass);flex:none}
@@ -1793,7 +1794,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.65";
+var APP_VERSION = "0.2.66";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -9089,13 +9090,16 @@ function cbUnpack(body, enc){ if (enc!=="gzip") return Promise.resolve(body);
   return new Response(new Blob([cbUnB64(body)]).stream().pipeThrough(new DecompressionStream("gzip"))).text(); }
 function cbUi(msg, good){ if (msg!=null){ CB.msg=msg; CB.good=!!good; } lastSheet=""; renderSheet(); }
 function cbPost(path, obj){ return fetch(LB_URL+path,{method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(obj), cache:"no-store"}); }
-function cbSignIn(name, pass){
-  if (CB.busy) return; CB.busy=true; cbUi("Connecting\u2026", true);
-  cbPost("/backup/account",{name:name, pass:pass}).then(function(r){ return r.json(); }).then(function(d){
+/* 0.2.66: a game with nothing in it yet (one city, Town Hall 2 at most, never attacked) has nothing to lose, so signing in loads the account's game without asking */
+function gameFresh(){ return S.cities.length<=1 && totalTH()<=2 && !(S.stats && S.stats.atk); }
+function cbSignIn(name, pass, opt){
+  opt=opt||{}; if (CB.busy) return; CB.busy=true; cbUi(opt.signin?"Signing in\u2026":"Connecting\u2026", true);
+  cbPost("/backup/account",opt.signin?{name:name, pass:pass, signin:1}:{name:name, pass:pass}).then(function(r){ return r.json(); }).then(function(d){
     CB.busy=false; if (!d || !d.ok){ cbUi((d&&d.error)||"Couldn\u2019t reach the backup server"); return; }
     S.cloud={name:d.info.name, token:d.token, last:d.info.latest?d.info.latest.at:0, info:d.info, display:d.info.display||""}; if (d.created) S.nameOneAsked=1; save();
     nameOneNote(); nameFollow(); lbLastSync=0; setTimeout(function(){ lbSync(true); nameOneMaybe(); }, 800);
     if (d.created || !d.info.latest){ CB.found=null; cbSave(false); }
+    else if (opt.signin || gameFresh()){ CB.found=d.info; cbUi("Signed in. Loading your game\u2026", true); cbRestore("latest"); }
     else { CB.found=d.info; cbUi("Signed in. This account already has a backup.", true); }
   }).catch(function(){ CB.busy=false; cbUi("Couldn\u2019t reach the backup server. Check your connection."); });
 }
@@ -13759,6 +13763,11 @@ function meLifeHtml(){ var st=S.stats, ls=lbStats();
       .map(function(x){ return '<div><b>'+x[1]+'</b><span>'+x[0]+'</span></div>'; }).join("")+'</div>'; }
 function mpIntroSheet(){
   return '<div class="head"><span class="ico">'+ICON.crest+'</span><div><h2>How do you want to play?</h2><div class="sub">You can change this any time in Settings.</div></div></div>'+
+    (LB_URL?'<details class="det wsign"'+(WCB_OPEN?' open':'')+'><summary><b>Already playing? Sign in</b> <span class="dur">loads your game</span></summary>'+ // 0.2.66: no trip through Settings for a browser that forgets everything
+      '<form id="wcbform" class="wsignf" autocomplete="on"><input id="wcbname" name="username" type="text" maxlength="20" autocomplete="username" aria-label="Username" placeholder="Username" value="'+esc(CB.nameDraft||"")+'">'+
+      '<input id="wcbpass" name="password" type="password" maxlength="64" autocomplete="current-password" aria-label="Password" placeholder="Password">'+
+      '<button class="btn small" type="submit" data-act="cb-welcome"'+(CB.busy?' disabled':'')+'>Sign in and load</button></form>'+
+      (CB.msg?'<p class="'+(CB.good?'dur':'why')+'" style="margin:6px 0 0">'+esc(CB.msg)+'</p>':'')+'</details>':'')+
     '<p>Ibory is a complete <b>single-player</b> game. Every building, hero, battle and quest works without anyone else.</p>'+
     '<p><b>Multiplayer</b> adds player alliances, invasions and PvP. There is no pay to win in it, and there never will be: the only things ever sold are cosmetics like picture frames.</p>'+
     '<p>It also puts you on the <b>server map</b>: one shared world where your capital sits with every other player\u2019s, shielded on your alliance\u2019s land.</p>'+
@@ -13767,6 +13776,8 @@ function mpIntroSheet(){
     '<label class="chk"><input type="checkbox" id="mpiwc"'+(S.wcOn===false?' checked':'')+'> With single player, hide the world chat too</label>'+
     '<div class="upbtns" style="grid-template-columns:1fr 1fr"><button class="btn" data-act="mp-intro" data-v="on">Multiplayer on</button><button class="btn ghost" data-act="mp-intro" data-v="off">Single player only</button></div>';
 }
+var WCB_OPEN=false;
+document.addEventListener("submit", function(e){ if (e.target && e.target.id==="wcbform") e.preventDefault(); }, true); // Enter in the password box taps the button; the form never reloads the page
 function mpWarnSheet(act){
   return '<div class="head"><span class="ico">'+ICON.crest+'</span><div><h2>Move to the multiplayer boards?</h2><div class="sub">'+esc(MP_ACTS[act]||"This")+' is multiplayer.</div></div></div>'+
     '<p>Doing this moves your high scores to the <b>multiplayer boards</b>, and there is no going back. You will no longer be ranked with single-player realms, and you will be listed on the multiplayer high scores automatically.</p>'+
@@ -15797,6 +15808,8 @@ document.addEventListener("click",function(e){
           adoptState(ob); toastQ("Save loaded from file."); };
         rd.readAsText(f); }); }
     fi.click(); return; }
+  if (act==="cb-welcome"){ var wn=((document.getElementById("wcbname")||{}).value||"").replace(/\s+/g," ").trim(), wp=(document.getElementById("wcbpass")||{}).value||"";
+    CB.nameDraft=wn; WCB_OPEN=true; if (wn.length<2){ cbUi("Usernames are 2 to 20 characters"); return; } if (wp.length<4){ cbUi("Type your password"); return; } cbSignIn(wn, wp, {signin:true}); return; }
   if (act==="cb-signin"){ var cn=((document.getElementById("cbname")||{}).value||"").replace(/\s+/g," ").trim(), cp=(document.getElementById("cbpass")||{}).value||"";
     CB.nameDraft=cn; if (cn.length<2){ cbUi("Backup names need 2 to 20 characters"); return; } if (cp.length<4){ cbUi("Passwords need at least 4 characters"); return; } cbSignIn(cn, cp); return; }
   if (act==="cb-save"){ armed=null; cbSave(false); return; }
