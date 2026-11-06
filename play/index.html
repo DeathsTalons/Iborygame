@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.67";
+window.IBORY_V="0.2.68";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1542,8 +1542,12 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 .mapview.fs #minic{width:110px;height:110px;bottom:calc(10px + env(safe-area-inset-bottom,0px))}
 .mapview.fs.rot #minic,.paintbar:not([hidden])~#minic{display:none}
 #mapglance{min-height:0;margin-top:10px}#mapglance:empty{display:none}
-.mapfsbar .dpickbtn img{width:20px;height:20px;image-rendering:pixelated;display:block}
-.mapfsbar .dpickbtn[aria-pressed="true"]{box-shadow:0 0 0 2px var(--brass),0 2px 8px rgba(0,0,0,.35)}
+.dpickbtn img{width:20px;height:20px;image-rendering:pixelated;display:block}.mapstrip .dpickbtn{padding:4px 8px}
+.dpickbtn[aria-pressed="true"]{box-shadow:0 0 0 2px var(--brass),0 2px 8px rgba(0,0,0,.35)}
+/* 0.2.68: full screen: Cities is the first button, and the Marches list sits beside the buttons (its width set by kmlFit) */
+.mapfsbar .cityjump{flex:0 0 auto;width:auto;max-width:104px;margin:0;padding:6px 22px 6px 10px;font-size:.88rem;font-weight:700;border:0;border-radius:8px;background-color:var(--brass);color:var(--bg);box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.mapview.fs .kml{top:calc(8px + env(safe-area-inset-top,0px))}.mapview.fs.rot .kml{top:8px}
+.mapview.fs .kml .wdmlh{padding:8px 0 7px}.mapview.fs .kml .wdml1{flex-wrap:wrap;column-gap:6px}.mapview.fs .kml .wdml1 .wdmlw{white-space:normal;overflow-wrap:anywhere;flex:1 1 7em}
 .wdpills{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
 .wdpill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:.8rem;background:var(--panel2);max-width:100%;box-sizing:border-box}
 .wdpill.prot{border-color:#7fb0e0;color:#9cc4ea}
@@ -1794,7 +1798,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.67";
+var APP_VERSION = "0.2.68";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -4919,9 +4923,9 @@ function viewMap(){
   return '<div class="section mapcard"><div class="maptools"><h3 id="realmh">'+esc(realmName())+'</h3>'+cityJumpHtml()+'<button class="btn ghost small" data-act="map-home" aria-label="My city" title="My city">⌂</button><button class="btn ghost small" data-act="map-fs" title="Full screen" aria-label="Full screen">⛶</button></div>'+
     '<div class="mapview'+(MAPFS.on?' fs'+(MAPFS.rot?' rot':''):'')+'" id="mapview"><canvas id="mapc" aria-label="Map. Drag to pan, tap a tile to see it."></canvas><span class="mapcoordov" id="mapcoord"></span><div class="mpop" id="mappop" hidden></div><div class="wdml kml" id="kmml" hidden></div><div class="paintbar" id="paintbar" hidden></div>'+
       '<canvas id="minic" width="'+MAPW+'" height="'+MAPH+'" aria-label="Overview map. Tap to jump there."></canvas>'+
-      '<div class="mapfsbar"><button class="btn small dpickbtn" data-act="dpick" aria-pressed="'+(DPICK.on?'true':'false')+'" title="Tap decorations instead of tiles" aria-label="Pick decorations"><img src="'+ITEM_IMG._deco+'" alt=""></button><button class="btn small" data-act="map-home" aria-label="My city">⌂</button><button class="btn small" data-act="map-rot" aria-label="Turn sideways">⟳</button><button class="btn small" data-act="map-fs" aria-label="Leave full screen">✕</button></div></div>'+
+      '<div class="mapfsbar">'+cityJumpHtml("cityjumpfs")+'<button class="btn small" data-act="map-home" aria-label="My city">⌂</button><button class="btn small" data-act="map-rot" aria-label="Turn sideways">⟳</button><button class="btn small" data-act="map-fs" aria-label="Leave full screen">✕</button></div></div>'+
     '<div id="tileinfo" class="tinfo"'+(selTile?'':' hidden')+'></div>'+
-    '<div class="mapstrip"><button class="link" id="mapstat" data-act="held-open" title="See every valley and flat you hold"></button>'+bmJumpHtml()+'<span id="mapfarmbox">'+mapFarmHtml()+'</span><button class="btn ghost small" data-act="march-open" data-tile="'+homeTileId()+'" data-mission="hide">Hide troops in the woods</button></div></div>'+
+    '<div class="mapstrip"><button class="link" id="mapstat" data-act="held-open" title="See every valley and flat you hold"></button>'+bmJumpHtml()+'<span id="mapfarmbox">'+mapFarmHtml()+'</span><button class="btn ghost small dpickbtn" data-act="dpick" aria-pressed="'+(DPICK.on?'true':'false')+'" title="Tap decorations instead of tiles" aria-label="Pick decorations"><img src="'+ITEM_IMG._deco+'" alt=""></button><button class="btn ghost small" data-act="march-open" data-tile="'+homeTileId()+'" data-mission="hide">Hide troops in the woods</button></div></div>'+
     '<div id="bmpanel">'+bmPanel()+'</div>'+occPanel()+'<div id="marchbox"></div>';
 }
 /* 0.1.243: show one preset's farm list on the map: every target outlined and numbered in farm order, and dotted on the overview.
@@ -5280,7 +5284,11 @@ function selectTile(id, center){
 var MAPFS={on:false, rot:false, want:false, real:false};
 function mapLocal(c, cx, cy){ var v=document.getElementById("mapview"); if (MAPFS.rot && v && v.classList.contains("rot")) return {x:cy, y:window.innerWidth-cx};
   var rc=c.getBoundingClientRect(); return {x:cx-rc.left, y:cy-rc.top}; }
-function mapFsApply(){ var v=document.getElementById("mapview"); if (v){ v.classList.toggle("fs", MAPFS.on); v.classList.toggle("rot", MAPFS.on && MAPFS.rot); } document.body.classList.toggle("mapfs", MAPFS.on); requestDraw(); }
+function mapFsApply(){ var v=document.getElementById("mapview"); if (v){ v.classList.toggle("fs", MAPFS.on); v.classList.toggle("rot", MAPFS.on && MAPFS.rot); } document.body.classList.toggle("mapfs", MAPFS.on); kmlFit(); requestDraw(); }
+// 0.2.68 (Cody: "squeeze the march list up there beside it"): in full screen the Marches box takes the room left of the buttons
+function kmlFit(){ var v=document.getElementById("mapview"), k=document.getElementById("kmml"); if (!v || !k) return;
+  if (!MAPFS.on){ if (k.style.maxWidth) k.style.maxWidth=""; return; }
+  var bar=v.querySelector(".mapfsbar"); if (!bar) return; var w=v.clientWidth-bar.offsetWidth-8-6-6; k.style.maxWidth=Math.max(96,w)+"px"; }
 function mapFs(on){ MAPFS.on=!!on;
   if (on){ try { var de=document.documentElement; if (de.requestFullscreen && !document.fullscreenElement){ var fp=de.requestFullscreen({navigationUI:"hide"}); if (fp && fp.then) fp.then(function(){ MAPFS.real=true; }).catch(function(){}); } } catch(e){} }
   else { MAPFS.rot=false; MAPFS.want=false; try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(e){}
@@ -5459,9 +5467,9 @@ var MPOP={hide:false};
 var MPOP_ACTS={attack:1, scout:2, occupy:3, conquer:4, found:5, transport:6, reinforce:7, allyguard:8, station:9};
 /* 0.2.61 (Cody: an easy way to find your other cities on the map): a Cities picker in the map toolbar, between the name and ⌂.
    Lists every city but the one you're in, nearest first; picking one centres the map on it and opens its pop-up. */
-function cityJumpHtml(){ var cur=C(), l=S.cities.filter(function(c){ return c.id!==cur.id; }); if (!l.length) return '';
+function cityJumpHtml(id){ var cur=C(), l=S.cities.filter(function(c){ return c.id!==cur.id; }); if (!l.length) return '';
   l=l.map(function(c){ return {c:c, d:Math.hypot(c.x-cur.x, c.y-cur.y)}; }).sort(function(a,b){ return a.d-b.d; });
-  return '<select class="cityjump" id="cityjump" aria-label="Go to one of your cities" title="Your cities"><option value="">Cities '+l.length+'</option>'+l.map(function(r){ return '<option value="'+r.c.x+','+r.c.y+'">'+esc(r.c.name)+' ('+r.c.x+', '+r.c.y+') \u00b7 '+r.d.toFixed(1)+' tiles</option>'; }).join("")+'</select>'; }
+  return '<select class="cityjump" id="'+(id||"cityjump")+'" aria-label="Go to one of your cities" title="Your cities"><option value="">Cities '+l.length+'</option>'+l.map(function(r){ return '<option value="'+r.c.x+','+r.c.y+'">'+esc(r.c.name)+' ('+r.c.x+', '+r.c.y+') \u00b7 '+r.d.toFixed(1)+' tiles</option>'; }).join("")+'</select>'; }
 function bmJumpHtml(){ var l=bmList(); if (!l.length) return '';
   return '<select class="bmjump" id="bmjump" aria-label="Go to a bookmark" title="Bookmarks"><option value="">\u2605 '+l.length+'</option>'+l.map(function(b){ var q=bmTile(b); return '<option value="'+b.id+'">'+esc(b.n||tileName(q))+' ('+q.x+', '+q.y+')</option>'; }).join("")+'</select>'; }
 function mapGo(id){ var xy=String(id).split(","), q=tileAt(+xy[0],+xy[1]); MPOP.hide=false; selectTile(q.id,true); var mv2=document.getElementById("mapview"); if (mv2 && mv2.scrollIntoView) mv2.scrollIntoView({behavior:"smooth",block:"center"}); }
@@ -10581,7 +10589,7 @@ function renderKmMarches(ms, rys){ var el=document.getElementById("kmml"); if (!
       return '<div class="wdmlr"><div class="wdml1"><span class="wdmlw" title="'+esc(l.txt)+'">'+esc(l.txt)+'</span><b id="kml-'+m.id+'"></b></div><div class="dur">'+fmt(sumT(m.t))+' troops'+(hn?' \u00b7 '+esc(hn):'')+'</div>'+(b?'<div class="wdmlb">'+b+'</div>':'')+'</div>'; }).join("")+
     rys.map(function(m){ var I=ryMarchInfo(m), t=m.st==="back"?(m.back||m.t):m.t;
       return '<div class="wdmlr"><div class="wdml1"><span class="wdmlw" title="'+esc(I.txt)+'">'+esc(I.txt)+'</span><b id="kmlr-'+esc(m.ref)+'"></b></div><div class="dur">'+fmt(sumT(t))+' troops</div>'+(I.recall?'<div class="wdmlb"><button class="link" data-act="ry-recall" data-rid="'+m.rid+'" data-ref="'+esc(m.ref)+'">Recall</button></div>':'')+'</div>'; }).join("");
-  if (el.dataset.sig!==h){ el.innerHTML=h; el.dataset.sig=h; } el.hidden=false;
+  if (el.dataset.sig!==h){ el.innerHTML=h; el.dataset.sig=h; } el.hidden=false; kmlFit();
   ms.forEach(function(m){ var e=document.getElementById("kml-"+m.id); if (e) e.textContent= m.phase==="stay" ? (m.mission==="hide"?"hidden":m.mission==="station"?"camped":"on guard") : fmtT(realMs(marchT(m)-S.gt)); });
   rys.forEach(function(m){ var e=document.getElementById("kmlr-"+m.ref); if (!e) return; var I=ryMarchInfo(m); e.textContent=I.at ? fmtT(Math.max(0,I.at-Date.now())) : ""; }); }
 function renderMarchStrip(){
@@ -16704,7 +16712,7 @@ document.addEventListener("change",function(e){ markDirty();
   if (e.target.id==="bqunit"){ BQD.u=+e.target.value; e.target.blur(); lastView=""; renderView(true); return; }
   if (e.target.id==="bqamt"){ BQD.n=e.target.value; bqRefresh(); return; }
   if (e.target.id==="mapfarm"){ MAPFARM=+e.target.value; e.target.blur(); mapFarmRefresh(); if (MAPFARM>=0) mapFarmFit(); return; } // 0.1.243
-  if (e.target.id==="bmjump"||e.target.id==="cityjump"){ var bj=e.target.value; e.target.value=""; e.target.blur(); if (bj) mapGo(bj); return; }
+  if (e.target.id==="bmjump"||e.target.id==="cityjump"||e.target.id==="cityjumpfs"){ var bj=e.target.value; e.target.value=""; e.target.blur(); if (bj) mapGo(bj); return; }
   if (e.target.id==="ryfrom"){ RYS.from=+e.target.value; e.target.blur(); lastSheet=""; renderSheet(); return; }
   if (e.target.id==="rymins"){ RYS.mins=e.target.value; e.target.blur(); lastSheet=""; renderSheet(); return; }
   if (e.target.id==="bm-label"){ var bmb=bmAt(selTile); if (bmb){ bmb.n=e.target.value.trim().slice(0,40); save(); bmRefresh(); } return; }
