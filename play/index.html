@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.63";
+window.IBORY_V="0.2.64";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1576,7 +1576,16 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 .acgrid.actot{margin:0 0 4px}.acgrid.actot span{background:var(--panel2)}
 .acmore{margin:2px 0 0;font-size:.82rem}.acmore .link{font-size:.82rem}
 .heldrow{display:flex;align-items:center;gap:8px}.heldrow .gearrow{flex:1;min-width:0}.heldrow .link{flex:none}
-#toast.show{opacity:1;transform:translate(-50%,0)}
+ #toast.show{opacity:1;transform:translate(-50%,0)}
+/* 0.2.64: the catch-up screen (the game running the hours you were away), so it doesn't look frozen. The hourglass turns on the compositor, so it keeps moving even while a slice of the catch-up has the page busy */
+.cu{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(10,8,6,.62);padding:24px;touch-action:none}.cu[hidden]{display:none}
+.cucard{width:min(300px,100%);background:var(--panel);border:1px solid var(--brass);border-radius:16px;padding:22px 20px 18px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.55);display:flex;flex-direction:column;align-items:center;gap:8px}
+.cuspin{color:var(--brass);animation:cuflip 1.6s cubic-bezier(.6,0,.4,1) infinite;will-change:transform}
+@keyframes cuflip{0%,35%{transform:rotate(0deg)}50%,85%{transform:rotate(180deg)}100%{transform:rotate(360deg)}}
+.cuh{font:700 1.2rem var(--display);color:var(--ink)}.cut{margin:0;font-size:.95rem;font-variant-numeric:tabular-nums}
+.cubar{width:100%;height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line);overflow:hidden}.cubar i{display:block;height:100%;width:0;background:var(--brass);transition:width .2s linear}
+.cun{margin:2px 0 0;font-size:.82rem}
+@media (prefers-reduced-motion: reduce){ .cuspin{animation-duration:4s} }
 :focus-visible{outline:2px solid var(--brass);outline-offset:2px}
 @media (prefers-reduced-motion: reduce){ #toast{transition:none} }
 @media (max-width:420px){
@@ -1779,11 +1788,12 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
       <div class="dkpop" id="dkpop" hidden><button class="chipbtn" data-act="chat-pic" data-tgt="dock">&#128247; Picture</button><button class="chipbtn" data-act="chat-gif" data-tgt="dock">GIF</button></div></div></div>
 </div></div>
 <div id="toast" role="status" aria-live="polite"></div>
+<div id="catchup" class="cu" hidden role="status" aria-live="polite"><div class="cucard"><div class="cuspin" aria-hidden="true"><svg viewBox="0 0 48 48" width="56" height="56" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6h20M14 42h20"/><path d="M16 6c0 9 16 11 16 18s-16 9-16 18"/><path d="M32 6c0 9-16 11-16 18s16 9 16 18"/><path d="M19 37c1.6-2.4 8.4-2.4 10 0z" fill="currentColor"/></svg></div><b class="cuh">Catching up</b><p class="cut" id="cutext"></p><div class="cubar"><i id="cubar"></i></div><p class="dur cun">Your cities kept working while you were away.</p></div></div>
 
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.63";
+var APP_VERSION = "0.2.64";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -10400,8 +10410,32 @@ function catchupPoll(){ woundExpire(); dayTurn(); try { wizSpawn(); } catch(e){}
    minute's work: with batch size 1 on every goal line and 160 Barracks, a night was hundreds of thousands of events, and the runaway guard
    (meant for a march that never moves) stopped the catch-up an hour or two in; the rest of the night passed with no training at all (Cody and Sax). */
 var CATCHUP={on:false};
+/* 0.2.64 (Cody: coming back after a long time away felt frozen): a long catch-up runs in slices of game time with the page free between them,
+   behind a "Catching up" screen with how far it has got. Each slice aims at about a tenth of a second; the screen only shows if it isn't
+   done within a quarter of a second, so short trips away never flash it. The same events in the same order as one big advance(). */
+var CU={on:false, from:0, to:0, step:30*60000, t0:0, shown:false, done:null};
+var CU_GAP=90000; // real time away before the catch-up goes in slices
+function catchUpDue(){ return !CU.on && Date.now()-S.real>CU_GAP; }
+function catchUpShow(){ var el=document.getElementById("catchup"); if (!el) return; var span=CU.to-CU.from, got=Math.max(0,Math.min(span, S.real-CU.from));
+  var t=document.getElementById("cutext"), b=document.getElementById("cubar");
+  if (t) t.textContent=fmtT(got)+" of "+fmtT(span)+" away"; if (b) b.style.width=(span>0?Math.round(got/span*100):100)+"%";
+  if (!CU.shown){ CU.shown=true; el.hidden=false; } }
+function catchUpStart(done){ if (CU.on){ if (done) CU.done=done; return; } CU.on=true; CU.from=S.real; CU.to=Date.now(); CU.t0=performance.now(); CU.shown=false; CU.done=done||null; CU.step=30*60000;
+  try { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); } catch(e){}
+  setTimeout(catchUpSlice, 0); }
+function catchUpSlice(){ if (!CU.on) return;
+  var goal=Math.min(CU.to, S.real+CU.step), t=performance.now(), ch=false;
+  try { ch=advance(goal); } catch(e){ try { console.warn("catch-up slice", e); } catch(e2){} }
+  if (ch) S_DIRTY=true;
+  var d=performance.now()-t; if (d<50) CU.step=Math.min(CU.step*1.8, 24*3600000); else if (d>160) CU.step=Math.max(CU.step/1.8, 10*60000);
+  if (S.real>=CU.to){ var now=Date.now(); if (now-S.real>2000) CU.to=now; else { catchUpEnd(); return; } }
+  if (CU.shown || performance.now()-CU.t0>250) catchUpShow();
+  setTimeout(catchUpSlice, CU.shown?16:0); }
+function catchUpEnd(){ advance(Date.now()); CU.on=false; var el=document.getElementById("catchup"); if (el) el.hidden=true; CU.shown=false;
+  try { flushFinished(); renderQueue(); lastView=""; renderView(true); renderCityBar(); renderSheet(); tickText(); save(); if (tab==="map") requestDraw(); } catch(e){}
+  var dn=CU.done; CU.done=null; if (dn) try { dn(); } catch(e){} }
 function advance(now){
-  var dtG = Math.max(0,(now - S.real))*S.speed; S.real = now; CATCHUP.on = dtG >= 10*60000;
+  var dtG = Math.max(0,(now - S.real))*S.speed; S.real = now; CATCHUP.on = dtG >= 10*60000 || CU.on; // a sliced catch-up counts as one long one
   if (dtG>0) for (var aw=0; aw<S.cities.length; aw++) if (S.cities[aw].away) invHold(S.cities[aw], dtG);
   var target = S.gt + dtG, changed=false, viewing=S.cur;
   var pollAt=S.gt+CATCHUP_POLL_MS, evGuard=0, evCap=50000+Math.ceil(dtG/HOUR)*3000; // 0.2.18: room for every event of a long absence (busy farm presets ran out of 50,000 in about a week and skipped the rest)
@@ -16748,7 +16782,7 @@ window.addEventListener("resize", function(){ if (sheetFor && sheetFor.kind==="r
 ["orientationchange","pageshow","focus"].forEach(function(ev){ window.addEventListener(ev,function(){ if (tab==="map") setTimeout(requestDraw,60); }); });
 if (window.visualViewport) window.visualViewport.addEventListener("resize",function(){ if (tab==="map") requestDraw(); });
 document.addEventListener("scroll",function(){ if (tab==="map") requestDraw(); },{passive:true});
-advance(Date.now());
+if (catchUpDue()) catchUpStart(); else advance(Date.now()); // 0.2.64: a long time away catches up in slices behind the Catching up screen
 if (finished.length){ var awayL=shownFinished(); if (awayL.length) toastQ("Finished while you were away: "+awayL.slice(0,4).join(", ")+(awayL.length>4?", and more":"")); }
 refresh();
 // tell the player once about conquered cities that were filled in by the 0.1.19 fix
@@ -16771,12 +16805,14 @@ if (S.repSeen0==null){ S.repSeen0=S.gt; save(); } // 0.2.4: reports from before 
 if (!S.realm){ try { var al0=AL(); if (al0 && al0.name==="North March Pact"){ al0.name=realmName()+" Pact"; save(); } } catch(e){} }
 
 setInterval(function(){
+  if (CU.on) return; // 0.2.64: a catch-up is running in slices; it redraws when it's done
   if (document.hidden){ // 0.1.235: in the background only the game clock runs (so finished jobs still notify); no drawing, no polling, no per-tick work
     woundExpire(); autoHealAll(); var ch0=advance(Date.now()); if (finished.length || ch0){ flushFinished(); save(); } return; }
   if (bfOn()) bfTick();
   if (pvOn()) pvTick();
   if (invOk()){ invPoll(false); if (IV.st) invRescue(); }
   woundExpire(); autoHealAll();
+  if (catchUpDue()){ catchUpStart(); return; } // the browser held the page asleep (timers stop): catch up in slices, not one long freeze
   var changed=advance(Date.now());
   if (finished.length || changed){ flushFinished(); renderQueue(); renderView(tab==="map"); renderCityBar(); renderSheet(); tickText(); save(); } // renderCityBar: the idle-Barracks dots follow batches finishing on any tab
   else { tickText(); renderView(false); renderSheet(); }
@@ -16812,6 +16848,7 @@ document.addEventListener("visibilitychange",function(){
     if (cbOn() && !CB.conflict && hiddenAt-(S.cloud.last||0)>5*60000) cbSave(true, {leaving:true});
     lbSync(true);
   } else {
+    if (catchUpDue()) catchUpStart(); // 0.2.64
     if (hiddenAt && Date.now()-hiddenAt>60000) cbCheck();
     if (swCheck) swCheck();
     if (tab==="map") setTimeout(requestDraw,60);
