@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.60";
+window.IBORY_V="0.2.61";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1610,11 +1610,11 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 .mpop .mpfadd{flex:none;border:0;border-inline-start:1px solid var(--line);background:transparent;color:var(--brass);width:28px;height:100%;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
 .mpop .mpfarm.on{border-color:var(--brass)}.mpop .mpfarm.on .mpfadd{background:var(--brass-soft)}
 .mpop .mpbar{display:flex;gap:4px;margin-top:6px;align-items:stretch}
-.mpop .mpt2{position:relative;flex:0 1 46px;min-width:38px;width:auto;height:42px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:9px;font:700 .6rem var(--body);line-height:1;padding:0;cursor:pointer}
+.mpop .mpt2{position:relative;flex:0 1 auto;min-width:40px;width:auto;padding:0 4px !important;height:42px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:9px;font:700 .6rem var(--body);line-height:1;padding:0;cursor:pointer}
 .mpop .mpt2 span{max-width:100%;padding:0 2px;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mpop .mpt2:disabled{opacity:.45;cursor:not-allowed}
 .mpop .mpbadge{position:absolute;top:3px;inset-inline-end:5px;font-style:normal;font-size:.64rem;color:var(--brass)}
-.mpop .mppri{flex:1 1 auto;min-width:72px;overflow:hidden;height:42px;min-height:0;display:flex;align-items:center;justify-content:center;gap:6px;font-size:.95rem;border-radius:10px;padding:0 10px;white-space:nowrap}
+.mpop .mppri{flex:1 1 0;min-width:68px;overflow:hidden;height:42px;min-height:0;display:flex;align-items:center;justify-content:center;gap:6px;font-size:.95rem;border-radius:10px;padding:0 10px;white-space:nowrap}
 .mpop .mppri span{overflow:hidden;text-overflow:ellipsis}
 .mpop .mpt b{line-height:1.15}
 @media (max-width:374px){ .mpop .mppri svg{display:none} .mpop .mppri{padding:0 6px} .mpop .mpt2{font-size:.6rem} .mpop .mpt2 span{padding:0 1px} }
@@ -1638,6 +1638,9 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 #mapfarmstat{flex-basis:100%;margin:0;font-size:.8rem}
 .mapcoordov{position:absolute;top:6px;inset-inline-start:6px;z-index:3;font-size:.72rem;font-variant-numeric:tabular-nums;padding:1px 6px;border-radius:6px;background:rgba(0,0,0,.45);color:#f4ead6;pointer-events:none}
 .mapcoordov:empty{display:none}
+.maptools #realmh{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.maptools .cityjump{flex:0 0 auto;width:auto;max-width:112px;margin:0;padding:5px 24px 5px 10px;font-size:.84rem;font-weight:700;color:var(--brass);min-height:36px}
+.tgift{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}.tgift>summary{cursor:pointer;font-weight:700;font-size:.9rem;list-style-position:inside}.tgift>summary .dur{font-weight:500;margin-inline-start:4px}
 .mapstrip .bmjump{flex:0 0 auto;width:auto;max-width:96px;margin:0 0 0 auto;padding:6px 24px 6px 10px;font-weight:700;color:var(--brass)}
 .mcard>summary .dur{font-weight:500}
 .bmsort{margin-top:10px}.bmsort button{padding:7px 8px}
@@ -1780,7 +1783,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.60";
+var APP_VERSION = "0.2.61";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -4901,7 +4904,7 @@ function viewMap(){
   // on the map's corner and the farm-list overlay is a chip in the strip under the map.
   // 0.2.58 (Cody: the valleys-held line pushed the map off the top): the map card comes first. Its toolbar is the name, the bookmarks
   // ⌂, coordinates and ⛶; under the map, the picked tile's details, then a strip with valleys held, the bookmarks jump (★ n) and Hide troops.
-  return '<div class="section mapcard"><div class="maptools"><h3 id="realmh">'+esc(realmName())+'</h3><button class="btn ghost small" data-act="map-home" aria-label="My city" title="My city">⌂</button><button class="btn ghost small" data-act="map-fs" title="Full screen" aria-label="Full screen">⛶</button></div>'+
+  return '<div class="section mapcard"><div class="maptools"><h3 id="realmh">'+esc(realmName())+'</h3>'+cityJumpHtml()+'<button class="btn ghost small" data-act="map-home" aria-label="My city" title="My city">⌂</button><button class="btn ghost small" data-act="map-fs" title="Full screen" aria-label="Full screen">⛶</button></div>'+
     '<div class="mapview'+(MAPFS.on?' fs'+(MAPFS.rot?' rot':''):'')+'" id="mapview"><canvas id="mapc" aria-label="Map. Drag to pan, tap a tile to see it."></canvas><span class="mapcoordov" id="mapcoord"></span><div class="mpop" id="mappop" hidden></div><div class="wdml kml" id="kmml" hidden></div><div class="paintbar" id="paintbar" hidden></div>'+
       '<canvas id="minic" width="'+MAPW+'" height="'+MAPH+'" aria-label="Overview map. Tap to jump there."></canvas>'+
       '<div class="mapfsbar"><button class="btn small dpickbtn" data-act="dpick" aria-pressed="'+(DPICK.on?'true':'false')+'" title="Tap decorations instead of tiles" aria-label="Pick decorations"><img src="'+ITEM_IMG._deco+'" alt=""></button><button class="btn small" data-act="map-home" aria-label="My city">⌂</button><button class="btn small" data-act="map-rot" aria-label="Turn sideways">⟳</button><button class="btn small" data-act="map-fs" aria-label="Leave full screen">✕</button></div></div>'+
@@ -5442,6 +5445,11 @@ function renderTileInfo(){ if (renderTileInfoBase()===false){ try { mapPop(); } 
 /* ---------- map popup (0.1.135): tap a tile and its basics and main buttons open right on the map ---------- */
 var MPOP={hide:false};
 var MPOP_ACTS={attack:1, scout:2, occupy:3, conquer:4, found:5, transport:6, reinforce:7, allyguard:8, station:9};
+/* 0.2.61 (Cody: an easy way to find your other cities on the map): a Cities picker in the map toolbar, between the name and ⌂.
+   Lists every city but the one you're in, nearest first; picking one centres the map on it and opens its pop-up. */
+function cityJumpHtml(){ var cur=C(), l=S.cities.filter(function(c){ return c.id!==cur.id; }); if (!l.length) return '';
+  l=l.map(function(c){ return {c:c, d:Math.hypot(c.x-cur.x, c.y-cur.y)}; }).sort(function(a,b){ return a.d-b.d; });
+  return '<select class="cityjump" id="cityjump" aria-label="Go to one of your cities" title="Your cities"><option value="">Cities '+l.length+'</option>'+l.map(function(r){ return '<option value="'+r.c.x+','+r.c.y+'">'+esc(r.c.name)+' ('+r.c.x+', '+r.c.y+') \u00b7 '+r.d.toFixed(1)+' tiles</option>'; }).join("")+'</select>'; }
 function bmJumpHtml(){ var l=bmList(); if (!l.length) return '';
   return '<select class="bmjump" id="bmjump" aria-label="Go to a bookmark" title="Bookmarks"><option value="">\u2605 '+l.length+'</option>'+l.map(function(b){ var q=bmTile(b); return '<option value="'+b.id+'">'+esc(b.n||tileName(q))+' ('+q.x+', '+q.y+')</option>'; }).join("")+'</select>'; }
 function mapGo(id){ var xy=String(id).split(","), q=tileAt(+xy[0],+xy[1]); MPOP.hide=false; selectTile(q.id,true); var mv2=document.getElementById("mapview"); if (mv2 && mv2.scrollIntoView) mv2.scrollIntoView({behavior:"smooth",block:"center"}); }
@@ -5537,6 +5545,7 @@ function draftTileBtns(q){ var n=sumT(draftTake(current(q))); if (!n) return '';
 /* 0.2.58: Tile details sit right under the map, cut down to what the pop-up doesn't already show: facts in short lines, defenders and
    loot, and only the actions the pop-up has no room for. The pop-up's own buttons (Attack, Scout, Found city, Send, Reinforce, switch
    city, establish an NPC city, the farm lists) stay in a hidden row here: the pop-up builds its bar from them. */
+var GIFT_OPEN=null; // the city tile whose Give to an ally fold is open (closes when you pick another tile)
 function tiFact(t){ return '<li>'+t+'</li>'; }
 function tiActsHidden(h){ return h ? '<div class="tiacts" hidden>'+h+'</div>' : ''; }
 function tiMore(h){ return h ? '<div class="tmore">'+h+'</div>' : ''; }
@@ -5555,7 +5564,7 @@ function renderTileInfoBase(){
   if (!selTile){ el.innerHTML=''; el.hidden=true; return; }
   el.hidden=false;
   if (editingIn(el) && el.dataset.tile===selTile) return false; // wait until they're done with it (false: nothing else may touch the panel either)
-  el.dataset.tile=selTile;
+  if (el.dataset.tile!==selTile) GIFT_OPEN=null; el.dataset.tile=selTile;
   var q=TILE_BY[selTile], f=[], hid='', more='', body='';
   var head='<div class="tch"><b>'+esc(tileName(q))+'</b><span class="dur">('+q.x+', '+q.y+')'+(q.k!=="home"?' · '+tdist(q).toFixed(1)+' tiles':'')+'</span></div>';
   function out(){ el.innerHTML='<div class="tcard">'+head+(f.length?'<ul class="tfacts">'+f.join("")+'</ul>':'')+body+tiMore(more)+tiActsHidden(hid)+'</div>'; }
@@ -5567,10 +5576,10 @@ function renderTileInfoBase(){
     if (canAb){ more+='<button class="btn ghost small danger" data-act="city-abandon" data-city="'+hc.id+'">'+(armedTile==="ab"+hc.id?"Tap again to abandon "+esc(hc.name):"Abandon city")+'</button>';
       body+='<p class="dur tnote">Abandoned, it becomes a level '+Math.max(1,Math.min(10,hc.th||1))+' NPC city. Troops, heroes and marches move to your nearest city; buildings and resources are lost.</p>'; }
     if (hc.fieldCap){ var gw=giftWhy(hc), gr=GIFT_REP[hc.fieldCap]||GIFT_REP[12];
-      body+='<div class="tsec">Give to an ally <span>+'+fmt(gr)+' reputation</span></div><p class="dur tnote">Historic cities can’t be abandoned. Everything in it goes with it; its heroes come home.</p>'+
+      body+='<details class="tgift"'+(GIFT_OPEN===q.id||armedTile==="gift"+hc.id?' open':'')+'><summary>Give to an ally <span class="dur">+'+fmt(gr)+' reputation</span></summary><p class="dur tnote">Historic cities can’t be abandoned. Everything in it goes with it; its heroes come home.</p>'+ // 0.2.61: folded shut, so nobody gives a city away by a stray tap
         (gw?'<p class="why">'+gw+'</p>':'<div class="farmadd"><select id="giftally">'+allyTiles().map(function(aq){ return '<option value="'+aq.id+'">'+esc(aq.ai.name)+'</option>'; }).join("")+'</select>'+
-        '<button class="btn small'+(armedTile==="gift"+hc.id?' danger':'')+'" data-act="city-gift" data-city="'+hc.id+'">'+(armedTile==="gift"+hc.id?'Tap again to give it away':'Give city')+'</button></div>'); }
-    out(); return; }
+        '<button class="btn small'+(armedTile==="gift"+hc.id?' danger':'')+'" data-act="city-gift" data-city="'+hc.id+'">'+(armedTile==="gift"+hc.id?'Tap again to give it away':'Give city')+'</button></div>')+'</details>'; }
+    out(); var tgd=el.querySelector(".tgift"); if (tgd) tgd.addEventListener("toggle", function(){ GIFT_OPEN=tgd.open?q.id:null; if (!tgd.open && armedTile==="gift"+hc.id) armedTile=null; }); return; }
   if (q.k==="wiz"){ var wh=wizInfoHtml(q), wre=/<div class="btnrow"[^>]*><button class="btn" data-act="march-open"[^>]*>[^<]*<\/button><\/div>/;
     var wm=wh.match(wre); if (wm){ hid+=wm[0]; wh=wh.replace(wre,''); } body+=wh; out(); return; }
   var owned=!!S.map.owned[q.id];
@@ -16642,7 +16651,7 @@ document.addEventListener("change",function(e){ markDirty();
   if (e.target.id==="bqunit"){ BQD.u=+e.target.value; e.target.blur(); lastView=""; renderView(true); return; }
   if (e.target.id==="bqamt"){ BQD.n=e.target.value; bqRefresh(); return; }
   if (e.target.id==="mapfarm"){ MAPFARM=+e.target.value; e.target.blur(); mapFarmRefresh(); if (MAPFARM>=0) mapFarmFit(); return; } // 0.1.243
-  if (e.target.id==="bmjump"){ var bj=e.target.value; e.target.value=""; e.target.blur(); if (bj) mapGo(bj); return; }
+  if (e.target.id==="bmjump"||e.target.id==="cityjump"){ var bj=e.target.value; e.target.value=""; e.target.blur(); if (bj) mapGo(bj); return; }
   if (e.target.id==="ryfrom"){ RYS.from=+e.target.value; e.target.blur(); lastSheet=""; renderSheet(); return; }
   if (e.target.id==="rymins"){ RYS.mins=e.target.value; e.target.blur(); lastSheet=""; renderSheet(); return; }
   if (e.target.id==="bm-label"){ var bmb=bmAt(selTile); if (bmb){ bmb.n=e.target.value.trim().slice(0,40); save(); bmRefresh(); } return; }
