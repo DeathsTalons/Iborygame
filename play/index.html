@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.64";
+window.IBORY_V="0.2.65";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1793,7 +1793,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.64";
+var APP_VERSION = "0.2.65";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -10580,7 +10580,7 @@ function renderMarchStrip(){
   (function(){ var me0=C().id; renderKmMarches(S.marches.filter(function(m){ return m.city===me0; }).sort(function(a,b){ return marchT(a)-marchT(b); }), ryMarchRows(me0)); })();
   var el=document.getElementById("marchstrip"), mc=document.getElementById("mchip"); if (!el) return;
   var me=C().id, ms=S.marches.filter(function(m){ return m.city===me; }).sort(function(a,b){ return marchT(a)-marchT(b); }), rys=ryMarchRows(me);
-  if (!ms.length && !rys.length){ if (el.innerHTML) el.innerHTML=""; el.dataset.sig=""; if (mc && mc.innerHTML) mc.innerHTML=""; return; }
+  if (!ms.length && !rys.length){ if (el.innerHTML) el.innerHTML=""; el.dataset.sig=""; if (mc){ if (mc.innerHTML) mc.innerHTML=""; mc._h=""; } return; } /* 0.2.65: forget the last chip too, or the next lone march matched it and never drew */
   var nAll=ms.length+rys.length;
   // 0.2.48: the chip is always first on the status row; tapping it opens this city's marches under the row, each with its own Recall / Speed up
   var ch='<button class="speedchip mchipb" data-act="march-toggle" aria-expanded="'+(stripOpen?'true':'false')+'" aria-label="'+nAll+' march'+(nAll>1?'es':'')+'">\u2691 <b>'+nAll+'</b> \u00b7 <span id="ms-next"></span> '+(stripOpen?'\u25b4':'\u25be')+'</button>';
