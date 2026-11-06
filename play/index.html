@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.58";
+window.IBORY_V="0.2.60";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1596,28 +1596,28 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 #cityname.cpin-l{animation:cpinl .22s ease-out}#cityname.cpin-r{animation:cpinr .22s ease-out}
 @keyframes cpinl{from{opacity:.2;transform:translateX(18px)}to{opacity:1;transform:none}}@keyframes cpinr{from{opacity:.2;transform:translateX(-18px)}to{opacity:1;transform:none}}
 
-.mpop.dock{left:6px;right:6px;top:auto;bottom:6px;width:auto;max-width:none;max-height:min(50%,280px);overflow-y:auto;overscroll-behavior:contain} /* 0.2.53: docked, never moves */
+.mpop.dock{left:6px;right:6px;top:auto;bottom:6px;width:auto;max-width:none} /* 0.2.53: docked, never moves. 0.2.60: no longer a scroll box (it's short now): a drag on it on Android stretched it and left a blank band over the title */
 /* 0.2.58: the tile pop-up (Cody's pick, C): title row with fixed icon buttons, a line with where it is and the farm chip, and one bar
    of icon tiles with the main action filling the rest at the bottom right */
-.mpop .mpt{align-items:center;gap:4px}.mpop .mpt b{flex:1 1 auto;min-width:0}.mpop .mploy{margin-left:0}
+.mpop.dock{padding:4px 8px 8px}.mpop .mpt{align-items:center;gap:4px}.mpop .mpt b{flex:1 1 auto;min-width:0;font-size:.88rem}.mpop .mploy{margin-left:0;font-size:.68rem;padding:0 5px}
 .mpop .mpic{display:flex;align-items:center;flex:none;margin-inline-end:-6px}
-.mpop .mpx{width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:8px;padding:0;color:var(--muted)}
+.mpop .mpx{width:32px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:8px;padding:0;color:var(--muted)}
 .mpop .mpx.mpbm{margin-left:0;padding:0}.mpop .mpx.on,.mpop .mpx.mpbm.on{color:var(--brass)}.mpop .mpx.mpbm.on svg{fill:currentColor}
-.mpop .mpsub{display:flex;align-items:center;justify-content:space-between;gap:4px 8px;flex-wrap:wrap;margin-top:-1px}
+.mpop .mpsub{display:flex;align-items:center;justify-content:space-between;gap:3px 8px;flex-wrap:wrap;margin-top:-2px;font-size:.78rem}
 .mpop .mpsub>.dur{min-width:0}
-.mpop .mpfarm{display:inline-flex;align-items:center;height:30px;margin:0;border:1px solid var(--line);border-radius:15px;background:var(--panel2);overflow:hidden;max-width:100%}
-.mpop .mpfarm select{border:0;background:transparent;font-size:.8rem;font-weight:700;padding:0 2px 0 10px;min-height:0;height:100%;width:auto;max-width:160px;color:var(--ink);box-shadow:none}
-.mpop .mpfadd{flex:none;border:0;border-inline-start:1px solid var(--line);background:transparent;color:var(--brass);width:32px;height:100%;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+.mpop .mpfarm{display:inline-flex;align-items:center;height:26px;margin:0;border:1px solid var(--line);border-radius:15px;background:var(--panel2);overflow:hidden;max-width:100%}
+.mpop .mpfarm select{border:0;background:transparent;font-size:.72rem;font-weight:700;padding:0 2px 0 10px;min-height:0;height:100%;width:auto;max-width:160px;color:var(--ink);box-shadow:none}
+.mpop .mpfadd{flex:none;border:0;border-inline-start:1px solid var(--line);background:transparent;color:var(--brass);width:28px;height:100%;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
 .mpop .mpfarm.on{border-color:var(--brass)}.mpop .mpfarm.on .mpfadd{background:var(--brass-soft)}
-.mpop .mpbar{display:flex;gap:5px;margin-top:8px;align-items:stretch}
-.mpop .mpt2{position:relative;flex:0 1 52px;min-width:40px;width:auto;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:10px;font:700 .68rem var(--body);line-height:1;padding:0;cursor:pointer}
+.mpop .mpbar{display:flex;gap:4px;margin-top:6px;align-items:stretch}
+.mpop .mpt2{position:relative;flex:0 1 46px;min-width:38px;width:auto;height:42px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:9px;font:700 .6rem var(--body);line-height:1;padding:0;cursor:pointer}
 .mpop .mpt2 span{max-width:100%;padding:0 2px;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mpop .mpt2:disabled{opacity:.45;cursor:not-allowed}
 .mpop .mpbadge{position:absolute;top:3px;inset-inline-end:5px;font-style:normal;font-size:.64rem;color:var(--brass)}
-.mpop .mppri{flex:1 1 auto;min-width:72px;overflow:hidden;height:52px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:1.02rem;border-radius:11px;padding:0 10px;white-space:nowrap}
+.mpop .mppri{flex:1 1 auto;min-width:72px;overflow:hidden;height:42px;min-height:0;display:flex;align-items:center;justify-content:center;gap:6px;font-size:.95rem;border-radius:10px;padding:0 10px;white-space:nowrap}
 .mpop .mppri span{overflow:hidden;text-overflow:ellipsis}
-.mpop{container-type:inline-size}
-@container (max-width:290px){ .mpop .mppri svg{display:none} .mpop .mppri{padding:0 6px} .mpop .mpt2{font-size:.6rem} .mpop .mpt2 span{padding:0 1px} }
+.mpop .mpt b{line-height:1.15}
+@media (max-width:374px){ .mpop .mppri svg{display:none} .mpop .mppri{padding:0 6px} .mpop .mpt2{font-size:.6rem} .mpop .mpt2 span{padding:0 1px} }
 /* 0.2.58: the map page facelift: tile details right under the map, a strip with valleys held and Hide troops, tidier bookmarks and Occupy flats */
 .tinfo{margin-top:10px}
 .tcard{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
@@ -1632,7 +1632,12 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 .tcard .farmadd{margin-top:6px}.tcard .dmonpic{margin-top:6px}
 .tcard .tmore{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
 .tcard .tryc{margin-top:8px;align-items:center}
-.mapstrip{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;flex-wrap:wrap}.mapstrip #mapstat{white-space:nowrap}
+.mapstrip{display:flex;align-items:center;gap:6px 8px;margin-top:10px;flex-wrap:wrap}.mapstrip #mapstat{white-space:nowrap;margin-inline-end:auto}
+.mapstrip .btn,.mapstrip select{min-height:32px;padding-top:4px;padding-bottom:4px;font-size:.84rem}
+#mapfarmbox{display:contents}.mapstrip .mapfarmrow{display:flex;gap:6px;align-items:center;margin:0;flex:0 1 auto;min-width:0}.mapstrip .mapfarmrow select{width:auto;max-width:170px;margin:0}
+#mapfarmstat{flex-basis:100%;margin:0;font-size:.8rem}
+.mapcoordov{position:absolute;top:6px;inset-inline-start:6px;z-index:3;font-size:.72rem;font-variant-numeric:tabular-nums;padding:1px 6px;border-radius:6px;background:rgba(0,0,0,.45);color:#f4ead6;pointer-events:none}
+.mapcoordov:empty{display:none}
 .mapstrip .bmjump{flex:0 0 auto;width:auto;max-width:96px;margin:0 0 0 auto;padding:6px 24px 6px 10px;font-weight:700;color:var(--brass)}
 .mcard>summary .dur{font-weight:500}
 .bmsort{margin-top:10px}.bmsort button{padding:7px 8px}
@@ -1775,7 +1780,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.58";
+var APP_VERSION = "0.2.60";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -4892,15 +4897,16 @@ var HC_COL={12:"#8e2b2b",14:"#6b3a8f",16:"#23508c",18:"#c9a227"};
 function viewMap(){
   var opts='<option value="npc">NPC city</option><option value="ai">AI lord</option><option value="hc">Historic city</option>'+Object.keys(VTYPES).map(function(k){ return '<option value="'+k+'">'+VTYPES[k].name+'</option>'; }).join("");
   var lv='<option value="0">Any level</option>'; for (var i=1;i<=10;i++) lv+='<option value="'+i+'">Level '+i+'</option>'; [12,14,16,18].forEach(function(i){ lv+='<option value="'+i+'">Level '+i+'</option>'; });
+  // 0.2.59 (Cody: "a lot of accessories at the top"): the toolbar is just the name, the home and full-screen buttons; the coordinates sit
+  // on the map's corner and the farm-list overlay is a chip in the strip under the map.
   // 0.2.58 (Cody: the valleys-held line pushed the map off the top): the map card comes first. Its toolbar is the name, the bookmarks
   // ⌂, coordinates and ⛶; under the map, the picked tile's details, then a strip with valleys held, the bookmarks jump (★ n) and Hide troops.
-  return '<div class="section mapcard"><div class="maptools"><h3 id="realmh">'+esc(realmName())+'</h3><button class="btn ghost small" data-act="map-home" aria-label="My city" title="My city">⌂</button><span class="dur" id="mapcoord"></span><button class="btn ghost small" data-act="map-fs" title="Full screen" aria-label="Full screen">⛶</button></div>'+
-    '<div id="mapfarmbox">'+mapFarmHtml()+'</div>'+
-    '<div class="mapview'+(MAPFS.on?' fs'+(MAPFS.rot?' rot':''):'')+'" id="mapview"><canvas id="mapc" aria-label="Map. Drag to pan, tap a tile to see it."></canvas><div class="mpop" id="mappop" hidden></div><div class="wdml kml" id="kmml" hidden></div><div class="paintbar" id="paintbar" hidden></div>'+
+  return '<div class="section mapcard"><div class="maptools"><h3 id="realmh">'+esc(realmName())+'</h3><button class="btn ghost small" data-act="map-home" aria-label="My city" title="My city">⌂</button><button class="btn ghost small" data-act="map-fs" title="Full screen" aria-label="Full screen">⛶</button></div>'+
+    '<div class="mapview'+(MAPFS.on?' fs'+(MAPFS.rot?' rot':''):'')+'" id="mapview"><canvas id="mapc" aria-label="Map. Drag to pan, tap a tile to see it."></canvas><span class="mapcoordov" id="mapcoord"></span><div class="mpop" id="mappop" hidden></div><div class="wdml kml" id="kmml" hidden></div><div class="paintbar" id="paintbar" hidden></div>'+
       '<canvas id="minic" width="'+MAPW+'" height="'+MAPH+'" aria-label="Overview map. Tap to jump there."></canvas>'+
       '<div class="mapfsbar"><button class="btn small dpickbtn" data-act="dpick" aria-pressed="'+(DPICK.on?'true':'false')+'" title="Tap decorations instead of tiles" aria-label="Pick decorations"><img src="'+ITEM_IMG._deco+'" alt=""></button><button class="btn small" data-act="map-home" aria-label="My city">⌂</button><button class="btn small" data-act="map-rot" aria-label="Turn sideways">⟳</button><button class="btn small" data-act="map-fs" aria-label="Leave full screen">✕</button></div></div>'+
     '<div id="tileinfo" class="tinfo"'+(selTile?'':' hidden')+'></div>'+
-    '<div class="mapstrip"><button class="link" id="mapstat" data-act="held-open" title="See every valley and flat you hold"></button>'+bmJumpHtml()+'<button class="btn ghost small" data-act="march-open" data-tile="'+homeTileId()+'" data-mission="hide">Hide troops in the woods</button></div></div>'+
+    '<div class="mapstrip"><button class="link" id="mapstat" data-act="held-open" title="See every valley and flat you hold"></button>'+bmJumpHtml()+'<span id="mapfarmbox">'+mapFarmHtml()+'</span><button class="btn ghost small" data-act="march-open" data-tile="'+homeTileId()+'" data-mission="hide">Hide troops in the woods</button></div></div>'+
     '<div id="bmpanel">'+bmPanel()+'</div>'+occPanel()+'<div id="marchbox"></div>';
 }
 /* 0.1.243: show one preset's farm list on the map: every target outlined and numbered in farm order, and dotted on the overview.
@@ -4915,9 +4921,9 @@ function mapFarmSummary(){ var ids=mapFarmIds(), c={}, order=[], nm={npc:["NPC c
 function mapFarmHtml(){ var ps=S.presets||[];
   if (MAPFARM<0 && !ps.some(function(p){ return p.farm.length; })) return ''; // 0.2.50: no lists, no row (every option was disabled)
   var opts='<option value="-1">Off</option>'+ps.map(function(p,i){ var n=p.farm.length; return '<option value="'+i+'"'+(i===MAPFARM?' selected':'')+(n||i===MAPFARM?'':' disabled')+'>'+(i+1)+'. '+esc(p.name)+' ('+n+')</option>'; }).join("");
-  return '<div class="mapfarmrow"><label class="dur" for="mapfarm" style="white-space:nowrap">Farm list</label><select id="mapfarm" style="flex:1 1 auto;min-width:0">'+opts+'</select>'+
-    (MAPFARM>=0 && mapFarmIds().length?'<button class="btn ghost small" data-act="map-farmfit" style="flex:0 0 auto">Show all</button>':'')+'</div>'+
-    (MAPFARM>=0?'<p class="dur" id="mapfarmstat" style="margin:4px 0 0">'+esc(mapFarmSummary())+'</p>':''); }
+  return '<span class="mapfarmrow"><select id="mapfarm" aria-label="Show a farm list on the map">'+opts.replace('>Off<','>Farm list: off<')+'</select>'+
+    (MAPFARM>=0 && mapFarmIds().length?'<button class="btn ghost small" data-act="map-farmfit">Show all</button>':'')+'</span>'+
+    (MAPFARM>=0?'<p class="dur" id="mapfarmstat">'+esc(mapFarmSummary())+'</p>':''); }
 function mapFarmRefresh(){ var el=document.getElementById("mapfarmbox"); if (el) el.innerHTML=mapFarmHtml(); requestDraw(); }
 // zoom and pan so the whole list (and the city it farms from) is in view, as far as the zoom allows
 function mapFarmFit(){ var ids=mapFarmIds(), c=document.getElementById("mapc"); if (!ids.length || !c) return;
@@ -5484,20 +5490,20 @@ function mapPop(){ var el=document.getElementById("mappop"); if (!el) return;
   acts.sort(function(a,b){ return a.o-b.o; });
   var pri=null; ["attack","city","npcmake"].some(function(m){ for (var i=0;i<acts.length;i++) if (acts[i].m===m){ pri=acts.splice(i,1)[0]; return true; } return false; });
   if (!pri && acts.length && /reinforce|allyguard|transport/.test(acts[0].m)) pri=acts.shift();
-  var tiles=acts.map(function(a){ var L=MPOP_LBL[a.m]||[a.m,"info"]; return '<button class="mpt2"'+a.attrs+'>'+mpIc(L[1],19)+'<span>'+L[0]+'</span></button>'; });
-  try { if (ryOn() && ryTargetOk(q) && !ryLocked(q.id) && ryMineN()<RY_MAX_MINE && !ryWait(q.k)) tiles.push('<button class="mpt2" data-act="ry-callopen" data-tile="'+q.id+'">'+mpIc("rally",19)+'<span>Rally</span></button>'); } catch(e){} // only while the call is free (a historic city once a day; NPC 10s, wizards and monsters any time)
+  var tiles=acts.map(function(a){ var L=MPOP_LBL[a.m]||[a.m,"info"]; return '<button class="mpt2"'+a.attrs+'>'+mpIc(L[1],16)+'<span>'+L[0]+'</span></button>'; });
+  try { if (ryOn() && ryTargetOk(q) && !ryLocked(q.id) && ryMineN()<RY_MAX_MINE && !ryWait(q.k)) tiles.push('<button class="mpt2" data-act="ry-callopen" data-tile="'+q.id+'">'+mpIc("rally",16)+'<span>Rally</span></button>'); } catch(e){} // only while the call is free (a historic city once a day; NPC 10s, wizards and monsters any time)
   if (q.k==="flat" && !S.map.owned[q.id] && (!C().fieldCap || hasHC(16))){ var tpn=S.items.teleport||0; // teleport this city onto an empty flat: one tap (0.2.55)
-    tiles.push('<button class="mpt2" data-act="teleport" data-tile="'+q.id+'"'+(tpn?'':' disabled')+' aria-label="Teleport ('+tpn+' left)">'+mpIc("teleport",19)+'<span>Teleport</span><i class="mpbadge">'+tpn+'</i></button>'); }
-  tiles.push('<button class="mpt2" data-act="mpop-more">'+mpIc("info",19)+'<span>Details</span></button>');
+    tiles.push('<button class="mpt2" data-act="teleport" data-tile="'+q.id+'"'+(tpn?'':' disabled')+' aria-label="Teleport ('+tpn+' left)">'+mpIc("teleport",16)+'<span>Teleport</span><i class="mpbadge">'+tpn+'</i></button>'); }
+  tiles.push('<button class="mpt2" data-act="mpop-more">'+mpIc("info",16)+'<span>Details</span></button>');
   var priH='';
   if (pri){ var pl=pri.m==="attack"?["Attack","attack"]:pri.m==="city"?["Go to city","home"]:pri.m==="npcmake"?["Build NPC city","build"]:(MPOP_LBL[pri.m]||[pri.m,"info"]);
-    priH='<button class="btn mppri"'+pri.attrs+'>'+mpIc(pl[1],20)+'<span>'+pl[0]+'</span></button>'; }
+    priH='<button class="btn mppri"'+pri.attrs+'>'+mpIc(pl[1],17)+'<span>'+pl[0]+'</span></button>'; }
   var bm=bmAt(q.id), dec=S.deco&&S.deco.at[q.id]&&S.deco.at[q.id].length;
   var loyH=""; if ((q.k==="npc"||q.k==="hc"||q.k==="ai") && !S.map.owned[q.id]){ var lv=Math.floor(loyOf(q)); loyH='<span class="mploy'+(lv<=30?' low':lv<70?' mid':'')+'" title="Loyalty: at 0 a win takes the city">Loyalty '+lv+'</span>'; } // 0.1.190
   var ph='<div class="mpt">'+(q.k==="monster"&&!q.ev&&DMON_ART[q.mon]?'<img class="mpmon" src="'+DMON_ART[q.mon].still+'" alt=""'+(DMON_ART[q.mon].px?' style="image-rendering:pixelated"':'')+'>':'')+'<b>'+esc(tileName(q))+'</b>'+loyH+
-    '<span class="mpic"><button class="mpx mpbrush'+(dec?' on':'')+'" data-act="deco-open" data-tile="'+q.id+'" aria-label="Decorate this tile" title="Decorate">'+mpIc("brush",19)+'</button>'+
-    '<button class="mpx mpbm'+(bm?' on':'')+'" data-act="'+(bm?'bm-del':'bm-add')+'" data-tile="'+q.id+'" aria-label="'+(bm?'Remove bookmark':'Bookmark')+'" title="'+(bm?'Remove bookmark':'Bookmark')+'">'+mpIc("star",19)+'</button>'+
-    '<button class="mpx" data-act="mpop-close" aria-label="Close">'+mpIc("close",19)+'</button></span></div>'+
+    '<span class="mpic"><button class="mpx mpbrush'+(dec?' on':'')+'" data-act="deco-open" data-tile="'+q.id+'" aria-label="Decorate this tile" title="Decorate">'+mpIc("brush",16)+'</button>'+
+    '<button class="mpx mpbm'+(bm?' on':'')+'" data-act="'+(bm?'bm-del':'bm-add')+'" data-tile="'+q.id+'" aria-label="'+(bm?'Remove bookmark':'Bookmark')+'" title="'+(bm?'Remove bookmark':'Bookmark')+'">'+mpIc("star",16)+'</button>'+
+    '<button class="mpx" data-act="mpop-close" aria-label="Close">'+mpIc("close",16)+'</button></span></div>'+
     '<div class="mpsub"><span class="dur">'+mapPopInfo(q)+'</span>'+mpopFarmHtml(q)+'</div>'+
     '<div class="mpbar">'+tiles.join("")+priH+'</div>';
   if (el._h!==ph){ el.innerHTML=ph; el._h=ph; var fsel=el.querySelector("#mpfarmsel"); if (fsel) fsel.addEventListener("change", function(){ MPOPFARM=+fsel.value; el._h=""; mapPop(); }); } el.hidden=false; mapPopPos(); }
@@ -5506,7 +5512,7 @@ var MPOPFARM=0;
 function mpopFarmHtml(q){ if (!document.querySelector('#tileinfo [data-act="farm-toggle"]') || !S.presets || !S.presets.length) return '';
   if (MPOPFARM>=S.presets.length) MPOPFARM=0; var on=S.presets[MPOPFARM].farm.indexOf(q.id)>=0;
   return '<span class="mpfarm'+(on?' on':'')+'"><select id="mpfarmsel" aria-label="Farm list">'+S.presets.map(function(pr,pi){ var has=pr.farm.indexOf(q.id)>=0; return '<option value="'+pi+'"'+(pi===MPOPFARM?' selected':'')+'>Farm '+(pi+1)+'. '+esc(pr.name)+(has?' ✓':'')+'</option>'; }).join("")+'</select>'+
-    '<button class="mpfadd" data-act="mpop-farm" data-tile="'+q.id+'" aria-label="'+(on?'Take it off this farm list':'Add it to this farm list')+'">'+mpIc(on?"check":"plus",16)+'</button></span>'; }
+    '<button class="mpfadd" data-act="mpop-farm" data-tile="'+q.id+'" aria-label="'+(on?'Take it off this farm list':'Add it to this farm list')+'">'+mpIc(on?"check":"plus",14)+'</button></span>'; }
 function mapPopPos(){ var el=document.getElementById("mappop"), c=document.getElementById("mapc"); if (!el || el.hidden || !c || !selTile) return; var q=TILE_BY[selTile]; if (!q) return;
   // 0.2.53 (Cody: "it jumps around a lot, especially when you click teleport"): the pop-up sits docked along the bottom of the map and never moves.
   // When you pick a tile, the map shifts once (only if needed) so that tile shows above it; the overview map hides while it's open.
