@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.66";
+window.IBORY_V="0.2.67";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1794,7 +1794,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.66";
+var APP_VERSION = "0.2.67";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -10438,6 +10438,9 @@ function catchUpSlice(){ if (!CU.on) return;
 function catchUpEnd(){ advance(Date.now()); CU.on=false; var el=document.getElementById("catchup"); if (el) el.hidden=true; CU.shown=false;
   try { flushFinished(); renderQueue(); lastView=""; renderView(true); renderCityBar(); renderSheet(); tickText(); save(); if (tab==="map") requestDraw(); } catch(e){}
   var dn=CU.done; CU.done=null; if (dn) try { dn(); } catch(e){} }
+/* 0.2.67: set whenever the clock finishes or changes something; the next visible tick redraws for it. Ticks in the background, going to the background,
+   a map tap or alliance Help used to move the clock without redrawing, so a finished build stayed on screen with a frozen timer until the next change. */
+var ADV_DIRTY=false;
 function advance(now){
   var dtG = Math.max(0,(now - S.real))*S.speed; S.real = now; CATCHUP.on = dtG >= 10*60000 || CU.on; // a sliced catch-up counts as one long one
   if (dtG>0) for (var aw=0; aw<S.cities.length; aw++) if (S.cities[aw].away) invHold(S.cities[aw], dtG);
@@ -10491,6 +10494,7 @@ function advance(now){
   try { wizSpawn(); } catch(e){}
   try { vampSpawn(); } catch(e){}
   if (dayTurn()) changed=true;
+  if (changed) ADV_DIRTY=true;
   return changed;
 }
 
@@ -16826,7 +16830,7 @@ setInterval(function(){
   if (invOk()){ invPoll(false); if (IV.st) invRescue(); }
   woundExpire(); autoHealAll();
   if (catchUpDue()){ catchUpStart(); return; } // the browser held the page asleep (timers stop): catch up in slices, not one long freeze
-  var changed=advance(Date.now());
+  var changed=advance(Date.now()); if (ADV_DIRTY){ changed=true; ADV_DIRTY=false; }
   if (finished.length || changed){ flushFinished(); renderQueue(); renderView(tab==="map"); renderCityBar(); renderSheet(); tickText(); save(); } // renderCityBar: the idle-Barracks dots follow batches finishing on any tab
   else { tickText(); renderView(false); renderSheet(); }
   if (tab==="map" && !drag && (S.marches.length || (S.alRally||[]).length || ++mapTick%2===0)) requestDraw();
