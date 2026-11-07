@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.69";
+window.IBORY_V="0.2.71";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -527,7 +527,7 @@ nav.tabs{display:block;margin:0}
 .altabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--brass)}.aldot{color:var(--brass)}
 .wdview{position:relative;max-width:560px;margin:0 auto}
 .wdtab .wdzoom{margin:0 0 6px!important}.wdtab .wdbox{background:#22301f}.wdbox{position:relative;border-radius:12px;overflow:hidden;max-width:560px;margin:0 auto}
-.wdpop{z-index:7;max-height:calc(100% - 8px);overflow:auto;overscroll-behavior:contain}.wdpop .wdpx{position:absolute;top:4px;right:4px;z-index:1}.wdpop .wdinfo{margin:0;padding:0;background:none}.wdpop .wdinfo h4{padding-right:22px}.wdpop .btnrow{margin-top:6px}.wdpop .btn{padding:5px 9px;font-size:.82rem;min-height:0}
+.mpop.wdpop{z-index:12}.wdpop{max-height:calc(100% - 12px);overflow:auto;overscroll-behavior:contain}.wdpop.dock{position:absolute}.wdpop .wdinfo{font-size:.8rem}.wdpop .wdwarn{margin:4px 0 0;font-size:.8rem}.wdpop .mpt b{display:block}.wdpop .mpt b .dur{font-weight:400}.wdpop .mpt2.on{border-color:var(--brass);color:var(--brass)}.wdpop .mpbar{flex-wrap:wrap}.wdpop .wdpx{position:absolute;top:4px;right:4px;z-index:1}.wdpop .wdinfo{margin:0;padding:0;background:none}.wdpop .wdinfo h4{padding-right:22px}.wdpop .btnrow{margin-top:6px}.wdpop .btn{padding:5px 9px;font-size:.82rem;min-height:0}
 .wdmvbar{position:absolute;left:6px;right:6px;bottom:6px;z-index:6;display:flex;gap:8px;align-items:center;background:var(--panel);border:1px solid var(--brass);border-radius:10px;padding:6px 8px;font-size:.86rem;box-shadow:0 4px 12px rgba(0,0,0,.3)}.wdmvbar span{flex:1}
 .wdview.gest .wdpop{visibility:hidden!important}
 .wdfsbar{display:none}
@@ -1653,7 +1653,12 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 .mapcoordov{position:absolute;top:6px;inset-inline-start:6px;z-index:3;font-size:.72rem;font-variant-numeric:tabular-nums;padding:1px 6px;border-radius:6px;background:rgba(0,0,0,.45);color:#f4ead6;pointer-events:none}
 .mapcoordov:empty{display:none}
 .maptools #realmh{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.maptools .cityjump{flex:0 0 auto;width:auto;max-width:112px;margin:0;padding:5px 24px 5px 10px;font-size:.84rem;font-weight:700;color:var(--brass);min-height:36px}
+.maptools #mapstat{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;align-items:flex-start;text-align:start;line-height:1.1;padding:0;text-decoration:none;white-space:nowrap}
+.maptools #mapstat b{color:var(--brass);font-size:.98rem}.maptools #mapstat span{font-size:.72rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.pclip{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:6px 0 10px;padding:8px 10px;border:1px solid var(--brass);border-radius:10px;background:var(--brass-soft);font-size:.86rem}.pclip span{flex:1;min-width:0}.pclip .link{flex:none}
+.maptools .bmjump,.maptools .cityjump{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23d4a843' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 7px center;background-size:10px 6px;text-overflow:ellipsis}
+.maptools .bmjump{flex:0 0 auto;width:62px;max-width:62px;margin:0;padding:5px 20px 5px 9px;font-size:.84rem;font-weight:700;color:var(--brass);min-height:36px}
+.maptools .cityjump{flex:0 0 auto;width:94px;max-width:94px;margin:0;padding:5px 20px 5px 9px;font-size:.84rem;font-weight:700;color:var(--brass);min-height:36px}
 .tgift{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}.tgift>summary{cursor:pointer;font-weight:700;font-size:.9rem;list-style-position:inside}.tgift>summary .dur{font-weight:500;margin-inline-start:4px}
 .mapstrip .bmjump{flex:0 0 auto;width:auto;max-width:96px;margin:0 0 0 auto;padding:6px 24px 6px 10px;font-weight:700;color:var(--brass)}
 .mcard>summary .dur{font-weight:500}
@@ -1798,7 +1803,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.69";
+var APP_VERSION = "0.2.71";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -1933,8 +1938,10 @@ function techMax(k){ if (k && TECH[k] && TECH[k].cap10) return MAXLV; return C()
 function techEff(L){ return L<=MAXLV ? L : MAXLV+(L-MAXLV)/2; }
 function techRaw(k){ if (!S.techG) S.techG={}; var L=Math.min(S.techG[k]||0, academyLv()); return TECH[k]&&TECH[k].cap10 ? Math.min(L,MAXLV) : L; }
 function hcLevels(){ return S.cities.filter(function(c){ return c.fieldCap; }).map(function(c){ return c.fieldCap; }); }
-function placeLeft(){ var n=hcLevels().filter(function(l){ return l===12; }).length; if (!n) return 0; var pl=S.map.placed||{day:-1,n:0}; return Math.max(0, n-(pl.day===gameDay()?pl.n:0)); }
-function hasHC(L){ return hcLevels().indexOf(L)>=0; }
+/* 0.2.71 (Cody): each historic tier also has the powers of the tiers below it. A 14, 16 or Atlantis places an NPC city a day like a 12,
+   a 16 or Atlantis lets historic cities teleport (monsters already came to 14s, 16s and Atlantis). */
+function placeLeft(){ var n=hcLevels().filter(function(l){ return l>=12; }).length; if (!n) return 0; var pl=S.map.placed||{day:-1,n:0}; return Math.max(0, n-(pl.day===gameDay()?pl.n:0)); }
+function hasHC(L){ return hcLevels().some(function(l){ return l>=L; }); } // holds a historic city of this level or higher (0.2.71; it was exactly this level)
 /* 0.2.24: the draft (Age 2, Cody). A historic city you hold conscripts troops out of an NPC city around it, once a game day: a tenth of the
    NPC city's biggest troop type as it stands (0.2.25; it was every type), straight into the historic city. Since 0.2.26 you pick the one NPC city (it was all of them). The NPC cities lose them as if hit by an attack and
    grow back within the hour. Range in tiles by the city's level (Age 2's distances scaled to this 396-tile map). */
@@ -4513,12 +4520,22 @@ function processAuto(){
 }
 function presetSummary(pr){ var parts=[]; pr.t.forEach(function(n,i){ if (n) parts.push(fmt(n)+" "+U[i].name); }); return parts.length?parts.join(", "):"No troops set"; }
 var presetClip=null; // a copied preset: troops, hero choice and the pause-on-loss setting (never the farm list, since an NPC only sits on one list). Kept until you reload, so it can go to another city too.
+/* 0.2.70 (requested: copy one preset to another city): Copy and Paste were there but silent since the toasts went (0.2.54). Now a bar says
+   what's copied and from where, Copy reads "Copied", Paste brings the name too and reads "Pasted", and the source preset has no Paste. */
+var PASTED="";
+function pclipKey(m,pi){ return C().id+":"+(m?"m":"f")+":"+pi; }
+function pclipBar(){ if (!presetClip) return '';
+  var pn=fmt(presetClip.t.reduce(function(a,b){ return a+b; },0));
+  return '<div class="pclip" role="status"><span><span class="dur">Copied</span> <b>'+esc(presetClip.name)+'</b> <span class="dur">('+(presetClip.city?esc(presetClip.city)+', ':'')+pn+' troops)</span><br>Tap Paste on a preset in any city to copy it there.</span><button class="link" data-act="preset-clipx">Clear</button></div>'; }
+function pclipBtns(m,pi,pr){ var k=pclipKey(m,pi), mine=presetClip && presetClip.src===k, ma=m?' data-m="1"':'';
+  return '<button class="btn ghost small" data-act="preset-copy"'+ma+' data-p="'+pi+'"'+(presetTotal(pr)?'':' disabled')+'>'+(mine?'Copied \u2713':'Copy')+'</button>'+
+    (presetClip && !mine?'<button class="btn ghost small" data-act="preset-paste"'+ma+' data-p="'+pi+'">'+(PASTED===k?'Pasted \u2713':'Paste')+'</button>':''); }
 function presetsSection(){
-  var h='<div class="section"><div class="shead"><h3>March presets</h3><span class="dur">'+esc(S.name)+'</span></div><p class="hint">Ten per city for marches you send yourself: load one on the march screen, stack them into timed waves from a target on the Map, or occupy flats with one. Farming has its own ten presets, on the <button class="link" data-act="tab" data-tab="farms">Farms tab</button>.</p><div class="unitlist">';
+  var h='<div class="section"><div class="shead"><h3>March presets</h3><span class="dur">'+esc(S.name)+'</span></div><p class="hint">Ten per city for marches you send yourself: load one on the march screen, stack them into timed waves from a target on the Map, or occupy flats with one. Farming has its own ten presets, on the <button class="link" data-act="tab" data-tab="farms">Farms tab</button>.</p>'+pclipBar()+'<div class="unitlist">';
   S.mpresets.forEach(function(pr,pi){ var hh=presetHero(pr);
     h+='<div class="unit"><h4>'+esc(pr.name)+'</h4><span class="own" style="font-size:.85rem">'+(presetTotal(pr)?fmt(presetTotal(pr))+' troops':'')+'</span>'+
       '<div class="us"><span>'+presetSummary(pr)+'</span><span>Hero <b>'+(pr.hero===HERO_BEST?'Best attack':pr.hero===HERO_FAST?'Fastest':pr.hero===HERO_ANY?'Any free':hh?esc(hh.name):"none")+'</b>'+(presetAutoHero(pr.hero)?' <span class="dur">('+(hh?'now '+esc(hh.name):'nobody free')+')</span>':'')+'</span></div>'+
-      '<div class="trainrow"><button class="btn ghost small" data-act="preset-edit" data-m="1" data-p="'+pi+'">Edit</button><button class="btn ghost small" data-act="preset-copy" data-m="1" data-p="'+pi+'"'+(presetTotal(pr)?'':' disabled')+'>Copy</button>'+(presetClip?'<button class="btn ghost small" data-act="preset-paste" data-m="1" data-p="'+pi+'">Paste</button>':'')+
+      '<div class="trainrow"><button class="btn ghost small" data-act="preset-edit" data-m="1" data-p="'+pi+'">Edit</button>'+pclipBtns(1,pi,pr)+
       (presetTotal(pr)>armyCap()?'<span class="why">Over the '+fmt(armyCap())+'-troop march limit</span>':'')+'</div></div>';
   });
   return h+'</div></div>';
@@ -4637,7 +4654,7 @@ function farmCardHtml(pr,pi){
         '<label class="dur" for="fl'+pi+'">Level</label><select id="fl'+pi+'" data-farmlvl="'+pi+'" style="width:auto">'+['<option value="0">Any</option>'].concat([1,2,3,4,5,6,7,8,9,10].map(function(n){ return '<option value="'+n+'"'+(pr.farmLevel===n?' selected':'')+'>Level '+n+'</option>'; })).join("")+'</select></div>'+
       '<div class="trainrow">'+[["off","Off"],["training","Training"],["resources","Resources"]].map(function(x){ var on=(x[0]==="off")?!pr.farmMode:pr.farmMode===x[0];
         return '<button class="chipbtn wide'+(on?' on':'')+'" data-act="farm-mode" data-p="'+pi+'" data-m="'+x[0]+'" aria-pressed="'+on+'">'+x[1]+'</button>'; }).join("")+'</div>'+
-      '<div class="trainrow"><button class="btn ghost small" data-act="preset-edit" data-p="'+pi+'">Edit army</button><button class="btn ghost small" data-act="preset-copy" data-p="'+pi+'"'+(presetTotal(pr)?'':' disabled')+'>Copy</button>'+(presetClip?'<button class="btn ghost small" data-act="preset-paste" data-p="'+pi+'">Paste</button>':'')+
+      '<div class="trainrow"><button class="btn ghost small" data-act="preset-edit" data-p="'+pi+'">Edit army</button><span hidden></span>'+pclipBtns(0,pi,pr)+
       (pr.farmMode?'<button class="btn ghost small" data-act="farm-refill" data-p="'+pi+'">Refill list</button>':'')+
       (pr.farm.length&&presetTotal(pr)?'<button class="btn small'+(pr.auto?' ghost':'')+'" data-act="preset-auto" data-p="'+pi+'">'+(pr.auto?'Stop auto-farm':'Start auto-farm')+'</button>':'')+'</div>'+
       (msg?'<div class="fnote'+(msg.bad?' bad':'')+'">'+esc(msg.t)+'</div>':(!presetTotal(pr)?'<div class="fnote">No troops set yet. Use Edit army first.</div>':''))+'</div>';
@@ -4662,7 +4679,7 @@ function viewFarms(){
           '<span class="dur" style="grid-column:1/-1">'+tdist(q).toFixed(1)+' tiles'+(presetTotal(pr)?' \u00b7 round trip '+fmtT(realMs(2*travelMs(pr.t,q,hid))):'')+'</span>'+
           '<span class="btnrow" style="grid-column:1/-1;justify-content:flex-end;margin:0"><button class="btn ghost small" data-act="goto-tile" data-tile="'+id+'">Show</button><button class="btn ghost small danger" data-act="farm-remove" data-p="'+pi+'" data-k="'+k+'">Remove</button></span></div>'; }).join("")+'</div>'
         :'<p class="hint">Empty. Pick a goal and tap Refill list, or add NPCs from their map tiles.</p>')+'</details>';
-    return '<div class="albk"><button class="link" data-act="farm-page" data-p="-1">\u2039 Farm planner</button></div><div class="unitlist">'+farmCardHtml(pr,pi)+'</div>'+
+    return '<div class="albk"><button class="link" data-act="farm-page" data-p="-1">\u2039 Farm planner</button></div>'+pclipBar()+'<div class="unitlist">'+farmCardHtml(pr,pi)+'</div>'+
       (fd.n?'<p class="hint" style="margin:8px 4px">Last 24 hours: <b>'+fd.w+'</b> won'+(fd.n>fd.w?', <span class="badc">'+(fd.n-fd.w)+' lost</span>':'')+', '+fmt(fd.loot)+' loot. <button class="link" data-act="rep-cat" data-v="atk" data-go="1">See the reports</button></p>':'')+list+
       '<div class="wcnav"><button class="link" data-act="farm-page" data-p="'+((pi+n-1)%n)+'">\u2039 '+esc(S.presets[(pi+n-1)%n].name)+'</button><button class="link" data-act="farm-page" data-p="'+((pi+1)%n)+'">'+esc(S.presets[(pi+1)%n].name)+' \u203a</button></div>'; }
   FARMV=-1;
@@ -4920,12 +4937,12 @@ function viewMap(){
   // on the map's corner and the farm-list overlay is a chip in the strip under the map.
   // 0.2.58 (Cody: the valleys-held line pushed the map off the top): the map card comes first. Its toolbar is the name, the bookmarks
   // ⌂, coordinates and ⛶; under the map, the picked tile's details, then a strip with valleys held, the bookmarks jump (★ n) and Hide troops.
-  return '<div class="section mapcard"><div class="maptools"><h3 id="realmh">'+esc(realmName())+'</h3>'+cityJumpHtml()+'<button class="btn ghost small" data-act="map-home" aria-label="My city" title="My city">⌂</button><button class="btn ghost small" data-act="map-fs" title="Full screen" aria-label="Full screen">⛶</button></div>'+
+  return '<div class="section mapcard"><div class="maptools"><button class="link" id="mapstat" data-act="held-open" title="See every valley and flat you hold"></button>'+bmJumpHtml()+cityJumpHtml()+'<button class="btn ghost small" data-act="map-home" aria-label="My city" title="My city">⌂</button><button class="btn ghost small" data-act="map-fs" title="Full screen" aria-label="Full screen">⛶</button></div>'+
     '<div class="mapview'+(MAPFS.on?' fs'+(MAPFS.rot?' rot':''):'')+'" id="mapview"><canvas id="mapc" aria-label="Map. Drag to pan, tap a tile to see it."></canvas><span class="mapcoordov" id="mapcoord"></span><div class="mpop" id="mappop" hidden></div><div class="wdml kml" id="kmml" hidden></div><div class="paintbar" id="paintbar" hidden></div>'+
       '<canvas id="minic" width="'+MAPW+'" height="'+MAPH+'" aria-label="Overview map. Tap to jump there."></canvas>'+
       '<div class="mapfsbar">'+cityJumpHtml("cityjumpfs")+'<button class="btn small" data-act="map-home" aria-label="My city">⌂</button><button class="btn small" data-act="map-rot" aria-label="Turn sideways">⟳</button><button class="btn small" data-act="map-fs" aria-label="Leave full screen">✕</button></div></div>'+
     '<div id="tileinfo" class="tinfo"'+(selTile?'':' hidden')+'></div>'+
-    '<div class="mapstrip"><button class="link" id="mapstat" data-act="held-open" title="See every valley and flat you hold"></button>'+bmJumpHtml()+'<span id="mapfarmbox">'+mapFarmHtml()+'</span><button class="btn ghost small dpickbtn" data-act="dpick" aria-pressed="'+(DPICK.on?'true':'false')+'" title="Tap decorations instead of tiles" aria-label="Pick decorations"><img src="'+ITEM_IMG._deco+'" alt=""></button><button class="btn ghost small" data-act="march-open" data-tile="'+homeTileId()+'" data-mission="hide">Hide troops in the woods</button></div></div>'+
+    '<div class="mapstrip"><span id="mapfarmbox">'+mapFarmHtml()+'</span><button class="btn ghost small dpickbtn" data-act="dpick" aria-pressed="'+(DPICK.on?'true':'false')+'" title="Tap decorations instead of tiles" aria-label="Pick decorations"><img src="'+ITEM_IMG._deco+'" alt=""></button><button class="btn ghost small" data-act="march-open" data-tile="'+homeTileId()+'" data-mission="hide">Hide troops in the woods</button></div></div>'+
     '<div id="bmpanel">'+bmPanel()+'</div>'+occPanel()+'<div id="marchbox"></div>';
 }
 /* 0.1.243: show one preset's farm list on the map: every target outlined and numbered in farm order, and dotted on the overview.
@@ -5497,6 +5514,12 @@ function mapPopInfo(q){ var bits=['('+q.x+', '+q.y+')'], cur;
    the tile's own main thing) filling the rest, always bottom right. Valleys and flats have no Occupy here: Attack's march screen has Raid
    or Take and hold. */
 var MPI={
+  msg:'<path d="M4 5h16v11H9l-5 4z"/>',
+  user:'<circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/>',
+  group:'<circle cx="9" cy="9" r="3"/><circle cx="16.5" cy="10" r="2.5"/><path d="M3.5 19c.8-3.4 3-5 5.5-5s4.7 1.6 5.5 5M15 14.5c2.6-.3 4.7 1.2 5.5 4.5"/>',
+  zoom:'<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5M10.5 8v5M8 10.5h5"/>',
+  move:'<path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/>',
+  open:'<path d="M5 19V5h9l5 5v9z"/><path d="M14 5v5h5"/>',
   scout:'<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',
   info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
   rally:'<path d="M4 10v4h3l8 4V6l-8 4z"/><path d="M18 9.5a4 4 0 0 1 0 5"/>',
@@ -5675,7 +5698,9 @@ function renderMarchBox(){
   }
   if (el._sig!==h){ el.innerHTML=h; el._sig=h; }
   var ms=document.getElementById("mapstat"); if (ms){ var allH=Object.keys(S.map.owned).filter(function(k){ return cityIndex(S.map.owned[k])>=0; }).length, allC=S.cities.reduce(function(a,c){ return a+(c.th||0); },0);
-    ms.textContent = ownedIds().length+' / '+S.th+' valleys held'+(S.cities.length>1?' (all cities '+allH+' / '+allC+')':''); }
+    // 0.2.70 (requested): in the map toolbar where the city name was, stacked so it fits beside the buttons
+    var mh='<b>'+ownedIds().length+' / '+S.th+'</b><span>valleys</span>'+(S.cities.length>1?'<span class="msall">all '+allH+' / '+allC+'</span>':'');
+    if (ms.innerHTML!==mh) ms.innerHTML=mh; }
 }
 // 0.2.50: unit icons in the rows, and a two-row header (You: sent, lost / Enemy: had, lost) so the table fits a phone
 function repUnitCell(i){ var im=ITEM_IMG["u_"+U[i].k]; return '<td><span class="rpu">'+(im?'<img class="iic" src="'+im+'" alt="">':'')+'<span>'+U[i].name+'</span></span></td>'; }
@@ -5810,7 +5835,9 @@ function marchSheet(){
   var any=false, av=draftAvail(), camps=CAMP_MISSIONS[d.mission]?cityCamps().filter(function(c){ return c.tile!==d.tile; }):[];
   if (camps.length) h+='<div class="mfrom"><label class="dur" for="marchfrom">From</label><select id="marchfrom"><option value="">'+esc(S.name)+' (the city)</option>'+camps.map(function(c){ var cq=TILE_BY[c.tile]; return '<option value="'+c.tile+'"'+(d.from===c.tile?' selected':'')+'>Camp at '+esc(cq?tileName(cq):c.tile)+' ('+fmt(sumT(c.t))+' troops)</option>'; }).join("")+'</select></div>';
   // only the march presets you've set (the Rally Spot's); none set, no row
-  var pre=d.mission!=="transport" && d.mission!=="scout" ? presetsOf(1).map(function(pr,pi){ if (!presetTotal(pr)) return ''; var on=d.pk==="m"+pi; return '<button class="chipbtn'+(on?' on':'')+'" aria-pressed="'+on+'" data-act="march-preset" data-m="1" data-p="'+pi+'">'+esc(pr.name)+'</button>'; }).join("") : '';
+  // 0.2.70 (requested): "Previous" first, the troops and hero this city last sent
+  var lm=C().lastMarch, prev=d.mission!=="transport" && d.mission!=="scout" && lm && sumT(lm.t) ? '<button class="chipbtn'+(d.pk==="prev"?' on':'')+'" aria-pressed="'+(d.pk==="prev")+'" data-act="march-prev" title="The troops and hero this city sent last ('+fmt(sumT(lm.t))+')">\u21ba Previous</button>' : '';
+  var pre=prev+(d.mission!=="transport" && d.mission!=="scout" ? presetsOf(1).map(function(pr,pi){ if (!presetTotal(pr)) return ''; var on=d.pk==="m"+pi; return '<button class="chipbtn'+(on?' on':'')+'" aria-pressed="'+on+'" data-act="march-preset" data-m="1" data-p="'+pi+'">'+esc(pr.name)+'</button>'; }).join("") : '');
   if (pre) h+='<div class="mpres">'+pre+'</div>';
   h+='<div class="mgh"><span class="dur">'+(d.mission==="scout"?'Only scouts go':'Tap a unit for all of it, or type a number')+'</span><button class="link" data-act="march-clear">Clear</button></div><div class="mgrid">';
   U.forEach(function(u,i){ if (d.mission==="scout" && i!==2) return; if (av[i]) any=true;
@@ -5867,6 +5894,7 @@ function launchMarch(tileId, mission, t, heroId, opt){
   if (opt.label!=null) m.label=opt.label;
   S.marches.push(m); return m;
 }
+function lastMarchSet(ci, t, hero){ var c=S.cities[ci]; if (c && sumT(t)) c.lastMarch={t:t.slice(), hero:hero?hero.id:0}; } // "Previous" on every march screen (0.2.70; server map, rallies and the Arena since 0.2.71)
 function sendMarch(){
   if (marchDraft.mission==="arena"){ arSend(); return; }
   if (marchDraft.mission==="wd"){ wdSend(); return; }
@@ -5885,6 +5913,7 @@ function sendMarch(){
   if (d.mission==="found") RES.forEach(function(k){ S.res[k]-=10000; });
   var cargo={}; if (d.mission==="transport" || d.mission==="reinforce") RES.forEach(function(k){ cargo[k]=d.cargo[k]||0; S.res[k]-=cargo[k]; });
   S.marches.push({id:S.nextMarchId++, city:C().id, food:food, ensign:ek||false, tile:q.id, mission:d.mission, cargo:cargo, t:d.t.slice(), hero:hero?hero.id:0, dep:S.gt, arr:S.gt+tm, travel:tm, phase:"out", loot:{}});
+  if (d.mission!=="transport" && d.mission!=="scout") lastMarchSet(S.cur, d.t, hero); // 0.2.70: for "Previous" on the march screen
   if (dcamp) S.marches[S.marches.length-1].from=dcamp.tile;
   if (d.mission==="occupy" && d.camp) S.marches[S.marches.length-1].camp=1;
   if (d.keep && KEEP_MISSIONS[d.mission]) S.marches[S.marches.length-1].keep=1;
@@ -7172,7 +7201,7 @@ function arSend(){
     var sc=(S.soloAr&&S.soloAr.live||[]).filter(function(c){ return c.id===d.mid; })[0]; if (!sc){ toast("The window has closed"); return; }
     var trv=Math.round(arTravelEst(d.hero||0)), arr=Date.now()+trv;
     for (var si=0;si<12;si++) S.troops[si]=Math.max(0,S.troops[si]-t[si]); if (ens && S.items[ens]>0) S.items[ens]--;
-    if (hero) hero.away=true;
+    if (hero) hero.away=true; lastMarchSet(S.cur, t, hero);
     sc.joins.push({ref:ref, t:t, side:side, arrive:arr});
     S.alArena=S.alArena||[]; S.alArena.push({ref:ref, aid:"solo", mid:sc.id, city:cid, hero:hero?hero.id:0, t:t, dep:Date.now(), arrive:arr, travel:trv, ends:sc.ends, st:"out", keep:d.keep?1:0});
     save(); toastQ("Marching to the Arena: arrives in "+fmtT(trv)); closeSheet(); lastView=""; refresh(); return;
@@ -7182,7 +7211,7 @@ function arSend(){
     if (r.error){ toast(r.error); if (gb) gb.disabled=false; return; }
     var ci=cityIndex(cid); if (ci<0) return;
     withCity(ci,function(){ for (var i=0;i<12;i++) S.troops[i]=Math.max(0,S.troops[i]-t[i]); if (ens && S.items[ens]>0) S.items[ens]--; });
-    if (hero) hero.away=true;
+    if (hero) hero.away=true; lastMarchSet(ci, t, hero);
     S.alArena=S.alArena||[]; S.alArena.push({ref:ref, aid:ALS.aid, mid:r.mid, city:cid, hero:hero?hero.id:0, t:t, dep:Date.now(), arrive:r.arrive, travel:r.travel, ends:r.ends, st:"out", keep:d.keep?1:0});
     save(); toastQ("Marching to the Arena: arrives in "+fmtT(r.arrive-Date.now())); closeSheet(); lastView=""; refresh(); ALS.last=0; alSync(); })
     .catch(function(){ ALS.arSending=false; if (gb) gb.disabled=false; toast("Couldn’t reach the server. Check your connection."); });
@@ -7287,7 +7316,7 @@ function rySend(){
   alPost("/al/rally/join",jb).then(function(r){ RYS.sending=false;
     if (r.error){ toast(r.error); if (gb) gb.disabled=false; return; }
     var ci=cityIndex(cid); withCity(ci,function(){ for (var i=0;i<12;i++) S.troops[i]=Math.max(0,S.troops[i]-t[i]); if (ens && S.items[ens]>0) S.items[ens]--; });
-    if (hero) hero.away=true;
+    if (hero) hero.away=true; lastMarchSet(ci, t, hero);
     S.alRally=S.alRally||[]; var Rj=ryById(r.rid); S.alRally.push({ref:ref, aid:ALS.aid, rid:r.rid, city:cid, hero:hero?hero.id:0, t:t, dep:Date.now(), arrive:r.arrive, travel:r.travel, hitAt:r.hitAt, st:"out", keep:d.keep?1:0, tile:Rj&&Rj.mine&&Rj.x!=null?Rj.x+","+Rj.y:null, from:Rj&&Rj.from||""}); // 0.1.216: your own rally's target is on your map: draw the march there
     save(); toastQ("Marching to the rally: arrives in "+fmtT(r.arrive-Date.now())); closeSheet(); lastView=""; refresh(); ALS.last=0; alSync(); })
     .catch(function(){ RYS.sending=false; if (gb) gb.disabled=false; toast("Couldn\u2019t reach the server. Check your connection."); });
@@ -8042,20 +8071,54 @@ function wdPopAnchor(){ var v=WDS.sel, d=WDS.d; if (!v || !d) return null;
   if (v.k==="bld"){ var b=d.bld[v.i]; return {x:b.x+1.5, y:b.y+1.5, r:1.5}; }
   if (v.k==="throne") return {x:d.throne.x+1.5, y:d.throne.y+1.5, r:1.5};
   return null; }
-function wdPopPlace(){ var p=document.getElementById("wdpop"), b=wdBoxEl(); if (!p || !b) return; var A=wdPopAnchor(), V=wdWin(), bw=b.offsetWidth, bh=b.offsetHeight, pw=p.offsetWidth, ph=p.offsetHeight;
-  var ax=A?(A.x-V.x)/V.w*bw:bw/2, ay=A?(A.y-V.y)/V.h*bh:bh/2, rr=A?A.r/V.w*bw:0, top;
-  var left=Math.max(4, Math.min(bw-pw-4, ax-pw/2));
-  if (ay+rr+6+ph<=bh-4) top=ay+rr+6; else if (ay-rr-6-ph>=4) top=ay-rr-6-ph; else top=Math.max(4, bh-ph-4); // below the tile, else above, else wherever it fits
-  p.style.left=Math.round(left)+"px"; p.style.top=Math.round(Math.max(4,top))+"px"; p.style.visibility="visible"; }
+var WDPOP_SEEN="";
+function wdPopPlace(){ var p=document.getElementById("wdpop"), b=wdBoxEl(); if (!p || !b) return; var A=wdPopAnchor(), V=wdWin(), bh=b.offsetHeight, ph=p.offsetHeight;
+  p.style.left=""; p.style.top=""; p.style.visibility="visible";
+  var key=WDS.sel?[WDS.sel.k,WDS.sel.i,WDS.sel.x,WDS.sel.y,WDS.sel.m&&WDS.sel.m.id].join(","):""; if (!A || key===WDPOP_SEEN) return; WDPOP_SEEN=key;
+  var ay=(A.y-V.y)/V.h*bh, room=bh-ph-10; // 0.2.71: like the kingdom map, the map shifts once (only if needed) so what you tapped shows above the docked pop-up
+  if (room>20 && (ay<4 || ay>room)){ var ncy=Math.round(A.y-0.5-(room/2-bh/2)/bh*V.h); if (ncy!==WDS.cy){ WDS.cy=ncy; wdPaint(); } } }
 // placed the moment it's drawn, whatever drew it (a tap, the alliance page or the menu re-rendering)
 if (window.MutationObserver) new MutationObserver(function(){ var p=document.getElementById("wdpop"); if (p && p.style.visibility!=="visible" && !WDS.gest) wdPopPlace(); }).observe(document.body, {childList:true, subtree:true});
 function wdTrip(x, y){ var d=WDS.d, c=Math.floor(d.c), dist=Math.max(1, Math.sqrt((x-c)*(x-c)+(y-c)*(y-c))); return fmtT(dist*18000/1000*1000); } // base Cavalry, no speed bonuses
 function wdLong(ms){ return ms>=48*3600e3 ? Math.ceil(ms/864e5)+" days" : fmtT(ms); } // a week reads as days, not 168h
 function wdProt(ms){ return ms>0 ? '<span class="badge">Protected '+wdLong(ms)+'</span>' : ''; }
 /* 0.2.40: map popups show the essentials; the longer text waits behind More */
-function wdPopHtml(){ var inf=wdInfo(), more=WDS.more===WDS.sel, has=/class="(hint|[^"]*\bwdx\b)/.test(inf);
-  return '<div class="mpop wdpop'+(more?' more':'')+'" id="wdpop" style="visibility:hidden"><button class="mpx wdpx" data-act="wd-popx" aria-label="Close">\u00d7</button><div class="wdinfo" id="wdinfo">'+inf+'</div>'+
-    (has?'<button class="link wdmore" data-act="wd-more">'+(more?'Less \u25b4':'More \u25be')+'</button>':'')+'</div>'; }
+/* 0.2.71 (Cody: "bring the server map popups in line with the kingdom map's"): docked along the bottom of the map, title row with the close,
+   the essentials (the longer text behind Details), and one bar of action tiles with the main one bottom right, built from the same info as before. */
+function wdBtnSpec(b, tn){ var A=b.getAttribute("data-act"), k=b.getAttribute("data-k"), m=b.getAttribute("data-m"), g=b.getAttribute("data-go"), tx=(b.textContent||"").trim();
+  if (A==="wd-matk") return m==="call"?{l:"Rally",i:"rally"}:{l:"Attack",i:"attack",p:1};
+  if (A==="wb-go"){ if (k==="sc") return {l:"Scout",i:"scout"}; if (k==="gar") return {l:"Garrison",i:"reinforce"}; return m==="call"?{l:"Rally",i:"rally"}:{l:"Attack",i:"attack",p:1}; }
+  if (A==="wd-mjoin") return {l:tx.replace(/’s rally$/,"").replace(/^Join /,"Join "),i:"rally",p:2};
+  if (A==="wd-go") return g==="rf"?{l:"Reinforce",i:"reinforce",p:3}:g==="tp"?{l:"Send",i:"transport"}:{l:"Open",i:"open",p:6};
+  if (A==="wd-tp") return {l:"Move here",i:"teleport",p:4,n:tn};
+  if (A==="wd-home") return {l:"Go home",i:"home",p:4,n:tn};
+  if (A==="wd-almove") return {l:"Move here",i:"found",p:5};
+  if (A==="wd-claim") return {l:/^Tap again/.test(tx)?"Tap again":/^Move/.test(tx)?"Move here":"Claim",i:"found",p:5};
+  if (A==="wd-mv") return {l:"Move",i:"move"};
+  if (A==="dm-with") return {l:"Message",i:"msg"};
+  if (A==="pl-open") return {l:"Profile",i:"user"};
+  if (A==="al-view") return {l:"Alliance",i:"group"};
+  if (A==="wd-zoomhere"||A==="wd-zoomslot") return {l:"Zoom",i:"zoom"};
+  if (A==="wb-pass") return {l:"Hand on",i:"transport"};
+  return {l:tx.length>12?tx.slice(0,11)+"\u2026":tx, i:"info"}; }
+function wdPopHtml(){ var inf=wdInfo(), more=WDS.more===WDS.sel, tn=wdTele();
+  var box=document.createElement("div"); box.innerHTML=inf;
+  var h4=box.querySelector("h4"), title=h4?h4.innerHTML:""; if (h4) h4.remove();
+  var acts=[], warn="";
+  box.querySelectorAll(".btnrow button[data-act], .mpb button[data-act], .wdry button[data-act]").forEach(function(b){ var sp=wdBtnSpec(b, tn), at="";
+    for (var i=0;i<b.attributes.length;i++){ var nm=b.attributes[i].name; if (nm.indexOf("data-")===0 || nm==="disabled") at+=" "+nm+'="'+esc(b.attributes[i].value)+'"'; }
+    var tx=(b.textContent||"").trim(); if (/tap again/i.test(tx) && b.getAttribute("data-act")==="wb-go") warn=tx; // the "they're your ally" check: said above the bar, the button keeps its label
+    acts.push({sp:sp, at:at, tx:tx}); b.remove(); });
+  box.querySelectorAll(".btnrow, .mpb").forEach(function(r){ if (!r.querySelector("button,select,input")) r.remove(); });
+  box.querySelectorAll(".wdry").forEach(function(r){ if (!r.querySelector("button") && r.querySelector("select") && !r.querySelector("label")) r.insertAdjacentHTML("afterbegin",'<span class="dur">A rally leaves in</span>'); }); // its Call a rally button went to the bar // emptied rows go (with the "1 City Teleport, you have N" note: the count is on the tile)
+  var has=!!box.querySelector(".hint,.wdx"), pri=null;
+  acts.forEach(function(a){ if (a.sp.p && (!pri || a.sp.p<pri.sp.p)) pri=a; });
+  var tiles=acts.filter(function(a){ return a!==pri; }).map(function(a){ return '<button class="mpt2"'+a.at+' title="'+esc(a.tx)+'">'+mpIc(a.sp.i,16)+'<span>'+esc(a.sp.l)+'</span>'+(a.sp.n!=null?'<i class="mpbadge">'+a.sp.n+'</i>':'')+'</button>'; });
+  if (has) tiles.push('<button class="mpt2'+(more?' on':'')+'" data-act="wd-more" aria-pressed="'+more+'">'+mpIc("info",16)+'<span>Details</span></button>');
+  var priH=pri?'<button class="btn mppri'+(/danger/.test(inf)&&pri.sp.i==="attack"&&warn?' danger':'')+'"'+pri.at+' title="'+esc(pri.tx)+'">'+mpIc(pri.sp.i,17)+'<span>'+esc(pri.sp.l)+'</span>'+(pri.sp.n!=null?'<i class="mpbadge">'+pri.sp.n+'</i>':'')+'</button>':'';
+  return '<div class="mpop wdpop dock'+(more?' more':'')+'" id="wdpop"><div class="mpt"><b>'+title+'</b><span class="mpic"><button class="mpx" data-act="wd-popx" aria-label="Close">'+mpIc("close",16)+'</button></span></div>'+
+    '<div class="wdinfo" id="wdinfo">'+box.innerHTML+'</div>'+(warn?'<p class="why wdwarn">'+esc(warn)+'</p>':'')+
+    (tiles.length||priH?'<div class="mpbar">'+tiles.join("")+priH+'</div>':'')+'</div>'; }
 function wdInfo(){ var d=WDS.d, v=WDS.sel, me=d.me, mine=me.aid, tn=wdTele(), myS=me.slot!=null?d.slots[me.slot]:null;
   if (!v) return '';
   if (v.k==="mon"){ var mStill=(d.mons||[]).filter(function(m){ return m.id===v.m.id; })[0]; if (!mStill) return '<p class="hint">That monster is gone.</p>'; v.m=mStill; return wdMonInfo(v); }
@@ -8086,12 +8149,12 @@ function wdInfo(){ var d=WDS.d, v=WDS.sel, me=d.me, mine=me.aid, tn=wdTele(), my
       '<p class="dur">'+(l.wild?'In the Wilds: no shield out here.':'On '+(l.me?'your':'their')+' alliance map.')+'</p>';
     var mmL=wdMyMap(); if (!l.wild && wdInMine(l.x, l.y, mmL)) h2+=wdMemBtns(l.name, mmL); else if (!l.me) h2+=wdOtherBtns(l.name);
     if (!l.me && !(!l.wild && wdInMine(l.x, l.y, mmL))) h2+=wbLordBtns(l);
-    if (l.me && l.wild && mine) h2+='<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="wd-home"'+(WDS.acting||!tn?' disabled':'')+'>'+(WDS.armed==="home"?'Tap again to go home':'Back to your alliance map')+'</button>'+tele()+'</div>';
+    if (l.me && l.wild && mine) h2+='<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="wd-home"'+(WDS.acting||!tn?' disabled':'')+'>'+('Back to your alliance map')+'</button>'+tele()+'</div>';
     return h2+'<p class="dur wdx">To the Throne: about '+wdTrip(l.x,l.y)+' for Cavalry with no speed bonuses.</p>'; }
   // the Wilds
   var h3='<h4>The Wilds <span class="dur">('+v.x+', '+v.y+')</span></h4><p class="hint">'+(v.closed!=null?'Part of the outer ring, which opens once every slot of the inner ring is taken. Until then it’s Wilds. ':'')+'No shield out here. Lords without an alliance live here, and monsters roam it: tap one to fight it.</p>';
   if (me.on){ var an=wdAnchor(v.x, v.y, wdOccMap(true)), arm=an&&WDS.armed==="tp"+an[0]+","+an[1]; // 0.2.23: a capital needs a free 2 x 2 block; the one covering this tile
-    if (an) h3+='<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="wd-tp" data-x="'+an[0]+'" data-y="'+an[1]+'"'+(WDS.acting||!tn?' disabled':'')+'>'+(arm?'Tap again to move here':'Move your capital here')+'</button>'+tele()+'</div>'+(!tn?'<p class="dur">You have no City Teleports.</p>':'');
+    if (an) h3+='<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="wd-tp" data-x="'+an[0]+'" data-y="'+an[1]+'"'+(WDS.acting||!tn?' disabled':'')+'>'+('Move your capital here')+'</button>'+tele()+'</div>'+(!tn?'<p class="dur">You have no City Teleports.</p>':'');
     else h3+='<p class="dur">No room here: a capital takes 2 \u00d7 2 free tiles.</p>';
   } else h3+='<p class="dur">Join the server map to settle here.</p>';
   if (wdWin().z<WD_ZOOMS[WD_ZOOMS.length-1]-0.01) h3+='<div class="btnrow" style="margin-top:6px"><button class="btn ghost small" data-act="wd-zoomhere">Zoom in here</button></div>';
@@ -8248,8 +8311,8 @@ function wdAct(act, a, e){
   if (act==="wd-leave"){ if (WDS.armed!=="leave"){ WDS.armed="leave"; wdPaint(); return true; } WDS.armed=""; wdLeave(false); return true; }
   if (act==="wd-claim"){ var si=+a.dataset.v; if (WDS.armed!=="slot"+si){ WDS.armed="slot"+si; wdPaint(); return true; } if (WDS.acting) return true; WDS.acting=true; wdPaint();
     alPost("/wd/claim",{slot:si}).then(function(d){ wdAfter(d, d.error?"":"Your alliance is on its new slot"); }).catch(function(){ WDS.acting=false; toast("Couldn’t reach the server. Check your connection."); wdPaint(); }); return true; }
-  if (act==="wd-tp"){ var tk="tp"+a.dataset.x+","+a.dataset.y; if (WDS.armed!==tk){ WDS.armed=tk; wdPaint(); return true; } wdTeleport({x:+a.dataset.x, y:+a.dataset.y}, "Your capital moved to ("+a.dataset.x+", "+a.dataset.y+")"); return true; }
-  if (act==="wd-home"){ if (WDS.armed!=="home"){ WDS.armed="home"; wdPaint(); return true; } wdTeleport({home:1}, "Your capital is back on your alliance map"); return true; }
+  if (act==="wd-tp"){ wdTeleport({x:+a.dataset.x, y:+a.dataset.y}, "Your capital moved to ("+a.dataset.x+", "+a.dataset.y+")"); return true; }
+  if (act==="wd-home"){ wdTeleport({home:1}, "Your capital is back on your alliance map"); return true; }
   if (act==="wd-set"){ if (a.dataset.v==="on"){ if (S.wdOn) return true; if (!S.mp){ mpPending=null; openSheet({kind:"mpwarn", act:"wd-join"}); return true; } wdJoin(); toastQ("Joining the server map…"); return true; }
     if (S.wdOn) openSheet({kind:"wdleave"}); return true; }
   if (act==="wd-leave-ok"){ closeSheet(); wdLeave(false); return true; }
@@ -8541,7 +8604,7 @@ function wdSend(){ var d=marchDraft; if (wdWhy(sumT(d.t)) || WDS.sending) return
     if (r.error){ toast(r.error); if (gb) gb.disabled=false; return; }
     var ci=cityIndex(cid); if (ci<0) return;
     withCity(ci,function(){ for (var i=0;i<12;i++) S.troops[i]=Math.max(0,S.troops[i]-t[i]); if (ens && S.items[ens]>0) S.items[ens]--; }); // a March Size item is spent, as for any march
-    if (hero) hero.away=true;
+    if (hero) hero.away=true; lastMarchSet(ci, t, hero); // 0.2.71: Previous works for server map marches too
     S.wdM=S.wdM||[]; S.wdM.push({ref:ref, rid:r.rid||W.rid, city:cid, hero:hero?hero.id:0, t:t, dep:Date.now(), st:"out", L:tg?tg.L:0, tk:W.kind==="b"?W.tk:(tg&&tg.r&&tg.r.tk)||"mon", name:W.kind==="b"?(tg?tg.name:""):(tg&&tg.r&&tg.r.tname)||""});
     save(); toastQ(W.kind==="join"?"Marching to the rally":W.mins?"Rally called: it leaves in "+W.mins+" minutes":"Marching: it lands in "+fmtT(Math.max(0,(r.hit||Date.now())-Date.now())));
     closeSheet(); WDS.at=0; wdFetch(); lastView=""; refresh(); })
@@ -14183,9 +14246,9 @@ function viewTitlesBody(t,nt,nr){
   h+='<div class="section"><h3>'+(nr?'Next rank: '+nr.name:'Highest rank reached')+'</h3>'+(nr?questCard(nr,false,"rankup","Promote to "+nr.name):'<p class="hint">You are a General. Only titles remain.</p>')+'</div>';
   h+='<div class="section"><h3>'+(nt?'Next title: '+nt.name:'Highest title reached')+'</h3>'+(nt?'<p class="hint">Allows '+nt.cities+' cities.</p>'+questCard(nt,true,"titleup","Run for "+nt.name):'<p class="hint">You are Prinzessin. Ten cities are yours to rule.</p>')+'</div>';
   h+='<details class="section"><summary>All titles</summary><div class="ladder">'+TITLES.map(function(x,i){ return '<span class="'+(i===S.title?'cur':'')+'">'+x.name+'</span><span class="dur">'+(i?fmt(x.prestige)+' prestige, '+fmt(x.gold)+' gold, '+MEDALS.filter(function(m){return x.m[m[0]];}).map(function(m){return x.m[m[0]]+' '+m[1];}).join(" + "):'Starting title')+'</span><span>'+x.cities+' '+(x.cities===1?'city':'cities')+'</span>'; }).join("")+'</div></details>';
-  var pw=[[12,"Place one NPC city of any level on any open flat or valley, once a day per level 12 you hold."],[14,"Monsters gather near your level 14s each day. Slay them for Dragon Scales, the material for Mythic gear."],[16,"Your historic cities can be teleported like any other city."],[18,"Atlantis raises your city cap by 4."]];
+  var pw=[[12,"Place one NPC city of any level on any open flat or valley, once a day for each historic city you hold."],[14,"Monsters gather near your level 14 and higher historic cities each day. Slay them for Dragon Scales, the material for Mythic gear."],[16,"Your historic cities can be teleported like any other city."],[18,"Atlantis raises your city cap by 4."]];
   pw.push([0,"Every historic city you hold can draft once a day from one NPC city, or lower-level historic city, within reach (a level 12: NPC cities within 12 tiles; a 14: 24 tiles, with the 12s around it; a 16: its quarter of the map; Atlantis: the whole map). It takes a tenth of that city\u2019s biggest troop type into its own army. Pick the city below, or tap it on the map. It grows back within the hour."]);
-  h+='<div class="section"><h3>Historic powers</h3><div class="gearlist">'+pw.map(function(x){ if (!x[0]){ var on0=hcLevels().length>0; return '<div class="gearrow'+(on0?' t3':'')+'"><span class="gn">Draft</span><span class="gb '+(on0?'okc':'dur')+'">'+(on0?'Active':'Locked')+'</span><span class="dur" style="grid-column:1/-1">'+x[1]+'</span></div>'; } var on=hasHC(x[0]); return '<div class="gearrow'+(on?' t3':'')+'"><span class="gn">Level '+x[0]+'</span><span class="gb '+(on?'okc':'dur')+'">'+(on?'Active':'Locked')+'</span><span class="dur" style="grid-column:1/-1">'+x[1]+'</span></div>'; }).join("")+'</div>'+
+  h+='<div class="section"><h3>Historic powers</h3><p class="hint">Each level also has the powers of the levels below it.</p><div class="gearlist">'+pw.map(function(x){ if (!x[0]){ var on0=hcLevels().length>0; return '<div class="gearrow'+(on0?' t3':'')+'"><span class="gn">Draft</span><span class="gb '+(on0?'okc':'dur')+'">'+(on0?'Active':'Locked')+'</span><span class="dur" style="grid-column:1/-1">'+x[1]+'</span></div>'; } var on=hasHC(x[0]); return '<div class="gearrow'+(on?' t3':'')+'"><span class="gn">Level '+x[0]+'</span><span class="gb '+(on?'okc':'dur')+'">'+(on?'Active':'Locked')+'</span><span class="dur" style="grid-column:1/-1">'+x[1]+'</span></div>'; }).join("")+'</div>'+
     draftListHtml()+
     '<p class="hint" style="margin-top:6px">Historic cities also let their buildings, fields and research climb to the city\u2019s own level: 12 marches from a level 12 Rally Spot, cheaper troops from Barracks above 10, and new research at Academy 12, 14 and 16.</p></div>';
   return h;
@@ -14198,6 +14261,13 @@ function draftListHtml(){ var hc=S.cities.map(function(c,ci){ return {c:c, ci:ci
     return '<div class="gearrow'+(pk?' t3':'')+'"><span class="gn">'+esc(c.name)+' <span class="dur">(level '+c.fieldCap+', reach: '+draftReachText(c)+')</span></span><span class="gb">'+(ready?(pk?fmt(pk.n)+' troops':'Nothing in reach'):'Drafted today')+'</span>'+
       (ready?'<span class="dur" style="grid-column:1/-1">'+(os.length===1?'1 city in reach':fmt(os.length)+' cities in reach')+(os.length>DRAFT_SHOW?', the '+DRAFT_SHOW+' that give the most listed (tap any other on the map)':'')+'</span>'+sel:'<span class="dur" style="grid-column:1/-1">Next draft in '+fmtT(realMs(msToNewDay()))+'</span>')+
       (pk?'<span class="btnrow" style="grid-column:1/-1;justify-content:flex-end"><button class="btn small" data-act="hc-draft" data-ci="'+o.ci+'" data-tile="'+pk.q.id+'">Draft now</button></span>':'')+'</div>'; }).join("")+'</div>'; }
+/* 0.2.71 (requested by a player: copy troop goals to another city): Copy lines takes this city's lines (troop or fortification goals);
+   in another city a bar offers Replace these or Add below. Kept until reload, like a copied preset. */
+var GCLIP={};
+function gclipBar(k){ var g=GCLIP[k]; if (!g) return ''; var here=g.city===C().id, n=g.lines.length, done=!here && g.done && g.done[C().id];
+  return '<div class="pclip" role="status"><span><span class="dur">Copied</span> <b>'+n+' line'+(n===1?'':'s')+'</b> <span class="dur">('+esc(g.name)+')</span>'+(here?'<br>Switch to another city to paste them there.':done?'<br>Pasted here \u2713 Paste into any other city too.':'')+'</span>'+
+    (here||done?'':'<button class="btn small" data-act="gclip-paste" data-k="'+k+'" data-v="replace">Replace these</button><button class="btn ghost small" data-act="gclip-paste" data-k="'+k+'" data-v="add">Add below</button>')+
+    '<button class="link" data-act="gclip-clear" data-k="'+k+'">Clear</button></div>'; }
 function goalLinesHtml(k){
   var G=GK[k], have=G.have(), lines=gLines(k), act=gActive(k,have), auto=k==="fg"?S.autoFort:S.autoTrain, h='';
   if (!lines.length) h+='<p class="hint"><b>No lines yet.</b> Add one to start.</p>';
@@ -14207,7 +14277,8 @@ function goalLinesHtml(k){
     h+='<div class="tgline'+(on?' on':met?' done':'')+'"><div class="tgh"><b>Line '+(li+1)+'</b>'+(on?'<span class="badge">'+(auto?(k==="fg"?'Building now':'Training now'):'Next up')+'</span>':met?'<span class="dur">Met</span>':'<span class="dur">Waiting</span>')+
       '<span class="dur">Batch '+(L.b>0?fmt(L.b):'Auto')+'</span><span class="sp"></span><button class="link strong" data-act="tg-edit" data-k="'+k+'" data-l="'+li+'">Edit</button></div>'+
       '<div class="tgu">'+(chips||'<span class="dur">Empty line: tap Edit to set it.</span>')+'</div></div>'; });
-  return h+'<div class="btnrow" style="margin-top:8px"><button class="btn ghost small" data-act="tg-add" data-k="'+k+'">Add a line</button></div>';
+  return gclipBar(k)+h+'<div class="btnrow" style="margin-top:8px"><button class="btn ghost small" data-act="tg-add" data-k="'+k+'">Add a line</button>'+
+    (lines.length?'<button class="btn ghost small" data-act="gclip-copy" data-k="'+k+'">'+(GCLIP[k]&&GCLIP[k].city===C().id?'Copied \u2713':'Copy lines')+'</button>':'')+'</div>';
 }
 function goalsSection(){ var nl=tgLines().length;
   // 0.2.47: a plain section (it was a dropdown the Goals page forced open, so its arrow folded the whole page away); the Auto-train switch sits in its heading
@@ -16042,6 +16113,11 @@ document.addEventListener("click",function(e){
     return;
   }
   if (act==="allcities"){ openSheet({kind:"allcities"}); return; }
+  if (act==="gclip-copy"){ var gkc=GK[a.dataset.k]?a.dataset.k:"tg"; GCLIP[gkc]={city:C().id, name:C().name, lines:JSON.parse(JSON.stringify(gLines(gkc)))}; lastView=""; renderView(true); return; }
+  if (act==="gclip-clear"){ delete GCLIP[a.dataset.k]; lastView=""; renderView(true); return; }
+  if (act==="gclip-paste"){ var gkp=GK[a.dataset.k]?a.dataset.k:"tg", gc=GCLIP[gkp]; if (!gc || gc.city===C().id) return;
+    var gl=gLines(gkp), add=JSON.parse(JSON.stringify(gc.lines)); if (a.dataset.v==="replace") gl.length=0; add.forEach(function(L){ gl.push(L); });
+    gc.done=gc.done||{}; gc.done[C().id]=1; save(); lastView=""; renderView(true); return; }
   if (act==="tg-add"){ var gka=GK[a.dataset.k]?a.dataset.k:"tg"; gLines(gka).push(gNew(gka)); save(); lastView=""; renderView(true); openSheet({kind:"tgline", gk:gka, l:gLines(gka).length-1, city:S.cur}); return; }
   if (act==="tg-edit"){ openSheet({kind:"tgline", gk:GK[a.dataset.k]?a.dataset.k:"tg", l:+a.dataset.l, city:S.cur}); return; }
   if (act.indexOf("tg-")===0 && sheetFor && sheetFor.kind==="tgline"){
@@ -16429,9 +16505,10 @@ document.addEventListener("click",function(e){
   if (act==="rep-page"){ repPage=Math.max(0,repPage+(+a.dataset.d)); fillRepList(); window.scrollTo({top:0}); return; }
   if (act==="arrange"){ arrange = (arrange && arrange.w===a.dataset.aw) ? null : {w:a.dataset.aw, sel:null}; lastView=""; renderView(true); return; }
   if (act==="preset-edit"){ openSheet({kind:"preset",p:+a.dataset.p,m:a.dataset.m?1:0}); return; }
-  if (act==="preset-copy"){ var cpp=presetsOf(a.dataset.m)[+a.dataset.p]; if (!cpp || !presetTotal(cpp)) return; presetClip={name:cpp.name, t:cpp.t.slice(), hero:cpp.hero, stopOnLoss:cpp.stopOnLoss, noCap:!!cpp.noCap, m:!!a.dataset.m}; toastQ("Copied "+cpp.name+"; Paste it onto another preset"); lastView=""; refresh(); return; }
+  if (act==="preset-copy"){ var cpp=presetsOf(a.dataset.m)[+a.dataset.p]; if (!cpp || !presetTotal(cpp)) return; presetClip={name:cpp.name, t:cpp.t.slice(), hero:cpp.hero, stopOnLoss:cpp.stopOnLoss, noCap:!!cpp.noCap, m:!!a.dataset.m, city:C().name, src:pclipKey(a.dataset.m,+a.dataset.p)}; PASTED=""; toastQ("Copied "+cpp.name+"; Paste it onto another preset"); lastView=""; refresh(); return; }
+  if (act==="preset-clipx"){ presetClip=null; PASTED=""; lastView=""; refresh(); return; }
   if (act==="preset-paste"){ var ppp=presetsOf(a.dataset.m)[+a.dataset.p]; if (!ppp || !presetClip) return;
-    ppp.t=presetClip.t.slice(); if (!a.dataset.m && !presetClip.m){ ppp.stopOnLoss=presetClip.stopOnLoss; ppp.noCap=presetClip.noCap; } ppp.hero=(presetClip.hero>0 && !C().heroes.some(function(x){ return x.id===presetClip.hero; })) ? 0 : presetClip.hero; // farm settings only travel farm to farm; the hero comes along when this city has it
+    ppp.t=presetClip.t.slice(); if (presetClip.name) ppp.name=presetClip.name; PASTED=pclipKey(a.dataset.m,+a.dataset.p); if (!a.dataset.m && !presetClip.m){ ppp.stopOnLoss=presetClip.stopOnLoss; ppp.noCap=presetClip.noCap; } ppp.hero=(presetClip.hero>0 && !C().heroes.some(function(x){ return x.id===presetClip.hero; })) ? 0 : presetClip.hero; // farm settings only travel farm to farm; the hero comes along when this city has it
     toastQ("Pasted "+presetClip.name+" onto "+ppp.name); save(); lastView=""; refresh(); return; }
   if (act==="preset-auto"){ var pa=S.presets[+a.dataset.p]; pa.auto=!pa.auto; toastQ(pa.name+(pa.auto?" is auto-farming":" stopped")); processAuto(); refresh(); return; }
   if (act==="mpop-farm"){ var mfs=document.getElementById("mpfarmsel"); if (mfs) MPOPFARM=+mfs.value; var mfp=S.presets[MPOPFARM], mft=a.dataset.tile; if (!mfp || !mft) return; var mfi=mfp.farm.indexOf(mft);
@@ -16453,6 +16530,8 @@ document.addEventListener("click",function(e){
   if (act==="farm-clear-all"){ if (!farmArmed){ farmArmed=true; lastView=""; renderView(true); return; }
     farmArmed=false; S.presets.forEach(function(pr,pi){ pr.farm=[]; pr.idx=0; pr.auto=false; delete farmMsg[C().id+":"+pi]; }); toastQ("Every farm list in "+S.name+" is cleared"); lastView=""; refresh(); return; }
   if (act==="farm-clear"){ var fc2=S.presets[+a.dataset.p]; fc2.farm=[]; fc2.idx=0; fc2.auto=false; lastSheet=""; renderSheet(); save(); return; }
+  if (act==="march-prev"){ var lmp=C().lastMarch; if (!lmp) return; var pav=draftAvail(); marchDraft.t=lmp.t.map(function(n,i){ return Math.min(n,pav[i]||0); }); marchDraft.pk="prev";
+    var ph=lmp.hero ? C().heroes.filter(function(x){ return x.id===lmp.hero; })[0] : null; marchDraft.hero = marchDraft.from ? marchDraft.hero : (ph && !ph.away && !seatLocked(ph) ? ph.id : 0); marchDraft.preview=""; keepX("#sheetbody .mpres", function(){ lastSheet=""; renderSheet(); }); return; }
   if (act==="march-preset"){ var mp=presetsOf(a.dataset.m)[+a.dataset.p], mav=draftAvail(); marchDraft.t=mp.t.map(function(n,i){ return Math.min(n,mav[i]); }); marchDraft.pk=(a.dataset.m?"m":"f")+a.dataset.p; // 0.2.33 (Cody): light the preset you picked
     var mh=presetHero(mp); marchDraft.hero = marchDraft.from ? marchDraft.hero : (mh && !mh.away && !seatLocked(mh) ? mh.id : 0); marchDraft.preview=""; keepX("#sheetbody .mpres", function(){ lastSheet=""; renderSheet(); }); return; }
   if (act==="waves-mode"){ waveDraft.mode=a.dataset.v; lastSheet=""; renderSheet(); return; }
