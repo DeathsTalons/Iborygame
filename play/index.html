@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.73";
+window.IBORY_V="0.2.74";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1328,7 +1328,7 @@ dialog::backdrop{background:rgba(10,12,10,.5)}
 .armon{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);font:inherit;color:inherit;cursor:pointer;min-width:0}.armon.on{border-color:var(--brass);box-shadow:inset 0 0 0 1px var(--brass);background:var(--brass-soft)}
 .armon img{width:44px;height:44px;object-fit:contain;image-rendering:pixelated}.armon b{font-size:.7rem;line-height:1.15;text-align:center}.armon span{font-size:.64rem;color:var(--muted)}
 .arstep{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.arstep .btn{min-width:40px;font-size:1.1rem;line-height:1}.arstep b{min-width:4.5em;text-align:center}.arstep .dur{font-size:.82rem}
-.rfrow{display:flex;align-items:center;gap:8px;margin:8px 0 0}.rfrow>.dur{flex:none;min-width:3.2em;white-space:nowrap;font-size:.82rem}.rfchips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin;padding:1px;min-width:0}.rfchips .chipbtn{flex:none;white-space:nowrap}
+.rfrow{display:flex;align-items:center;gap:8px;margin:8px 0 0}.rfrow .rysel{flex:1;min-width:0;margin:0}.rfrow>.dur{flex:none;min-width:3.2em;white-space:nowrap;font-size:.82rem}.rfchips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin;padding:1px;min-width:0}.rfchips .chipbtn{flex:none;white-space:nowrap}
 .rfhero{display:inline-flex;align-items:center;gap:6px;height:auto;min-height:34px;padding:3px 10px 3px 4px;max-width:100%;min-width:0;font-family:var(--body);font-weight:600}.rfhero .dur{font-weight:400;font-size:.76rem;white-space:nowrap}.rfhero>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rfhead{display:flex;justify-content:space-between;align-items:center;margin:12px 0 6px}.rfhead .dur{font-size:.8rem}
 .rfgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-bottom:10px}
@@ -1805,7 +1805,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.73";
+var APP_VERSION = "0.2.74";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -7278,9 +7278,10 @@ function ryCallSheet(){ var q=TILE_BY[sheetFor.tile]; if (!q) return '<div class
     '<p class="hint">Everyone marches to your kingdom and waits; at the leave time they set off together'+(q.k==="wiz"?' and fight it all at once':' and hit in the order you set')+'. '+(q.k==="hc"?'One historic city call a day':q.k==="wiz"?'Wizard calls have no limit':'One level 10 NPC city call a day')+'; calling it off gives the call back.'+alMore("rycall")+'</p>'+
     (alMoreOn("rycall")?'<p class="hint">Every member can march from their kingdom square to yours (you too, from any city). At the leave time, every march that made it sets off together from the city you pick below, at the pace of the slowest troop in the whole rally, and '+(q.k==="wiz"?'they fight the wizard all together when they land (Arena-style: nobody dies, the wounded go home to their Medic Camps, and if it survives it heals to full). If it falls, everyone who got a march there rolls the rewards on their own: '+wizRewardText(q.L)+'.':'hits this target one after another when they land, in the order you set on the Rallies tab; each wave fights what the ones before it left.'+(isVamp(q)?' If it falls, everyone who got a march there takes its spoils, and the kill counts on their event track.':''))+' Then they ride back to that city and everyone\u2019s troops are home at once. Your own marches are at your kingdom the moment you send them. Marches still on the way to you when it leaves turn round.'+(q.k==="wiz"?'':' If the rally wipes the garrison, everyone who got a march there in time rolls the target\u2019s full drop table on their own (medals, boxes, gems, items; the garrison has to be full when it lands, like a normal attack). No resources are looted. Every wave that wins, and every one that hits it already empty, lowers its loyalty like your own win would; if it reaches 0 the city is yours. When it\u2019s over you get the garrison that\u2019s left, so send your own waves to finish it before it refills'+(q.k==="hc"?' (historic cities refill within an hour)':'')+'.')+' While the rally runs you can\u2019t attack it yourself except through the rally. Join with a faster hero yourself and the rally speeds up to match.</p>':'')+
     (q.k==="wiz"?'<p class="dur">Health '+fmt(WIZ[q.L].hp)+'.</p>':'<p class="dur">Right now: '+fmt(sumT(cur.t))+' defenders, '+fmt(cur.f.reduce(function(a,b){ return a+b; },0))+' fortifications, wall level '+cur.wall+'.</p>')+
-    (S.cities.length>1?'<div class="rfrow"><span class="dur">From</span><span class="rfchips">'+S.cities.map(function(c,i){ return '<button class="chipbtn wide'+(i===fci?' on':'')+'" data-act="ry-from" data-v="'+c.id+'" aria-pressed="'+(i===fci)+'" translate="no">'+esc(c.name)+'</button>'; }).join("")+'</span></div>':'')+
+    // 0.2.74 (Cody): dropdowns again; the chip rows snapped back to the start every second (the leave clock below redraws this sheet)
+    (S.cities.length>1?'<div class="rfrow"><span class="dur">From</span><select id="ryfrom" class="rysel" aria-label="Rally leaves from" translate="no">'+S.cities.map(function(c,i){ return '<option value="'+c.id+'"'+(i===fci?' selected':'')+'>'+esc(c.name)+'</option>'; }).join("")+'</select></div>':'')+
     '<p class="dur" style="margin:0">'+(S.cities.length>1?'From there':'From <span translate="no">'+esc(S.cities[fci].name)+'</span>')+(fh&&heroById(fh)?', at '+esc(heroById(fh).name)+'\u2019s pace':'')+': '+fmtT(tmin)+' for the fastest troops, '+fmtT(tmax)+' for the slowest. Back the same way.</p>'+
-    '<div class="rfrow"><span class="dur">Leaves in</span><span class="rfchips">'+[[5,"5 min"],[15,"15 min"],[30,"30 min"],[60,"1 h"],[120,"2 h"],[240,"4 h"],[480,"8 h"],[720,"12 h"],[1440,"24 h"]].map(function(o){ return '<button class="chipbtn wide'+(o[0]===mins?' on':'')+'" data-act="ry-mins" data-v="'+o[0]+'" aria-pressed="'+(o[0]===mins)+'">'+o[1]+'</button>'; }).join("")+'</span></div>'+
+    '<div class="rfrow"><span class="dur">Leaves in</span><select id="rymins" class="rysel" aria-label="Leaves in">'+[[5,"5 min"],[15,"15 min"],[30,"30 min"],[60,"1 h"],[120,"2 h"],[240,"4 h"],[480,"8 h"],[720,"12 h"],[1440,"24 h"]].map(function(o){ return '<option value="'+o[0]+'"'+(o[0]===mins?' selected':'')+'>'+o[1]+'</option>'; }).join("")+'</select></div>'+
     '<p class="dur">The waves leave at about '+trClock(S.gt+mins*60000*S.speed)+'. You can change it on Rallies.</p>'+
     '<label class="chk" style="margin:6px 0"><input type="checkbox" id="rysend"'+(RYS.sendToo?' checked':'')+'> Send my own march right after calling (the march form opens from '+esc(C().name)+')</label>'+
     '<div class="act"><span></span><button class="btn" data-act="ry-call" id="rycallgo"'+(RYS.sending?' disabled':'')+'>Call the alliance</button></div>';
@@ -15443,7 +15444,9 @@ function renderSheetCore0(){
   }
   if (sheetFor.page) h=h.replace(/<button class="closebtn" data-act="close">[^<]*<\/button>/g,"").replace(/<button class="btn ghost small" data-act="close" aria-label="Close">[^<]*<\/button>/g,"");
   if (h===lastSheet) return;
+  var rfx=[].map.call(sheetBody.querySelectorAll('.rfchips'), function(r){ return r.scrollLeft; }); // 0.2.74: chip rows keep their scroll through a redraw
   lastSheet=h; sheetBody.innerHTML=h; wireDetails(sheetBody);
+  if (rfx.some(function(x){ return x; })) [].forEach.call(sheetBody.querySelectorAll('.rfchips'), function(r,i){ if (rfx[i]) r.scrollLeft=rfx[i]; });
   if (!sheetFor.page) sheet.classList.toggle("full", sheetFor.kind==="lb" || sheetFor.kind==="wc" || sheetFor.kind==="replay" || sheetFor.kind==="drops"); if (sheetFor.kind==="lb"){ var lbt=document.querySelector("#lbtabs .on"); if (lbt) lbt.scrollIntoView({block:"nearest",inline:"center"}); } if (sheetFor.kind==="drops"){ var dpo=document.querySelector("#dtplaces .on"), dpw=document.getElementById("dtplaces"); if (dpo && dpw) dpw.scrollLeft=Math.max(0, dpo.offsetLeft-dpw.offsetLeft-(dpw.clientWidth-dpo.offsetWidth)/2); }
   if (!sheetFor.page){ var fitOn=sheetFor.kind==="report" && repFit; sheet.classList.toggle("fit", fitOn); if (fitOn && sheet.open) fitReport(); }
   if (sheetFor && sheetFor.focus){ var fe=document.getElementById(sheetFor.focus==="gear"?"herogear":sheetFor.focus); sheetFor.focus=null; if (fe && fe.scrollIntoView) fe.scrollIntoView({block:"start"}); }
@@ -16791,6 +16794,8 @@ document.addEventListener("input",function(e){ markDirty();
   if (e.target.id==="wgap"){ waveDraft.gap=Math.max(0,+e.target.value||0); updateWaveInfo(); }
   if (e.target.id==="hname" && sheetFor && sheetFor.kind==="hero"){ var rh=heroById(sheetFor.id); if (rh && rh.tier!=="historic" && !rh.fixedName){ var nv=e.target.value.replace(/\s+/g," ").trim(); if (rh.tier==="queen"){ nv=nv.replace(/^queen\s+/i,""); rh.name=nv?"Queen "+nv:rh.name; } else rh.name=nv||rh.name; var hh2=document.getElementById("hname-h"); if (hh2) hh2.textContent=rh.name; save(); } }
   if (e.target.id==="gname"){ var ng=forgeGear(); if (ng){ ng.nm=e.target.value.replace(/\s+/g," ").trim().slice(0,28)||undefined; if (!ng.nm) delete ng.nm; save(); } }
+  if (e.target.id==="ryfrom"){ RYS.from=+e.target.value; lastSheet=""; renderSheet(); return; }
+  if (e.target.id==="rymins"){ RYS.mins=e.target.value; lastSheet=""; renderSheet(); return; }
   if (e.target.dataset.asd!=null && ASD){ var ak=e.target.dataset.asd; if (ak==="two") ASD.two=e.target.checked; else if (ak==="g1"||ak==="g2") ASD[ak]=e.target.value; else ASD[ak]=+e.target.value; EDITING=null; lastSheet=""; renderSheet(); return; }
   if (e.target.dataset.gsn!=null && sheetFor && sheetFor.kind==="hero"){ var nh=heroById(sheetFor.id); if (nh){ nh.gearSetNames=nh.gearSetNames||[]; nh.gearSetNames[+e.target.dataset.gsn]=e.target.value.replace(/\s+/g," ").trim().slice(0,24); save(); } }
   if (e.target.dataset && e.target.dataset.wct && sheetFor && sheetFor.kind==="wc"){ var wcp2=wcById(sheetFor.id); if (wcp2){ var wpart=e.target.dataset.wct.split(":"), wdr=wcDraftOf(wcp2), wv=wdr.waves[+wpart[0]];
