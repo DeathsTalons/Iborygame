@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.71";
+window.IBORY_V="0.2.72";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1655,6 +1655,8 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 .maptools #realmh{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .maptools #mapstat{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;align-items:flex-start;text-align:start;line-height:1.1;padding:0;text-decoration:none;white-space:nowrap}
 .maptools #mapstat b{color:var(--brass);font-size:.98rem}.maptools #mapstat span{font-size:.72rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.acell{position:relative}.acauto{position:absolute;top:3px;inset-inline-start:3px;background:var(--panel)}
+.asmark{font:700 .62rem var(--body);color:var(--brass);border:1px solid var(--brass);border-radius:6px;padding:0 4px;vertical-align:middle}
 .pclip{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:6px 0 10px;padding:8px 10px;border:1px solid var(--brass);border-radius:10px;background:var(--brass-soft);font-size:.86rem}.pclip span{flex:1;min-width:0}.pclip .link{flex:none}
 .maptools .bmjump,.maptools .cityjump{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23d4a843' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 7px center;background-size:10px 6px;text-overflow:ellipsis}
 .maptools .bmjump{flex:0 0 auto;width:62px;max-width:62px;margin:0;padding:5px 20px 5px 9px;font-size:.84rem;font-weight:700;color:var(--brass);min-height:36px}
@@ -1803,7 +1805,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.71";
+var APP_VERSION = "0.2.72";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -11273,7 +11275,7 @@ function slotIdx(g){ for (var i=0;i<GEAR_SLOTS.length;i++) if (GEAR_SLOTS[i].k==
 function armList(){ return S.gear.filter(function(g){ var un=gearUnworn(g); return (ARM.tab==="all" || (ARM.tab==="unworn")===un) && (armoryFilter==="all" || g.slot===armoryFilter) && (!ARM.stat || gearStat(g)===ARM.stat) && (ARM.tier<0 || g.tier===ARM.tier); }).sort(armSortFn()); }
 function armCell(g){ var who=g.on?heroById(g.on):null, on=ARM.sel&&ARM.sel[g.id], beats=gearUnworn(g)&&!!gearBeats(g);
   return '<button class="acell'+(on?' sel':'')+'" data-act="'+(ARM.sel?'arm-pick':'forge-open')+'" data-g="'+g.id+'" aria-pressed="'+!!on+'" aria-label="'+esc(gearName(g))+'">'+gearTile(g,{size:60, up:beats})+
-    '<span class="av"><b>+'+gearVal(g)+' '+STATN[gearStat(g)].slice(0,3)+'</b><br>'+(g.nm?esc(g.nm):slotOf(g).name)+(who&&ARM.tab!=="unworn"?'<br><i>'+esc(who.name)+'</i>':'')+'</span>'+(on?'<span class="achk">✓</span>':'')+'</button>'; }
+    '<span class="av"><b>+'+gearVal(g)+' '+STATN[gearStat(g)].slice(0,3)+'</b><br>'+(g.nm?esc(g.nm):slotOf(g).name)+(who&&ARM.tab!=="unworn"?'<br><i>'+esc(who.name)+'</i>':'')+'</span>'+(on?'<span class="achk">✓</span>':'')+(asRun(g.id)?'<span class="asmark acauto">Auto</span>':'')+'</button>'; }
 // 0.2.50: in the Armory pop-up the sheet's own heading carries the counts (no second "Armory" heading), and the crafting hint is gone.
 // stat and tier filters are one row of coloured dots; sort, Group and Select share one row
 function armCounts(){ var all=S.gear, unN=all.filter(gearUnworn).length; return all.length+' pieces \u00b7 '+(all.length-unN)+' worn \u00b7 '+unN+' unworn'; }
@@ -11318,7 +11320,7 @@ document.addEventListener("change", function(e){ var t=e.target; if (!t) return;
 var armoryFilter="all";
 function gearRow(g){
   var sl=slotOf(g), who=g.on?heroById(g.on):null;
-  return '<button class="gearrow gearpiece t'+g.tier+'" data-act="forge-open" data-g="'+g.id+'"><span class="gn">'+gearName(g)+'</span><span class="gst">'+starStr(g)+'</span><span class="gb">+'+gearVal(g)+' '+STATN[gearStat(g)]+(g.slot==="mount"?', '+pct(MOUNT_SPD[g.tier])+' march speed':'')+'</span><span class="dur">'+(who?'Worn by '+esc(who.name):'Unequipped')+'</span></button>';
+  return '<button class="gearrow gearpiece t'+g.tier+'" data-act="forge-open" data-g="'+g.id+'"><span class="gn">'+gearName(g)+'</span><span class="gst">'+starStr(g)+(asRun(g.id)?' <span class="asmark">Auto</span>':'')+'</span><span class="gb">+'+gearVal(g)+' '+STATN[gearStat(g)]+(g.slot==="mount"?', '+pct(MOUNT_SPD[g.tier])+' march speed':'')+'</span><span class="dur">'+(who?'Worn by '+esc(who.name):'Unequipped')+'</span></button>';
 }
 function forgeControls(g){ // star and tier upgrades for one piece: shared by the Forge's piece menu and a hero's gear slot menu (0.2.39: the new look)
   var sl=slotOf(g), max=GEAR_MAX[g.tier], h="";
@@ -11331,7 +11333,7 @@ function forgeControls(g){ // star and tier upgrades for one piece: shared by th
       '<div class="ggauge"><i style="width:'+Math.round(p)+'%"></i><span>'+Math.round(p)+'% success \u00b7 +'+nv+' '+STATN[gearStat(g)]+' if it lands</span></div>'+
       (m?'<p class="dur" style="margin:4px 0 0">Includes +'+Math.min(10,hs(m,gearStat(g))/40).toFixed(1)+'% from '+esc(m.name)+'\u2019s '+STATN[gearStat(g)]+'.</p>':'');
     var why = have<n ? "Not enough "+(forgeGem==="D"?"Delicate":"Flawless")+" gems" : "";
-    var asOn=S.autoStar&&S.autoStar.gid===g.id;
+    var asOn=!!asRun(g.id);
     h+='<div class="act"><span class="why">'+why+'</span><button class="btn" data-act="forge-strike"'+(why||asOn?' disabled':'')+'>Strike the star</button></div>'+autoStarHtml(g)+'</div>';
   }
   var ut=g.tier+1;
@@ -11358,8 +11360,8 @@ function forgeStrike(sg, gem, n, pre){
   if (!sg || sg.stars>=GEAR_MAX[sg.tier]) return false;
   var gk="gem"+gem, gn=Math.max(1,Math.min(4,n)); if ((S.items[gk]||0)<gn) return false;
   var chance=gemChance(sg,gem,gn); S.items[gk]-=gn; gearChanged(); // the stars change either way below
-  if (Math.random()*100<chance){ sg.stars++; if (sg.stars>=11){ S.starLog=(S.starLog||[]).filter(function(e){ return e.at>Date.now()-HOUR; }); S.starLog.push({at:Date.now(), st:sg.stars, nm:(sg.nm?sg.nm+' ('+TIERS[GEAR_TIERS[sg.tier]].name+' '+slotOf(sg).name+')':gearTypeName(sg))}); } forgeLog.unshift((pre||'')+'<b class="okc">Success!</b> Now '+sg.stars+' star'+(sg.stars>1?'s':'')+' ('+Math.round(chance)+'% roll).'); return {ok:true}; }
-  var from=sg.stars; sg.stars=failTo(from); forgeLog.unshift((pre||'')+'<b class="badc">Failed</b> at '+Math.round(chance)+'%. '+(sg.stars===from?'No stars lost.':'Dropped from '+from+' to '+sg.stars+'.')); if (forgeLog.length>40) forgeLog.length=40; return {ok:false}; }
+  if (Math.random()*100<chance){ sg.stars++; if (sg.stars>=11){ S.starLog=(S.starLog||[]).filter(function(e){ return e.at>Date.now()-HOUR; }); S.starLog.push({at:Date.now(), st:sg.stars, nm:(sg.nm?sg.nm+' ('+TIERS[GEAR_TIERS[sg.tier]].name+' '+slotOf(sg).name+')':gearTypeName(sg))}); } if (pre!==false) forgeLog.unshift((pre||'')+'<b class="okc">Success!</b> Now '+sg.stars+' star'+(sg.stars>1?'s':'')+' ('+Math.round(chance)+'% roll).'); return {ok:true}; }
+  var from=sg.stars; sg.stars=failTo(from); if (pre!==false) forgeLog.unshift((pre||'')+'<b class="badc">Failed</b> at '+Math.round(chance)+'%. '+(sg.stars===from?'No stars lost.':'Dropped from '+from+' to '+sg.stars+'.')); if (forgeLog.length>40) forgeLog.length=40; return {ok:false}; }
 /* ---------- 0.2.41: auto-strike. Up to two steps (gem, gems per try, up to which star); one try every AS_EVERY while the game is open.
    Same odds and costs as tapping; it stops at the target, when the gems for a step run out, or on Stop. One piece at a time. ---------- */
 var AS_EVERY=1000, ASD=null;
@@ -11370,36 +11372,51 @@ function asDraft(g){ var max=GEAR_MAX[g.tier];
 function asSteps(A){ return A.steps.filter(function(st){ return st.to>0; }); }
 function asStepNow(A, g){ var L=asSteps(A); for (var i=0;i<L.length;i++) if (g.stars<L[i].to) return L[i]; return null; }
 function asPlan(A){ return asSteps(A).map(function(st,i){ return (i?'then ':'')+GEMN[st.gem]+' \u00d7'+st.n+' until '+st.to+'\u2605'; }).join(', '); }
-function autoStarHtml(g){ var A=S.autoStar, max=GEAR_MAX[g.tier];
-  if (A && A.gid===g.id){ var st=asStepNow(A,g), left=Math.max(0, Math.ceil((A.next-Date.now())/1000));
-    return '<div class="aspanel on"><div class="act" style="margin:0"><b>Auto-strike is running</b><button class="btn ghost small" data-act="as-stop">Stop</button></div>'+
+/* 0.2.72 (Cody): any number of pieces at once (S.autoStars, one run a piece; it was one piece, S.autoStar), and no Success/Failed line per try
+   (only a line when a run ends): the screen redraws only when the open piece's stars change, the countdown and counts update in place. */
+function asRuns(){ if (S.autoStar){ S.autoStars=(S.autoStars||[]).concat([S.autoStar]); S.autoStar=null; } return S.autoStars||(S.autoStars=[]); }
+function asRun(gid){ return asRuns().filter(function(r){ return r.gid===gid; })[0]||null; }
+function autoStarHtml(g){ var A=asRun(g.id), max=GEAR_MAX[g.tier], others=asRuns().filter(function(r){ return r.gid!==g.id; }).length;
+  var oth=others?'<p class="dur" style="margin:4px 0 0" id="asoth"><span></span> <button class="link" data-act="as-stopall">Stop all</button></p>':'';
+  if (A){ var st=asStepNow(A,g); // the countdown and the counts are filled in place by asTick (asFill), so this HTML only changes with the stars and the sheet isn't rebuilt every tick
+    return '<div class="aspanel on"><div class="act" style="margin:0"><b>Auto-strike is running</b><button class="btn ghost small" data-act="as-stop" data-g="'+g.id+'">Stop</button></div>'+
       '<p class="dur" style="margin:2px 0">'+asPlan(A)+'.</p>'+
-      '<p class="dur" style="margin:2px 0">'+(st?'Now '+g.stars+'\u2605. Next try in <b id="asnext">'+left+'s</b>.':'Done.')+'</p><p class="dur" style="margin:2px 0">'+asCount(A)+'</p></div>'; }
-  if (A){ var og=gearById(A.gid); return '<div class="aspanel"><p class="dur" style="margin:0">Auto-strike is working on '+(og?esc(gearName(og)):'another piece')+'. One piece at a time.</p><div class="btnrow" style="margin-top:4px"><button class="btn ghost small" data-act="as-stop">Stop it</button></div></div>'; }
+      '<p class="dur" style="margin:2px 0">'+(st?'Now '+g.stars+'\u2605. Next try in <b id="asnext-'+g.id+'"></b>.':'Done.')+'</p><p class="dur" style="margin:2px 0" id="ascount-'+g.id+'"></p>'+oth+'</div>'; }
   var D=asDraft(g), gsel=function(k,v){ return '<select data-asd="'+k+'">'+["D","F"].map(function(q){ return '<option value="'+q+'"'+(v===q?' selected':'')+'>'+GEMN[q]+'</option>'; }).join("")+'</select>'; },
     nsel=function(k,v){ return '<select data-asd="'+k+'">'+[1,2,3,4].map(function(q){ return '<option value="'+q+'"'+(v===q?' selected':'')+'>\u00d7'+q+'</option>'; }).join("")+'</select>'; },
     tsel=function(k,v,lo){ var o=''; for (var q=lo;q<=max;q++) o+='<option value="'+q+'"'+(v===q?' selected':'')+'>'+q+'\u2605</option>'; return '<select data-asd="'+k+'">'+o+'</select>'; };
   return '<details class="det aspanel" data-det="autostar"'+(DET.autostar?' open':'')+'><summary><b>Auto-strike</b> <span class="dur">one try every '+(AS_EVERY/1000)+'s while the game is open</span></summary>'+
     '<div class="asrow">'+gsel("g1",D.g1)+nsel("n1",D.n1)+'<span class="dur">until</span>'+tsel("to1",D.to1,g.stars+1)+'</div>'+
     (D.to1<max?'<label class="chk dur" style="margin-top:4px"><input type="checkbox" data-asd="two"'+(D.two?' checked':'')+'> then</label>'+(D.two?'<div class="asrow">'+gsel("g2",D.g2)+nsel("n2",D.n2)+'<span class="dur">until</span>'+tsel("to2",D.to2,D.to1+1)+'</div>':''):'')+
-    '<p class="dur" style="margin:4px 0 0">Same odds and gems as striking by hand. A failure can drop stars; it just keeps going until it reaches the target or a step runs out of gems.</p>'+
-    '<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="as-start">Start auto-strike</button></div></details>'; }
+    '<p class="dur" style="margin:4px 0 0">Same odds and gems as striking by hand. A failure can drop stars; it just keeps going until it reaches the target or a step runs out of gems. Run it on as many pieces as you like: they share your gems.</p>'+
+    '<div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="as-start">Start auto-strike</button></div>'+oth+'</details>'; }
+function asFill(){ var now=Date.now(), open=forgeGear(); asRuns().forEach(function(A){ var el=document.getElementById("asnext-"+A.gid); if (el) el.textContent=Math.max(0,Math.ceil((A.next-now)/1000))+"s";
+    var ce=document.getElementById("ascount-"+A.gid); if (ce) ce.textContent=asCount(A); });
+  var oe=document.getElementById("asoth"); if (oe && oe.firstChild){ var on=asRuns().filter(function(r){ return !open || r.gid!==open.id; }).length; oe.firstChild.textContent=asOthText(on); } }
+function asOthText(n){ return 'Also running on '+n+' other piece'+(n===1?'':'s')+'.'; }
 function asCount(A){ return 'Tries: '+fmt(A.tries)+' \u00b7 landed: '+fmt(A.ok)+' \u00b7 Delicate used: '+fmt(A.used.D||0)+' \u00b7 Flawless used: '+fmt(A.used.F||0); }
-function asStart(g){ var D=asDraft(g), steps=[{gem:D.g1, n:D.n1, to:D.to1}]; if (D.two && D.to1<GEAR_MAX[g.tier]) steps.push({gem:D.g2, n:D.n2, to:D.to2});
-  S.autoStar={gid:g.id, steps:steps, next:Date.now()+500, tries:0, ok:0, used:{D:0,F:0}, start:g.stars}; save(); }
-function asEnd(why, toastIt){ var A=S.autoStar; if (!A) return; var g=gearById(A.gid);
+function asStart(g){ if (asRun(g.id)) return; var D=asDraft(g), steps=[{gem:D.g1, n:D.n1, to:D.to1}]; if (D.two && D.to1<GEAR_MAX[g.tier]) steps.push({gem:D.g2, n:D.n2, to:D.to2});
+  asRuns().push({gid:g.id, steps:steps, next:Date.now()+500, tries:0, ok:0, used:{D:0,F:0}, start:g.stars}); save(); }
+function asEnd(A, why, quiet){ if (!A) return; var L=asRuns(), i=L.indexOf(A); if (i<0) return; L.splice(i,1); var g=gearById(A.gid);
   var msg=(g?'Auto-strike on '+gearName(g):'Auto-strike')+': '+why+'. '+asCount(A)+'.';
-  S.autoStar=null; note("heroes", msg); if (toastIt) toastQ(msg); forgeLog.unshift(esc(msg)); save(); lastSheet=""; if (sheetFor) renderSheet(); }
-function asTick(){ var A=S&&S.autoStar; if (!A || saveLocked) return; var now=Date.now();
-  var el=document.getElementById("asnext"); if (el) el.textContent=Math.max(0,Math.ceil((A.next-now)/1000))+"s";
-  if (now<A.next) return;
-  var g=gearById(A.gid); if (!g){ asEnd("stopped: the piece is gone", true); return; }
-  var st=asStepNow(A,g); if (!st || g.stars>=GEAR_MAX[g.tier]){ asEnd("reached "+g.stars+"\u2605", true); return; }
-  if ((S.items["gem"+st.gem]||0)<st.n){ asEnd(st.gem==="D"?"out of Delicate gems at "+g.stars+"\u2605":"out of Flawless gems at "+g.stars+"\u2605", true); return; }
-  var r=forgeStrike(g, st.gem, st.n, '<span class="dur">Auto:</span> '); A.next=now+AS_EVERY; if (!r){ asEnd("stopped", true); return; }
-  A.tries++; if (r.ok) A.ok++; A.used[st.gem]=(A.used[st.gem]||0)+st.n;
-  var st2=asStepNow(A,g); if (!st2) { asEnd("reached "+g.stars+"\u2605", true); return; }
-  save(); if (sheetFor && !editingIn(sheetBody)){ lastSheet=""; renderSheet(); } tickText(); }
+  note("heroes", msg); forgeLog.unshift(esc(msg)); if (forgeLog.length>40) forgeLog.length=40; save();
+  if (!quiet && sheetFor){ lastSheet=""; renderSheet(); } }
+function asTick(){ if (!S || saveLocked) return; var L=asRuns(); if (!L.length){ if (document.getElementById("asoth")) asFill(); return; } var now=Date.now(), open=forgeGear(), redraw=false, anyStar=false;
+  L.slice().forEach(function(A){
+    if (now<A.next) return;
+    var g=gearById(A.gid), mine=open && open.id===A.gid, end=function(why){ asEnd(A, why, true); if (mine) redraw=true; else anyStar=true; };
+    if (!g){ end("stopped: the piece is gone"); return; }
+    var st=asStepNow(A,g); if (!st || g.stars>=GEAR_MAX[g.tier]){ end("reached "+g.stars+"\u2605"); return; }
+    if ((S.items["gem"+st.gem]||0)<st.n){ end(st.gem==="D"?"out of Delicate gems at "+g.stars+"\u2605":"out of Flawless gems at "+g.stars+"\u2605"); return; }
+    var before=g.stars, r=forgeStrike(g, st.gem, st.n, false); A.next=now+AS_EVERY; if (!r){ end("stopped"); return; }
+    A.tries++; if (r.ok) A.ok++; A.used[st.gem]=(A.used[st.gem]||0)+st.n;
+    if (!asStepNow(A,g)){ end("reached "+g.stars+"\u2605"); return; }
+    if (g.stars!==before){ anyStar=true; if (open && open.id===g.id) redraw=true; } // only the open piece's stars changing redraws its screen
+ });
+  save();
+  if (sheetFor && !editingIn(sheetBody) && (redraw || (anyStar && sheetFor.kind==="armory"))){ lastSheet=""; renderSheet(); } // a list of pieces (the Armory) redraws when any star changes
+  asFill();
+  tickText(); }
 setInterval(asTick, 500);
 function forgeGear(){ // the piece the open menu is upgrading: the one in the Forge menu, or the one worn in a hero's slot
   if (!sheetFor) return null;
@@ -15201,7 +15218,8 @@ function renderPage(force){
   sheetFor={kind:tab,page:true}; lastSheet=force?"":pageLast; sheetBody=host;
   try { renderSheetCore(); } finally { pageLast=lastSheet; sheetFor=sv[0]; lastSheet=sv[1]; sheetBody=sv[2]; }
 }
-function renderSheetCore(){
+function renderSheetCore(){ renderSheetCore0(); if (S && S.autoStars && S.autoStars.length) try { asFill(); } catch(e){} } // 0.2.72: auto-strike's countdown and counts, filled in place
+function renderSheetCore0(){
   if (sheetFor && sheetFor.kind==="world" && WDS.gest){ WDS.needPaint=1; return; } // 0.2.43: never rebuild the server map under a moving finger
   if (sheetFor && !sheetFor.page && (sheetFor.kind==="deco"||sheetFor.kind==="decopick") && lastSheet!=="") return; // 0.1.202: nothing on it changes by itself; anything that changes it rebuilds it (lastSheet="")
   if (!sheetFor) return;
@@ -16335,11 +16353,12 @@ document.addEventListener("click",function(e){
     lastSheet=""; renderSheet(); refresh(); return; }
   if (act==="gear-off"){ var og=S.gear.filter(function(x){ return x.id===+a.dataset.g; })[0]; if (og){ og.on=0; delete og.at; gearChanged(); } heroBack(sheetFor.back); refresh(); return; }
   if (act==="forge-gem"){ forgeGem=a.dataset.v; lastSheet=""; renderSheet(); return; }
-  if (act==="as-start"){ var asg=forgeGear(); if (!asg) return; if (S.autoStar){ toast("Auto-strike is already running on a piece"); return; } asStart(asg); lastSheet=""; renderSheet(); return; }
-  if (act==="as-stop"){ asEnd("stopped", false); return; }
+  if (act==="as-start"){ var asg=forgeGear(); if (!asg || asRun(asg.id)) return; asStart(asg); lastSheet=""; renderSheet(); return; }
+  if (act==="as-stop"){ asEnd(asRun(+a.dataset.g), "stopped"); return; }
+  if (act==="as-stopall"){ asRuns().slice().forEach(function(A){ asEnd(A, "stopped", true); }); lastSheet=""; if (sheetFor) renderSheet(); return; }
   if (act==="forge-n"){ forgeN=+a.dataset.v; lastSheet=""; renderSheet(); return; }
   if (act==="forge-strike"){
-    var sg=forgeGear(); if (!sg || (S.autoStar&&S.autoStar.gid===sg.id)) return;
+    var sg=forgeGear(); if (!sg || asRun(sg.id)) return;
     if (!forgeStrike(sg, forgeGem, forgeN, "")) return;
     lastSheet=""; renderSheet(); tickText(); save(); lastView=""; renderView(true); return;
   }
