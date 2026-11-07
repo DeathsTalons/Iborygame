@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.75";
+window.IBORY_V="0.2.76";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1805,7 +1805,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.75";
+var APP_VERSION = "0.2.76";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -1975,7 +1975,7 @@ function draftTakeText(tk){ return U.map(function(u,i){ return tk[i]?fmt(tk[i])+
 function doDraft(ci, tid){ var c=S.cities[ci]; if (!c || !draftReady(c)) return null;
   var xy=String(tid||"").split(","), q=xy.length===2?tileAt(+xy[0],+xy[1]):null; if (!draftOk(c,q)) return null;
   var cur=current(q), take=draftTake(cur); if (!sumT(take)) return null;
-  TILE_BY[q.id]=q; S.map.hit[q.id]={t:cur.t.map(function(v,i){ return Math.max(0,(v||0)-take[i]); }), f:(cur.f||[0,0,0,0,0]).slice(), res:Object.assign({},cur.res), at:S.gt};
+  TILE_BY[q.id]=q; S.map.hit[q.id]={t:cur.t.map(function(v,i){ return Math.max(0,(v||0)-take[i]); }), f:(cur.f||[0,0,0,0,0]).slice(), res:Object.assign({},cur.res), at:S.gt}; hitMark(q.id);
   withCity(ci, function(){ for (var i=0;i<12;i++) S.troops[i]+=take[i]; });
   c.draftDay=gameDay(); miniDirty=true; delete DRAFT_PICK[c.id];
   note("march", c.name+" drafted "+draftTakeText(take)+" from "+tileName(q)+".");
@@ -3583,13 +3583,13 @@ function dmonImg(k){ var a=DMON_ART[k]; if (!a) return null; var c=DMON_IMG[k]; 
 function ensureMonsters(){
   var day=gameDay(); if (!S.map.monsters) S.map.monsters={day:-1,list:[]};
   if (S.map.monsters.day===day) return;
-  var list=[], kinds=["wyvern","troll","hydra","behemoth"]; // 0.2.36: the event monsters are in MONSTERS too, and were picked here by mistake
+  var list=[], kinds=["wyvern","troll","hydra","behemoth"], busy=wizFarmed(); // 0.2.36: the event monsters are in MONSTERS too, and were picked here by mistake
   S.cities.forEach(function(c){ var per=DMON_PER[c.fieldCap]||0; if (!per) return; // 0.2.51 (Cody): a level 14 historic city draws 3 a day, a 16 draws 4, Atlantis (18) 5
     for (var n=0, tries=0; n<per && tries<200; tries++){
       var u=function(k){ return hash3(c.x*31+tries, c.y*17+n*7+k, S.map.seed+day*131+c.id); };
       var x=c.x+Math.round((u(1)-0.5)*24), y=c.y+Math.round((u(2)-0.5)*24); if (x<0||y<0||x>=MAPW||y>=MAPH) continue;
       var id=x+","+y; if (list.some(function(m){ return m.id===id; })) continue;
-      var q=tileAt(x,y); if (!VTYPES[q.k] || S.map.owned[id]) continue;
+      var q=tileAt(x,y); if (!VTYPES[q.k] || S.map.owned[id] || busy[id]) continue; // 0.2.76: not on a farmed, marched-on or recently hit tile
       var r3=u(3); list.push({id:id, kind:kinds[Math.floor(u(4)*kinds.length)], L: r3<0.55?1:r3<0.88?2:3}); n++;
     } });
   // 0.1.205: event monsters no longer come in a daily batch; vampires spawn every hour and stay until slain (vampSpawn)
@@ -3632,7 +3632,13 @@ function wizSpread(){ var W=wizS(); if (W.sp181) return; W.sp181=1; var busy=wiz
     if (wizPlace(w.L, busy)){ keep.push(W.list[W.list.length-1]); } });
   miniDirty=true; }
 function wizCount(L){ return wizS().list.filter(function(w){ return w.L===L; }).length; }
-function wizFarmed(){ var f={}; S.cities.forEach(function(c){ (c.presets||[]).forEach(function(pr){ (pr.farm||[]).forEach(function(id){ f[id]=1; }); }); }); S.marches.forEach(function(m){ f[m.tile]=1; }); return f; }
+/* 0.2.76 (Cody): no monster spawns on a tile that's on any farm list, has a march going to it, or was attacked in the last 5 hours.
+   Hits are timed in S.map.recent (S.map.hit is cleared at the daily reset); entries older than 5 hours are dropped as they're read. */
+var SPAWN_QUIET=5*3600000;
+function hitMark(id){ S.map.recent=S.map.recent||{}; S.map.recent[id]=S.gt; }
+function wizFarmed(){ var f={}; S.cities.forEach(function(c){ (c.presets||[]).forEach(function(pr){ (pr.farm||[]).forEach(function(id){ f[id]=1; }); }); }); S.marches.forEach(function(m){ f[m.tile]=1; });
+  var R=S.map.recent; if (R){ var cut=S.gt-SPAWN_QUIET*(S.speed||1); for (var id in R){ if (R[id]<cut) delete R[id]; else f[id]=1; } }
+  return f; }
 // 0.1.205: wizards turn up anywhere on the map (they used to stay within WIZ_R of your cities, where the vampires now rise)
 function wizPlace(L, busy){ var W=wizS(); if (!S.cities.length) return false;
   for (var tries=0; tries<400; tries++){
@@ -4374,7 +4380,7 @@ function resolveMarch0(m){
   }
   achKills(cur.t, r.defender);
   var left={}; RES.forEach(function(k){ left[k]=cur.res[k]-loot[k]; });
-  S.map.hit[q.id]={t:r.defender, f:r.forts, res:left, at:S.gt};
+  S.map.hit[q.id]={t:r.defender, f:r.forts, res:left, at:S.gt}; hitMark(q.id);
   var medal=-1;
   if (won && q.k==="npc") qmax("npcWin", q.L);
   var wd = won && fullGar ? winDrops(q) : {drops:[], medal:-1, box:null}, boxKey=wd.box, drops=wd.drops; medal=wd.medal;
@@ -4854,7 +4860,7 @@ function planAttack(q, city){
     out.push({id:S.nextMarchId++, ai:q.id, name:q.ai.name, pers:pers, iq:iq, city:city.id, label:w.label, plan:choice, t:w.t, r:side.r, am:side.am, dep:arr-travel[k], arr:arr, phase:"wait"});
     w.t.forEach(function(n,i){ sent[i]+=n; });
   });
-  S.map.hit[q.id]={t:cur.t.map(function(n,i){ return Math.max(0,n-sent[i]); }), f:cur.f, res:cur.res, at:S.gt};
+  S.map.hit[q.id]={t:cur.t.map(function(n,i){ return Math.max(0,n-sent[i]); }), f:cur.f, res:cur.res, at:S.gt}; hitMark(q.id);
   return {waves:out, plan:choice, iq:iq};
 }
 var PLAN_NAMES={mob:"a disorganized mob",assault:"a full frontal assault",rainbow:"a rainbow strike",layered:"layered waves",blitz:"a cavalry blitz",spam:"trap-bait spam followed by a main strike"};
@@ -7485,10 +7491,10 @@ function ryResults(Y){
       var lk=ryLocks().filter(function(x){ return x.rid===r.id && x.aid===ALS.aid; })[0]; if (lk){ var q=TILE_BY[lk.tile];
         if (lk.k==="vamp" || isVamp(q)){ var vnm=q?tileName(q):r.name; // 0.1.209: a vampire on your map
           if (r.win && !r.cancelled){ if (S.vamp) S.vamp.list=S.vamp.list.filter(function(v){ return v.id!==lk.tile; }); delete S.map.hit[lk.tile]; if (q) VAMP_FX.push({x:q.x, y:q.y, L:VAMP_K[q.mon], t0:Date.now()}); miniDirty=true; note("rally","Your alliance slew the "+vnm+"!"); }
-          else if (!r.cancelled && q && r.final){ S.map.hit[q.id]={t:r.final.t.slice(), f:r.final.f.slice(), res:current(q).res, at:S.gt}; miniDirty=true; note("rally","The "+vnm+" survived your alliance\u2019s rally with "+fmt(sumT(r.final.t))+" of its brood left."); } }
+          else if (!r.cancelled && q && r.final){ S.map.hit[q.id]={t:r.final.t.slice(), f:r.final.f.slice(), res:current(q).res, at:S.gt}; hitMark(q.id); miniDirty=true; note("rally","The "+vnm+" survived your alliance\u2019s rally with "+fmt(sumT(r.final.t))+" of its brood left."); } }
         else if (q && q.k==="wiz"){ if (r.win && !r.cancelled){ var WS=wizS(); WS.list=WS.list.filter(function(w){ return w.id!==q.id; }); WIZ_FX.push({x:q.x, y:q.y, L:q.L, t0:Date.now(), dead:true}); note("rally","Your alliance brought down the "+tileName(q)+"!"); }
           else if (!r.cancelled) note("rally","The "+tileName(q)+" survived your alliance\u2019s rally and healed back to full."); }
-        else if (q && r.final && !r.cancelled){ var cur=current(q); S.map.hit[q.id]={t:r.final.t.slice(), f:r.final.f.slice(), res:cur.res, at:S.gt}; miniDirty=true;
+        else if (q && r.final && !r.cancelled){ var cur=current(q); S.map.hit[q.id]={t:r.final.t.slice(), f:r.final.f.slice(), res:cur.res, at:S.gt}; hitMark(q.id); miniDirty=true;
           // 0.1.179: every rally wave that won, and every one that hit it already empty, knocks loyalty down like your own win would; at 0 the city is the caller's (it's on your map)
           var lhits=(r.fights||[]).filter(function(f){ return f.won; }).length+(r.idleN||0), lnote="", qname=tileName(q);
           if (lhits && (q.k==="npc"||q.k==="hc")){ var loy=loyOf(q); for (var li=0; li<lhits && loy>0; li++) loy-=loyDrop(q,loy); loy=Math.max(0,loy); S.map.loy[q.id]={v:loy, at:S.gt};
@@ -11627,7 +11633,7 @@ function bullyWave(){
     var left=keepMine; guards.forEach(function(m){ var n=m.t[i]; if (!n) return; var nk=Math.min(n, Math.round(n*ratio)); woundAdd(m.city, i, n-nk); m.t[i]=nk; }); }
   S.marches=S.marches.filter(function(m){ if (m.mission==="allyguard" && m.phase==="stay" && sumT(m.t)<=0){ if (m.hero){ var hh=heroById(m.hero); if (hh) hh.away=false; } return false; } return true; });
   // the ally's own losses heal over time like any battle
-  S.map.hit[q.id]={t:cur.t.map(function(n,i){ return n-allyLost[i]; }), f:r.forts.slice(), res:Object.assign({},cur.res), at:S.gt};
+  S.map.hit[q.id]={t:cur.t.map(function(n,i){ return n-allyLost[i]; }), f:r.forts.slice(), res:Object.assign({},cur.res), at:S.gt}; hitMark(q.id);
   for (i=0;i<12;i++) B.army[i]=Math.max(0, B.army[i]-(w.t[i]-r.attacker[i]));
   var share=sumT(mine)/Math.max(1,sumT(dt)), gain=0;
   if (sumT(mine)>0 && held) qbump("allyDef");
@@ -11774,7 +11780,7 @@ function warAllyHit(j){
     myLost[i]=mine[i]-Math.round(mine[i]*ratio); allyLost[i]=cur.t[i]-Math.round(cur.t[i]*ratio);
     guards.forEach(function(m){ var n=m.t[i]; if (n){ var nn=Math.min(n, Math.round(n*ratio)); woundAdd(m.city, i, n-nn); m.t[i]=nn; } }); }
   S.marches=S.marches.filter(function(m){ if (m.mission==="allyguard" && m.phase==="stay" && sumT(m.t)<=0){ if (m.hero){ var hh=heroById(m.hero); if (hh) hh.away=false; } return false; } return true; });
-  S.map.hit[q.id]={t:cur.t.map(function(n,i){ return n-allyLost[i]; }), f:r.forts.slice(), res:Object.assign({},cur.res), at:S.gt};
+  S.map.hit[q.id]={t:cur.t.map(function(n,i){ return n-allyLost[i]; }), f:r.forts.slice(), res:Object.assign({},cur.res), at:S.gt}; hitMark(q.id);
   for (i=0;i<12;i++) E.army[i]+=r.attacker[i]; // survivors go home
   var killed=killedOf(p.t, r.attacker), share=sumT(mine)/Math.max(1,sumT(dt)), earn=0;
   if (sumT(mine)>0){ achKills(p.t, r.attacker); earn=ptsOf(killed)*Math.min(WAR_ALLY_MUL, share*3); }
@@ -12079,7 +12085,7 @@ function chalAllyHit(c, j){
   for (var i=0;i<12;i++){ var tot=dt[i]; if (!tot) continue; var ratio=r.defender[i]/tot; allyLost[i]=cur.t[i]-Math.round(cur.t[i]*ratio);
     guards.forEach(function(m){ var n=m.t[i]; if (n){ var nn=Math.min(n, Math.round(n*ratio)); woundAdd(m.city, i, n-nn); m.t[i]=nn; } }); }
   S.marches=S.marches.filter(function(m){ if (m.mission==="allyguard" && m.phase==="stay" && sumT(m.t)<=0){ if (m.hero){ var hh=heroById(m.hero); if (hh) hh.away=false; } return false; } return true; });
-  S.map.hit[q.id]={t:cur.t.map(function(n,i){ return n-allyLost[i]; }), f:r.forts.slice(), res:Object.assign({},cur.res), at:S.gt};
+  S.map.hit[q.id]={t:cur.t.map(function(n,i){ return n-allyLost[i]; }), f:r.forts.slice(), res:Object.assign({},cur.res), at:S.gt}; hitMark(q.id);
   for (i=0;i<12;i++) c.army[i]+=r.attacker[i];
   if (sumT(mine)) achKills(p.t, r.attacker);
 }
