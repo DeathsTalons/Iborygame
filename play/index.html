@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.77";
+window.IBORY_V="0.2.78";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1806,7 +1806,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.77";
+var APP_VERSION = "0.2.78";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -5503,7 +5503,7 @@ var MPOP_ACTS={attack:1, scout:2, occupy:3, conquer:4, found:5, transport:6, rei
 /* 0.2.61 (Cody: an easy way to find your other cities on the map): a Cities picker in the map toolbar, between the name and ⌂.
    Lists every city but the one you're in, nearest first; picking one centres the map on it and opens its pop-up. */
 function cityJumpHtml(id){ var cur=C(), l=S.cities.filter(function(c){ return c.id!==cur.id; }); if (!l.length) return '';
-  l=l.map(function(c){ return {c:c, d:Math.hypot(c.x-cur.x, c.y-cur.y)}; }).sort(function(a,b){ return a.d-b.d; });
+  l=l.map(function(c){ return {c:c, d:Math.hypot(c.x-cur.x, c.y-cur.y)}; }); // 0.2.78 (Cody): in your cities' own order, not nearest first
   return '<select class="cityjump" id="'+(id||"cityjump")+'" aria-label="Go to one of your cities" title="Your cities"><option value="">Cities '+l.length+'</option>'+l.map(function(r){ return '<option value="'+r.c.x+','+r.c.y+'">'+esc(r.c.name)+' ('+r.c.x+', '+r.c.y+') \u00b7 '+r.d.toFixed(1)+' tiles</option>'; }).join("")+'</select>'; }
 function bmJumpHtml(){ var l=bmList(); if (!l.length) return '';
   return '<select class="bmjump" id="bmjump" aria-label="Go to a bookmark" title="Bookmarks"><option value="">\u2605 '+l.length+'</option>'+l.map(function(b){ var q=bmTile(b); return '<option value="'+b.id+'">'+esc(b.n||tileName(q))+' ('+q.x+', '+q.y+')</option>'; }).join("")+'</select>'; }
