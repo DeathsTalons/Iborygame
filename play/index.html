@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.76";
+window.IBORY_V="0.2.77";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1269,6 +1269,7 @@ body.bfmode #chatdock{display:none!important}
 .mapfsbar .btn{min-width:40px;box-shadow:0 2px 8px rgba(0,0,0,.35)}
 body.mapfs{overflow:hidden}
 .mapview canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.mapview canvas#mapc{width:calc(100% / 1.5);height:calc(100% / 1.5);transform:scale(1.5);transform-origin:0 0} /* MAP_K (0.2.77): everything on the map 1.5x */
 .mapbottom{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;margin-top:10px;align-items:start}
 /* 0.2.9: the picked tile at a glance, beside the overview (the full card stays in Tile details below) */
 .glance{min-height:132px;font-size:.8rem;line-height:1.3} /* 0.2.10: no inner scrolling: it grows with the tile, so a swipe here scrolls the page */
@@ -1805,7 +1806,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.76";
+var APP_VERSION = "0.2.77";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -3481,7 +3482,7 @@ function bgDraw(g, q, tx, ty, x, y, z, detail){ var bk=bgAt(q.id); if (!bk || !p
   if (VTYPES[q.k]){ if (hit) wash=1-Math.max(0,Math.min(1,(S.gt-hit.at)/REGEN_R)); if (wash>0){ g.fillStyle="rgba(236,228,206,.5)"; g.fillRect(x,y,z,Math.round(z*wash)); }
     if (detail && nums){ g.lineWidth=3; g.lineJoin="round"; g.miterLimit=2; g.strokeStyle="rgba(0,0,0,.6)"; ctext(g,1,q.L,x+z/2,y+z/2+1); g.fillStyle="#fff"; ctext(g,0,q.L,x+z/2,y+z/2+1); } }
   else if (q.k==="hc" && hcBig(q)){} // drawn big later, on top of this background
-  else if (q.k==="npc" && q.L>=10 && EXT_IMG.npc10){ var dw=Math.ceil(x+z)-px0, im10=EXT_IMG.npc10, pad=Math.max(1,dw*0.03), sc10=(dw-2*pad)/Math.max(im10.width,im10.height), sp10=extSprite("npc10", im10.width*sc10*(window.devicePixelRatio||1));
+  else if (q.k==="npc" && q.L>=10 && EXT_IMG.npc10){ var dw=Math.ceil(x+z)-px0, im10=EXT_IMG.npc10, pad=Math.max(1,dw*0.03), sc10=(dw-2*pad)/Math.max(im10.width,im10.height), sp10=extSprite("npc10", im10.width*sc10*(window.devicePixelRatio||1)*MAP_K);
     if (sp10){ g.imageSmoothingEnabled=true; g.drawImage(sp10, px0+(dw-im10.width*sc10)/2, py0+dw-pad-im10.height*sc10, im10.width*sc10, im10.height*sc10); }
     if (hit) wash=1-Math.max(0,Math.min(1,(S.gt-hit.at)/REGEN_R)); if (wash>0){ g.fillStyle="rgba(236,228,206,.5)"; g.fillRect(x,y,z,Math.round(z*wash)); }
     if (z>=18 && nums){ var t10=String(q.L), bw10=Math.max(12,t10.length*7+6), bx10=x+z-bw10-1, by10=y+z-14; g.fillStyle="rgba(20,16,12,.78)"; g.fillRect(bx10,by10,bw10,13); g.save(); g.font="700 10px sans-serif"; g.fillStyle="#f6ecd4"; g.textAlign="center"; g.textBaseline="middle"; ctext(g,0,t10,bx10+bw10/2,by10+7); g.restore(); } }
@@ -5030,11 +5031,11 @@ function hcBigList(x0, y0, x1, y1){ var list=[];
   return list.sort(function(a,b){ return a.y-b.y || a.x-b.x; }); }
 // 0.1.199: drawn with the decorations, in row order: roads and backgrounds stay under a castle, pieces on the rows in front of it stand in front
 function hcBigDraw(g, x0, y0, x1, y1, z){ hcBigList(x0,y0,x1,y1).forEach(function(q){ hcBigOne(g,q,z); }); }
-function hcBigOne(g, q, z){ var dpr=window.devicePixelRatio||1; (function(){ var w=z*HC_W, sp=extSprite(hcKey(q), w*dpr); if (!sp) return; var h=w*sp.height/sp.width, x=(q.x-mv.x)*z, y=(q.y-mv.y)*z;
+function hcBigOne(g, q, z){ var dpr=(window.devicePixelRatio||1)*MAP_K; (function(){ var w=z*HC_W, sp=extSprite(hcKey(q), w*dpr); if (!sp) return; var h=w*sp.height/sp.width, x=(q.x-mv.x)*z, y=(q.y-mv.y)*z;
     g.imageSmoothingEnabled=true; g.drawImage(sp, x+z/2-w/2, y+z*0.98-h, w, h);
     if (mapNums() && z>=18){ var t=String(q.L), bw=Math.max(12, t.length*7+6), bh=13, bx=x+z-bw-1, by=y+z-bh-1; g.fillStyle="rgba(20,16,12,.78)"; if (g.roundRect){ g.beginPath(); g.roundRect(bx,by,bw,bh,4); g.fill(); } else g.fillRect(bx,by,bw,bh);
       g.save(); g.font="700 10px sans-serif"; g.fillStyle="#f6ecd4"; g.textAlign="center"; g.textBaseline="middle"; g.fillText(t, bx+bw/2, by+bh/2+0.5); g.restore(); } })(); }
-function setDraw(g, key, x, y, z, wash, lv){ if (!mapNums()) lv=null; var px0=Math.floor(x), py0=Math.floor(y), dw=Math.ceil(x+z)-px0, dh=Math.ceil(y+z)-py0, dpr=window.devicePixelRatio||1, ex=EXT_TILES[key]?extTile(key, dw*dpr):null, cv=ex||setTile(key); if (!cv) return false;
+function setDraw(g, key, x, y, z, wash, lv){ if (!mapNums()) lv=null; var px0=Math.floor(x), py0=Math.floor(y), dw=Math.ceil(x+z)-px0, dh=Math.ceil(y+z)-py0, dpr=(window.devicePixelRatio||1)*MAP_K, ex=EXT_TILES[key]?extTile(key, dw*dpr):null, cv=ex||setTile(key); if (!cv) return false;
   g.imageSmoothingEnabled=!!ex; g.drawImage(cv, px0, py0, dw, dh); g.imageSmoothingEnabled=true;
   if (wash>0){ g.fillStyle="rgba(236,228,206,.6)"; g.fillRect(x,y,z,Math.round(z*wash)); }
   if (lv!=null && z>=18){ var t=String(lv), bw=Math.max(12, t.length*7+6), bh=13, bx=x+z-bw-1, by=y+z-bh-1; g.fillStyle="rgba(20,16,12,.78)"; if (g.roundRect){ g.beginPath(); g.roundRect(bx,by,bw,bh,4); g.fill(); } else g.fillRect(bx,by,bw,bh);
@@ -5129,7 +5130,7 @@ function mapSettle(){ mapDirty(); for (var i=0; i<200; i++){ MCH.pending=false; 
 function drawMap(){
   var c=document.getElementById("mapc"); if (!c) return; try { mapPopPos(); } catch(e){}
   if (!isFinite(mv.x) || !isFinite(mv.y) || !isFinite(mv.z)) clampView();
-  var dpr=Math.min(3, window.devicePixelRatio||1), W=c.clientWidth||360, H=c.clientHeight||360, z=mv.z, t0=performance.now();
+  var dpr=Math.min(3, window.devicePixelRatio||1)*MAP_K, W=c.clientWidth||360, H=c.clientHeight||360, z=mv.z, t0=performance.now(); // MAP_K: drawn sharp under the CSS scale
   if (c.width!==Math.round(W*dpr) || c.height!==Math.round(H*dpr)){ c.width=Math.round(W*dpr); c.height=Math.round(H*dpr); }
   var g=c.getContext("2d"); if (!g) return; MCH.use++;
   var pinch=!!(drag && drag.pinch), moving=!!(drag && (drag.moved || drag.pinch)), cur=MCH.sets[0];
@@ -5173,7 +5174,7 @@ function drawMap(){
   g.imageSmoothingEnabled=true;
   drawMapCore(c, {overlay:true, dpr:dpr, mons:mons}); DECO_ANIM=anim; }
 function drawMapCore(c, OV){ var GR=!!(OV && OV.ground), OL=!!(OV && OV.overlay); // GR: one saved block's ground; OL: the moving things over the blocks
-  var dpr=OV?OV.dpr:(window.devicePixelRatio||1), W=OV&&OV.W?OV.W:(c.clientWidth||360), H=OV&&OV.H?OV.H:(c.clientHeight||360); if (OV && OV.cv) c=OV.cv;
+  var dpr=OV?OV.dpr:(window.devicePixelRatio||1)*MAP_K, W=OV&&OV.W?OV.W:(c.clientWidth||360), H=OV&&OV.H?OV.H:(c.clientHeight||360); if (OV && OV.cv) c=OV.cv;
   if (c.width!==Math.round(W*dpr) || c.height!==Math.round(H*dpr)){ c.width=Math.round(W*dpr); c.height=Math.round(H*dpr); }
   var g=c.getContext("2d"); if (!g) return;
   g.setTransform(dpr,0,0,dpr,0,0); g._cs=dpr;
@@ -5308,8 +5309,8 @@ function selectTile(id, center){
    Full screen fills the phone with the map (and asks the browser to hide its bars). Turn sideways first asks the phone for a real landscape;
    if it says no (the installed app is locked to portrait), the map is turned 90 degrees on screen instead, and touches are read in the map's own frame. */
 var MAPFS={on:false, rot:false, want:false, real:false};
-function mapLocal(c, cx, cy){ var v=document.getElementById("mapview"); if (MAPFS.rot && v && v.classList.contains("rot")) return {x:cy, y:window.innerWidth-cx};
-  var rc=c.getBoundingClientRect(); return {x:cx-rc.left, y:cy-rc.top}; }
+function mapLocal(c, cx, cy){ var v=document.getElementById("mapview"); if (MAPFS.rot && v && v.classList.contains("rot")) return {x:cy/MAP_K, y:(window.innerWidth-cx)/MAP_K};
+  var rc=c.getBoundingClientRect(); return {x:(cx-rc.left)/MAP_K, y:(cy-rc.top)/MAP_K}; } // in the canvas's own pixels (it's scaled up MAP_K by CSS, 0.2.77)
 function mapFsApply(){ var v=document.getElementById("mapview"); if (v){ v.classList.toggle("fs", MAPFS.on); v.classList.toggle("rot", MAPFS.on && MAPFS.rot); } document.body.classList.toggle("mapfs", MAPFS.on); kmlFit(); requestDraw(); }
 // 0.2.68 (Cody: "squeeze the march list up there beside it"): in full screen the Marches box takes the room left of the buttons
 function kmlFit(){ var v=document.getElementById("mapview"), k=document.getElementById("kmml"); if (!v || !k) return;
@@ -5585,7 +5586,7 @@ function mapPopPos(){ var el=document.getElementById("mappop"), c=document.getEl
   // 0.2.53 (Cody: "it jumps around a lot, especially when you click teleport"): the pop-up sits docked along the bottom of the map and never moves.
   // When you pick a tile, the map shifts once (only if needed) so that tile shows above it; the overview map hides while it's open.
   el.classList.add("dock"); el.style.left=""; el.style.top="";
-  if (el._seen!==selTile){ el._seen=selTile; var H=c.clientHeight, z=mv.z, h=el.offsetHeight||120, py=(q.y-mv.y)*z, room=H-h-10;
+  if (el._seen!==selTile){ el._seen=selTile; var H=c.clientHeight, z=mv.z, h=(el.offsetHeight||120)/MAP_K, py=(q.y-mv.y)*z, room=H-h-10/MAP_K; // the canvas's own pixels
     if (room>z && (py<4 || py+z>room)){ mv.y=q.y+0.5-room/(2*z); clampView(); try { requestDraw(); } catch(e){} } } }
 // 0.2.24: a dropdown or box in use inside a panel that redraws every tick (the place-an-NPC level, the ally to give a city to) closed as you opened it
 var PLACE_LV=10; // 0.2.36: the level picked in "Place an NPC city here" (the panel redraws every second and used to draw the dropdown back at 10 the moment a pick was made)
@@ -7864,7 +7865,11 @@ function wdGoTab(){ S.mapMode="world"; tab="map"; save(); } // 0.2.38: every way
 function wdOnTab(){ return tab==="map" && !sheetFor && mapWorldOn(); } // 0.2.37: the server map on the Map tab (taller, first on the page)
 /* 0.2.47: the box on the Map tab is square like the world (it was up to 1.75 x as tall, which left ~260 px of empty band at Whole world); full screen still fills the phone */
 function wdAsp(){ if (!WDFS.on) return 1; var W=window.innerWidth||1, H=window.innerHeight||1; return WDFS.rot ? W/H : H/W; } // 0.2.21: full screen fills the phone
-function wdWin(){ var d=WDS.d, N=d?d.n:180, z=WDS.zf||WD_ZOOMS[Math.max(0,Math.min(WD_ZOOMS.length-1,(WDS.z||1)-1))], w=N/z, h=w*wdAsp(),
+/* 0.2.77 (Cody: "everything on both maps bigger"): the server map draws 1.5x (MAP_K) at every zoom from x2 up; text and lines are
+   sized by the zoom step, so they grow with the tiles. From the whole world (x1) to x2 it eases in, so a pinch doesn't jump. */
+var MAP_K=1.5;
+function wdZe(z){ return z>=2 ? z*MAP_K : 1+(z-1)*(2*MAP_K-1); }
+function wdWin(){ var d=WDS.d, N=d?d.n:180, z=WDS.zf||WD_ZOOMS[Math.max(0,Math.min(WD_ZOOMS.length-1,(WDS.z||1)-1))], w=N/wdZe(z), h=w*wdAsp(),
   x=Math.max(0,Math.min(N-w,WDS.cx+0.5-w/2)), y=h>=N ? (N-h)/2 : Math.max(0,Math.min(N-h,WDS.cy+0.5-h/2)); return {x:x, y:y, w:w, h:h, z:z, N:N}; }
 function wdMineAid(){ return WDS.d&&WDS.d.me?WDS.d.me.aid:null; }
 /* 0.2.23: a capital takes 2 x 2 tiles (d.ls; its x, y is the top-left), in the Wilds and on an alliance's land (M.ks) */
@@ -7915,7 +7920,7 @@ function wdFree(x, y, occ){ var LS=wdLS(); for (var j=0;j<LS;j++) for (var i=0;i
    While a finger is down only a CSS transform moves it (wdView), so dragging and pinching don't redraw the map; it redraws when the
    gesture ends, or if a drag runs past the margin. Before, every finger move reset the viewBox and the whole map was rasterized again. */
 var WD_OV=0.5;
-function wdSvg(){ var d=WDS.d, V0=wdWin(), V={x:V0.x-V0.w*WD_OV, y:V0.y-V0.h*WD_OV, w:V0.w*(1+2*WD_OV), h:V0.h*(1+2*WD_OV), z:V0.z, N:V0.N}, z=V.z, close=z>=WD_CLOSE, fs=function(n){ return (n/z).toFixed(2); }, sel=WDS.sel, mine=wdMineAid(), h=''; WDS.vb=V0;
+function wdSvg(){ var d=WDS.d, V0=wdWin(), V={x:V0.x-V0.w*WD_OV, y:V0.y-V0.h*WD_OV, w:V0.w*(1+2*WD_OV), h:V0.h*(1+2*WD_OV), z:V0.z, N:V0.N}, z=V.z, zt=wdZe(z), close=z>=WD_CLOSE, /* zt: the zoom as it looks (0.2.77's 1.5x): names and detail come in at the size they used to */ fs=function(n){ return (n/z).toFixed(2); }, sel=WDS.sel, mine=wdMineAid(), h=''; WDS.vb=V0;
   h+='<svg class="wdmap" id="wdsvg" viewBox="'+V.x.toFixed(2)+' '+V.y.toFixed(2)+' '+V.w.toFixed(2)+' '+V.h.toFixed(2)+'" role="img" aria-label="Server map" data-act="wd-tap">';
   if (close){ if (!WD_GRASS) WD_GRASS=wdGrassDefs(); h+=WD_GRASS; }
   h+='<rect x="0" y="0" width="'+V.N+'" height="'+V.N+'" fill="'+(close?'url(#wdgr)':'#33452c')+'"/>';
@@ -7927,26 +7932,26 @@ function wdSvg(){ var d=WDS.d, V0=wdWin(), V={x:V0.x-V0.w*WD_OV, y:V0.y-V0.h*WD_
     h+='<rect x="'+s.x+'" y="'+s.y+'" width="'+d.sz+'" height="'+d.sz+'" rx="'+(close?0:1)+'" fill="'+(close?(me?'rgba(215,176,88,.16)':s.aid?'rgba(20,24,22,.18)':'rgba(0,0,0,.22)'):(me?'#6b5a2a':s.aid?'#313834':'rgba(0,0,0,.12)'))+'" stroke="'+(on?'#ebe3d0':me?'#d7b058':'#8d928a')+'" stroke-width="'+fs(on||me?2.5:1.5)+'"'+(s.aid?'':' stroke-dasharray="'+fs(5)+' '+fs(4)+'"')+'/>'+wbSlotRing(s, fs);
     if (close){ if (s.city){ var cu=alSprUrl("city"); h+=cu?'<image href="'+cu+'" x="'+s.city[0]+'" y="'+s.city[1]+'" width="'+s.city[2]+'" height="'+s.city[2]+'" preserveAspectRatio="none" style="image-rendering:pixelated"/>':'<rect x="'+s.city[0]+'" y="'+s.city[1]+'" width="'+s.city[2]+'" height="'+s.city[2]+'" fill="#a8894a"/>'; }
       (s.b||[]).forEach(function(bb){ var bu=alSprUrl(bb.k), bs=d.bs||3; h+=bu?'<image href="'+bu+'" x="'+bb.x+'" y="'+bb.y+'" width="'+bs+'" height="'+bs+'" preserveAspectRatio="none" style="image-rendering:pixelated"/>':'<rect x="'+bb.x+'" y="'+bb.y+'" width="'+bs+'" height="'+bs+'" fill="#59605a"/>';
-        if (z>=12) h+='<text x="'+(bb.x+bs/2)+'" y="'+(bb.y+bs-0.15)+'" text-anchor="middle" font-size=".42" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".08" paint-order="stroke">'+esc(bb.n)+'</text>'; });
+        if (zt>=12) h+='<text x="'+(bb.x+bs/2)+'" y="'+(bb.y+bs-0.15)+'" text-anchor="middle" font-size=".42" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".08" paint-order="stroke">'+esc(bb.n)+'</text>'; });
       if (s.aid) h+='<text x="'+(s.x+0.3)+'" y="'+(s.y+0.75)+'" font-size=".6" class="wdtag" fill="'+(me?'#f3dc9a':'#ebe3d0')+'" stroke="#1f2421" stroke-width=".1" paint-order="stroke" translate="no">'+esc(s.tag)+'</text>';
       else h+='<text x="'+(s.x+d.sz/2)+'" y="'+(s.y+d.sz/2)+'" text-anchor="middle" font-size=".8" class="wdsm" fill="#ebe3d0">Open slot</text>';
       return; }
     if (s.city) h+='<rect x="'+s.city[0]+'" y="'+s.city[1]+'" width="'+s.city[2]+'" height="'+s.city[2]+'" fill="'+(me?'#a8894a':'#59605a')+'"/>';
-    if (s.aid && z<4) h+='<text x="'+(s.x+d.sz/2)+'" y="'+(s.y+d.sz/2+(z<2?1.6:0.8))+'" text-anchor="middle" font-size="'+fs(z<2?5.2:6)+'" class="wdtag" fill="'+(me?'#f3dc9a':'#ebe3d0')+'" translate="no">'+esc(s.tag)+'</text>';
-    else if (!s.aid && z<2) h+='<text x="'+(s.x+d.sz/2)+'" y="'+(s.y+d.sz/2+1.3)+'" text-anchor="middle" font-size="'+fs(4)+'" class="wdsm" fill="#c9cdc0">Open</text>'; });
-  if (z>=4){ var g=''; for (var gx=x0; gx<=x1; gx++) g+='M'+gx+' '+V.y.toFixed(1)+'v'+V.h.toFixed(1); for (var gy=y0; gy<=y1; gy++) g+='M'+V.x.toFixed(1)+' '+gy+'h'+V.w.toFixed(1); h+='<path d="'+g+'" stroke="rgba(0,0,0,'+(close?'.22':'.18')+')" stroke-width="'+fs(0.6)+'"/>'; }
+    if (s.aid && zt<4) h+='<text x="'+(s.x+d.sz/2)+'" y="'+(s.y+d.sz/2+(zt<2?1.6:0.8))+'" text-anchor="middle" font-size="'+fs(zt<2?5.2:6)+'" class="wdtag" fill="'+(me?'#f3dc9a':'#ebe3d0')+'" translate="no">'+esc(s.tag)+'</text>';
+    else if (!s.aid && zt<2) h+='<text x="'+(s.x+d.sz/2)+'" y="'+(s.y+d.sz/2+1.3)+'" text-anchor="middle" font-size="'+fs(4)+'" class="wdsm" fill="#c9cdc0">Open</text>'; });
+  if (zt>=4){ var g=''; for (var gx=x0; gx<=x1; gx++) g+='M'+gx+' '+V.y.toFixed(1)+'v'+V.h.toFixed(1); for (var gy=y0; gy<=y1; gy++) g+='M'+V.x.toFixed(1)+' '+gy+'h'+V.w.toFixed(1); h+='<path d="'+g+'" stroke="rgba(0,0,0,'+(close?'.22':'.18')+')" stroke-width="'+fs(0.6)+'"/>'; }
   // close up: a dot on every tile your capital could move to
   if (close && d.me.on){ var occ=wdOccMap(), dots='';
     for (var ty=y0; ty<y1; ty++) for (var tx=x0; tx<x1; tx++) if (ty>=0 && wdFree(tx,ty,occ)) dots+='M'+(tx+0.5)+' '+(ty+0.5)+'h0';
     if (dots) h+='<path d="'+dots+'" stroke="rgba(243,220,154,.55)" stroke-width=".16" stroke-linecap="round"/>'; }
   if (d.bk) h+=wbDrawBlds(d, sel, z, fs); else { d.bld.forEach(function(b,i){ var on=sel&&sel.k==="bld"&&sel.i===i; h+='<rect x="'+b.x+'" y="'+b.y+'" width="3" height="3" rx=".4" fill="#3a423d" stroke="'+(on?'#ebe3d0':'#b4b9aa')+'" stroke-width="'+fs(on?2.5:1.2)+'"/>';
-    if (z>=2) h+=wdIco(WD_BLD[i][0], b.x+1.5, b.y+1.5, 0.11, "#ebe3d0");
-    if (z>=12) h+='<text x="'+(b.x+1.5)+'" y="'+(b.y+3.5)+'" text-anchor="middle" font-size=".42" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".08" paint-order="stroke">'+esc(WD_BLD[i][1])+'</text>'; });
-  var on=sel&&sel.k==="throne"; h+='<rect x="'+d.throne.x+'" y="'+d.throne.y+'" width="3" height="3" rx=".5" fill="#6b5a2a" stroke="'+(on?'#ebe3d0':'#d7b058')+'" stroke-width="'+fs(on?3:2)+'"/>'+(z>=2?wdIco(WD_CROWN, d.throne.x+1.5, d.throne.y+1.5, 0.11, "#f3dc9a"):''); }
+    if (zt>=2) h+=wdIco(WD_BLD[i][0], b.x+1.5, b.y+1.5, 0.11, "#ebe3d0");
+    if (zt>=12) h+='<text x="'+(b.x+1.5)+'" y="'+(b.y+3.5)+'" text-anchor="middle" font-size=".42" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".08" paint-order="stroke">'+esc(WD_BLD[i][1])+'</text>'; });
+  var on=sel&&sel.k==="throne"; h+='<rect x="'+d.throne.x+'" y="'+d.throne.y+'" width="3" height="3" rx=".5" fill="#6b5a2a" stroke="'+(on?'#ebe3d0':'#d7b058')+'" stroke-width="'+fs(on?3:2)+'"/>'+(zt>=2?wdIco(WD_CROWN, d.throne.x+1.5, d.throne.y+1.5, 0.11, "#f3dc9a"):''); }
   // 0.2.19: monsters (their sprite close up, a coloured dot further out; a ring when your side has a rally on one) and every march on the map
   var ryOn={}; (d.rallies||[]).forEach(function(r){ ryOn[r.mon]=1; });
   (d.mons||[]).forEach(function(m){ if (!close || !inV(m.x,m.y,1)) return; // 0.2.23: monsters only show close up: zoom in and look around to find them
-    if (close) h+='<image href="'+WD_MART[m.L]+'" x="'+(m.x-0.3)+'" y="'+(m.y-0.6)+'" width="1.6" height="1.6" preserveAspectRatio="xMidYMax meet" style="image-rendering:pixelated"/>'+(z>=12?'<text x="'+(m.x+0.5)+'" y="'+(m.y+1.3)+'" text-anchor="middle" font-size=".34" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".07" paint-order="stroke">Lv '+m.L+'</text>':'');
+    if (close) h+='<image href="'+WD_MART[m.L]+'" x="'+(m.x-0.3)+'" y="'+(m.y-0.6)+'" width="1.6" height="1.6" preserveAspectRatio="xMidYMax meet" style="image-rendering:pixelated"/>'+(zt>=12?'<text x="'+(m.x+0.5)+'" y="'+(m.y+1.3)+'" text-anchor="middle" font-size=".34" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".07" paint-order="stroke">Lv '+m.L+'</text>':'');
     else { var mr=Math.max(0.5, 1.5/z)*(0.8+m.L*0.2); h+='<circle cx="'+(m.x+0.5)+'" cy="'+(m.y+0.5)+'" r="'+mr.toFixed(2)+'" fill="'+WD_MCOL[m.L]+'" stroke="#1f2421" stroke-width="'+fs(0.6)+'"/>'; }
     if (ryOn[m.id]) h+='<circle cx="'+(m.x+0.5)+'" cy="'+(m.y+0.5)+'" r="'+(close?0.75:Math.max(1.1,3/z)).toFixed(2)+'" fill="none" stroke="#f3dc9a" stroke-width="'+fs(1.6)+'" stroke-dasharray="'+fs(3)+' '+fs(2)+'"/>'; });
   var nowM=Date.now(), mk=Math.max(0.9, 3.2/z), caps={}; d.lords.forEach(function(l){ caps[l.x+","+l.y]=1; });
@@ -7955,20 +7960,20 @@ function wdSvg(){ var d=WDS.d, V0=wdWin(), V={x:V0.x-V0.w*WD_OV, y:V0.y-V0.h*WD_
     var dx=b2[0]-a[0], dy=b2[1]-a[1], st=mv.cos&&COSM.march&&COSM.march[mv.cos]?mv.cos:"";
     if (st){ var im=cosMarchImg(st, dx<0?-1:1, Math.atan2(dy,dx)); h+='<image href="'+im+'" x="'+(px-mk/2).toFixed(2)+'" y="'+(py-mk/2).toFixed(2)+'" width="'+mk.toFixed(2)+'" height="'+mk.toFixed(2)+'"/>'; }
     else h+='<circle cx="'+px.toFixed(2)+'" cy="'+py.toFixed(2)+'" r="'+(mk/3).toFixed(2)+'" fill="'+(mv.me?'#f3dc9a':'#ebe3d0')+'" stroke="#1f2421" stroke-width="'+fs(0.8)+'"/>';
-    if (z>=12) h+='<text x="'+px.toFixed(2)+'" y="'+(py-mk/2-0.1).toFixed(2)+'" text-anchor="middle" font-size=".3" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".06" paint-order="stroke" translate="no">'+esc(mv.name)+'</text>'; });
+    if (zt>=12) h+='<text x="'+px.toFixed(2)+'" y="'+(py-mk/2-0.1).toFixed(2)+'" text-anchor="middle" font-size=".3" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".06" paint-order="stroke" translate="no">'+esc(mv.name)+'</text>'; });
   // capitals: castles close up (names at x12), squares further out (bigger when zoomed out, so they can be seen)
   var LS=wdLS();
   if (close){ d.lords.forEach(function(l){ if (!inV(l.x,l.y,LS)) return; var col=l.me?["#f3dc9a","#b8902f","#3a2a10"]:l.wild?["#f0b27a","#c0612a","#3a1f10"]:["#d9dcd3","#8d928a","#2a2f2c"], look=l.me?myLook("city"):l.look;
       h+=wdCastle(l.x, l.y, col, LS, look)+wbLordRing(l, LS);
       if (l.prot) h+='<rect x="'+(l.x+0.05)+'" y="'+(l.y+0.05)+'" width="'+(LS-0.1)+'" height="'+(LS-0.1)+'" rx="'+(LS*0.2)+'" fill="rgba(127,176,224,.14)" stroke="#7fb0e0" stroke-width=".07"/>';
       if (l.me) h+='<rect x="'+l.x+'" y="'+l.y+'" width="'+LS+'" height="'+LS+'" fill="none" stroke="#f3dc9a" stroke-width=".08"/>';
-      if (z>=12) h+='<text x="'+(l.x+LS/2)+'" y="'+(l.y+LS+0.34)+'" text-anchor="middle" font-size=".36" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".07" paint-order="stroke" translate="no">'+esc(l.name)+'</text>'; }); }
+      if (zt>=12) h+='<text x="'+(l.x+LS/2)+'" y="'+(l.y+LS+0.34)+'" text-anchor="middle" font-size=".36" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".07" paint-order="stroke" translate="no">'+esc(l.name)+'</text>'; }); }
   else { var ls=Math.max(LS, 2.4/z), lo=(ls-LS)/2;
     d.lords.forEach(function(l){ if (l.me) return; h+='<rect x="'+(l.x-lo).toFixed(2)+'" y="'+(l.y-lo).toFixed(2)+'" width="'+ls.toFixed(2)+'" height="'+ls.toFixed(2)+'" fill="'+(l.wild?'#e08a3c':'#c9cdc0')+'" stroke="'+(l.prot?'#7fb0e0':'#1f2421')+'" stroke-width="'+fs(l.prot?1.4:0.7)+'"/>'; });
     d.lords.forEach(function(l){ if (!l.me) return; var s2=ls*1.4, o2=(s2-LS)/2; h+='<rect x="'+(l.x-o2).toFixed(2)+'" y="'+(l.y-o2).toFixed(2)+'" width="'+s2.toFixed(2)+'" height="'+s2.toFixed(2)+'" fill="#f3dc9a" stroke="#1f2421" stroke-width="'+fs(1.2)+'"/>'; }); }
   var mm=wdMyMap();
   if (mm && close && inV(mm.s.x, mm.s.y, mm.M.n)) wdAway(mm).forEach(function(k){ var kx=mm.s.x+k.x, ky=mm.s.y+k.y, kz=mm.M.ks||1; h+='<g opacity=".45">'+wdCastle(kx, ky, ["#d9dcd3","#8d928a","#2a2f2c"], kz)+'</g>';
-    if (z>=12) h+='<text x="'+(kx+kz/2)+'" y="'+(ky+kz+0.32)+'" text-anchor="middle" font-size=".34" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".07" paint-order="stroke" translate="no" opacity=".7">'+esc(k.name)+'</text>'; });
+    if (zt>=12) h+='<text x="'+(kx+kz/2)+'" y="'+(ky+kz+0.32)+'" text-anchor="middle" font-size=".34" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".07" paint-order="stroke" translate="no" opacity=".7">'+esc(k.name)+'</text>'; });
   if (mm) h+=wdAlMarches(mm, V, z);
   if (ALS.moving && mm) h+='<rect x="'+mm.s.x+'" y="'+mm.s.y+'" width="'+mm.M.n+'" height="'+mm.M.n+'" fill="none" stroke="#f3dc9a" stroke-width="'+fs(3)+'" stroke-dasharray="'+fs(6)+' '+fs(4)+'"/>';
   if (sel && sel.x!=null && (sel.k!=="slot" || close)){ var sz=sel.k==="lord"||sel.mem?LS:1; h+='<rect x="'+(close?sel.x:sel.x-0.25)+'" y="'+(close?sel.y:sel.y-0.25)+'" width="'+(close?sz:sz+0.5)+'" height="'+(close?sz:sz+0.5)+'" fill="none" stroke="#fff" stroke-width="'+fs(close?2.4:1.6)+'"/>'; }
@@ -8298,7 +8303,7 @@ function wdAct(act, a, e){
   if (act==="wd-mhasten"){ if (!(S.items.marchsp>0)){ toast("You have no March Speed items"); return true; } wdMarchAct("/wd/hasten", +a.dataset.id, "March sped up: half the time left"); return true; }
   if (act==="wd-fs"){ wdFs(!WDFS.on); return true; }
   if (act==="wd-rot"){ wdRot(); return true; }
-  if (act==="wd-mv"){ var mmv=wdMyMap(); ALS.moving={what:a.dataset.what, who:a.dataset.who}; WDS.sel=null; if (mmv){ WDS.cx=mmv.s.x+7; WDS.cy=mmv.s.y+7; WDS.z=WD_ZOOMS.indexOf(WD_CLOSE)+1; } /* the whole land, with room around it for the bar */ wdPaint(); return true; }
+  if (act==="wd-mv"){ var mmv=wdMyMap(); ALS.moving={what:a.dataset.what, who:a.dataset.who}; WDS.sel=null; if (mmv){ var mh=((WDS.d.sz||15)-1)/2; WDS.cx=mmv.s.x+mh; WDS.cy=mmv.s.y+mh; WDS.z=WD_ZOOMS.indexOf(WD_CLOSE)+1; } /* the whole land (tiles can only be picked from x8 up) */ wdPaint(); return true; }
   if (act==="wd-mvx"){ ALS.moving=null; wdPaint(); return true; }
   if (act==="wd-almove"){ WDS.sel=null; wdPaint(); alDo("/al/move",{what:"me", x:+a.dataset.x, y:+a.dataset.y},"Your kingdom moved", function(){ WDS.at=0; wdFetch(); }); return true; }
   if (act==="wd-go"){ var g=a.dataset.go, gv=a.dataset.v; if (WDFS.on) wdFs(false); if (sheetFor) closeSheet(); tab="guild"; ALS.armed=null; ALS.sel=null;
@@ -8306,7 +8311,7 @@ function wdAct(act, a, e){
     lastView=""; renderView(true); window.scrollTo({top:0}); ALS.last=0; alSync(); return true; } // not the click that ends a drag or pinch
   if (act==="wd-zoom"){ var zc=wdWin().z, zi=+a.dataset.v>0 ? WD_ZOOMS.filter(function(q){ return q<=zc+0.01; }).length+1 : WD_ZOOMS.filter(function(q){ return q<zc-0.01; }).length; zi=Math.max(1, Math.min(WD_ZOOMS.length, zi)); if (zi>(WDS.z||1) && WDS.sel && WDS.sel.x!=null){ WDS.cx=WDS.sel.x; WDS.cy=WDS.sel.y; } else if (zi>(WDS.z||1) && WDS.sel && WDS.sel.k==="slot" && WDS.d){ var zsl=WDS.d.slots[WDS.sel.i]; WDS.cx=zsl.x+7; WDS.cy=zsl.y+7; } WDS.z=zi; wdPaint(); return true; }
   if (act==="wd-pan"){ var V=wdWin(), st=V.w/3; WDS.cx=Math.max(0,Math.min(V.N-1, Math.round(V.x+V.w/2+(+a.dataset.x)*st))); WDS.cy=Math.max(0,Math.min(V.N-1, Math.round(V.y+V.h/2+(+a.dataset.y)*st))); wdPaint(); return true; }
-  if (act==="wd-zoomslot"){ var zs=WDS.d&&WDS.d.slots[+a.dataset.v]; if (zs){ WDS.cx=zs.x+7; WDS.cy=zs.y+7; WDS.z=wdZi(12); } wdPaint(); return true; } // a whole alliance map fills the screen at x12
+  if (act==="wd-zoomslot"){ var zs=WDS.d&&WDS.d.slots[+a.dataset.v]; if (zs){ var zh=((WDS.d.sz||15)-1)/2; WDS.cx=zs.x+zh; WDS.cy=zs.y+zh; WDS.z=wdZi(8); } wdPaint(); return true; } // a whole alliance map fills the screen at x8 (x12 before the 1.5x of 0.2.77)
   if (act==="wd-zoomhere"){ var sv=WDS.sel; if (sv && sv.x!=null){ WDS.cx=sv.x; WDS.cy=sv.y; WDS.z=wdZi(18); } wdPaint(); return true; }
   if (act==="wd-key"){ WDS.keyOn=!WDS.keyOn; wdPaint(); return true; } // 0.2.50: the Key overlay
   if (act==="wd-findme"){ var me=WDS.d&&WDS.d.me; if (me && me.x!=null){ WDS.cx=me.x; WDS.cy=me.y; WDS.z=3; var L=WDS.d.lords.filter(function(l){ return l.me; })[0]; WDS.sel=L?{k:"lord",x:L.x,y:L.y,l:L}:null; } wdPaint(); return true; }
