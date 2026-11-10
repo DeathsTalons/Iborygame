@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.90";
+window.IBORY_V="0.2.91";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -500,6 +500,7 @@ nav.tabs button.hasnew{position:relative}nav.tabs button.hasnew::after{content:"
 .shoptile b{font-size:.86rem;line-height:1.2}.shoptile .dur{font-size:.72rem;line-height:1.3;flex:1}.shoptile .btn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:4px}.shoptile.no{opacity:.8}
 .shopic{position:relative;width:52px;height:52px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:radial-gradient(circle at 50% 40%,color-mix(in srgb,var(--brass) 20%,var(--panel)),var(--panel) 78%)}
 .shopic .iic{width:36px;height:36px;image-rendering:pixelated}.shopic .shopegg{width:44px;height:44px}.shopic i{position:absolute;right:-6px;bottom:-4px;font-style:normal;font-size:.72rem;font-weight:700;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:0 5px}
+.ajrow{display:flex;gap:10px;align-items:flex-start}.ajtxt{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}.ajtxt .dur{font-size:.78rem;line-height:1.35}.ajsw{display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid var(--line);font-size:.95rem}.ajsw:last-of-type{border-bottom:0}.ajsw input{width:20px;height:20px;accent-color:var(--brass)}.ajcard .btn{display:inline-flex;align-items:center;gap:4px}
 .cosmohead{background:radial-gradient(circle at 8% 50%,color-mix(in srgb,#6a4abe 34%,var(--panel)),var(--panel) 62%)}.cosmohead .warbal b{color:#b9a3f5}.cosmoprev{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;width:100%;padding:6px;border-radius:10px;background:var(--panel);min-height:76px;align-items:end;justify-items:center}.cosmoprev span{display:flex;align-items:flex-end;justify-content:center;height:32px}.cosmotile.own{border-color:color-mix(in srgb,var(--good,#6fbf73) 50%,var(--line))}
 .shopcost{display:inline-flex;align-items:center;gap:3px;font-size:.74rem;color:var(--mut,#a9a595)}
 .tnode .tic{display:block;margin:0 auto 2px;width:24px;height:24px}.tnode.locked .tic{filter:grayscale(1);opacity:.75}.ttree .tnode.sel{border-color:var(--tc)}.tdetail{border-color:color-mix(in srgb,var(--tc) 55%,var(--line))}
@@ -1845,7 +1846,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.90";
+var APP_VERSION = "0.2.91";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -3609,11 +3610,41 @@ function paintBar(){ var el=document.getElementById("paintbar"); if (!el) return
 /* 0.2.90 (Cody): the Cosmo Shop (tap your Cosmo Coins on the Me page): everything sold for Cosmo Coins. Today that is the decoration packs. */
 function cosmoPacks(){ return DSHOP.map(function(sp){ var its=[], firsts=[]; DPACKS.forEach(function(pk){ if (sp.groups.indexOf(pk[0])>=0 && pk[0]!=="backgrounds"){ firsts.push(pk[2][0]); its=its.concat(pk[2].slice(1)); } }); DPACKS.forEach(function(pk){ if (pk[0]==="backgrounds" && sp.groups.indexOf("backgrounds")>=0) its=its.concat(pk[2]); });
   return {id:sp.id, name:sp.name, its:firsts.concat(its), ai:sp.ai, own:!!COS && cosHas("decopack",sp.id), price:decoPrice(sp.id)}; }); }
+/* 0.2.91 (Cody): Auto-join, a 31-day subscription for Cosmo Coins. The server sends one credit scout for you to every monster rally of the kinds
+   you tick, online or not; this is its tile in the Cosmo Shop and its settings sheet. */
+var AJ_K=[["ar","Monster Arena summons"],["wiz","Wizard rallies"],["vamp","Holiday monster rallies"],["wd","Server-map monster rallies"]], AJ_BUSY=false;
+function ajDays(aj){ return Math.max(0, Math.ceil((aj.until-Date.now())/864e5)); }
+function ajCard(bal){ var aj=COS&&COS.aj; if (!aj) return ''; var short=bal<aj.cost;
+  return '<div class="section ajcard" style="margin-top:10px"><h3>Subscriptions</h3><div class="ajrow"><div class="shopic">'+itemImg("u_scout")+'</div><div class="ajtxt"><b>Auto-join rallies</b>'+
+    '<span class="dur">One scout is sent for you to every monster rally your alliance calls, even while you are away, so you share in the reward. '+aj.days+' days.</span>'+
+    '<span class="'+(aj.on?'okc':'dur')+'">'+(aj.on?'Active: '+ajDays(aj)+' days left':'Not active')+'</span>'+(aj.on?'<span class="dur" translate="no">'+esc(cbWhen(aj.until))+'</span>':'')+'</div></div>'+
+    '<div class="btnrow" style="margin-top:8px"><button class="btn small" data-act="aj-buy"'+(short||AJ_BUSY?' disabled':'')+'>'+alArt("cosmo",16)+' '+fmt(aj.cost)+' \u00b7 '+(aj.on?'Add '+aj.days+' days':'Buy '+aj.days+' days')+'</button><button class="btn ghost small" data-act="aj-open">Settings</button></div>'+
+    (short?'<p class="dur" style="margin:6px 0 0">Need '+fmt(aj.cost-bal)+' more Cosmo Coins.</p>':'')+'</div>'; }
+function ajSheet(){ var aj=COS&&COS.aj, h='<div class="head"><span class="ico">'+itemImg("u_scout")+'</span><div style="flex:1"><h2>Auto-join rallies</h2><div class="sub">'+(aj?(aj.on?'Active: '+ajDays(aj)+' days left':'Not active'):'')+'</div></div><button class="btn ghost small" data-act="close" aria-label="Close">\u2715</button></div>';
+  if (!cbOn()) return h+'<p class="why">Sign in to your cloud backup (Settings) first.</p>';
+  if (!aj) return h+'<p class="hint">Loading\u2026</p>';
+  if (!aj.on) h+='<div class="inote">Not active. Your choices below are kept. <button class="link" data-act="cosmo-open">Cosmo Shop</button></div>';
+  h+='<div class="section"><h3>What to join</h3>'+AJ_K.map(function(k){ return '<label class="ajsw"><input type="checkbox" data-ajk="'+k[0]+'"'+(aj.kinds[k[0]]?' checked':'')+(AJ_BUSY?' disabled':'')+'><span>'+k[1]+'</span></label>'; }).join("")+
+    '<p class="hint" style="margin-top:6px">Monsters only: never cities, buildings or capitals. One scout each, and it always arrives in time. Nothing leaves your city and nothing can be lost.</p></div>';
+  var hs=[]; S.cities.forEach(function(c){ (c.heroes||[]).forEach(function(x){ hs.push(x); }); }); hs.sort(function(a,b){ return (b.level||0)-(a.level||0); }); var cur=ajHero();
+  h+='<div class="section" style="margin-top:10px"><h3>Experience</h3><div class="farmadd"><label for="ajhero" class="sub">Goes to</label><select id="ajhero" style="flex:1"><option value="0">No hero</option>'+hs.map(function(x){ return '<option value="'+x.id+'"'+(x.id===cur?' selected':'')+'>'+esc(x.name)+' (level '+(x.level||1)+')</option>'; }).join("")+'</select></div>'+
+    '<p class="hint" style="margin-top:6px">When a monster falls, this hero gets the experience a leading hero would. The hero stays home and stays free to march.</p></div>';
+  h+='<div class="section" style="margin-top:10px"><h3>Limit</h3><p class="hint" style="margin:0">Up to '+aj.max+' auto-joins at once, counted together with your server-map marches. Past that, rallies are skipped until one comes home.</p></div>';
+  var why={full:"Skipped, "+aj.max+" already out", nomap:"Skipped, your capital is not on the server map"};
+  h+='<div class="section" style="margin-top:10px"><h3>Recent</h3>'+(aj.log.length?aj.log.map(function(l){ return '<div class="merow"><span>'+(l.skip?'<span class="badc">'+(why[l.skip]||"Skipped")+'</span>':'<span class="okc">Scout sent</span>')+': '+esc(l.n)+'</span><b class="dur">'+esc(cbWhen(l.at))+'</b></div>'; }).join(""):'<p class="dur" style="margin:0">Nothing yet.</p>')+'</div>';
+  return h+'<button class="closebtn" data-act="close">Close</button>'; }
+function ajPost(path, body, okMsg){ if (AJ_BUSY) return; AJ_BUSY=true; lastSheet=""; renderSheet();
+  alPost(path, body||{}).then(function(d){ AJ_BUSY=false; if (d && d.ok){ if (d.state) COS=d.state; else if (d.aj && COS) COS.aj=d.aj; if (okMsg) toast(okMsg); } else toast((d&&d.error)||"Couldn\u2019t do that"); lastSheet=""; renderSheet(); })
+    .catch(function(){ AJ_BUSY=false; toast("Can\u2019t reach the server"); lastSheet=""; renderSheet(); }); }
+document.addEventListener("change", function(e){ var t=e.target; if (!t) return;
+  if (t.id==="ajhero"){ S.aj=S.aj||{}; S.aj.hero=+t.value||0; save(); return; }
+  if (t.dataset && t.dataset.ajk && COS && COS.aj){ var k={}; AJ_K.forEach(function(x){ k[x[0]]=COS.aj.kinds[x[0]]?1:0; }); k[t.dataset.ajk]=t.checked?1:0; COS.aj.kinds=k; ajPost("/cos/aj/set",{kinds:k}); } }, true);
 function cosmoSheet(){ var coins=COS?COS.coins:null, free=!!(COS&&COS.allFree), bal=coins?coins.balance:0;
   var h='<div class="head"><span class="ico">'+alArt("cosmo",32)+'</span><div style="flex:1"><h2>Cosmo Shop</h2><div class="sub">Everything sold for Cosmo Coins.</div></div><button class="btn ghost small" data-act="close" aria-label="Close">\u2715</button></div>';
   if (!cbOn()) return h+'<p class="why">Sign in to your cloud backup (Settings) to use the shop: your Cosmo Coins live on the server.</p>';
   if (!COS) return h+'<p class="hint">Loading\u2026</p>';
   h+='<div class="section warhead cosmohead">'+alArt("cosmo",56)+'<div class="warbal"><b>'+fmt(bal)+'</b><span class="dur">Cosmo Coins</span></div><span class="dur warhow">'+(coins?(coins.needTH?'A free coin a day starts once one of your cities has a level '+coins.needTH+' Town Hall.':'Next free coin in '+fmtT(coins.nextIn)+'.'):'')+' More coins: <button class="link" data-act="iv-shop-open">War Marks shop</button></span></div>';
+  h+=ajCard(bal);
   var L=cosmoPacks();
   h+='<div class="section" style="margin-top:10px"><h3>Decoration packs</h3><p class="hint" style="margin-top:0">Unlock a pack once and place everything in it on as many map tiles as you like. Only you see your map.'+(free?' Free during the beta.':'')+'</p><div class="shopgrid">'+L.map(function(pk){
     var why=pk.own?"Owned":(!free && bal<pk.price)?"Need "+fmt(pk.price-bal)+" more":"";
@@ -5949,7 +5980,7 @@ function previewMarch(){
 }
 function cityMarches(){ var me=C().id; return S.marches.filter(function(x){ return x.city===me; }); }
 // troops hidden in the woods don't take a Rally Spot slot
-function rallyUsed(){ var me=C().id; return cityMarches().length+(S.alRally||[]).filter(function(m){ return m.city===me; }).length; } // alliance rally marches take a slot while they're out (0.1.142)
+function rallyUsed(){ var me=C().id; return cityMarches().length+(S.alRally||[]).filter(function(m){ return m.city===me && !m.auto; }).length; } // alliance rally marches take a slot while they're out (0.1.142)
 function homeTileId(){ return S.map.home[0]+","+S.map.home[1]; }
 function launchMarch(tileId, mission, t, heroId, opt){
   opt=opt||{}; markDirty(); var q=TILE_BY[tileId], tm=travelMs(t,q,heroId,mission), dep=opt.dep!=null?opt.dep:S.gt, food=marchFood(t,mission,tm);
@@ -7177,15 +7208,24 @@ function arStatus(m){ var now=Date.now(); return m.st==="back" ? 'coming home, '
 function arRewardList(rw){ if (!rw) return ""; var out=[]; for (var k in rw.items) out.push(fmt(rw.items[k])+" "+((ITEMS[k]&&ITEMS[k].name)||k)); var rs=0; for (var r in rw.res) rs+=rw.res[r]; if (rs) out.push(fmt(rw.res.food||0)+" of each resource"); return out.join(", "); }
 var ARS=""; // the Arena page's picked monster
 // results from the server: send each march home with what survived, and hand out the reward once per fight
+/* 0.2.91 (Cody): Auto-join. The server sends a credit scout for subscribers to monster rallies (refs "aj-..."). This game never sent those marches,
+   so when a result for one arrives it is adopted here as a march that is already home: the reward, the report and the experience for the hero
+   the player picked (m.xh; the hero never leaves) run through the same code as a hand-sent march, and nothing is added to or taken from a city. */
+function ajRef(ref){ return String(ref||"").indexOf("aj-")===0; }
+function ajHero(){ var id=S.aj&&S.aj.hero, h=id?heroById(id):null; return h?h.id:0; }
+function ajRec(ref, more){ var t=Z12(); t[2]=1; var m={ref:ref, auto:1, city:S.cities[0].id, hero:0, xh:ajHero(), t:t, dep:Date.now(), arrive:Date.now(), travel:1, st:"out"}; for (var k in (more||{})) m[k]=more[k]; return m; }
+function ajSeen(ref){ S.ajDone=S.ajDone||{}; if (S.ajDone[ref]) return true; S.ajDone[ref]=Date.now(); var cut=Date.now()-14*864e5; for (var k in S.ajDone) if (S.ajDone[k]<cut) delete S.ajDone[k]; return false; }
+function mHero(m){ var id=m&&(m.hero||m.xh); return id?heroById(id):null; } // the hero leading a march, or the one an auto scout earns experience for
 var AR_XP_LV=10000; // 0.1.214: Arena monster experience: 10,000 a level (level 1: 10,000; level 10: 100,000)
 function arResults(mon){
-  var L=S.alArena||[], ch=false; S.alArenaDone=S.alArenaDone||{};
+  var L=S.alArena||(S.alArena=[]), ch=false; S.alArenaDone=S.alArenaDone||{};
   (mon.recent||[]).forEach(function(r){ var refs=Object.keys(r.mine||{}); if (!refs.length) return;
+    refs.forEach(function(ref){ if (ajRef(ref) && !S.alArenaDone[ALS.aid+":"+r.id] && !L.some(function(x){ return x.ref===ref; }) && !ajSeen(ALS.aid+":"+ref)) L.push(ajRec(ref, {aid:ALS.aid, mid:r.id, ends:r.at})); }); // 0.2.91
     /* 0.2.41: a fight pays only for marches this game sent and is still waiting on (as alliance rallies do). Before, any fight the
        server listed with you in it paid out once per alliance id, so after a switch old fights could pay again and again (Cody, Nov 3). */
     var fresh=L.filter(function(x){ return r.mine[x.ref] && x.st==="out"; });
     fresh.forEach(function(m){ var o=r.mine[m.ref];
-      m.st="back"; m.back=o.back.slice(); m.wounded=o.wounded.slice(); m.home=Math.max(Date.now(), (r.at||Date.now())+(m.travel||60000)); ch=true; }); // 0.1.191: straight home from the moment of the fight
+      m.st="back"; m.back=o.back.slice(); m.wounded=o.wounded.slice(); m.home=m.auto?Date.now():Math.max(Date.now(), (r.at||Date.now())+(m.travel||60000)); ch=true; }); // 0.1.191: straight home from the moment of the fight
     var key=ALS.aid+":"+r.id; if (S.alArenaDone[key]) return; S.alArenaDone[key]=r.at||Date.now(); ch=true;
     if (fresh.length) arReward(r, fresh[0], fresh); });
   var cut=Date.now()-3*864e5; for (var k in S.alArenaDone) if (S.alArenaDone[k]<cut) delete S.alArenaDone[k];
@@ -7213,7 +7253,7 @@ function wdRepHtml(r){ var pct0=r.hp0?Math.max(r.result===1?0:1, Math.round(r.hp
 // a proper report for every Arena fight you joined, under Reports > Arena
 function arReport(r, myM, T){
   var axRef=xpFirstRef(myM), axFull=r.win ? AR_XP_LV*(r.lv||1) : 0;
-  var mine=myM.map(function(m){ var o=(r.mine&&r.mine[m.ref])||{}, ci=cityIndex(m.city), hh=m.hero?heroById(m.hero):null, xp=0;
+  var mine=myM.map(function(m){ var o=(r.mine&&r.mine[m.ref])||{}, ci=cityIndex(m.city), hh=mHero(m), xp=0;
     if (hh && m.ref===axRef && axFull){ var aups=giveXp(hh, axFull); xp=Math.round(axFull*bHeroXp()); if (aups) note("heroes", hh.name+" reached level "+hh.level+" at the Arena"); }
     return {city:ci>=0?S.cities[ci].name:"?", hero:hh?hh.name:"", sent:m.t.slice(), back:(o.back||m.t).slice(), wounded:(o.wounded||Z12()).slice(), xp:xp, xpNo:hh&&m.ref!==axRef?1:0}; });
   var wd=0, sent=0; mine.forEach(function(x){ wd+=sumT(x.wounded); sent+=sumT(x.sent); });
@@ -7286,7 +7326,7 @@ function arTick(){
   for (var i=L.length-1;i>=0;i--){ var m=L[i]; if (m.st==="back" && now>=m.home){ arHome(m); L.splice(i,1); ch=true; } }
   if (ch){ reconcileHeroes(); save(); flushFinished(); refresh(); }
 }
-function arHome(m){
+function arHome(m){ if (m.auto) return; // 0.2.91: a credit scout: nothing comes back to a city
   var ci=cityIndex(m.city); if (ci<0) return; var c=S.cities[ci], back=0, wd=0, wb=null;
   withCity(ci,function(){ for (var i=0;i<12;i++){ S.troops[i]+=m.back[i]||0; back+=m.back[i]||0; } });
   for (var j=0;j<12;j++){ var n=m.wounded[j]||0; if (n){ if (!wb) wb=woundBucket(c); wb.t[j]+=n; wd+=n; } }
@@ -7294,7 +7334,7 @@ function arHome(m){
 }
 function arWhy(n){
   var d=marchDraft, cur=arById(d.mid); if (!cur) return "The monster\u2019s window has closed";
-  if ((S.alArena||[]).length>=arSlots()) return "Every Arena slot is in use ("+arSlots()+")";
+  if ((S.alArena||[]).filter(function(m){ return !m.auto; }).length>=arSlots()) return "Every Arena slot is in use ("+arSlots()+")";
   if (!n) return "Choose some troops";
   if (n>armyCap(d.ensign, d.hero?heroById(d.hero):null)) return "Army limit is "+fmt(armyCap(d.ensign, d.hero?heroById(d.hero):null))+" troops"+(ensKey(d.ensign)?" (with the "+ITEMS[ensKey(d.ensign)].name+")":"");
   var av=draftAvail(); for (var i=0;i<12;i++) if (d.t[i]>av[i]) return "Not enough "+U[i].name+"s";
@@ -7361,7 +7401,7 @@ function ryHoldFor(m){ if (m.mission!=="attack" && m.mission!=="conquer") return
 /* 0.1.182: the rally chip. Counts rallies still open to join (not left yet) that you have no march in and haven't ignored;
    tapping it lists them with Join and Ignore (or Ignore all). Ignored ones stay ignored for that rally only (S.ryIgn["aid:rid"]). */
 function ryIgn(){ if (!S.ryIgn) S.ryIgn={}; return S.ryIgn; }
-function ryOpen(){ var now=Date.now(), ig=ryIgn(); return ryLive().filter(function(R){ return now<R.hitAt && !(R.marches||[]).some(function(j){ return j.mine; }) && !ig[ALS.aid+":"+R.id]; }); }
+function ryOpen(){ var now=Date.now(), ig=ryIgn(); return ryLive().filter(function(R){ return now<R.hitAt && !(R.marches||[]).some(function(j){ return j.mine && !j.auto; }) && !ig[ALS.aid+":"+R.id]; }); } // 0.2.91: an auto scout doesn't count as having joined
 function ryListSheet(){ var L=ryOpen(), now=Date.now();
   var h='<div class="head"><span class="ico">'+ICON.rally+'</span><div style="flex:1"><h2>Rallies to join</h2><div class="sub">'+(L.length?L.length+' you haven\u2019t joined':'none waiting')+'</div></div>'+alX()+'</div>';
   if (!L.length) return h+'<p class="hint">Nothing waiting. New rallies show up here (and on the flag chip at the top) until they leave.</p>';
@@ -7369,7 +7409,7 @@ function ryListSheet(){ var L=ryOpen(), now=Date.now();
   h+=L.map(function(R){ return '<div class="bq"><span><b>'+esc(R.host)+'\u2019s '+esc(R.name)+'</b><br><span class="dur">leaves in '+fmtT(R.hitAt-now)+(R.from?' from '+esc(R.from):'')+' \u00b7 '+(R.marches||[]).length+' march'+((R.marches||[]).length===1?'':'es')+' so far \u00b7 travel about '+fmtT(ryTravelEst(R,"best"))+'</span></span>'+
     '<div class="mbtns"><button class="btn small" data-act="ry-send" data-rid="'+R.id+'">Join</button><button class="btn ghost small" data-act="ry-ign" data-rid="'+R.id+'">Ignore</button></div></div>'; }).join("");
   return h+'<p class="dur" style="margin-top:6px">Ignoring only hides it from the chip; it stays on Rallies.</p>'; }
-function ryInN(){ return ryLive().filter(function(R){ return (R.marches||[]).some(function(j){ return j.mine; }); }).length; } // rallies you have marches in
+function ryInN(){ return ryLive().filter(function(R){ return (R.marches||[]).some(function(j){ return j.mine && !j.auto; }); }).length; } // rallies you have marches in
 function ryMineN(){ return ryLive().filter(function(R){ return R.mine; }).length; }
 function ryTravelEst(R, hid){ hid=alPaceHero(hid); var al=alMine(), c=arCat(), M=al&&al.map; if (!c||!M||!R) return 60000; var me=alMyTile(M), host=null; (M.k||[]).forEach(function(k){ if (k.name===R.host) host=k; });
   if (R.mine) return 0; var d=me&&host?Math.hypot(me.x-host.x, me.y-host.y):5; return (c.travel0+c.travelTile*d)*1000/alSpeed(hid); } // 0.1.191: the caller's own marches are already there
@@ -7419,7 +7459,7 @@ function ryWhy(n){
   if (!rallyLv()) return "Build a Rally Spot first";
   if (rallyUsed()>=rallyLv()) return "Rally Spot is full ("+rallyLv()+" marches from "+S.name+"): send from another city";
   if (Date.now()+ryTravelEst(R)>R.hitAt) return "Too far to make it before the waves leave";
-  if (!(R.marches||[]).some(function(j){ return j.mine; }) && ryInN()>=RY_MAX_MINE) return "You\u2019re already in "+RY_MAX_MINE+" rallies";
+  if (!(R.marches||[]).some(function(j){ return j.mine && !j.auto; }) && ryInN()>=RY_MAX_MINE) return "You\u2019re already in "+RY_MAX_MINE+" rallies";
   return ""; }
 function rySend(){
   var d=marchDraft; if (ryWhy(sumT(d.t)) || RYS.sending) return;
@@ -7458,7 +7498,7 @@ function ryDetailSheet(){ var R=ryById(sheetFor.rid), live=R && ryLive().indexOf
   return '<div class="head rchead">'+ryImg(R)+'<div style="flex:1;min-width:0"><h2><span>'+esc(R.name)+'</span> <span class="rcby" translate="no">'+esc(R.host)+'</span></h2><div class="sub">'+(gone?'On the road \u00b7 lands in ':'Leaves in ')+'<b class="arleft" data-ends="'+ends+'">'+fmtT(Math.max(0,ends-now))+'</b></div>'+(gone ? ryBar(R.hitAt, ends, now) : ryBar(R.at||R.hitAt-3600e3, R.hitAt, now))+'</div>'+alX()+'</div>'+
     ryBody(R); }
 function ryBody(R){ var now=Date.now(), mine=S.alRally||[], h=''; var g=R.garrison||{t:[],f:[]}, ord={}; (R.order||[]).forEach(function(id,i){ ord[id]=i; });
-    R.marches=R.marches||[]; var ms=R.marches.slice().sort(function(a,b){ return (ord[a.id]!=null?ord[a.id]:1e6+a.arrive)-(ord[b.id]!=null?ord[b.id]:1e6+b.arrive); }), mineN=R.marches.filter(function(j){ return j.mine; }).length, total=0; ms.forEach(function(j){ total+=j.n; });
+    R.marches=R.marches||[]; var wvk=function(j){ return j.auto?4e15+j.id:ord[j.id]!=null?ord[j.id]:1e6+j.arrive; }, ms=R.marches.slice().sort(function(a,b){ return wvk(a)-wvk(b); }), mineN=R.marches.filter(function(j){ return j.mine; }).length, total=0; ms.forEach(function(j){ total+=j.n; });
     var gone=now>=R.hitAt, wz=R.k==="wiz";
     h+=
       '<p class="dur" style="margin:0 0 4px">At ('+R.x+', '+R.y+') on '+esc(R.host)+'\u2019s map'+(R.from?', leaving from '+esc(R.from):'')+(gone?'. On the road: no more marches can join.':', at '+wvClock(S.gt+(R.hitAt-now)*S.speed)+'.')+' '+(wz?'Health '+fmt(WIZ[R.L]?WIZ[R.L].hp:0)+'; it heals to full if it survives.':'Defenders now '+fmt(sumT(g.t))+' (about '+fmt(g.atHit)+' by the leave time, as it refills), fortifications '+fmt((g.f||[]).reduce(function(a,b){ return a+b; },0))+', wall level '+(g.wall||0)+'.')+'</p>'+
@@ -7467,7 +7507,7 @@ function ryBody(R){ var now=Date.now(), mine=S.alRally||[], h=''; var g=R.garris
     h+='<div class="h3" style="margin-top:8px">'+(wz?'Marches':'Waves, in hitting order')+' ('+ms.length+' marches, '+fmt(total)+' troops)</div>';
     if (!ms.length) h+='<p class="dur">Nobody has marched yet.</p>';
     ms.forEach(function(j,i){ var mm=j.mine&&j.ref?mine.filter(function(x){ return x.ref===j.ref; })[0]:null;
-      h+='<div class="bq"><span><b>'+(i+1)+'. '+esc(j.name)+'</b>: '+fmt(j.n)+' troops'+(j.hero?', led by '+esc(j.hero):'')+'<br><span class="dur">'+U.map(function(u,ui){ return j.t[ui]?fmt(j.t[ui])+' '+uname(ui,j.t[ui]):''; }).filter(Boolean).join(", ")+' \u00b7 '+(j.arrive>R.hitAt?'too late':gone?'on the road':j.arrive>now?'arrives in '+fmtT(j.arrive-now):'waiting')+'</span></span>'+
+      h+='<div class="bq"><span><b>'+(i+1)+'. '+esc(j.name)+'</b>'+(j.auto?' <span class="aitag">auto</span>':'')+': '+fmt(j.n)+' troops'+(j.hero?', led by '+esc(j.hero):'')+'<br><span class="dur">'+U.map(function(u,ui){ return j.t[ui]?fmt(j.t[ui])+' '+uname(ui,j.t[ui]):''; }).filter(Boolean).join(", ")+' \u00b7 '+(j.arrive>R.hitAt?'too late':gone?'on the road':j.arrive>now?'arrives in '+fmtT(j.arrive-now):'waiting')+'</span></span>'+
         '<div class="mbtns">'+(R.mine&&!gone&&!wz?'<button class="link" data-act="ry-move" data-rid="'+R.id+'" data-id="'+j.id+'" data-d="-1"'+(i?'':' disabled')+' aria-label="Hit earlier">\u25b2</button><button class="link" data-act="ry-move" data-rid="'+R.id+'" data-id="'+j.id+'" data-d="1"'+(i<ms.length-1?'':' disabled')+' aria-label="Hit later">\u25bc</button>':'')+
         (mm&&!gone?'<button class="link" data-act="ry-recall" data-rid="'+R.id+'" data-ref="'+esc(j.ref)+'">Recall</button>':'')+'</div></div>'; });
     if (R.mine && !gone) h+='<div class="h3" style="margin-top:8px">Your rally</div><div class="farmadd"><label class="dur" for="rytime">Leave at</label>'+hmsIn('id="rytime"', RYS.time)+'<button class="btn small ghost" data-act="ry-time" data-rid="'+R.id+'">Set time</button></div>'+
@@ -7488,7 +7528,7 @@ function arDetailSheet(){ var cur=arLive().filter(function(c){ return c.id===she
     '<p class="hint" style="margin:0 0 4px">'+esc(T.d||"")+'</p>'+
     ((T.lv[cur.lv-1])?'<p class="dur" style="margin:0 0 6px">Reward if it falls: '+esc(T.lv[cur.lv-1].reward)+'.</p>':'')+
     '<div class="btnrow"><button class="btn small" data-act="al-arena-send" data-mid="'+cur.id+'"'+(full?' disabled':'')+'>Send a march</button><span class="dur">'+(full?'Every Arena slot is in use':'Travel about '+fmtT(arTravelEst("best"))+' from your kingdom')+'</span></div>'+
-    (cur.joins.length?'<div class="h3" style="margin-top:8px">On the way ('+cur.joins.length+')</div>'+cur.joins.map(function(j){ return '<p class="dur" style="margin:2px 0"><b>'+esc(j.name)+'</b>: '+fmt(j.n)+' troops'+(j.arrive>now?', arriving in '+fmtT(j.arrive-now):', arrived')+'</p>'; }).join(""):'<p class="dur">Nobody has marched yet.</p>')+
+    (cur.joins.length?'<div class="h3" style="margin-top:8px">On the way ('+cur.joins.length+')</div>'+cur.joins.map(function(j){ return '<p class="dur" style="margin:2px 0"><b>'+esc(j.name)+'</b>'+(j.auto?' <span class="aitag">auto</span>':'')+': '+fmt(j.n)+' troops'+(j.arrive>now?', arriving in '+fmtT(j.arrive-now):', arrived')+'</p>'; }).join(""):'<p class="dur">Nobody has marched yet.</p>')+
     (mineM.length?'<div class="h3" style="margin-top:8px">Your marches in it</div>'+mineM.map(function(m){ var hh=m.hero?heroById(m.hero):null, ci=cityIndex(m.city); return '<div class="bq"><span><b>'+fmt(sumT(m.t))+' troops</b> from '+esc(ci>=0?S.cities[ci].name:"?")+(hh?' led by '+esc(hh.name):'')+'<br><span class="dur">'+arStatus(m)+'</span></span></div>'; }).join(""):''); }
 function alRallyHtml(al){
   var Y=ryData(); if (!Y) return '<div class="section"><p class="hint">Loading rallies…</p></div>';
@@ -7581,6 +7621,7 @@ function ryResults(Y){
   (Y.live||[]).forEach(function(R0){ if (R0.mine && R0.land) ryLocks().forEach(function(lk){ if (lk.rid===R0.id && lk.aid===ALS.aid && lk.land!==R0.land){ lk.land=R0.land; ch=true; } }); });
   (Y.live||[]).forEach(function(R0){ if (R0.land) L.forEach(function(m){ if (m.rid===R0.id && m.st==="out" && m.land!==R0.land){ m.land=R0.land; ch=true; } }); }); // when the rally lands (for the fallback below)
   (Y.recent||[]).forEach(function(r){
+    if (r.k==="wiz"||r.k==="vamp") Object.keys(r.mine||{}).forEach(function(ref){ if (ajRef(ref) && !L.some(function(x){ return x.ref===ref; }) && !ajSeen(ALS.aid+":"+ref)){ if (!S.alRally) S.alRally=L; L.push(ajRec(ref, {aid:ALS.aid, rid:r.id, hitAt:r.hitAt})); } }); // 0.2.91
     // rewards: when a rally wipes the garrison, every player who got a march there in time rolls the full drop table for that target once, on their own
     var rk=ALS.aid+":"+r.id, fresh=Object.keys(r.mine||{}).filter(function(ref){ var m=L.filter(function(x){ return x.ref===ref; })[0], o=r.mine[ref]; return m && m.st==="out" && !o.late && !o.cancelled; }), roll=null;
     if (fresh.length && r.win && !r.cancelled && !S.alRallyRoll[rk]){ S.alRallyRoll[rk]=Date.now();
@@ -7591,7 +7632,7 @@ function ryResults(Y){
       else roll = r.full ? winDrops({id:"rally:"+r.id, k:r.k, L:r.L}) : {drops:[], medal:-1, nofull:true}; }
     var xpRef=xpFirstRef(Object.keys(r.mine||{}).map(function(ref){ return L.filter(function(x){ return x.ref===ref; })[0]; }));
     Object.keys(r.mine||{}).forEach(function(ref){ var m=L.filter(function(x){ return x.ref===ref; })[0]; if (!m || m.st!=="out") return; var o=r.mine[ref];
-      m.st="back"; m.back=(o.left||m.t).slice(); if (o.wd) m.wd=o.wd.slice(); else if (r.k==="vamp") m.wd=m.t.map(function(n,i){ return Math.max(0,n-(m.back[i]||0)); }); /* 0.1.212: a vampire rally: every loss is wounded */ m.home=Math.max(Date.now(), o.home||0); /* 0.1.191: home the moment the rally is back at its launch city */ m.res=o; ch=true; var rw=fresh.indexOf(ref)>=0?roll:null; if (rw) roll=null; try { ryReport(r, m, o, rw, ref===xpRef); } catch(e){}
+      m.st="back"; m.back=(o.left||m.t).slice(); if (o.wd) m.wd=o.wd.slice(); else if (r.k==="vamp") m.wd=m.t.map(function(n,i){ return Math.max(0,n-(m.back[i]||0)); }); /* 0.1.212: a vampire rally: every loss is wounded */ m.home=m.auto?Date.now():Math.max(Date.now(), o.home||0); /* 0.1.191: home the moment the rally is back at its launch city */ m.res=o; ch=true; var rw=fresh.indexOf(ref)>=0?roll:null; if (rw) roll=null; try { ryReport(r, m, o, rw, ref===xpRef); } catch(e){}
       if (!rw && !r.isHost) note("rally","The rally on "+r.host+"\u2019s "+r.name+" "+(o.cancelled||r.cancelled?"was called off: your march is heading home.":o.late?"left without your march (it arrived too late).":o.idle?"wiped it out before your wave was needed.":o.wave?"hit: your wave "+(o.won?"won":"was thrown back")+".":"is over.")); });
     var key=ALS.aid+":"+r.id; if (r.isHost && !S.alRallyDone[key]){ S.alRallyDone[key]=Date.now(); ch=true;
       var lk=ryLocks().filter(function(x){ return x.rid===r.id && x.aid===ALS.aid; })[0]; if (lk){ var q=TILE_BY[lk.tile];
@@ -7618,9 +7659,9 @@ function ryResults(Y){
 // 0.1.215: a monster's experience (map monsters and vampires): what its whole garrison is worth. Paid in full to every player who brings it down, nothing if it survives
 function monXpFull(q){ var b=monsterBase(q), x=0; for (var i=0;i<12;i++) x+=(b.t[i]||0)*KILLXP[i]; return Math.round(x); }
 // 0.1.214: in a rally or an Arena fight, only the first hero a player sends earns experience (no sending every hero with one troop each)
-function xpFirstRef(ms){ var f=null; ms.forEach(function(m){ if (m && m.hero && (!f || (m.dep||0)<(f.dep||0))) f=m; }); return f?f.ref:null; }
+function xpFirstRef(ms){ var f=null; ms.forEach(function(m){ if (m && m.hero && (!f || f.auto || (m.dep||0)<(f.dep||0))) f=m; else if (m && m.auto && m.xh && !f) f=m; }); return f?f.ref:null; } // 0.2.91: a real hero's march comes before an auto scout's
 function ryReport(r, m, o, rw, xpOk){
-  var ci=cityIndex(m.city), hh=m.hero?heroById(m.hero):null, lost=m.t.map(function(n,i){ return Math.max(0,n-((o.left||[])[i]||0)); });
+  var ci=cityIndex(m.city), hh=mHero(m), lost=m.t.map(function(n,i){ return Math.max(0,n-((o.left||[])[i]||0)); });
   if (hh && o.wave) heroRec(hh, {won:!!o.won, killed:o.killed||[], lost:lost, label:r.host+"\u2019s "+r.name+" (rally)"});
   // 0.1.213: every rally gives the leading hero experience: kills and destroyed fortifications (as in a solo attack), or for a wizard its share of the wizard's health
   var rxp=0; if (hh && (o.wave || (o.idle && (r.k==="vamp"||r.k==="wiz"))) && !o.cancelled && !o.late && xpOk){ if (r.k==="wiz") rxp=r.win ? (WIZ_XP[r.L]||0) : 0; // 0.1.215: monsters: everyone in it gets the full amount, only for the kill
@@ -7681,7 +7722,7 @@ function ryTick(){
   for (var i=L.length-1;i>=0;i--){ var m=L[i]; if (m.st==="back" && now>=m.home){ ryHome(m); L.splice(i,1); ch=true; } }
   if (ch){ reconcileHeroes(); save(); flushFinished(); refresh(); }
 }
-function ryHome(m){ var ci=cityIndex(m.city); if (ci<0) return; var c=S.cities[ci], back=sumT(m.back), wd=0;
+function ryHome(m){ if (m.auto) return; var ci=cityIndex(m.city); if (ci<0) return; var c=S.cities[ci], back=sumT(m.back), wd=0;
   withCity(ci,function(){ for (var i=0;i<12;i++) S.troops[i]+=m.back[i]||0; });
   if (m.wd){ var wb2=null; for (var wi=0;wi<12;wi++) if (m.wd[wi]){ if (!wb2) wb2=woundBucket(c); wb2.t[wi]+=m.wd[wi]; wd+=m.wd[wi]; } } // a wizard: every loss is wounded
   else wd=woundFrom(c.id, m.t, m.back, false);
@@ -8728,19 +8769,22 @@ function wdSend(){ var d=marchDraft; if (wdWhy(sumT(d.t)) || WDS.sending) return
     WDS.at=0; wdFetch(); })
     .catch(function(){ undo("Couldn’t reach the server. Your troops are back home."); if (wdVisible()) wdPaint(); }); }
 // results: each of my marches learns what came back; it's taken home when it gets there (troops, wounded to the Medic Camp, rewards)
-function wdResults(d){ var L=S.wdM||[], ch=false; (d.mine||[]).forEach(function(j){ var m=L.filter(function(x){ return x.ref===j.ref; })[0]; if (!m) return;
+function wdResults(d){ var L=S.wdM||(S.wdM=[]), ch=false; (d.mine||[]).forEach(function(j){ var m=L.filter(function(x){ return x.ref===j.ref; })[0];
+    if (!m && ajRef(j.ref) && j.st==="back" && j.res && !ajSeen("wd:"+j.id)){ m=ajRec(j.ref, {id:j.id, L:j.L}); L.push(m); } // 0.2.91: an auto scout's result
+    if (!m) return;
     if (j.st==="in" && m.st!=="in"){ m.st="in"; m.name=j.tname||m.name; m.tk=j.tk||m.tk; ch=true; }
     if (m.id!==j.id || m.L!==j.L){ m.id=j.id; m.L=j.L; ch=true; }
-    if (j.st==="back" && j.res && m.st!=="back"){ m.st="back"; m.res=j.res; m.reward=j.reward; m.home=j.home; m.host=j.host; m.result=j.result||null; m.solo=j.solo; ch=true; }
+    if (j.st==="back" && j.res && m.st!=="back"){ m.st="back"; m.res=j.res; m.reward=j.reward; m.home=m.auto?Date.now():j.home; m.host=j.host; m.result=j.result||null; m.solo=j.solo; ch=true; }
     else if (j.st==="back" && m.st==="back" && j.home && j.home!==m.home){ m.home=j.home; ch=true; } }); // 0.2.23: sped up on the way home
   // 0.2.85: a march the server no longer knows (its row was pruned after 12 days, or this is an old save) comes home as it left; it used to stay out for good with its hero and slot
   if (Array.isArray(d.mine)){ var have={}; d.mine.forEach(function(j){ have[j.ref]=1; }); L.forEach(function(m){ if (m.st!=="back" && !have[m.ref] && Date.now()-(m.dep||0)>15*60000){ m.st="back"; m.res={back:m.t.slice(), wounded:[]}; m.home=Date.now(); m.lostRow=1; ch=true; } }); }
   if (ch) save(); }
 function wdHome(m){ if (m.res && m.res.pvp) return wbHome(m); var ci=cityIndex(m.city); if (ci<0) ci=S.cur; var c=S.cities[ci], r=m.res||{back:m.t, wounded:[]}, back=0, wd=0, wb=null, nm="level "+(m.L||"?")+" "+wdMonName(m.L);
-  withCity(ci,function(){ for (var i=0;i<12;i++){ var n=(r.back&&r.back[i])||0; S.troops[i]+=n; back+=n; } });
-  for (var j=0;j<12;j++){ var w=(r.wounded&&r.wounded[j])||0; if (w){ if (!wb) wb=woundBucket(c); wb.t[j]+=w; wd+=w; } }
-  var hh=m.hero?heroById(m.hero):null; if (hh) hh.away=false;
-  var tail=" Back in "+c.name+": "+fmt(back)+" troops"+(wd?", and "+fmt(wd)+" wounded in the Medic Camp (heal them within 24 hours)":"")+".";
+  if (!m.auto){ withCity(ci,function(){ for (var i=0;i<12;i++){ var n=(r.back&&r.back[i])||0; S.troops[i]+=n; back+=n; } });
+    for (var j=0;j<12;j++){ var w=(r.wounded&&r.wounded[j])||0; if (w){ if (!wb) wb=woundBucket(c); wb.t[j]+=w; wd+=w; } } }
+  var hh=mHero(m); if (hh && m.hero) hh.away=false;
+  var tail=m.auto?"":" Back in "+c.name+": "+fmt(back)+" troops"+(wd?", and "+fmt(wd)+" wounded in the Medic Camp (heal them within 24 hours)":"")+".";
+  if (m.auto && !m.reward && !(r.win!=null && !r.gone && !r.cancelled && !r.recalled && !r.late)) return; // 0.2.91: an auto scout that never fought says nothing
   if (m.reward){ var rw=m.reward, its=rw.items||{}; for (var k in its) S.items[k]=(S.items[k]||0)+its[k];
     var xp=0; if (rw.xp && hh){ var full=WD_MXP[m.L]||0, ups=giveXp(hh, full); xp=Math.round(full*bHeroXp()); if (ups) note("heroes", hh.name+" reached level "+hh.level+" on the server map"); }
     note("alliance","The "+nm+" fell on the server map! Your share: a Shield Orb for the Shield Generator"+(Object.keys(its).length?", "+arRewardList({items:its, res:{}}):"")+(xp?", and "+fmt(xp)+" experience for "+hh.name:"")+"."+tail); }
@@ -13752,7 +13796,7 @@ function cosPrice(kind,id){ var c=COS&&COS.cat.filter(function(x){ return x.k===
 function myLook(kind){ var v=S.me&&S.me[kind]; return v&&COSM[kind]&&COSM[kind][v]&&cosHas(kind,v)?v:""; }
 function cosSync(force){
   if (!cbOn() || cosBusy) return; var n=Date.now(); if (!force && n-cosAt<60000) return; cosBusy=true; cosAt=n;
-  alPost("/cos/state",{}).then(function(d){ cosBusy=false; if (d && d.ok){ COS=d; applyTheme(); if (sheetFor && (sheetFor.kind==="me"||sheetFor.kind==="deco"||sheetFor.kind==="cosmo")){ lastSheet=""; renderSheet(); } } }).catch(function(){ cosBusy=false; });
+  alPost("/cos/state",{}).then(function(d){ cosBusy=false; if (d && d.ok){ COS=d; applyTheme(); if (sheetFor && (sheetFor.kind==="me"||sheetFor.kind==="deco"||sheetFor.kind==="cosmo"||sheetFor.kind==="aj")){ lastSheet=""; renderSheet(); } } }).catch(function(){ cosBusy=false; });
 }
 function cosBuy(kind,id){
   if (cosBusy) return; cosBusy=true; alPost("/cos/buy",{item:kind+":"+id}).then(function(d){ cosBusy=false;
@@ -15431,6 +15475,9 @@ function renderSheetCore0(){
     h=alViewSheet();
   } else if (sheetFor.kind==="cosmo"){
     h=cosmoSheet();
+  } else if (sheetFor.kind==="aj"){
+    if (sheetBody.contains(document.activeElement) && document.activeElement.tagName==="SELECT" && lastSheet) return;
+    h=ajSheet();
   } else if (sheetFor.kind==="bfpre"){
     if (sheetBody.contains(document.activeElement) && document.activeElement.tagName==="INPUT" && lastSheet) return;
     h=bfPresetSheet();
@@ -15917,6 +15964,8 @@ document.addEventListener("click",function(e){
   if (act==="deco-open"){ cosSync(); openSheet({kind:"deco", tile:a.dataset.tile}); return; }
   if (act==="deco-buy"){ decoBuy(a.dataset.pack); return; }
   if (act==="cosmo-open"){ openSheet({kind:"cosmo"}); cosSync(true); return; } // 0.2.90
+  if (act==="aj-open"){ openSheet({kind:"aj"}); cosSync(true); return; } // 0.2.91
+  if (act==="aj-buy"){ ajPost("/cos/aj/buy", {}, "Auto-join is active"); return; }
   if (act==="deco-move"){ var Dm=decoS().at[a.dataset.tile]||[], mi=+a.dataset.i; if (Dm[mi]==null) return; PAINT.k=""; PAINT.n=0; CLR.on=false; MOVE={tid:a.dataset.tile, i:mi, e:Dm[mi], n:0}; closeSheet(); MPOP.hide=true; selTile=null; renderTileInfo(); paintBar(); drawMap(); return; }
   if (act==="move-stop"){ var mt=MOVE.n?MOVE.tid:""; MOVE={tid:"", i:-1, e:"", n:0}; paintBar(); if (mt){ MPOP.hide=true; selectTile(mt,false); } else drawMap(); return; }
   if (act==="paint-stop"){ PAINT.k=""; PAINT.n=0; paintBar(); return; }
