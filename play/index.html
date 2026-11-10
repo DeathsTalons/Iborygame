@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.89";
+window.IBORY_V="0.2.90";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -500,6 +500,7 @@ nav.tabs button.hasnew{position:relative}nav.tabs button.hasnew::after{content:"
 .shoptile b{font-size:.86rem;line-height:1.2}.shoptile .dur{font-size:.72rem;line-height:1.3;flex:1}.shoptile .btn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:4px}.shoptile.no{opacity:.8}
 .shopic{position:relative;width:52px;height:52px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:radial-gradient(circle at 50% 40%,color-mix(in srgb,var(--brass) 20%,var(--panel)),var(--panel) 78%)}
 .shopic .iic{width:36px;height:36px;image-rendering:pixelated}.shopic .shopegg{width:44px;height:44px}.shopic i{position:absolute;right:-6px;bottom:-4px;font-style:normal;font-size:.72rem;font-weight:700;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:0 5px}
+.cosmohead{background:radial-gradient(circle at 8% 50%,color-mix(in srgb,#6a4abe 34%,var(--panel)),var(--panel) 62%)}.cosmohead .warbal b{color:#b9a3f5}.cosmoprev{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;width:100%;padding:6px;border-radius:10px;background:var(--panel);min-height:76px;align-items:end;justify-items:center}.cosmoprev span{display:flex;align-items:flex-end;justify-content:center;height:32px}.cosmotile.own{border-color:color-mix(in srgb,var(--good,#6fbf73) 50%,var(--line))}
 .shopcost{display:inline-flex;align-items:center;gap:3px;font-size:.74rem;color:var(--mut,#a9a595)}
 .tnode .tic{display:block;margin:0 auto 2px;width:24px;height:24px}.tnode.locked .tic{filter:grayscale(1);opacity:.75}.ttree .tnode.sel{border-color:var(--tc)}.tdetail{border-color:color-mix(in srgb,var(--tc) 55%,var(--line))}
 .memgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
@@ -1844,7 +1845,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.89";
+var APP_VERSION = "0.2.90";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -3605,6 +3606,21 @@ function decoFilter(){ var root=document.getElementById("decofind"); if (!root) 
 function paintBar(){ var el=document.getElementById("paintbar"); if (!el) return; if (CLR.on){ clrBar(el); return; } if (MOVE.e){ moveBar(el); return; } el.style.flexWrap=""; if (!PAINT.k){ if (!el.hidden){ el.hidden=true; el.innerHTML=""; el._h=""; } return; }
   var ph='<span>'+decoIcon(PAINT.k,22)+'</span><span style="flex:1">Tap tiles to place <b>'+esc(DECOS[PAINT.k].n)+'</b>'+(PAINT.n===Infinity?'':': '+PAINT.n+' left')+'</span><button class="btn small" data-act="paint-stop">Done</button>';
   if (el._h!==ph){ el.innerHTML=ph; el._h=ph; } el.hidden=false; }
+/* 0.2.90 (Cody): the Cosmo Shop (tap your Cosmo Coins on the Me page): everything sold for Cosmo Coins. Today that is the decoration packs. */
+function cosmoPacks(){ return DSHOP.map(function(sp){ var its=[], firsts=[]; DPACKS.forEach(function(pk){ if (sp.groups.indexOf(pk[0])>=0 && pk[0]!=="backgrounds"){ firsts.push(pk[2][0]); its=its.concat(pk[2].slice(1)); } }); DPACKS.forEach(function(pk){ if (pk[0]==="backgrounds" && sp.groups.indexOf("backgrounds")>=0) its=its.concat(pk[2]); });
+  return {id:sp.id, name:sp.name, its:firsts.concat(its), ai:sp.ai, own:!!COS && cosHas("decopack",sp.id), price:decoPrice(sp.id)}; }); }
+function cosmoSheet(){ var coins=COS?COS.coins:null, free=!!(COS&&COS.allFree), bal=coins?coins.balance:0;
+  var h='<div class="head"><span class="ico">'+alArt("cosmo",32)+'</span><div style="flex:1"><h2>Cosmo Shop</h2><div class="sub">Everything sold for Cosmo Coins.</div></div><button class="btn ghost small" data-act="close" aria-label="Close">\u2715</button></div>';
+  if (!cbOn()) return h+'<p class="why">Sign in to your cloud backup (Settings) to use the shop: your Cosmo Coins live on the server.</p>';
+  if (!COS) return h+'<p class="hint">Loading\u2026</p>';
+  h+='<div class="section warhead cosmohead">'+alArt("cosmo",56)+'<div class="warbal"><b>'+fmt(bal)+'</b><span class="dur">Cosmo Coins</span></div><span class="dur warhow">'+(coins?(coins.needTH?'A free coin a day starts once one of your cities has a level '+coins.needTH+' Town Hall.':'Next free coin in '+fmtT(coins.nextIn)+'.'):'')+' More coins: <button class="link" data-act="iv-shop-open">War Marks shop</button></span></div>';
+  var L=cosmoPacks();
+  h+='<div class="section" style="margin-top:10px"><h3>Decoration packs</h3><p class="hint" style="margin-top:0">Unlock a pack once and place everything in it on as many map tiles as you like. Only you see your map.'+(free?' Free during the beta.':'')+'</p><div class="shopgrid">'+L.map(function(pk){
+    var why=pk.own?"Owned":(!free && bal<pk.price)?"Need "+fmt(pk.price-bal)+" more":"";
+    return '<div class="shoptile cosmotile'+(pk.own?' own':why?' no':'')+'"><div class="cosmoprev">'+pk.its.slice(0,6).map(function(it){ return '<span>'+decoIcon(it[0],26)+'</span>'; }).join("")+'</div><b>'+esc(pk.name)+(pk.ai?' <span class="aitag">AI</span>':'')+'</b><span class="dur">'+pk.its.length+' decorations</span>'+
+      '<button class="btn small" data-act="deco-buy" data-pack="'+pk.id+'"'+(why||cosBusy?' disabled':'')+'>'+(pk.own?'\u2713 Owned':free?'Get (free)':alArt("cosmo",16)+' '+fmt(pk.price))+'</button>'+(why&&!pk.own?'<span class="shopcost">'+esc(why)+'</span>':'')+'</div>'; }).join("")+'</div>'+
+    '<p class="dur" style="margin-top:8px">To place them, tap a tile on your kingdom map, then the brush.</p></div>';
+  return h+'<button class="closebtn" data-act="close">Close</button>'; }
 function decoBuy(pid){ if (cosBusy) return; if (!cbOn()){ toast("Sign in to your cloud save first (Settings)"); return; } cosBusy=true; var pk=DSHOP.filter(function(x){ return x.id===pid; })[0];
   alPost("/cos/buy",{item:"decopack:"+pid}).then(function(d){ cosBusy=false; if (d && d.ok){ COS=d.state; toastQ((pk?pk.name:"Pack")+" unlocked"+(d.already?"":"!")); } else toast((d&&d.error)||"Couldn\u2019t buy that"); lastSheet=""; renderSheet(); renderTileInfo(); })
     .catch(function(){ cosBusy=false; toast("Can\u2019t reach the server"); }); }
@@ -6487,7 +6503,7 @@ function alInvHtml(){ var tabs=[["inv","war-inv","Invasions"]]; if (pvShown()) t
   var w=ALS.wtab||"inv"; if (!tabs.some(function(t){ return t[0]===w; })) w="inv"; var bal=SHOP.st?SHOP.st.balance:(S.warMarks||0);
   var h='<div class="section warhead">'+alArt("war-marks",56)+'<div class="warbal"><b>'+fmt(bal)+'</b><span class="dur">War Marks</span></div><span class="dur warhow">Won by killing troops in invasions. Spend them in the shop.</span></div>'+
     '<div class="wartabs" style="grid-template-columns:repeat('+tabs.length+',minmax(0,1fr))">'+tabs.map(function(t){ return '<button class="wartab'+(w===t[0]?' on':'')+'" data-act="al-wtab" data-v="'+t[0]+'">'+alArt(t[1],32)+'<b>'+t[2]+'</b></button>'; }).join("")+'</div>';
-  return h+(w==="inv"?invSection():w==="pvp"?pvSection():'<div class="warshop">'+shopBody(1)+'</div>'); }
+  return h+(w==="inv"?invSection():w==="pvp"?pvSection():'<div class="warshop">'+shopBody()+'</div>'); }
 function alHomeHtml(al, need){ var now=Date.now(), E=al.econ||{lv:{}}, my=al.my||{can:{}}, rk=al.ranks||[], hp=(ALS.d&&ALS.d.help)||{projects:[],canHelp:0}, h='';
   // the heading: tag, name, members, your rank and honor; Info as a chip
   h+='<div class="section alhead2"><span class="altag" translate="no">'+esc(al.tag)+'</span><div class="alhn"><b translate="no">'+esc(al.name)+'</b><span class="dur">'+al.members.length+' / '+al.cap+' members · you: '+esc((rk[my.rank]||{}).n||'')+' · honor '+fmt(ALS.d.honor||0)+'</span></div><button class="chipbtn wide" data-act="al-sub" data-v="about">Info ›</button></div>';
@@ -12875,8 +12891,8 @@ function shopSync(force){
   return shopPost("state").then(function(d){
     SHOP.busy=false; SHOP.at=Date.now();
     if (d.error) SHOP.err=d.error; else { SHOP.err=""; SHOP.st=d; shopApply(d); }
-    if (sheetFor && sheetFor.kind==="shop"){ lastSheet=""; renderSheet(); }
-    if (tab==="guild" && ALS.sub==="inv"){ lastView=""; renderView(true); } // 0.2.89: the shop tab of the War page
+    var ae=document.activeElement, typing=ae && (ae.tagName==="INPUT"||ae.tagName==="SELECT") && ae.closest && ae.closest(".warshop"); // don't redraw under someone filling in a gift
+    if (tab==="guild" && ALS.sub==="inv" && !typing){ lastView=""; renderView(true); } // 0.2.89: the shop tab of the War page
   });
 }
 function shopBuy(k){
@@ -12903,14 +12919,13 @@ function shopGift(){
     lastSheet=""; renderSheet(); refresh();
   });
 }
-function shopOpen(){ SHOP.msg=""; SHOP.err=""; openSheet({kind:"shop"}); shopSync(true); }
-function shopSheet(){ // the pop-up (opened from a report or the inventory): the same body as the War page's Shop tab
-  return '<div class="head"><span class="ico">'+ICON.crest+'</span><div style="flex:1"><h2>War Marks shop</h2><div class="sub">Earned by killing troops in invasions. Kept on the server, so a restored save can’t undo a purchase.</div></div><button class="btn ghost small" data-act="close" aria-label="Close">✕</button></div>'+shopBody(); }
+/* 0.2.90 (Cody): the War page's Shop tab is the only way into the War Marks shop; every old link lands there. */
+function shopOpen(){ SHOP.msg=""; SHOP.err=""; if (!mpShown()){ toast("Turn Multiplayer on (Settings) to use the War Marks shop"); return; } if (sheetFor) closeSheet(); tab="guild"; ALS.sub="inv"; ALS.wtab="shop"; lastView=""; renderView(true); window.scrollTo(0,0); shopSync(true); }
 function shopIcon(c){ var dgt=/^dragon_/.test(c.k)?c.k.slice(7):""; if (dgt && DRAGONS[dgt]) return eggImg(dgt,'dgimg shopegg'); var k=c.item||c.k; return ITEM_IMG[k]?itemImg(k):ITEM_IMG[k.replace(/\d+$/,"")]?itemImg(k.replace(/\d+$/,"")):alArt("war-marks",32); }
-function shopBody(inWar){ var st=SHOP.st, h='';
+function shopBody(){ var st=SHOP.st, h='';
   if (!cbOn()) return '<p class="why">Sign in to your cloud backup (Settings) to use the shop: your War Marks live on the server.</p>';
   if (!st) return SHOP.err?'<p class="why">'+esc(SHOP.err)+'</p>':'<p class="hint">Loading…</p>';
-  h+='<div class="shopstats">'+(inWar?'':'<span><b>'+fmt(st.balance)+'</b><i>War Marks</i></span>')+'<span><b>'+fmt(st.earned)+'</b><i>Earned</i></span><span><b>'+fmt(st.spent)+'</b><i>Spent</i></span><span><b>'+fmt(st.writs)+'</b><i>Courier Writs</i></span>'+(st.coins!=null?'<span><b>'+fmt(st.coins)+'</b><i>Cosmo Coins</i></span>':'')+'</div>';
+  h+='<div class="shopstats"><span><b>'+fmt(st.earned)+'</b><i>Earned</i></span><span><b>'+fmt(st.spent)+'</b><i>Spent</i></span><span><b>'+fmt(st.writs)+'</b><i>Courier Writs</i></span>'+(st.coins!=null?'<span><b>'+fmt(st.coins)+'</b><i>Cosmo Coins</i></span>':'')+'</div>';
   if (SHOP.err) h+='<p class="why">'+esc(SHOP.err)+'</p>'; else if (SHOP.msg) h+='<div class="inote">'+esc(SHOP.msg)+'</div>';
   var groups=[]; (st.cat||[]).forEach(function(c){ var g=groups.filter(function(x){ return x[0]===c.grp; })[0]; if (!g){ g=[c.grp,[]]; groups.push(g); } g[1].push(c); });
   groups.forEach(function(g){
@@ -13068,7 +13083,7 @@ function invSection(){
     var many=S.cities.length>=2;
     h+='<div class="act"><span class="why">'+(many?'':'You need at least two cities: one goes out, one stays home.')+'</span><button class="btn" data-act="iv-optin"'+(many&&!IV.busy?'':' disabled')+'>Opt in</button></div>';
   } else {
-    h+='<div class="wstats"><div><b>'+fmt(S.warMarks||0)+'</b><span>War Marks</span></div><div><b>'+p.launched+'</b><span>invaded</span></div><div><b>'+p.invaded+'</b><span>been invaded</span></div></div><p class="dur" style="margin:0 0 4px"><button class="link" data-act="iv-shop-open">War Marks shop</button></p>';
+    h+='<div class="wstats"><div><b>'+fmt(S.warMarks||0)+'</b><span>War Marks</span></div><div><b>'+p.launched+'</b><span>invaded</span></div><div><b>'+p.invaded+'</b><span>been invaded</span></div></div>';
     if (p.owe>0) h+='<p class="hint">You’re <b>'+p.owe+'</b> invasion'+(p.owe>1?'s':'')+' ahead: you can’t leave until others have invaded you as often as you’ve invaded them.</p>';
     if (p.safeUntil) h+='<p class="hint">You were just invaded, so you’re safe from new invasions for '+fmtT(Math.max(0,p.safeUntil-invNow()))+'.</p>';
     var sh=p.safeHours||72;
@@ -13737,7 +13752,7 @@ function cosPrice(kind,id){ var c=COS&&COS.cat.filter(function(x){ return x.k===
 function myLook(kind){ var v=S.me&&S.me[kind]; return v&&COSM[kind]&&COSM[kind][v]&&cosHas(kind,v)?v:""; }
 function cosSync(force){
   if (!cbOn() || cosBusy) return; var n=Date.now(); if (!force && n-cosAt<60000) return; cosBusy=true; cosAt=n;
-  alPost("/cos/state",{}).then(function(d){ cosBusy=false; if (d && d.ok){ COS=d; applyTheme(); if (sheetFor && (sheetFor.kind==="me"||sheetFor.kind==="deco")){ lastSheet=""; renderSheet(); } } }).catch(function(){ cosBusy=false; });
+  alPost("/cos/state",{}).then(function(d){ cosBusy=false; if (d && d.ok){ COS=d; applyTheme(); if (sheetFor && (sheetFor.kind==="me"||sheetFor.kind==="deco"||sheetFor.kind==="cosmo")){ lastSheet=""; renderSheet(); } } }).catch(function(){ cosBusy=false; });
 }
 function cosBuy(kind,id){
   if (cosBusy) return; cosBusy=true; alPost("/cos/buy",{item:kind+":"+id}).then(function(d){ cosBusy=false;
@@ -13981,7 +13996,7 @@ function meSheet(){
   var h='<div class="mecard"><button class="meav" data-act="me-img-pick" aria-label="'+(me.img?'Change your picture':'Add a picture')+'">'+avatarHtml(me,nm)+'<span class="mecam" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span></button>'+
     '<div class="meid"><div class="menm">'+nmBox+'</div>'+(wait?'<div class="dur">Next name change '+cbWhen(nameNext())+'</div>':'')+
     '<div class="mewho">'+who+(!al&&alOn()?' · <button class="link" data-act="tab" data-tab="guild">Find an alliance</button>':'')+'</div>'+
-    '<div class="mechips"><button class="chipbtn wide" data-act="iv-shop-open" title="'+(coins?esc(coins.needTH?'A free coin a day starts once one of your cities has a level '+coins.needTH+' Town Hall':'Next free coin in '+fmtT(coins.nextIn)):'Cosmo Coins')+'">Cosmo Coins '+(coins?fmt(coins.balance):'—')+'</button><span class="chipbtn wide mechip">Honor '+honor+'</span>'+
+    '<div class="mechips"><button class="chipbtn wide" data-act="cosmo-open" title="'+(coins?esc(coins.needTH?'A free coin a day starts once one of your cities has a level '+coins.needTH+' Town Hall':'Next free coin in '+fmtT(coins.nextIn)):'Cosmo Coins')+'">Cosmo Coins '+(coins?fmt(coins.balance):'—')+'</button><span class="chipbtn wide mechip">Honor '+honor+'</span>'+
     (me.img?'<button class="link" data-act="me-img-clear">Remove picture</button>':'')+'</div></div></div>'+
     '<input type="file" id="meimg" accept="image/*,.png,.jpg,.jpeg,.webp,.gif,.bmp,.avif,.heic,.heif" hidden>';
   // Cities opens All cities (where city names are edited), Valleys held the held list
@@ -15414,9 +15429,8 @@ function renderSheetCore0(){
     h=worldSheet();
   } else if (sheetFor.kind==="alview"){
     h=alViewSheet();
-  } else if (sheetFor.kind==="shop"){
-    if (sheetBody.contains(document.activeElement) && document.activeElement.tagName==="INPUT" && lastSheet) return;
-    h=shopSheet();
+  } else if (sheetFor.kind==="cosmo"){
+    h=cosmoSheet();
   } else if (sheetFor.kind==="bfpre"){
     if (sheetBody.contains(document.activeElement) && document.activeElement.tagName==="INPUT" && lastSheet) return;
     h=bfPresetSheet();
@@ -15902,6 +15916,7 @@ document.addEventListener("click",function(e){
   if (act==="dpick-show"){ closeSheet(); MPOP.hide=false; selectTile(a.dataset.tile, true); return; }
   if (act==="deco-open"){ cosSync(); openSheet({kind:"deco", tile:a.dataset.tile}); return; }
   if (act==="deco-buy"){ decoBuy(a.dataset.pack); return; }
+  if (act==="cosmo-open"){ openSheet({kind:"cosmo"}); cosSync(true); return; } // 0.2.90
   if (act==="deco-move"){ var Dm=decoS().at[a.dataset.tile]||[], mi=+a.dataset.i; if (Dm[mi]==null) return; PAINT.k=""; PAINT.n=0; CLR.on=false; MOVE={tid:a.dataset.tile, i:mi, e:Dm[mi], n:0}; closeSheet(); MPOP.hide=true; selTile=null; renderTileInfo(); paintBar(); drawMap(); return; }
   if (act==="move-stop"){ var mt=MOVE.n?MOVE.tid:""; MOVE={tid:"", i:-1, e:"", n:0}; paintBar(); if (mt){ MPOP.hide=true; selectTile(mt,false); } else drawMap(); return; }
   if (act==="paint-stop"){ PAINT.k=""; PAINT.n=0; paintBar(); return; }
