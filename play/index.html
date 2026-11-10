@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.92";
+window.IBORY_V="0.2.93";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -500,6 +500,21 @@ nav.tabs button.hasnew{position:relative}nav.tabs button.hasnew::after{content:"
 .shoptile b{font-size:.86rem;line-height:1.2}.shoptile .dur{font-size:.72rem;line-height:1.3;flex:1}.shoptile .btn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:4px}.shoptile.no{opacity:.8}
 .shopic{position:relative;width:52px;height:52px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:radial-gradient(circle at 50% 40%,color-mix(in srgb,var(--brass) 20%,var(--panel)),var(--panel) 78%)}
 .shopic .iic{width:36px;height:36px;image-rendering:pixelated}.shopic .shopegg{width:44px;height:44px}.shopic i{position:absolute;right:-6px;bottom:-4px;font-style:normal;font-size:.72rem;font-weight:700;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:0 5px}
+.bfhead{background:radial-gradient(circle at 50% 0,color-mix(in srgb,var(--brass) 16%,var(--panel)),var(--panel) 70%)}.bfclock{display:flex;align-items:baseline;justify-content:center;gap:8px}.bfclock b{font:700 2rem var(--display);color:var(--brass);font-variant-numeric:tabular-nums}
+.bfscore{display:flex;justify-content:space-between;gap:10px;margin-top:2px}.bfscore div{display:flex;flex-direction:column;min-width:0}.bfscore .r{text-align:right;align-items:flex-end}.bfscore b{font:700 1.35rem var(--display);font-variant-numeric:tabular-nums}.bfscore div:first-child b{color:var(--grass)}.bfscore .r b{color:var(--red)}
+.bftug{height:8px;border-radius:4px;background:color-mix(in srgb,var(--red) 70%,var(--panel));overflow:hidden;margin:6px 0}.bftug i{display:block;height:100%;background:var(--grass);transition:width .4s}
+.bfrew{display:block;width:100%;text-align:left;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);color:var(--ink);cursor:pointer;font:inherit}.bfrew[disabled]{cursor:default}.bfrewt{display:flex;justify-content:space-between;gap:8px;font-size:.82rem}.bfrewt span{color:var(--muted)}.bfrewb{display:block;height:8px;border-radius:4px;background:var(--panel);overflow:hidden;margin-top:5px}.bfrewb i{display:block;height:100%;background:linear-gradient(90deg,var(--brass),#f2d27a)}
+.bfchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.bfchips span{font-size:.74rem;padding:3px 8px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);color:var(--muted)}
+.bfcard{border-left:4px solid var(--line)}.bfcard.mine{border-left-color:var(--grass)}.bfcard.theirs{border-left-color:var(--red)}.bfcardh{display:flex;align-items:center;gap:10px}.bfcardh .iic{image-rendering:pixelated;flex:none}.bfcardt{display:flex;flex-direction:column;min-width:0;flex:1}.bfcardt b{font-size:1.02rem}.bfcardt .dur{font-size:.76rem;line-height:1.25}.bfcardi{margin:6px 0 4px}
+.bfown{font-size:.74rem;font-weight:700;padding:3px 9px;border-radius:999px;border:1px solid var(--line);white-space:nowrap;max-width:40%;overflow:hidden;text-overflow:ellipsis}.bfown.me{color:var(--grass);border-color:var(--grass)}.bfown.foe{color:var(--red);border-color:var(--red)}.bfown.n{color:var(--muted)}
+.bfini{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font:700 1.2rem var(--display);background:color-mix(in srgb,var(--red) 30%,var(--panel));flex:none}
+.bfsts,.bfmrs{display:grid;gap:6px;margin:6px 0}.bfst{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:10px;background:color-mix(in srgb,var(--grass) 10%,var(--panel2));border:1px solid color-mix(in srgb,var(--grass) 35%,var(--line))}.bfsth{display:flex;flex-direction:column;min-width:0;flex:1}.bfsth .dur{font-size:.74rem;line-height:1.25}
+.bfmr{padding:7px 9px;border-radius:10px;background:var(--panel2);border:1px solid var(--line)}.bfmr.back{opacity:.85}.bfmrt{display:flex;align-items:baseline;gap:8px}.bfmrt .dur{flex:1;min-width:0;font-size:.76rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bfmrb{display:flex;gap:6px;justify-content:flex-end}
+.bfheroes{display:flex;flex-wrap:wrap;gap:5px}.bfhero{font-size:.76rem;padding:3px 8px;border-radius:999px;border:1px solid color-mix(in srgb,var(--brass) 50%,var(--line));background:var(--panel2)}.bfhero.busy{opacity:.55;border-color:var(--line)}
+.bfreps{display:grid;gap:5px}.bfrep{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:7px 9px;border-radius:10px;border:1px solid var(--line);border-left:4px solid var(--red);background:var(--panel2);color:var(--ink);font:inherit;cursor:pointer}.bfrep.won{border-left-color:var(--grass)}.bfrept{font-size:.74rem;color:var(--muted);font-variant-numeric:tabular-nums}.bfrepm{display:flex;flex-direction:column;flex:1;min-width:0}.bfrepm b{font-size:.86rem}.bfrepm .dur{font-size:.74rem}.bfrepr{font-weight:700;font-size:.8rem}.bfrep.won .bfrepr{color:var(--grass)}.bfrep.lost .bfrepr{color:var(--red)}
+.rwgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:6px}.rwit{display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 2px;border-radius:10px;background:var(--panel2);border:1px solid var(--line)}.rwit .iic{width:30px;height:30px;image-rendering:pixelated}.rwit b{font-size:.8rem;font-variant-numeric:tabular-nums}.rwgrid.big{grid-template-columns:repeat(auto-fill,minmax(84px,1fr))}.rwgrid.big .rwit{padding:10px 4px;border-color:color-mix(in srgb,var(--brass) 55%,var(--line));background:radial-gradient(circle at 50% 35%,color-mix(in srgb,var(--brass) 18%,var(--panel2)),var(--panel2) 75%)}.rwgrid.big .iic{width:44px;height:44px}.rwgrid.big b{font-size:1rem;color:var(--brass)}
+.rwtier.got{border-color:color-mix(in srgb,var(--grass) 50%,var(--line))}.rwtier.next{border-color:var(--brass)}.rwtier:not(.got):not(.next) .rwgrid{opacity:.7}
+.bfdone{text-align:left}.bfdoneh{display:flex;align-items:center;gap:12px}.bfdoneh h2{margin:0;font:700 1.7rem var(--display)}.bfdone.win{background:radial-gradient(circle at 12% 30%,color-mix(in srgb,var(--brass) 26%,var(--panel)),var(--panel) 65%)}.bfdone.win h2{color:var(--brass)}.bfdone.loss h2{color:var(--red)}.bfprize{border-color:color-mix(in srgb,var(--brass) 55%,var(--line))}
 .ajrow{display:flex;gap:10px;align-items:flex-start}.ajtxt{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}.ajtxt .dur{font-size:.78rem;line-height:1.35}.ajsw{display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid var(--line);font-size:.95rem}.ajsw:last-of-type{border-bottom:0}.ajsw input{width:20px;height:20px;accent-color:var(--brass)}.ajcard .btn{display:inline-flex;align-items:center;gap:4px}
 .cosmohead{background:radial-gradient(circle at 8% 50%,color-mix(in srgb,#6a4abe 34%,var(--panel)),var(--panel) 62%)}.cosmohead .warbal b{color:#b9a3f5}.cosmoprev{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;width:100%;padding:6px;border-radius:10px;background:var(--panel);min-height:76px;align-items:end;justify-items:center}.cosmoprev span{display:flex;align-items:flex-end;justify-content:center;height:32px}.cosmotile.own{border-color:color-mix(in srgb,var(--good,#6fbf73) 50%,var(--line))}
 .shopcost{display:inline-flex;align-items:center;gap:3px;font-size:.74rem;color:var(--mut,#a9a595)}
@@ -1846,7 +1861,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.92";
+var APP_VERSION = "0.2.93";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -12326,6 +12341,22 @@ var BF_LADDER=[ // personal points, as a share of the average army's starting va
   {f:0.80, r:{s480:1, marchsp:3, gemF:14, ingot:6, mithril:3}},
   {f:1.20, r:{s480:2, marchsp:4, gemF:20, ingot:8, mithril:4, starmetal:1}}
 ];
+/* 0.2.93 (Cody): Battlefield rewards by points, for PvP and the single-player field. Ten tiers from 100k to 100M points; you get the pack of the
+   highest tier you reach, and the winner gets it twice. */
+var BF_TIER_PTS=[1e5,2.5e5,5e5,1e6,2.5e6,5e6,1e7,2.5e7,5e7,1e8], BF_TIER_MI=[1,3,6,10,15,20,30,40,50,60], BF_TIER_SM=[0,0,0,0,1,2,4,6,8,10];
+function bfTierOf(pts){ var n=0; while (n<BF_TIER_PTS.length && pts>=BF_TIER_PTS[n]) n++; return n; } // 0 = none yet
+function bfTierPack(n, mult){ if (n<1) return {}; var m=mult||1, o={s60:10*n*m, marchsp:10*n*m, gemF:20*n*m, ingot:10*n*m, mithril:BF_TIER_MI[n-1]*m}; if (BF_TIER_SM[n-1]) o.starmetal=BF_TIER_SM[n-1]*m; return o; }
+function bfTierDelta(n){ var a=bfTierPack(n), b=bfTierPack(n-1), o={}; for (var k in a){ var d=a[k]-(b[k]||0); if (d>0) o[k]=d; } return o; } // what reaching tier n adds over tier n-1
+function bfPtsK(n0){ return n0>=1e6?(n0/1e6)+"M":(n0/1e3)+"k"; }
+function bfItems(pack, cls){ return '<div class="rwgrid'+(cls?' '+cls:'')+'">'+Object.keys(pack).map(function(k){ return '<span class="rwit" title="'+esc((ITEMS[k]&&ITEMS[k].name)||k)+'">'+itemImg(k)+'<b>\u00d7'+fmt(pack[k])+'</b></span>'; }).join("")+'</div>'; }
+function bfMeter(pts){ var n=bfTierOf(pts), lo=n?BF_TIER_PTS[n-1]:0, hi=n<BF_TIER_PTS.length?BF_TIER_PTS[n]:null, f=hi?Math.max(0,Math.min(1,(pts-lo)/(hi-lo))):1;
+  return '<button class="bfrew" data-act="bf-rewards" aria-label="Rewards"><span class="bfrewt"><b>'+(n?'Tier '+n:'No tier yet')+'</b><span>'+(hi?fmt(Math.round(pts))+' / '+bfPtsK(hi)+' for tier '+(n+1):'Top tier reached')+'</span></span><span class="bfrewb"><i style="width:'+Math.round(f*100)+'%"></i></span></button>'; }
+function bfRewSheet(){ var bf=BF(), pv=pvOn()&&PV.v, pts=pv?((PV.v.players[PV.v.me]||{}).pts||0):(bf?bfMyPts():0), n=bfTierOf(pts);
+  var h='<div class="head"><span class="ico">'+itemImg("medalbox")+'</span><div style="flex:1"><h2>Battlefield rewards</h2><div class="sub">You get the pack of the highest tier your points reach. The winner gets it twice.</div></div><button class="btn ghost small" data-act="close" aria-label="Close">\u2715</button></div>';
+  if (bf||pv) h+='<div class="section">'+bfMeter(pts).replace('data-act="bf-rewards"','disabled')+'</div>';
+  h+=BF_TIER_PTS.map(function(t,i){ var got=i<n, next=i===n;
+    return '<div class="section rwtier'+(got?' got':next?' next':'')+'"><div class="shead"><h3>Tier '+(i+1)+'</h3><span class="dur">'+bfPtsK(t)+' points'+(got?' \u00b7 reached':'')+'</span></div>'+bfItems(bfTierPack(i+1))+'</div>'; }).join("");
+  return h+'<button class="closebtn" data-act="close">Close</button>'; }
 var Z12=function(){ return [0,0,0,0,0,0,0,0,0,0,0,0]; };
 function BF(){ return pvOn() && PV.bf ? PV.bf : S.bf; } // a PvP match borrows the Battlefield screens
 function bfOn(){ return !!(S.bf && S.bf.active); }
@@ -12347,9 +12378,14 @@ function bfTravel(pi, bi, t, hint, tp){
 }
 function bfTgtName(m){ var bf=BF(); return m.tp!=null ? bf.p[m.tp].name+"’s camp" : BF_B[m.b].name; }
 function bfHeroSnap(id){ var me=BF().p[0]; if (!id || !me.heroes) return {atk:0, int:0, life:1, name:""}; for (var i=0;i<me.heroes.length;i++) if (me.heroes[i].id===id) return me.heroes[i]; return {atk:0, int:0, life:1, name:""}; }
-function bfHeroBusy(id){ return !!id && BF().m.some(function(m){ return m.p===0 && m.h===id; }); }
+function bfHeroBusy(id){ if (id && BF().pvp && BF().b.some(function(B){ return (B.st||[]).some(function(x){ return x.h===id; }); })) return true; // 0.2.93: holding a building
+  return !!id && BF().m.some(function(m){ return m.p===0 && m.h===id; }); }
 function bfAm(p){ var lb=0; if (p.team===1) BF().p.forEach(function(o){ if (o!==p && o.team===1 && o.leader) lb=Math.max(lb,o.leader); }); return p.am+lb; }
-function bfCap(p){ var B=BF().b[0]; return Math.round(p.rally*10000*(B.owner===p.team?BF_BANNER:1)); }
+function bfCap(p, hid){ var bf=BF(), B=bf.b[0];
+  if (bf.pvp && p===bf.p[0] && PV.v && PV.v.capB){ // 0.2.93: a PvP match uses the city's real limit, plus the leading hero's dragon
+    var id=arguments.length>1?hid:(sheetFor&&sheetFor.kind==="bfsend"?bfDraftHero:0), hh=id?(PV.v.heroes||[]).filter(function(x){ return x.id===id; })[0]:null;
+    return Math.round(PV.v.capB*(1+((hh&&hh.size)||0)/100)*(B.owner===p.team?BF_BANNER:1)); }
+  return Math.round(p.rally*10000*(B.owner===p.team?BF_BANNER:1)); }
 function bfOut(pi){ return BF().m.filter(function(m){ return m.p===pi; }).length; }
 function bfGar(B){ var t=Z12(); for (var k in B.gar) B.gar[k].forEach(function(n,i){ t[i]+=n; }); return t; }
 function bfSide(p, h){
@@ -12556,10 +12592,10 @@ function bfEnter(cityIdx, allyIds){
   return true;
 }
 function bfLadderCheck(){
-  var bf=BF(), avg=bf.T/6;
-  while (bf.tier<BF_LADDER.length && bfMyPts()>=BF_LADDER[bf.tier].f*avg){
-    var t=BF_LADDER[bf.tier]; for (var k in t.r) S.items[k]=(S.items[k]||0)+t.r[k];
-    bfLog("Spoils: "+rewardText({items:t.r})+"."); bf.tier++;
+  var bf=BF(); if (!bf.tv2){ bf.tv2=1; bf.tier=0; } // 0.2.93: the point tiers; a field begun on the old rungs starts counting again
+  while (bf.tier<BF_TIER_PTS.length && bfMyPts()>=BF_TIER_PTS[bf.tier]){
+    bf.tier++; var t=bfTierDelta(bf.tier); for (var k in t) S.items[k]=(S.items[k]||0)+t[k];
+    bfLog("Tier "+bf.tier+" reached: "+rewardText({items:t})+".");
   }
 }
 function bfAdvance(dt){
@@ -12595,7 +12631,7 @@ function bfEnd(why){
   var a=achStore();
   a.bfWins=(a.bfWins||0)+(win?1:0); a.bfHoldMin=(a.bfHoldMin||0)+Math.floor(bf.centerMs/60000); a.bfBest=Math.max(a.bfBest||0, Math.round(bfMyPts()));
   bf.p.forEach(function(p){ if (p.kind!=="foe") return; var b=rosterById(p.rid); if (!b) return; if (win) b.losses++; else b.wins++; });
-  if (win) S.items.surgeon=(S.items.surgeon||0)+1;
+  if (win){ S.items.surgeon=(S.items.surgeon||0)+1; var wpk=bf.tv2?bfTierPack(bf.tier):{}; for (var wk0 in wpk) S.items[wk0]=(S.items[wk0]||0)+wpk[wk0]; } // 0.2.93: the winner gets their tier's pack twice
   A.bfReady=S.gt+BF_COOLDOWN_DAYS*DAY*bfCooldownMul();
   A.bfLast={win:win, us:Math.round(us), them:Math.round(them), mine:Math.round(bfMyPts()), why:why, tiers:bf.tier, at:S.gt};
   var msg = why==="quit" ? "You retreated from the battlefield. It counts as a loss." :
@@ -12823,10 +12859,10 @@ function bfSection(){
   return h+'</div>';
 }
 function viewBattlefield(){
-  var bf=BF(), left=BF_MIN*60000-bf.t, me=bf.p[0], us=bfTeamPts(0), them=bfTeamPts(1), nt=BF_LADDER[bf.tier];
+  var bf=BF(), left=BF_MIN*60000-bf.t, me=bf.p[0], us=bfTeamPts(0), them=bfTeamPts(1);
   var h='<div class="section bullybox"><div class="shead"><h3>Battlefield</h3><span class="dur"><b>'+bfMin(left)+'</b> left</span></div>'+
     '<div class="act"><div><div class="bigstat">'+fmt(Math.round(us))+'</div><span class="dur">your side</span></div><div style="text-align:center"><div class="bigstat">'+fmt(Math.round(bfMyPts()))+'</div><span class="dur">you</span></div><div style="text-align:right"><div class="bigstat">'+fmt(Math.round(them))+'</div><span class="dur">rivals</span></div></div>'+
-    '<p class="hint">'+(nt?'Next spoils at '+fmt(Math.round(nt.f*bf.T/6))+' of your points: '+rewardText({items:nt.r})+'.':'Every rung of spoils claimed.')+' The clock stops whenever you leave this screen.</p></div>';
+    bfMeter(bfMyPts())+'<p class="hint">The clock stops whenever you leave this screen.</p></div>';
   h+='<div class="section">'+bfMap()+'</div>'+bfEnemyList()+bfMarchPanel();
   bf.b.forEach(function(B,bi){ var d=BF_B[bi], g=bfGar(B), mineHere=B.gar[0]?sumT(B.gar[0]):0;
     var holder=B.owner<0?'Neutral guards':B.owner===0?'<b style="color:var(--green)">Your side</b>':'<b style="color:var(--red)">Rivals</b>';
@@ -13359,7 +13395,7 @@ function pvBuild(){
   var it=v.intel||{}; for (var k in it) bf.intel[k.charAt(0)==="p"?"p1":k]=it[k];
   bf.b=(v.buildings||[]).map(function(B){ var own=B.owner<0?-1:B.owner===me?0:1, x=Z12(); x[1]=B.size||0;
     var o={owner:own, gar:{}, neutral:own<0?x:Z12(), forts:[0,0,0,0,0], wall:B.wall||0, size:B.size||0};
-    if (own===0) o.gar[0]=B.mine||x; else if (own===1) o.gar[1]=x; return o; });
+    if (own===0) o.gar[0]=B.mine||x; else if (own===1) o.gar[1]=x; o.st=B.st||[]; return o; });
   (v.marches||[]).forEach(function(m){ var c={id:m.id, p:0, b:m.b, kind:m.kind, back:m.back, scout:m.scout, t:m.t, h:m.h, dep:m.dep, arr:m.arr}; if (m.tp!=null) c.tp=1; bf.m.push(c); });
   (v.enemy||[]).forEach(function(e){ var b=e.b, tp=e.tp, n=1;
     if (e.route){ if (e.route.charAt(0)==="p"){ tp=0; b=0; } else b=+e.route.slice(1); n=e.n||1; }
@@ -13371,8 +13407,8 @@ function pvSnap(ci){
   withCity(ci, function(){
     var cp=S.troops.slice(); cp[0]=0; cp[6]=0; // workers and transporters stay home
     snap={name:lbAutoName(), city:S.name, troops:cp, research:simResearch(), mt:S.tech.militarytradition||0, inf:S.tech.informatics||0,
-      rally:Math.max(1,bLevel("rally")), beacon:bLevel("beacon"), buffA:bAttack(), buffD:bDefend(),
-      heroes:(S.heroes||[]).map(function(h){ return {id:h.id, name:h.name, atk:hsB(h,"atk"), int:hsB(h,"int"), life:setLife(h)}; }),
+      rally:Math.max(1,bLevel("rally")), cap:Math.floor(10000*rallyLv()+alFx("marchsize")), beacon:bLevel("beacon"), buffA:bAttack(), buffD:bDefend(), // 0.2.93: cap = what this city can really send
+      heroes:(S.heroes||[]).map(function(h){ return {id:h.id, name:h.name, atk:hsB(h,"atk"), int:hsB(h,"int"), life:setLife(h), size:(dgFx(h)||{}).size||0}; }),
       wint:hsB(wallHero(),"int",1), // 0.2.24: the wall hero's Intelligence counts for the camp's scouts
       items:{marchsp:S.items.marchsp||0}, prestige:Math.floor((S.prestige||0)*totalTH())};
   });
@@ -13408,8 +13444,7 @@ function pvOrder(o, ok, after){
 // spoils: the single-player ladder, measured against the average of the two armies
 function pvSpoils(){
   var v=PV.v, R=v&&v.result; if (!R) return {};
-  var mine=R.pts[v.me]||0, avg=(v.T||0)/2, sum={}; // every rung reached counts, as on the single-player field
-  BF_LADDER.forEach(function(L){ if (avg>0 && mine>=L.f*avg) for (var k in L.r) sum[k]=(sum[k]||0)+L.r[k]; });
+  var mine=R.pts[v.me]||0, sum=bfTierPack(bfTierOf(mine), R.winner===v.me?2:1); // 0.2.93: the highest tier reached; twice for the winner
   if (R.winner===v.me) sum.surgeon=(sum.surgeon||0)+1;
   return sum;
 }
@@ -13418,6 +13453,7 @@ function pvCollect(){
   var me=v.me, used=(R.used&&R.used[me]&&R.used[me].marchsp)||0, sp=pvSpoils();
   S.items.marchsp=Math.max(0,(S.items.marchsp||0)-used);
   for (var k in sp) S.items[k]=(S.items[k]||0)+sp[k];
+  try { pvFileReports(v); } catch(e){}
   var st=S.pvpStats=S.pvpStats||{w:0,l:0,d:0};
   if (R.winner<0) st.d++; else if (R.winner===me) st.w++; else st.l++;
   var foe=(v.players[1-me]||{}).name||"your opponent";
@@ -13435,7 +13471,7 @@ function pvSection(){
     '<p class="hint">You against another player on the Battlefield for 25 minutes. A copy of one city fights, so your real troops never die. Create a match and send the code, or join theirs.'+alMore("pv")+'</p>'+
     (alMoreOn("pv")?'<p class="hint">March Speed-ups you use are used up for real. The server keeps the clock, so it runs whether or not you\u2019re looking; if you drop for a minute, an autopilot plays for you until you\u2019re back. Building guards are sized to the smaller side: about three of its full marches, behind level 10 walls and traps.</p>':'')+
     '<p class="hint">'+(me&&me.games?'Your rating: <b>'+me.rating+'</b>'+(me.rank?', #'+me.rank+' of '+fmt(bd.players):'')+' ('+pvRec(me)+').':'Your rating starts at 1,000 and moves after your first rated match.')+(me&&me.off?' You\u2019re off the rating board.':'')+'</p>'+
-    '<div class="btnrow"><button class="btn ghost small" data-act="pv-board">Rating board</button>'+(PV.idClash?'<button class="btn ghost small danger" data-act="pv-newid">Start a fresh rating</button>':'')+'</div>'+
+    '<div class="btnrow"><button class="btn ghost small" data-act="pv-board">Rating board</button><button class="btn ghost small" data-act="bfpre-open">Presets ('+bfPresets().filter(function(pr){ return sumT(pr.t)>0; }).length+' of '+BF_NPRE+')</button><button class="btn ghost small" data-act="bf-rewards">Rewards</button>'+(PV.idClash?'<button class="btn ghost small danger" data-act="pv-newid">Start a fresh rating</button>':'')+'</div>'+
     pvCitySel("pvcity", S.cur)+
     '<div class="act"><span class="why">'+esc(why||PV.err)+'</span><button class="btn" data-act="pv-create"'+(why||PV.busy?' disabled':'')+'>'+(PV.busy?'Working…':'Create match')+'</button></div>'+
     '<div class="farmadd"><label for="pvcode" class="dur">Code</label><input id="pvcode" maxlength="6" autocapitalize="characters" autocomplete="off" spellcheck="false" value="'+esc(PV.code)+'" placeholder="KQ7M2D" style="text-transform:uppercase;letter-spacing:.1em"><button class="btn" data-act="pv-join"'+(why||PV.busy?' disabled':'')+'>Join</button></div>';
@@ -13461,46 +13497,99 @@ function pvLobby(){
     return '<div class="gearrow'+(p.ready?' t3':'')+'"><span class="gn">'+plName(p.name,0,i===me)+(i===me?' (you)':'')+'</span><span class="gb">'+(p.ready?'Ready':'Not ready')+'</span><span class="dur" style="grid-column:1/-1">'+esc(p.city)+', about '+fmt(p.army||0)+' troops.'+(p.rating!=null?' Rating '+p.rating+'.':' No rating.')+'</span></div>'; }).join("")+'</div><p class="hint">The match counts for ratings if you both have one and haven\u2019t already played 3 rated matches together today.</p></div>';
   h+='<div class="section"><h3>Your army</h3><p class="hint">Changing city unreadies you. Your troops, research, heroes, Rally Spot and Beacon Tower are copied the moment you pick.</p>'+pvCitySel("pvcity2", S.pvp.ci!=null?S.pvp.ci:S.cur)+
     (PV.err?'<p class="why">'+esc(PV.err)+'</p>':'')+
+    '<div class="btnrow" style="margin:6px 0"><button class="btn ghost small" data-act="bfpre-open">Presets ('+bfPresets().filter(function(pr){ return sumT(pr.t)>0; }).length+' of '+BF_NPRE+')</button><button class="btn ghost small" data-act="bf-rewards">Rewards</button></div>'+
     '<div class="act"><button class="btn ghost danger" data-act="pv-leave">'+(PV_LEAVE_ARMED?'Tap again: leave':'Leave')+'</button><button class="btn'+(mine.ready?' ghost':'')+'" data-act="pv-ready">'+(mine.ready?'Not ready':'Ready')+'</button></div></div>';
   return h;
 }
+/* 0.2.93 (Cody): a full report for every fight and every scouting run of a match: both sides troop by troop, each defending stack under its own hero,
+   fortifications and wall, rounds, and the War Wizard. Shown during the match and on the result screen, and filed under Reports when you collect. */
+var BF_FORTN=["Traps","Abatis","Archer Towers","Rolling Logs","Rocks"];
+function pvRepTitle(r){ return r.scout ? (r.attacker?'You scouted '+r.name:'Enemy scouts at '+r.name) : (r.attacker?'You attacked '+r.name:'Attacked at '+r.name); }
+function pvRepWon(r){ return r.scout ? (r.attacker?!!r.ok:!r.ok) : (r.attacker?!!r.won:!r.won); }
 function pvReports(){
   var v=PV.v, rs=v.reports||[]; if (!rs.length) return "";
-  return '<div class="section"><h3>Battle reports</h3><div class="gearlist">'+rs.slice(0,12).map(function(r,i){
-    var lostA=sumT(killedOf(r.sent,r.left)), lostD=sumT(killedOf(r.had,r.eleft)), mine=r.attacker, won=mine?r.won:!r.won;
-    return '<div class="gearrow'+(won?' t3':'')+'"><span class="gn">'+(mine?'You attacked ':'Attacked at ')+esc(r.name)+'</span><span class="gb">'+(won?'Won':'Lost')+'</span>'+
-      '<span class="dur" style="grid-column:1/-1">'+bfMin(r.t)+' on the battle clock. You lost '+fmt(mine?lostA:lostD)+', they lost '+fmt(mine?lostD:lostA)+'.</span>'+
-      (r.cap?'<span class="btnrow" style="grid-column:1/-1;justify-content:flex-end"><button class="btn ghost small" data-act="pv-ww" data-i="'+i+'">War Wizard</button></span>':'')+'</div>'; }).join("")+'</div></div>';
+  return '<div class="section"><div class="shead"><h3>Battle reports</h3><span class="dur">'+rs.length+'</span></div><div class="bfreps">'+rs.map(function(r,i){ var won=pvRepWon(r), sub;
+    if (r.scout) sub=r.attacker?(r.ok?'Report in'+(r.lost?', '+fmt(r.lost)+' scouts lost':''):'Caught: all '+fmt(r.lost||0)+' lost'):'Caught '+fmt(r.lost||0)+' of their scouts';
+    else { var lostA=sumT(killedOf(r.sent,r.left)), lostD=sumT(killedOf(r.had,r.eleft)); sub='You lost '+fmt(r.attacker?lostA:lostD)+', they lost '+fmt(r.attacker?lostD:lostA); }
+    return '<button class="bfrep'+(won?' won':' lost')+'" data-act="pv-rep" data-i="'+i+'"><span class="bfrept">'+bfMin(r.t)+'</span><span class="bfrepm"><b>'+esc(pvRepTitle(r))+'</b><span class="dur">'+sub+'</span></span><span class="bfrepr">'+(r.scout?(won?'✓':'✗'):(won?'Won':'Lost'))+'</span></button>'; }).join("")+'</div></div>';
 }
+function pvRepTable(cols, rows){ return '<div class="tscroll"><table class="gt" style="min-width:0"><thead><tr>'+cols.map(function(c){ return '<th>'+c+'</th>'; }).join("")+'</tr></thead><tbody>'+rows.join("")+'</tbody></table></div>'; }
+function pvRepSide(a, b, first){ var rows=[]; for (var i=0;i<12;i++) if ((a&&a[i])||0) rows.push('<tr><td>'+U[i].name+'</td><td>'+fmt(a[i])+'</td><td>'+fmt(Math.max(0,a[i]-((b&&b[i])||0)))+'</td><td>'+fmt((b&&b[i])||0)+'</td></tr>'); return rows.length?pvRepTable(["Troop",first||"Sent","Lost","Left"], rows):'<p class="dur">No troops.</p>'; }
+function pvRepHtml(r){ var won=pvRepWon(r), row=function(l,v){ return '<div class="merow"><span>'+l+'</span><b>'+v+'</b></div>'; }, h='';
+  if (r.scout){
+    h+='<div class="mestats">'+row("Result", won?'<span class="okc">'+(r.attacker?'Your scouts got through':'Their scouts were caught')+'</span>':'<span class="badc">'+(r.attacker?'Your scouts were caught':'Their scouts got through')+'</span>')+row("Battle clock", bfMin(r.t))+
+      (r.attacker&&r.sent?row("Scouts sent", fmt(r.sent[2]||0)):'')+row(r.attacker?"Scouts lost":"Scouts caught", fmt(r.lost||0))+(r.hn?row("Led by", esc(r.hn)):'')+'</div>';
+    if (r.seen){ var st=r.seen.t||[], rows=[]; for (var i=0;i<12;i++) if (st[i]) rows.push('<tr><td>'+U[i].name+'</td><td>'+fmt(st[i])+'</td></tr>');
+      h+='<div class="h3" style="margin-top:8px">What they saw</div>'+(rows.length?pvRepTable(["Troop","There"], rows):'<p class="dur">No troops there.</p>');
+      if (r.seen.f){ var fr=[]; r.seen.f.forEach(function(n,k){ if (n) fr.push('<tr><td>'+BF_FORTN[k]+'</td><td>'+fmt(n)+'</td></tr>'); }); h+=(fr.length?pvRepTable(["Fortification","Count"], fr):'')+'<p class="dur" style="margin:4px 0 0">'+(r.seen.wall?'Level '+r.seen.wall+' walls.':'No walls.')+'</p>'; } }
+    return h; }
+  h+='<div class="mestats">'+row("Result", won?'<span class="okc">'+(r.attacker?'You won':'You held')+'</span>':'<span class="badc">'+(r.attacker?'You were thrown back':'You lost it')+'</span>')+row("Battle clock", bfMin(r.t))+row("Rounds", fmt(r.rounds||0))+(r.fb?row("Walls", r.wall?'Level '+r.wall:'None'):'')+'</div>';
+  h+='<div class="h3" style="margin-top:8px">Attacker <span class="dur" translate="no">'+esc(r.an||(r.attacker?'You':'Them'))+(r.hn?', led by '+esc(r.hn):'')+'</span></div>'+pvRepSide(r.sent, r.left);
+  if (r.dst && r.dst.length) r.dst.forEach(function(x,k){ h+='<div class="h3" style="margin-top:8px">Defender'+(r.dst.length>1?' '+(k+1):'')+' <span class="dur" translate="no">'+esc(r.dn||"")+(x.h?', under '+esc(x.h):', no hero')+'</span></div>'+pvRepSide(x.had, x.left, "Had"); });
+  else h+='<div class="h3" style="margin-top:8px">Defender <span class="dur" translate="no">'+esc(r.dn||(r.attacker?'Them':'You'))+'</span></div>'+pvRepSide(r.had, r.eleft, "Had");
+  if (r.fb && r.fb.some(function(n){ return n>0; })){ var fr2=[]; r.fb.forEach(function(n,k){ if (n) fr2.push('<tr><td>'+BF_FORTN[k]+'</td><td>'+fmt(n)+'</td><td>'+fmt(Math.max(0,n-((r.fl||[])[k]||0)))+'</td><td>'+fmt((r.fl||[])[k]||0)+'</td></tr>'); });
+    h+='<div class="h3" style="margin-top:8px">Fortifications</div>'+pvRepTable(["Kind","Had","Lost","Left"], fr2); }
+  return h; }
+function pvRepSheet(){ var r=sheetFor.r; return '<div class="head"><span class="ico">'+pkImg("bf",32)+'</span><div style="flex:1"><h2>'+esc(pvRepTitle(r))+'</h2><div class="sub">PvP Battlefield</div></div><button class="btn ghost small" data-act="close" aria-label="Close">✕</button></div>'+pvRepHtml(r)+
+    (r.cap?'<div class="btnrow" style="margin-top:8px"><button class="btn ghost small" data-act="pv-ww2">War Wizard</button></div>':'')+'<button class="closebtn" data-act="close">Close</button>'; }
+// file every report of the match under Reports (without the War Wizard recording, which is big)
+function pvFileReports(v){ var foe=(v.players[1-v.me]||{}).name||"your opponent";
+  (v.reports||[]).slice().reverse().forEach(function(r){ var id=S.nextMarchId++, d={}; for (var k in r) if (k!=="cap") d[k]=r[k]; var won=pvRepWon(r), name="PvP: "+pvRepTitle(r)+" ("+foe+")";
+    var lost=r.scout?(r.attacker?r.lost||0:0):sumT(killedOf(r.attacker?r.sent:r.had, r.attacker?r.left:r.eleft)), kill=r.scout?(r.attacker?0:r.lost||0):sumT(killedOf(r.attacker?r.had:r.sent, r.attacker?r.eleft:r.left));
+    S.reports.unshift({id:id, at:S.gt, pvr:1, name:name, result:won?1:2, d:d, def:r.attacker?0:1}); 
+    S.log.unshift({id:id, at:S.gt, pv:1, sc:0, n:name, tile:null, r:won?1:2, d:0, l:lost, k:kill, lo:0, m:-1, g:[], h:null, f:null, o:0, c:C().name, sent:r.sent?sumT(r.sent):0}); });
+  trimKeepFav(S.reports, FULL_CAP); trimKeepFav(S.log, LOG_CAP); }
 function pvLog(n){ var bf=BF(); return bf&&bf.log.length?'<div class="section"><h3>Field reports</h3><ul class="log">'+bf.log.slice(0,n).map(function(l){ return '<li><span class="dur">'+bfMin(l.t)+'</span> '+esc(l.s)+'</li>'; }).join("")+'</ul></div>':''; }
+/* 0.2.93 (Cody): the match screen, reworked. A scoreboard with the clock, both scores and the rewards meter; the field; then one card per building with
+   everything about it in one place: who holds it, your stacks there (each with its hero and its own Withdraw), and your marches to and from it with
+   Recall and Speed up right on them. */
+var BF_PK={banner:"banner", center:"keep", infirmary:"infirm"};
+function bfMarchRow(m){ var bf=BF(), dep=m.dep!=null?m.dep:m.arr-60000, f=Math.max(0,Math.min(1,(bf.t-dep)/Math.max(1,m.arr-dep))), hn=m.h?bfHeroSnap(m.h).name:"", sp=bf.pvp?((PV.v.items||{}).marchsp||0):(S.items.marchsp||0);
+  var what=m.back?'Returning':m.kind==="reinforce"?'Reinforcing':(m.kind==="scout"||m.scout)?'Scouting':'Attacking';
+  return '<div class="bfmr'+(m.back?' back':'')+'"><div class="bfmrt"><b>'+what+'</b><span class="dur">'+(hn?esc(hn)+' · ':'')+fmt(sumT(m.t))+' troops</span><span class="qtime">'+bfMin(Math.max(0,m.arr-bf.t))+'</span></div>'+
+    '<div class="bfbar"><span style="width:'+Math.round(f*100)+'%"></span></div><div class="bfmrb">'+(m.back?'':'<button class="btn ghost small" data-act="bf-mrecall" data-m="'+m.id+'">Recall</button>')+
+    '<button class="btn ghost small" data-act="bf-hasten" data-m="'+m.id+'"'+(sp>0?'':' disabled')+'>Speed up ('+sp+')</button></div></div>'; }
 function pvField(){
   var v=PV.v, bf=BF(), me=v.me, fo=1-me, P=v.players, foe=P[fo]||{name:"Opponent", pts:0}, t=pvT(), cd=v.status==="countdown", live=pvLive();
   if (!bf) return pvHead('')+'<p class="hint">Loading the field…</p></div>';
-  var h=pvHead(cd?'starts in <b>'+Math.max(0,Math.ceil((v.start-pvNow())/1000))+'</b>':'<b>'+bfMin(Math.max(0,v.len-t))+'</b> left')+
-    '<div class="act"><div><div class="bigstat">'+fmt(P[me].pts)+'</div><span class="dur">you</span></div><div style="text-align:right"><div class="bigstat">'+fmt(foe.pts)+'</div><span class="dur">'+esc(foe.name)+(foe.ai?' (autopilot)':'')+'</span></div></div>'+
+  var mp=P[me].pts||0, fp=foe.pts||0, tot=mp+fp, share=tot>0?Math.round(mp/tot*100):50, mine=bf.m.filter(function(m){ return m.p===0; }).sort(function(a,b){ return a.arr-b.arr; }), out=mine.length;
+  var h='<div class="section bfhead"><div class="bfclock">'+(cd?'<span class="dur">starts in</span><b>'+Math.max(0,Math.ceil((v.start-pvNow())/1000))+'</b>':'<b>'+bfMin(Math.max(0,v.len-t))+'</b><span class="dur">left</span>')+'</div>'+
+    '<div class="bfscore"><div><b>'+fmt(mp)+'</b><span class="dur">you</span></div><div class="r"><b>'+fmt(fp)+'</b><span class="dur" translate="no">'+esc(foe.name)+(foe.ai?' (autopilot)':'')+'</span></div></div>'+
+    '<div class="bftug"><i style="width:'+share+'%"></i></div>'+bfMeter(mp)+
     (PV.err?'<p class="why">'+esc(PV.err)+'</p>':'')+
-    '<p class="dur" style="margin:2px 0">'+(v.rated?'Rated match.':'Unrated'+(v.unrated?': '+esc(v.unrated):'')+'.')+' Guards '+fmt(v.guard||0)+' per building.</p>'+
-    '<p class="hint">The clock runs on the server and never stops. Close the game or lose connection for a minute and an autopilot plays for you until you’re back.</p></div>';
-  h+='<div class="section">'+bfMap()+'</div>'+bfEnemyList()+bfMarchPanel();
-  v.buildings.forEach(function(B,bi){ var d=BF_B[bi], own=bf.b[bi].owner, mineHere=B.mine?sumT(B.mine):0;
-    var holder=own<0?'Neutral guards':own===0?'<b style="color:var(--green)">You</b>':'<b style="color:var(--red)">'+esc(foe.name)+'</b>';
-    h+='<div class="section"><div class="shead"><h3>'+d.name+'</h3><span class="dur">'+holder+'</span></div><p class="hint">'+d.eff.replace(/[Yy]our team’s/,"your").replace("Your team","You")+'. '+(B.wall?'Level '+B.wall+' walls and traps.':'Walls down: troop against troop.')+' Garrison '+(own===0?fmt(B.size):'about '+fmt(B.size))+'.</p>'+(own!==0?bfIntelLine("b"+bi):'')+
-      '<div class="btnrow"><button class="btn small" data-act="bf-send" data-b="'+bi+'"'+(!live||bfOut(0)>=v.rally?' disabled':'')+'>'+(own===0?'Reinforce':'Attack or scout')+'</button>'+(mineHere?'<button class="btn ghost small" data-act="bf-recall" data-b="'+bi+'">Withdraw</button>':'')+'</div></div>'; });
-  h+='<div class="section"><div class="shead"><h3>'+esc(foe.name)+'</h3><span class="dur">'+fmt(foe.pts)+' pts</span></div><p class="hint">'+esc(foe.city||"")+(foe.ai?'. On autopilot right now.':'.')+' Their reserve stays hidden until your scouts get into their camp.</p>'+bfIntelLine("p1")+
+    '<div class="bfchips"><span>'+(v.rated?'Rated':'Unrated')+'</span><span>Guards '+fmt(v.guard||0)+'</span><span>Marches '+out+' / '+v.rally+'</span><span>Up to '+fmt(bfCap(bf.p[0],0))+'</span></div></div>';
+  h+='<div class="section">'+bfMap()+'</div>'+bfEnemyList();
+  v.buildings.forEach(function(B,bi){ var d=BF_B[bi], own=bf.b[bi].owner, st=(B.st||(B.mine&&sumT(B.mine)?[{h:0, t:B.mine, old:1}]:[])).filter(function(x){ return sumT(x.t)>0; }), ms=mine.filter(function(m){ return m.tp==null && m.b===bi; });
+    var holder=own<0?'<span class="bfown n">Guards</span>':own===0?'<span class="bfown me">You</span>':'<span class="bfown foe" translate="no">'+esc(foe.name)+'</span>';
+    h+='<div class="section bfcard'+(own===0?' mine':own===1?' theirs':'')+'"><div class="bfcardh">'+pkImg(BF_PK[d.k],40)+'<div class="bfcardt"><b>'+d.name+'</b><span class="dur">'+d.eff.replace(/[Yy]our team’s/,"your").replace("Your team","You")+'</span></div>'+holder+'</div>'+
+      '<p class="dur bfcardi">'+(B.wall?'Level '+B.wall+' walls and traps':'Walls down')+' · garrison '+(own===0?fmt(B.size):'about '+fmt(B.size))+'</p>'+(own!==0?bfIntelLine("b"+bi):'');
+    if (st.length) h+='<div class="bfsts">'+st.map(function(x){ var hn=x.h?bfHeroSnap(x.h).name:"";
+      return '<div class="bfst"><span class="bfsth">'+(hn?'<b>'+esc(hn)+'</b>':'<span class="dur">No hero</span>')+'<span class="dur">'+fmt(sumT(x.t))+' troops: '+esc(bfPresetText({t:x.t}))+'</span></span><button class="btn ghost small" data-act="bf-recall" data-b="'+bi+'"'+(x.old?'':' data-h="'+(x.h||0)+'"')+(live?'':' disabled')+'>Withdraw</button></div>'; }).join("")+'</div>';
+    if (ms.length) h+='<div class="bfmrs">'+ms.map(bfMarchRow).join("")+'</div>';
+    h+='<div class="btnrow"><button class="btn small" data-act="bf-send" data-b="'+bi+'"'+(!live||out>=v.rally?' disabled':'')+'>'+(own===0?'Reinforce':'Attack or scout')+'</button>'+(st.length>1?'<button class="btn ghost small" data-act="bf-recall" data-b="'+bi+'"'+(live?'':' disabled')+'>Withdraw all</button>':'')+'</div></div>'; });
+  var cms=mine.filter(function(m){ return m.tp!=null; });
+  h+='<div class="section bfcard theirs"><div class="bfcardh"><span class="bfini" translate="no">'+esc(bfInitial(foe.name))+'</span><div class="bfcardt"><b translate="no">'+esc(foe.name)+'’s camp</b><span class="dur">'+esc(foe.city||"")+(foe.ai?' · on autopilot':'')+'</span></div><span class="bfown foe">'+fmt(fp)+' pts</span></div>'+
+    '<p class="dur bfcardi">Their reserve stays hidden until your scouts get in.</p>'+bfIntelLine("p1")+(cms.length?'<div class="bfmrs">'+cms.map(bfMarchRow).join("")+'</div>':'')+
     '<div class="btnrow"><button class="btn ghost small" data-act="bf-scout" data-p="1"'+(live?'':' disabled')+'>Scout camp</button></div></div>';
+  var rv=bf.p[0].reserve, free=(v.heroes||[]).filter(function(x){ return !bfHeroBusy(x.id); });
+  h+='<div class="section"><div class="shead"><h3>Your camp</h3><span class="dur">'+fmt(sumT(rv))+' in reserve</span></div>'+
+    '<p class="dur" style="margin:0 0 6px">'+(U.map(function(u,i){ return rv[i]?fmt(rv[i])+' '+uname(i,rv[i]):''; }).filter(Boolean).join(", ")||'Nothing in reserve')+'.</p>'+
+    ((v.heroes||[]).length?'<div class="bfheroes">'+(v.heroes||[]).map(function(x){ var busy=bfHeroBusy(x.id); return '<span class="bfhero'+(busy?' busy':'')+'" translate="no">'+esc(x.name)+(busy?' · out':'')+'</span>'; }).join("")+'</div>':'')+
+    '<div class="btnrow" style="margin-top:8px"><button class="btn ghost small" data-act="bfpre-open">Presets</button><button class="btn ghost small" data-act="bf-rewards">Rewards</button></div></div>';
   h+=pvReports()+pvLog(12);
-  h+='<div class="section"><div class="act"><span class="dur">Retreating ends it now as a loss.</span><button class="btn ghost danger" data-act="pv-forfeit"'+(live?'':' disabled')+'>'+(PV.quitArmed?'Tap again: retreat':'Retreat')+'</button></div></div>';
+  h+='<div class="section"><p class="hint" style="margin-top:0">The clock runs on the server and never stops. Lose connection for a minute and an autopilot plays for you until you’re back.</p><div class="act"><span class="dur">Retreating ends it now as a loss.</span><button class="btn ghost danger" data-act="pv-forfeit"'+(live?'':' disabled')+'>'+(PV.quitArmed?'Tap again: retreat':'Retreat')+'</button></div></div>';
   return h;
 }
 function pvDone(){
   var v=PV.v, R=v.result||{pts:[0,0]}, me=v.me, fo=1-me, P=v.players, foe=P[fo]||{name:"Your opponent"}, draw=R.winner<0, win=R.winner===me;
-  var used=(R.used&&R.used[me]&&R.used[me].marchsp)||0, sp=pvSpoils(), spT=Object.keys(sp).length?rewardText({items:sp}):"nothing this time";
-  var h=pvHead(R.why==="forfeit"?(win?esc(foe.name)+' retreated':'you retreated'):'time’s up')+
-    '<h2 style="margin:4px 0">'+(draw?'A draw':win?'Victory!':'Defeat')+'</h2>'+
-    '<div class="act"><div><div class="bigstat">'+fmt(R.pts[me]||0)+'</div><span class="dur">you</span></div><div style="text-align:right"><div class="bigstat">'+fmt(R.pts[fo]||0)+'</div><span class="dur">'+esc(foe.name)+'</span></div></div>'+
-    (function(){ var rr=R.rating&&R.rating[me]; return '<p class="hint">'+(rr?'Rating '+rr.from+' \u2192 <b>'+(rr.from+rr.d)+'</b> ('+(rr.d>=0?'+':'')+rr.d+').':'Unrated'+(v.unrated?': '+esc(v.unrated):'')+'.')+'</p>'; })()+
-    '<p class="hint">Spoils: '+esc(spT)+'.'+(used?' You used '+used+' March Speed-up'+(used>1?'s':'')+'.':'')+' Your real army is untouched.</p>'+
-    '<div class="btnrow"><button class="btn" data-act="pv-collect">'+(Object.keys(sp).length?'Collect and return':'Return to the game')+'</button></div></div>';
+  var used=(R.used&&R.used[me]&&R.used[me].marchsp)||0, sp=pvSpoils(), any=Object.keys(sp).length, tier=bfTierOf(R.pts[me]||0), rr=R.rating&&R.rating[me];
+  var h='<div class="section bfdone'+(win?' win':draw?'':' loss')+'"><div class="bfdoneh">'+pkImg("bf",56)+'<div><h2>'+(draw?'A draw':win?'Victory!':'Defeat')+'</h2><span class="dur">'+(R.why==="forfeit"?(win?esc(foe.name)+' retreated':'You retreated'):'Time’s up')+'</span></div></div>'+
+    '<div class="bfscore"><div><b>'+fmt(R.pts[me]||0)+'</b><span class="dur">you</span></div><div class="r"><b>'+fmt(R.pts[fo]||0)+'</b><span class="dur" translate="no">'+esc(foe.name)+'</span></div></div>'+
+    '<p class="hint">'+(rr?'Rating '+rr.from+' → <b>'+(rr.from+rr.d)+'</b> ('+(rr.d>=0?'+':'')+rr.d+').':'Unrated'+(v.unrated?': '+esc(v.unrated):'')+'.')+'</p></div>';
+  h+='<div class="section bfprize"><div class="shead"><h3>'+(any?(win?'Congratulations! Your rewards':'Your rewards'):'No rewards this time')+'</h3><span class="dur">'+(tier?'Tier '+tier+(win?' × 2':''):'')+'</span></div>'+
+    (any?bfItems(sp,"big"):'<p class="hint">Rewards start at '+bfPtsK(BF_TIER_PTS[0])+' points.</p>')+
+    '<p class="hint">'+(win?'The winner gets the tier’s pack twice. ':'')+(used?'You used '+used+' March Speed-up'+(used>1?'s':'')+'. ':'')+'Your real army is untouched.</p>'+
+    '<div class="btnrow"><button class="btn" data-act="pv-collect">'+(any?'Collect and return':'Return to the game')+'</button><button class="btn ghost small" data-act="bf-rewards">All tiers</button></div></div>';
   return h+pvReports()+pvLog(25);
 }
 function nextAllianceEvent(){
@@ -13864,7 +13953,7 @@ function dtPlaces(b){ var P=[], gt=Math.min(12,2+(S.th||1));
   var ladder=function(id,n,u,L,lab,note){ P.push({id:id, g:"Alliance", n:n, u:u, lvs:L.map(function(r,i){ return {id:String(i+1), t:"Rung "+(i+1), L:i+1}; }), ladder:L,
     rows:function(i){ var R=L[i-1].r, r=[]; for (var k in R) r.push({k:k, p:null, n:R[k], note:lab(L[i-1])}); return r; }, note:note}); };
   ladder("war","Pact War","per war, every rung you reach",WAR_LADDER,function(x){ return "at "+x.p+" war points"; },"Each rung pays once per war, on top of the ones below it.");
-  ladder("bf","Battlefield and PvP","per battle, every rung you reach",BF_LADDER,function(x){ return "at "+Math.round(x.f*100)+"% of the average army\u2019s value in points"; },"Each rung pays once per battle, on top of the ones below it. PvP matches use the same rungs.");
+  ladder("bf","Battlefield and PvP","per battle, the highest tier you reach",BF_TIER_PTS.map(function(t,i){ return {f:t, r:bfTierPack(i+1)}; }),function(x){ return "at "+bfPtsK(x.f)+" points"; },"You get the pack of the highest tier your points reach, and the winner gets it twice.");
   // the Wheel: each slice's share, with its own sub-rolls
   P.push({id:"wheel", g:"Other", n:"Wheel of Fortune", u:"per spin", rows:function(){ var r=[], gw=gearTierW(gt), bs=BOX_W.reduce(function(a,c){ return a+c; },0);
     WHEEL.forEach(function(s){ var p=s.w/WSUM;
@@ -14298,7 +14387,7 @@ function shareReport(){
   if (rep.share && rep.share.id) cbPost("/share/touch",{id:rep.share.id}).then(function(r){ return r.json(); }).then(function(d){ if (d && d.ok) finish({ok:true, id:rep.share.id, url:d.url, expires:d.expires}); else fresh(); }).catch(function(){ finish({error:"Couldn\u2019t reach the server. Check your connection."}); });
   else fresh();
 }
-function reportDetail(r){ if (r.arena) return arenaRepHtml(r); if (r.rally) return rallyRepHtml(r); return reportDetailBase(r)+killsHtml(r); }
+function reportDetail(r){ if (r.pvr) return pvRepHtml(r.d); if (r.arena) return arenaRepHtml(r); if (r.rally) return rallyRepHtml(r); return reportDetailBase(r)+killsHtml(r); }
 function modsLine(r){ if (!r.mods || !(r.mods[0]||r.mods[1]||r.mods[2])) return ""; /* 0.2.50: no "+0%" line */ var f=function(v){ return (v>=0?"+":"\u2212")+Math.abs(v)+"%"; };
   return '<div class="us" style="margin:4px 0;display:flex;flex-wrap:wrap;gap:2px 14px"><span>Your attack <b>'+f(r.mods[0])+'</b></span><span>Defence <b>'+f(r.mods[1])+'</b></span><span>Troop life <b>'+f(r.mods[2])+'</b></span></div>'; }
 function reportDetailBase(r){
@@ -15473,6 +15562,10 @@ function renderSheetCore0(){
     h=worldSheet();
   } else if (sheetFor.kind==="alview"){
     h=alViewSheet();
+  } else if (sheetFor.kind==="bfrew"){
+    h=bfRewSheet();
+  } else if (sheetFor.kind==="pvrep"){
+    h=pvRepSheet();
   } else if (sheetFor.kind==="cosmo"){
     h=cosmoSheet();
   } else if (sheetFor.kind==="aj"){
@@ -15578,7 +15671,7 @@ function renderSheetCore0(){
     h='<div id="repwrap"'+(repFit?' class="fit"':'')+'><div class="head"><span class="ico">'+ICON.rally+'</span><div style="flex:1;min-width:0"><h2><span class="'+(rg?'okc':'badc')+'">'+rv+'</span> '+esc(rc.sc?String(rc.n).replace(/^Scouted /,""):rc.n)+'</h2><div class="sub">'+repDay(rc.at)+', '+repTime(rc.at)+(rc.c&&!rc.d&&S.cities.length>1?', from '+esc(rc.c):'')+(rex.length?' \u00b7 '+rex.join(", "):'')+'</div></div><button class="btn ghost small" data-act="close" aria-label="Close" style="align-self:flex-start">\u2715</button></div>'+
       (rr?reportDetail(rr):'<p class="hint">Only the summary of this older battle was kept.</p>')+'</div>'+
       '<div class="btnrow rpbtns">'+(rr&&rr.ww?'<button class="btn small rpww" data-act="ww-rep">War Wizard</button>':'')+(rr&&rr.aww?'<button class="btn small rpww" data-act="arww-rep"'+(ARW.busy?' disabled':'')+'>War Wizard</button>':'')+
-        rpIcoB("rep-fav", rc.fav?"Saved (tap to unsave)":"Save report", svgStar, rc.fav)+(rc.tile&&!rc.d?rpIcoB("goto-tile", "Show on map", svgMap, false, ' data-tile="'+rc.tile+'"'):'')+(rr&&LB_URL&&!(rr.arena||rr.rally)?rpIcoB("rep-share", shareBusy?"Sharing\u2026":rr.share?"Share again":"Share", svgShare, false, shareBusy?' disabled':''):'')+'</div>'+
+        rpIcoB("rep-fav", rc.fav?"Saved (tap to unsave)":"Save report", svgStar, rc.fav)+(rc.tile&&!rc.d?rpIcoB("goto-tile", "Show on map", svgMap, false, ' data-tile="'+rc.tile+'"'):'')+(rr&&LB_URL&&!(rr.arena||rr.rally||rr.pvr)?rpIcoB("rep-share", shareBusy?"Sharing\u2026":rr.share?"Share again":"Share", svgShare, false, shareBusy?' disabled':''):'')+'</div>'+
       (rr&&rr.share&&rr.share.url?'<div class="farmadd" style="margin-top:6px"><input type="text" readonly id="shareurl" value="'+esc(rr.share.url)+'" style="width:auto;flex:1"><button class="btn ghost small" data-act="rep-share-copy">Copy link</button></div><p class="dur" style="margin:2px 0 0">Anyone with the link can see this report until '+new Date(rr.share.until||Date.now()).toLocaleDateString(undefined,{month:"short",day:"numeric"})+'. Sharing it again keeps it 30 more days.</p>':''); // 0.2.50: the ✕ at the top closes it
   } else if (sheetFor.kind==="legend"){
     if (!S.pendingLegend){ closeSheet(); return; }
@@ -16689,7 +16782,9 @@ document.addEventListener("click",function(e){
     var others=sumT(bfDraft)-(bfDraft[ui]||0); bfDraft[ui]=Math.max(0, Math.min(mea.reserve[ui], bfCap(mea)-others));
     if (!bfDraft[ui]) toast("The march is already full"); bfSimTxt=""; lastSheet=""; renderSheet(); return; }
   if (act==="bf-mode"){ bfMode=a.dataset.v; bfDraft=null; bfSimTxt=""; lastSheet=""; renderSheet(); return; }
-  if (act==="bf-recall" && pvOn()){ pvOrder({type:"withdraw", b:+a.dataset.b}, "Withdrawing your troops"); return; }
+  if (act==="bf-recall" && pvOn()){ var wo={type:"withdraw", b:+a.dataset.b}; if (a.dataset.h!=null) wo.h=+a.dataset.h; pvOrder(wo, "Withdrawing your troops"); return; }
+  if (act==="bf-rewards"){ openSheet({kind:"bfrew"}); return; }
+  if (act==="pv-rep"){ var prr=PV.v&&PV.v.reports&&PV.v.reports[+a.dataset.i]; if (prr) openSheet({kind:"pvrep", r:prr}); return; }
   if (act==="bf-mrecall" && pvOn()){ pvOrder({type:"recall", id:+a.dataset.m}, "March turned back"); return; }
   if (act==="bf-hasten" && pvOn()){ pvOrder({type:"hasten", id:+a.dataset.m}, "March hastened: half the remaining time"); return; }
   if (act==="bf-recall"){ if (bfOn() && bfRecall(0,+a.dataset.b)) { toastQ("Withdrawing your troops"); lastView=""; refresh(); } return; }
@@ -16720,6 +16815,7 @@ document.addEventListener("click",function(e){
   if (act==="pv-forfeit"){ if (!pvLive()) return; if (!PV.quitArmed){ PV.quitArmed=true; lastView=""; renderView(true); return; } PV.quitArmed=false; pvOrder({type:"forfeit"}, "You retreated"); return; }
   if (act==="pv-ww"){ var pwr=PV.v&&PV.v.reports&&PV.v.reports[+a.dataset.i]; if (!pwr || !pwr.cap) return; rpStop(); rpOpenCap(pwr.cap, {sub:"PvP \u00b7 "+pwr.name+" at "+bfMin(pwr.t), mine:pwr.attacker?"A":"D", back:null}); return; }
   if (act==="pv-collect"){ pvCollect(); refresh(); return; }
+  if (act==="pv-ww2"){ var pw2=sheetFor&&sheetFor.r; if (!pw2 || !pw2.cap) return; closeSheet(); rpStop(); rpOpenCap(pw2.cap, {sub:"PvP \u00b7 "+pw2.name+" at "+bfMin(pw2.t), mine:pw2.attacker?"A":"D", back:null}); return; }
   if (act==="bf-go"){ var gscout=sheetFor.tp!=null||bfMode==="scout", gd=(bfDraft||Z12()).slice(); if (gscout) gd=gd.map(function(n,i){ return i===2?n:0; });
     if (pvOn()){ var pvt=sheetFor.tp!=null; pvOrder(gscout?{type:"send", scout:true, b:pvt?0:sheetFor.b, tp:pvt?1-PV.v.me:undefined, t:gd, hero:bfDraftHero||0}:{type:"send", b:sheetFor.b, t:gd, hero:bfDraftHero||0}, gscout?"Scouts sent":"March sent", function(){ closeSheet(); bfDraft=null; bfDraftHero=null; }); return; }
     if (bfSend(0, sheetFor.tp!=null?0:sheetFor.b, gd, false, gscout?{scout:true, tp:sheetFor.tp, hero:bfDraftHero||0}:{hero:bfDraftHero||0})){ toastQ(gscout?"Scouts sent":"March sent"); closeSheet(); bfDraft=null; bfDraftHero=null; lastView=""; refresh(); }
