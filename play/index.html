@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.83";
+window.IBORY_V="0.2.84";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1806,7 +1806,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.83";
+var APP_VERSION = "0.2.84";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -11449,8 +11449,8 @@ function asEnd(A, why, quiet){ if (!A) return; var L=asRuns(), i=L.indexOf(A); i
   note("heroes", msg); forgeLog.unshift(esc(msg)); if (forgeLog.length>40) forgeLog.length=40; save();
   if (!quiet && sheetFor){ lastSheet=""; renderSheet(); } }
 function asTick(){ if (!S || saveLocked) return; var L=asRuns(); if (!L.length){ if (document.getElementById("asoth")) asFill(); return; } var now=Date.now(), open=forgeGear(), redraw=false, anyStar=false;
-  L.slice().forEach(function(A){
-    if (now<A.next) return;
+  var did=false; L.slice().forEach(function(A){
+    if (now<A.next) return; did=true;
     var g=gearById(A.gid), mine=open && open.id===A.gid, end=function(why){ asEnd(A, why, true); if (mine) redraw=true; else anyStar=true; };
     if (!g){ end("stopped: the piece is gone"); return; }
     var st=asStepNow(A,g); if (!st || g.stars>=GEAR_MAX[g.tier]){ end("reached "+g.stars+"\u2605"); return; }
@@ -11460,7 +11460,7 @@ function asTick(){ if (!S || saveLocked) return; var L=asRuns(); if (!L.length){
     if (!asStepNow(A,g)){ end("reached "+g.stars+"\u2605"); return; }
     if (g.stars!==before){ anyStar=true; if (open && open.id===g.id) redraw=true; } // only the open piece's stars changing redraws its screen
  });
-  save();
+  if (did) save(); // 0.2.84: only when a strike ran, not every half second
   if (sheetFor && !editingIn(sheetBody) && (redraw || (anyStar && sheetFor.kind==="armory"))){ lastSheet=""; renderSheet(); } // a list of pieces (the Armory) redraws when any star changes
   asFill();
   tickText(); }
@@ -14233,7 +14233,7 @@ function bLvSel(from, top, tgt){ var o=''; for (var n=from;n<=top;n++) o+='<opti
 function bRangeTxt(type, from, to){ var c={}, t=0; for (var n=from;n<=to;n++){ var cn=costFor(type,n); for (var k in cn) c[k]=(c[k]||0)+cn[k]; t+=timeFor(type,n); }
   var parts=RES.filter(function(k){ return c[k]; }).map(function(k){ return fmt(c[k])+' '+RNAME[k].toLowerCase(); }); if (c.script) parts.push(c.script+' Script'+(c.script>1?'s':''));
   return '<p class="dur bprange">Levels '+from+' to '+to+' in all: '+parts.join(', ')+' \u00b7 \u23f1 '+fmtT(realMs(t))+'</p>'; }
-function bTgt(from, top){ var t=sheetFor&&sheetFor.tgt; return Math.max(from, Math.min(top, t||from)); }
+function bTgt(from, top){ var cx=ctxPlot(), t=cx&&cx.tgt; return Math.max(from, Math.min(top, t||from)); }
 function upgradeBlock(w,i){ // 0.2.49: one layout for every building: header with level pips, the description behind More, now -> next, cost tiles, one button, then the level guide and Demolish
   var s=getSlot(w,i), d=DEF[s.type], L=s.level, busy=!!buildOn(w,i), h, top=cityMax();
   var pips=''; for (var k=1;k<=top;k++) pips+='<i class="'+(k<=L?'f':'')+'"></i>';
@@ -16232,7 +16232,7 @@ document.addEventListener("click",function(e){
     S.bq=S.bq.filter(function(it){ return !(it.w===dc.w && it.i===dc.i); });
     closeSheet(); if (tab==="bldg"){ tab="city"; pg=null; } lastView=""; toastQ(dn+" demolished"); refresh(); return;
   }
-  if (act==="queue-up"){ var qc=ctxPlot(), qs=getSlot(qc.w,qc.i); if (qs){ var qto=+a.dataset.to; if (qto) bqFill(qc.w,qc.i,qs.type,qto); else S.bq.push({w:qc.w,i:qc.i,type:qs.type}); toastQ(DEF[qs.type].name+" upgrade queued"); } if (sheetFor) delete sheetFor.tgt; processQueues(); lastSheet=""; refresh(); return; }
+  if (act==="queue-up"){ var qc=ctxPlot(), qs=getSlot(qc.w,qc.i); if (qs){ var qto=+a.dataset.to; if (qto) bqFill(qc.w,qc.i,qs.type,qto); else S.bq.push({w:qc.w,i:qc.i,type:qs.type}); toastQ(DEF[qs.type].name+" upgrade queued"); } var qcx=ctxPlot(); if (qcx) delete qcx.tgt; processQueues(); lastSheet=""; lastView=""; refresh(); return; }
   if (act==="bq-up"||act==="bq-down"||act==="bq-less"||act==="bq-remove"){ var BG=bqGroups(), bgi=+a.dataset.k, bg=BG[bgi]; if (!bg) return; // 0.2.83: by row (a building's run of levels)
     if (act==="bq-remove") S.bq.splice(bg.k,bg.n); else if (act==="bq-less") S.bq.splice(bg.k+bg.n-1,1);
     else if (act==="bq-up" && bgi>0){ var bup=S.bq.splice(bg.k,bg.n); S.bq.splice.apply(S.bq,[BG[bgi-1].k,0].concat(bup)); }
@@ -16241,10 +16241,11 @@ document.addEventListener("click",function(e){
   if (act==="bq-up"||act==="bq-down"||act==="rq-up"||act==="rq-down"){ var qa=act.charAt(0)==="b"?S.bq:S.rq, qk=+a.dataset.k, qj=act.slice(3)==="up"?qk-1:qk+1; if (qj>=0 && qj<qa.length && qk>=0 && qk<qa.length){ var qt=qa[qk]; qa[qk]=qa[qj]; qa[qj]=qt; save(); refresh(); } return; }
   if (act==="rq-add"){ S.rq.push(a.dataset.tech); toastQ(TECH[a.dataset.tech].name+" queued"); processQueues(); refresh(); return; }
   if (act==="rq-remove"){ S.rq.splice(+a.dataset.k,1); refresh(); return; }
-  if (act==="upgrade"){ var uc=ctxPlot(), s=getSlot(uc.w,uc.i); if (s && !upgradeWhy(s.type,s.level) && startBuild(uc.w,uc.i,s.type) && +a.dataset.to) bqFill(uc.w,uc.i,s.type,+a.dataset.to); closeSheet(); refresh(); return; }
+  if (act==="upgrade"){ var uc=ctxPlot(), s=getSlot(uc.w,uc.i); if (s && !upgradeWhy(s.type,s.level) && startBuild(uc.w,uc.i,s.type) && +a.dataset.to) bqFill(uc.w,uc.i,s.type,+a.dataset.to); if (uc) delete uc.tgt; closeSheet(); lastView=""; refresh(); return; }
   if (act==="cancel-build" && S.builds[+a.dataset.slot]){
     var bs=+a.dataset.slot, b=S.builds[bs], bc=costFor(b.type,b.to); bc.script = b.sc!=null ? b.sc : (b.to===10 ? 1 : 0); pay(bc,-1); // 0.2.9: give back the Scripts actually paid (builds started before 0.2.9 paid none past 10)
     if (b.to===1 && b.where!=="th" && b.where!=="wall"){ if (b.where==="in") S.inside[b.idx]=null; else S.fields[b.idx]=null; }
+    S.bq=S.bq.filter(function(it){ return !(it.w===b.where && it.i===b.idx); }); // 0.2.84: and the levels queued behind it, or the queue starts it again at once
     S.builds.splice(bs,1); toastQ("Construction cancelled. Resources returned."); refresh(); return;
   }
   if (act==="research" && S.alAcad){ toast("This Academy is working for the alliance. Bring it back from the Alliance tab first."); return; }
@@ -16898,7 +16899,7 @@ document.addEventListener("change",function(e){ markDirty();
   if (e.target.id==="mapfarm"){ MAPFARM=+e.target.value; e.target.blur(); mapFarmRefresh(); if (MAPFARM>=0) mapFarmFit(); return; } // 0.1.243
   if (e.target.id==="bmjump"||e.target.id==="cityjump"||e.target.id==="cityjumpfs"){ var bj=e.target.value; e.target.value=""; e.target.blur(); if (bj) mapGo(bj); return; }
   if (e.target.id==="ryfrom"){ RYS.from=+e.target.value; e.target.blur(); lastSheet=""; renderSheet(); return; }
-  if (e.target.id==="bplv"){ if (sheetFor) sheetFor.tgt=+e.target.value; e.target.blur(); lastSheet=""; renderSheet(); return; } // 0.2.83
+  if (e.target.id==="bplv"){ var bcx=ctxPlot(); if (bcx) bcx.tgt=+e.target.value; e.target.blur(); lastSheet=""; renderSheet(); if (tab==="bldg"){ lastView=""; renderView(true); } return; } // 0.2.83; 0.2.84: the seven page buildings too
   if (e.target.id==="rymins"){ RYS.mins=e.target.value; e.target.blur(); lastSheet=""; renderSheet(); return; }
   if (e.target.id==="bm-label"){ var bmb=bmAt(selTile); if (bmb){ bmb.n=e.target.value.trim().slice(0,40); save(); bmRefresh(); } return; }
   if (AW_ON && awChange(e)) return;
