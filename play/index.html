@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.91";
+window.IBORY_V="0.2.92";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1846,7 +1846,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.91";
+var APP_VERSION = "0.2.92";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -13396,9 +13396,9 @@ function pvStart(path, body, ci){
   PV.busy=1; PV.err=""; PV.v=null; PV.bf=null; lastView=""; renderView(true);
   pvPost(path, body).then(function(j){ PV.busy=0;
     if (j.error || !j.token){ PV.err=j.error||"Something went wrong. Try again."; PV.idClash=j._st===403 && /rating/.test(PV.err); PV.v=null; PV.bf=null; lastView=""; refresh(); return; }
-    S.pvp={code:j.code||body.code, token:j.token, ci:ci}; PV.code=""; PV.lost=false; PV.lastPoll=Date.now(); if (mpShown()){ tab="guild"; ALS.sub="inv"; } else tab="alliance"; save(); /* 0.2.50: PvP lives on the Alliance tab */ lastView=""; refresh(); }, function(){ PV.busy=0; PV.err="Something went wrong. Try again."; lastView=""; refresh(); });
+    S.pvp={code:j.code||body.code, token:j.token, ci:ci}; PV.code=""; PV.lost=false; PV.lastPoll=Date.now(); if (mpShown()){ tab="guild"; ALS.sub="inv"; ALS.wtab="pvp"; } else tab="alliance"; if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); save(); /* 0.2.50: PvP lives on the Alliance tab */ lastView=""; refresh(); }, function(){ PV.busy=0; PV.err="Something went wrong. Try again."; lastView=""; refresh(); });
 }
-function pvClear(){ S.pvp=null; PV.v=null; PV.bf=null; PV.err=""; PV.lost=false; PV.quitArmed=false; PV_LEAVE_ARMED=false; PV.busy=0; document.body.classList.remove("bfmode"); if (mpShown()){ tab="guild"; ALS.sub="inv"; } else tab="alliance"; lastView=""; } // 0.2.50: PvP lives on the Alliance tab
+function pvClear(){ S.pvp=null; PV.v=null; PV.bf=null; PV.err=""; PV.lost=false; PV.quitArmed=false; PV_LEAVE_ARMED=false; PV.busy=0; document.body.classList.remove("bfmode"); if (mpShown()){ tab="guild"; ALS.sub="inv"; ALS.wtab="pvp"; } else tab="alliance"; lastView=""; } // 0.2.50: PvP lives on the Alliance tab
 function pvOrder(o, ok, after){
   if (!pvLive() || PV.ordering) return; PV.ordering=1; // one order at a time, so a double tap can't send twice
   pvPost("order", pvWith({order:o})).then(function(j){ PV.ordering=0;
@@ -15268,7 +15268,7 @@ function renderView(force){
     setTabs(); return;
   }
   if (tab==="guild" && !mpShown()) tab="city";
-  if (tab==="guild"){ // chat keeps updating even while you type: it lives in its own box
+  if (tab==="guild" && !bfOn() && !pvOn()){ // chat keeps updating even while you type: it lives in its own box. 0.2.92: a running match takes the whole screen from here too (PvP is started from this tab, and its lobby and code never showed)
     var gh; try { gh="guild|"+viewGuild(); } catch(e){ S.evErr=String(e&&e.message||e); gh='guild|<div class="section"><p class="hint">The alliance page couldn\u2019t be drawn from the last answer from the server. It tries again on the next sync.</p></div>'; } // 0.2.35: one bad sync answer threw on every tick and stopped the clock and saving while this tab was open
     var typing=v.contains(document.activeElement) && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
     if (!typing && (gh!==lastView || force)){ var amo=document.getElementById("almap"), asl=amo?[amo.scrollLeft,amo.scrollTop]:null; v.innerHTML=gh.slice(6); lastView=gh; wireDetails(v);
