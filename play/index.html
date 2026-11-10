@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.88";
+window.IBORY_V="0.2.89";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -487,6 +487,21 @@ nav.tabs button.hasnew{position:relative}nav.tabs button.hasnew::after{content:"
 .alnow{display:flex;gap:12px;align-items:flex-start}.alnow img{width:56px;height:56px;flex:none}
 .alhead{display:flex;gap:12px;align-items:center}
 .alart{image-rendering:pixelated;flex:none}
+.warhead{display:grid;grid-template-columns:auto auto 1fr;gap:4px 12px;align-items:center;background:radial-gradient(circle at 8% 50%,color-mix(in srgb,var(--brass) 22%,var(--panel)),var(--panel) 62%)}
+.warbal{display:flex;flex-direction:column;line-height:1.1}.warbal b{font-size:1.7rem;color:var(--brass);font-variant-numeric:tabular-nums}.warhow{font-size:.78rem;line-height:1.3;text-align:right}
+.wartabs{display:grid;gap:6px;margin:0 0 10px}
+.wartab{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:12px;border:2px solid var(--line);background:var(--panel);color:inherit;font:inherit;cursor:pointer;min-width:0;--tc:var(--brass)}
+.wartab b{font-size:.8rem;line-height:1.15;text-align:center}.wartab .dur{font-size:.68rem}.wartab .bar{width:100%;height:4px;background:var(--line)}
+.wartab.on{border-color:var(--tc);background:radial-gradient(circle at 50% 25%,color-mix(in srgb,var(--tc) 26%,var(--panel2)),var(--panel2) 80%);box-shadow:0 0 8px color-mix(in srgb,var(--tc) 40%,transparent)}
+.shopstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(64px,1fr));gap:6px}.shopstats span{display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:10px;background:var(--panel2);text-align:center}
+.shopstats b{font-size:1rem;font-variant-numeric:tabular-nums}.shopstats i{font-style:normal;font-size:.68rem;color:var(--mut,#a9a595);line-height:1.2}.unistats{margin:2px 0 8px}
+.shopgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.shoptile{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 8px;border-radius:12px;border:2px solid var(--line);background:var(--panel2);text-align:center;min-width:0}
+.shoptile b{font-size:.86rem;line-height:1.2}.shoptile .dur{font-size:.72rem;line-height:1.3;flex:1}.shoptile .btn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:4px}.shoptile.no{opacity:.8}
+.shopic{position:relative;width:52px;height:52px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:radial-gradient(circle at 50% 40%,color-mix(in srgb,var(--brass) 20%,var(--panel)),var(--panel) 78%)}
+.shopic .iic{width:36px;height:36px;image-rendering:pixelated}.shopic .shopegg{width:44px;height:44px}.shopic i{position:absolute;right:-6px;bottom:-4px;font-style:normal;font-size:.72rem;font-weight:700;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:0 5px}
+.shopcost{display:inline-flex;align-items:center;gap:3px;font-size:.74rem;color:var(--mut,#a9a595)}
+.tnode .tic{display:block;margin:0 auto 2px;width:24px;height:24px}.tnode.locked .tic{filter:grayscale(1);opacity:.75}.ttree .tnode.sel{border-color:var(--tc)}.tdetail{border-color:color-mix(in srgb,var(--tc) 55%,var(--line))}
 .memgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .memtile{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px 6px;border-radius:10px;border:2px solid var(--line);background:var(--panel2);color:inherit;font:inherit;cursor:pointer;text-align:center;min-width:0}
 .memtile b{font-size:.74rem;line-height:1.15;min-height:2.3em;display:flex;align-items:center}.memtile .dur{font-size:.7rem}.memtile .bar{width:100%;height:4px;margin-top:3px}
@@ -1829,7 +1844,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.88";
+var APP_VERSION = "0.2.89";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -6467,7 +6482,12 @@ function alInvLine(){ var st=IV.st, v=st&&st.inv, p=st&&st.p;
   if (IV.search) return 'Looking for a target…';
   if (p && p.opted) return 'Opted in · score '+fmt(p.score||0);
   return pvShown()?'Invade players · PvP':'Invade other players'; }
-function alInvHtml(){ return invSection()+(pvShown()?pvSection():''); }
+/* 0.2.89 (Cody): Invasions & PvP is one War page: your War Marks on a banner, then Invasions, the Battlefield and the War Marks shop as tabs. */
+function alInvHtml(){ var tabs=[["inv","war-inv","Invasions"]]; if (pvShown()) tabs.push(["pvp","war-pvp","Battlefield"]); tabs.push(["shop","war-marks","Shop"]);
+  var w=ALS.wtab||"inv"; if (!tabs.some(function(t){ return t[0]===w; })) w="inv"; var bal=SHOP.st?SHOP.st.balance:(S.warMarks||0);
+  var h='<div class="section warhead">'+alArt("war-marks",56)+'<div class="warbal"><b>'+fmt(bal)+'</b><span class="dur">War Marks</span></div><span class="dur warhow">Won by killing troops in invasions. Spend them in the shop.</span></div>'+
+    '<div class="wartabs" style="grid-template-columns:repeat('+tabs.length+',minmax(0,1fr))">'+tabs.map(function(t){ return '<button class="wartab'+(w===t[0]?' on':'')+'" data-act="al-wtab" data-v="'+t[0]+'">'+alArt(t[1],32)+'<b>'+t[2]+'</b></button>'; }).join("")+'</div>';
+  return h+(w==="inv"?invSection():w==="pvp"?pvSection():'<div class="warshop">'+shopBody(1)+'</div>'); }
 function alHomeHtml(al, need){ var now=Date.now(), E=al.econ||{lv:{}}, my=al.my||{can:{}}, rk=al.ranks||[], hp=(ALS.d&&ALS.d.help)||{projects:[],canHelp:0}, h='';
   // the heading: tag, name, members, your rank and honor; Info as a chip
   h+='<div class="section alhead2"><span class="altag" translate="no">'+esc(al.tag)+'</span><div class="alhn"><b translate="no">'+esc(al.name)+'</b><span class="dur">'+al.members.length+' / '+al.cap+' members · you: '+esc((rk[my.rank]||{}).n||'')+' · honor '+fmt(ALS.d.honor||0)+'</span></div><button class="chipbtn wide" data-act="al-sub" data-v="about">Info ›</button></div>';
@@ -6781,7 +6801,8 @@ function alUnivHtml(al){
   var E=al.econ, C0=ALS.cat; if (!E || !C0) return '<div class="section"><p class="hint">Loading the University\u2026</p></div>';
   var my=al.my, ul=E.lv.univ||0, tree=ALS.uTree||C0.trees[0][0], h='';
   var uF=(E.flow&&E.flow.r)||0, uCum=0;
-  h+='<div class="section"><div class="shead"><h3>Research</h3><span class="dur">'+(ul?E.rs.length+' / '+E.slots+' running \u00b7 pool '+fmt(E.rp):'a preview')+'</span></div>';
+  h+='<div class="section"><div class="shead"><h3>Research</h3><span class="dur">'+(ul?'':'a preview')+'</span></div>';
+  if (ul) h+='<div class="shopstats unistats"><span><b>'+fmt(E.rp)+'</b><i>points in the pool</i></span><span><b>'+E.rs.length+' / '+E.slots+'</b><i>researches running</i></span><span><b>'+(uF?fmt(uF):'0')+'</b><i>points an hour</i></span></div>'; // 0.2.89
   if (ul && E.rs.length) h+='<p class="dur" style="margin:0">'+(uF?fmt(uF)+' research points/h from lent Academies, to the first research, then the next.':'<span class="why">No Academies are lent, so research isn\u2019t moving.</span> <button class="link" data-act="al-sub" data-v="lend">Lending</button>')+'</p>';
   E.rs.forEach(function(r){ var T=C0.techs.filter(function(t){ return t.k===r.k; })[0]||{n:r.k}; uCum+=Math.max(0,r.need-r.got); var eta=alEta(uCum,uF);
     h+='<div class="bq"><span><b>'+esc(T.n)+' level '+r.to+'</b><br>'+alBar(r.got,r.need)+(eta?'<br><span class="dur">Done in '+eta+'</span>':'')+'</span></div>'; });
@@ -6789,12 +6810,13 @@ function alUnivHtml(al){
   else if (!E.rs.length) h+='<p class="hint" style="margin:0">Members lend their Academies on <button class="link" data-act="al-sub" data-v="lend">Lending</button> to make research points. University level N opens tier N.</p>';
   h+='</div>';
   // tree picker
-  h+='<div class="alsubs" style="margin-top:2px;flex-wrap:wrap">'+C0.trees.map(function(tr){ var L=C0.techs.filter(function(t){ return t.t===tr[0]; }), got=L.reduce(function(a,t){ return a+Math.min(t.max,E.tech[t.k]||0); },0), all=L.reduce(function(a,t){ return a+t.max; },0);
-    return '<button class="chipbtn'+(tree===tr[0]?' on':'')+'" data-act="al-tree" data-v="'+tr[0]+'">'+esc(tr[1])+' <span class="dur">'+got+'/'+all+'</span></button>'; }).join("")+'</div>';
+  var uIdx=function(k){ var i=0; C0.trees.forEach(function(tr,j){ if (tr[0]===k) i=j; }); return Math.min(3,i); }, uCol=["#c9b24a","#c8913a","#6a8fc4","#b5523f"], ti0=uIdx(tree);
+  h+='<div class="wartabs utabs" style="grid-template-columns:repeat('+C0.trees.length+',minmax(0,1fr))">'+C0.trees.map(function(tr,j){ var L=C0.techs.filter(function(t){ return t.t===tr[0]; }), got=L.reduce(function(a,t){ return a+Math.min(t.max,E.tech[t.k]||0); },0), all=L.reduce(function(a,t){ return a+t.max; },0);
+    return '<button class="wartab'+(tree===tr[0]?' on':'')+'" data-act="al-tree" data-v="'+tr[0]+'" style="--tc:'+uCol[Math.min(3,j)]+'">'+alArt("uni-"+Math.min(3,j),32)+'<b>'+esc(tr[1])+'</b><div class="bar"><i style="width:'+alPct(got,all)+'%"></i></div><span class="dur">'+got+' / '+all+'</span></button>'; }).join("")+'</div>';
   var list=C0.techs.filter(function(t){ return t.t===tree; }), tiers=[]; list.forEach(function(t){ if (tiers.indexOf(t.tier)<0) tiers.push(t.tier); }); tiers.sort(function(a,b){ return a-b; });
   var sel=list.filter(function(t){ return t.k===ALS.uSel; })[0];
   if (!sel) sel=list.filter(function(t){ var st=alUnivState(E,ul,list,t); return st.open && !st.done; })[0]||list[0];
-  h+='<div class="section ttree'+(ul?'':' preview')+'">';
+  h+='<div class="section ttree'+(ul?'':' preview')+'" style="--tc:'+uCol[ti0]+'">';
   tiers.forEach(function(tn, ti){ var row=list.filter(function(t){ return t.tier===tn; }), st0=alUnivState(E,ul,list,row[0]);
     if (ti>0){ var up=list.filter(function(t){ return t.tier===tiers[ti-1]; }), uc=up.map(function(_,i){ return (i+0.5)/up.length*100; }), lc=row.map(function(_,i){ return (i+0.5)/row.length*100; }), all=uc.concat(lc);
       var lit=st0.open, d=uc.map(function(x){ return 'M'+x+' 0V50'; }).join("")+'M'+Math.min.apply(null,all)+' 50H'+Math.max.apply(null,all)+lc.map(function(x){ return 'M'+x+' 50V100'; }).join("");
@@ -6802,12 +6824,12 @@ function alUnivHtml(al){
     h+='<div class="tierlab"><span>Tier '+tn+'</span>'+(st0.open?'':'<span class="dur">'+(ul<tn?'needs University '+tn:'finish tier '+tiers[ti-1]+' first')+'</span>')+'</div>';
     h+='<div class="trow'+(row.length>=4?' n4':'')+'" style="grid-template-columns:repeat('+row.length+',minmax(0,1fr))">'+row.map(function(t){ var st=alUnivState(E,ul,list,t), cls=st.done?'done':st.run?'run':st.open?'open':'locked';
       var pips=t.max<=5?'<span class="tpips">'+Array.apply(null,{length:t.max}).map(function(_,i){ return '<i'+(i<st.lv?' class="on"':'')+'></i>'; }).join("")+'</span>':'<span class="tlv">'+st.lv+' / '+t.max+'</span>';
-      return '<button class="tnode '+cls+(sel&&sel.k===t.k?' sel':'')+'" data-act="al-tsel" data-key="'+t.k+'" aria-label="'+esc(t.n)+', level '+st.lv+' of '+t.max+'"><span class="tnm">'+esc(t.n)+'</span>'+pips+(st.run?'<span class="tbar"><i style="width:'+Math.round(100*Math.min(1,st.run.got/Math.max(1,st.run.need)))+'%"></i></span>':'')+'</button>'; }).join("")+'</div>';
+      return '<button class="tnode '+cls+(sel&&sel.k===t.k?' sel':'')+'" data-act="al-tsel" data-key="'+t.k+'" aria-label="'+esc(t.n)+', level '+st.lv+' of '+t.max+'">'+alArt("uni-"+ti0,20,"tic")+'<span class="tnm">'+esc(t.n)+'</span>'+pips+(st.run?'<span class="tbar"><i style="width:'+Math.round(100*Math.min(1,st.run.got/Math.max(1,st.run.need)))+'%"></i></span>':'')+'</button>'; }).join("")+'</div>';
   });
   h+='</div>';
   // the selected research
   if (sel){ var ss=alUnivState(E,ul,list,sel), nx=ss.lv+1, need=sel.need[ss.lv];
-    h+='<div class="section tdetail"><div class="shead"><h3>'+esc(sel.n)+'</h3><span class="dur">level '+ss.lv+' of '+sel.max+' \u00b7 tier '+sel.tier+'</span></div><p style="margin:0 0 6px">'+esc(sel.d)+'</p>';
+    h+='<div class="section tdetail" style="--tc:'+uCol[ti0]+'"><div class="alhead">'+alArt("uni-"+ti0,48)+'<div style="min-width:0"><h3 style="margin:0">'+esc(sel.n)+'</h3><span class="dur">level '+ss.lv+' of '+sel.max+' \u00b7 tier '+sel.tier+'</span></div></div><p style="margin:8px 0 6px">'+esc(sel.d)+'</p>';
     if (ss.done) h+='<p class="okc" style="margin:0">Finished.</p>';
     else { h+='<p class="dur" style="margin:0 0 6px">Level '+nx+': '+fmt(need)+' research points, '+alCostTxt(need)+'</p>';
       if (ss.run) h+='<div class="bq"><span>Researching level '+ss.run.to+'<br>'+alBar(ss.run.got,ss.run.need)+'</span></div>';
@@ -12854,6 +12876,7 @@ function shopSync(force){
     SHOP.busy=false; SHOP.at=Date.now();
     if (d.error) SHOP.err=d.error; else { SHOP.err=""; SHOP.st=d; shopApply(d); }
     if (sheetFor && sheetFor.kind==="shop"){ lastSheet=""; renderSheet(); }
+    if (tab==="guild" && ALS.sub==="inv"){ lastView=""; renderView(true); } // 0.2.89: the shop tab of the War page
   });
 }
 function shopBuy(k){
@@ -12881,21 +12904,22 @@ function shopGift(){
   });
 }
 function shopOpen(){ SHOP.msg=""; SHOP.err=""; openSheet({kind:"shop"}); shopSync(true); }
-function shopSheet(){
-  var st=SHOP.st;
-  var h='<div class="head"><span class="ico">'+ICON.crest+'</span><div style="flex:1"><h2>War Marks shop</h2><div class="sub">Earned by killing troops in invasions. Kept on the server, so a restored save can’t undo a purchase.</div></div><button class="btn ghost small" data-act="close" aria-label="Close">✕</button></div>';
-  if (!cbOn()) return h+'<p class="why">Sign in to your cloud backup (Settings) to use the shop: your War Marks live on the server.</p>';
-  if (!st) return h+(SHOP.err?'<p class="why">'+esc(SHOP.err)+'</p>':'<p class="hint">Loading…</p>');
-  h+='<div class="rgrid"><span>War Marks <b>'+fmt(st.balance)+'</b></span><span>Earned <b>'+fmt(st.earned)+'</b></span><span>Spent <b>'+fmt(st.spent)+'</b></span><span>Courier Writs <b>'+fmt(st.writs)+'</b></span>'+(st.coins!=null?'<span>Cosmo Coins <b>'+fmt(st.coins)+'</b></span>':'')+'</div>';
+function shopSheet(){ // the pop-up (opened from a report or the inventory): the same body as the War page's Shop tab
+  return '<div class="head"><span class="ico">'+ICON.crest+'</span><div style="flex:1"><h2>War Marks shop</h2><div class="sub">Earned by killing troops in invasions. Kept on the server, so a restored save can’t undo a purchase.</div></div><button class="btn ghost small" data-act="close" aria-label="Close">✕</button></div>'+shopBody(); }
+function shopIcon(c){ var dgt=/^dragon_/.test(c.k)?c.k.slice(7):""; if (dgt && DRAGONS[dgt]) return eggImg(dgt,'dgimg shopegg'); var k=c.item||c.k; return ITEM_IMG[k]?itemImg(k):ITEM_IMG[k.replace(/\d+$/,"")]?itemImg(k.replace(/\d+$/,"")):alArt("war-marks",32); }
+function shopBody(inWar){ var st=SHOP.st, h='';
+  if (!cbOn()) return '<p class="why">Sign in to your cloud backup (Settings) to use the shop: your War Marks live on the server.</p>';
+  if (!st) return SHOP.err?'<p class="why">'+esc(SHOP.err)+'</p>':'<p class="hint">Loading…</p>';
+  h+='<div class="shopstats">'+(inWar?'':'<span><b>'+fmt(st.balance)+'</b><i>War Marks</i></span>')+'<span><b>'+fmt(st.earned)+'</b><i>Earned</i></span><span><b>'+fmt(st.spent)+'</b><i>Spent</i></span><span><b>'+fmt(st.writs)+'</b><i>Courier Writs</i></span>'+(st.coins!=null?'<span><b>'+fmt(st.coins)+'</b><i>Cosmo Coins</i></span>':'')+'</div>';
   if (SHOP.err) h+='<p class="why">'+esc(SHOP.err)+'</p>'; else if (SHOP.msg) h+='<div class="inote">'+esc(SHOP.msg)+'</div>';
   var groups=[]; (st.cat||[]).forEach(function(c){ var g=groups.filter(function(x){ return x[0]===c.grp; })[0]; if (!g){ g=[c.grp,[]]; groups.push(g); } g[1].push(c); });
   groups.forEach(function(g){
-    h+='<div class="section" style="margin-top:10px"><h3>'+esc(g[0])+'</h3><div class="gearlist">'+g[1].map(function(c){
+    h+='<div class="section" style="margin-top:10px"><h3>'+esc(g[0])+'</h3><div class="shopgrid">'+g[1].map(function(c){
       var why=c.owned?"Owned":c.lim&&c.left<1?"Sold out this week":st.balance<c.cost?"Need "+fmt(c.cost-st.balance)+" more":"";
       var dgt=/^dragon_/.test(c.k)?c.k.slice(7):"", dgD=DRAGONS[dgt]; // 0.2.51: a dragon is sold as its egg
-      return '<div class="gearrow'+(dgD?' dgshop':'')+'">'+(dgD?eggImg(dgt,'dgimg dgshopimg'):'')+'<span class="gn">'+(dgD?esc(dgD.name+' Dragon egg'):esc(c.name))+(c.qty>1?' <span class="dur">×'+c.qty+'</span>':'')+'</span><span class="gb">'+fmt(c.cost)+'</span>'+
-        (c.desc?'<span class="dur" style="grid-column:1/-1">'+esc(c.desc)+(dgD?' Hatch it in the Overlook when you like.':'')+(c.lim?' ('+c.left+' of '+c.lim.n+' left this week)':'')+'</span>':'')+
-        '<span class="btnrow" style="grid-column:1/-1;margin-top:4px"><button class="btn small" data-act="iv-shop-buy" data-k="'+c.k+'"'+(why||SHOP.busy?' disabled':'')+'>'+(why||'Buy')+'</button></span></div>'; }).join("")+'</div></div>';
+      return '<div class="shoptile'+(why?' no':'')+'"><div class="shopic">'+shopIcon(c)+(c.qty>1?'<i>×'+c.qty+'</i>':'')+'</div><b>'+(dgD?esc(dgD.name+' Dragon egg'):esc(c.name))+'</b>'+
+        (c.desc?'<span class="dur">'+esc(c.desc)+(dgD?' Hatch it in the Overlook when you like.':'')+(c.lim?' ('+c.left+' of '+c.lim.n+' left this week)':'')+'</span>':'')+
+        '<button class="btn small" data-act="iv-shop-buy" data-k="'+c.k+'"'+(why||SHOP.busy?' disabled':'')+'>'+alArt("war-marks",16)+' '+fmt(c.cost)+'</button>'+(why?'<span class="shopcost">'+esc(why)+'</span>':'')+'</div>'; }).join("")+'</div></div>';
   });
   var gi=(st.giftable||[]).filter(function(k){ return (S.items[k]||0)>0 && ITEMS[k]; });
   h+='<div class="section" style="margin-top:10px"><h3>Send items to an alliance mate</h3><p class="hint">Each Courier Writ sends one stack of up to 25 items to someone in your alliance. Medals, medal boxes and Dragon Stones can’t be sent. Up to 10 a day.</p>'+
@@ -13214,7 +13238,7 @@ var PV_LEAVE_ARMED=false;
 var PV_TESTER=758262355; // the tester code's hash (the code itself isn't in the game); entered in Settings' developer box
 // the save's PvP identity: ratings follow it, and a cloud backup carries it to a new device
 function pvId(){ if (!S.pvpId || !S.pvpId.id) S.pvpId={id:lbHex(16), token:lbHex(16)}; return S.pvpId; }
-function pvShown(){ return !!S.pvpTester && mpShown(); }
+function pvShown(){ return mpShown(); } // 0.2.89 (Cody): open to everyone in multiplayer (was the tester code)
 PV.board={data:null, at:0, busy:false, err:""};
 function pvBoardLoad(force){
   var B=PV.board; if (!LB_URL || B.busy || (!force && B.at && Date.now()-B.at<60000)) return;
@@ -13348,7 +13372,7 @@ function pvWhy(){ return !LB_URL?"Needs the online server":bfOn()?"Finish your B
 function pvSection(){
   var why=pvWhy(); pvBoardLoad(false);
   var bd=PV.board.data, me=bd&&bd.me;
-  var h='<div class="section"><div class="shead"><h3>PvP Battlefield</h3><span class="dur">testing'+(me&&me.games?' \u00b7 rating '+me.rating:'')+'</span></div>'+
+  var h='<div class="section"><div class="shead"><h3>PvP Battlefield</h3><span class="dur">'+(me&&me.games?'rating '+me.rating:'')+'</span></div>'+
     '<p class="hint">You against another player on the Battlefield for 25 minutes. A copy of one city fights, so your real troops never die. Create a match and send the code, or join theirs.'+alMore("pv")+'</p>'+
     (alMoreOn("pv")?'<p class="hint">March Speed-ups you use are used up for real. The server keeps the clock, so it runs whether or not you\u2019re looking; if you drop for a minute, an autopilot plays for you until you\u2019re back. Building guards are sized to the smaller side: about three of its full marches, behind level 10 walls and traps.</p>':'')+
     '<p class="hint">'+(me&&me.games?'Your rating: <b>'+me.rating+'</b>'+(me.rank?', #'+me.rank+' of '+fmt(bd.players):'')+' ('+pvRec(me)+').':'Your rating starts at 1,000 and moves after your first rated match.')+(me&&me.off?' You\u2019re off the rating board.':'')+'</p>'+
@@ -15946,7 +15970,7 @@ document.addEventListener("click",function(e){
       if (S.secrets.p1){ if (gm) gm.textContent="That package was already claimed on this save."; return; }
       S.secrets.p1=1; RES.forEach(function(k){ S.res[k]+=200000; }); S.items.s15=(S.items.s15||0)+80;
       if (gi) gi.value=""; if (gm) gm.textContent=""; save(); toastQ("Secret package! +200,000 of every resource in "+S.name+" and 80 15-minute speed-ups"); lastView=""; refresh(); }
-    else if (devHash(gv)===PV_TESTER){ S.pvpTester=1; if (gi) gi.value=""; if (gm) gm.textContent=""; save(); toast("PvP Battlefield unlocked: find it in the Alliance tab"); lastView=""; refresh(); }
+    else if (devHash(gv)===PV_TESTER){ S.pvpTester=1; if (gi) gi.value=""; if (gm) gm.textContent=""; save(); toast("The PvP Battlefield is open to everyone now: Alliance tab, Invasions & PvP"); lastView=""; refresh(); }
     else if (gm) gm.textContent="That code isn\u2019t valid.";
     return; }
   if (act==="bk-restore"){ var bk=a.dataset.v; if (armed!=="bkr-"+bk){ armed="bkr-"+bk; lastSheet=""; renderSheet(); return; } armed=null;
@@ -16227,6 +16251,7 @@ document.addEventListener("click",function(e){
         .catch(function(){ ALS.donating=false; toast("Couldn\u2019t reach the server"); }); return; }
     if (act==="al-lendacad"){ var lci=+a.dataset.ci; withCity(lci,function(){ if (!S.alAcad && S.research){ toast("Finish or cancel this city\u2019s research first"); return; } S.alAcad=!S.alAcad; toastQ(S.alAcad?S.name+"\u2019s Academy now works for the alliance":S.name+"\u2019s Academy is back to its own research"); }); save(); lastView=""; renderView(true); processAll(); renderQueue(); return; }
     if (act==="al-lendbld"){ var bci=+a.dataset.ci, bn=+a.dataset.n; withCity(bci,function(){ if (S.builds.length>BUILDERS-bn){ toast("Those builders are busy here"); return; } S.alBld=bn; toastQ(bn?bn+" builder"+(bn>1?"s":"")+" from "+S.name+" now work"+(bn>1?"":"s")+" for the alliance":S.name+"\u2019s builders are back home"); }); save(); lastView=""; renderView(true); processAll(); renderQueue(); return; }
+    if (act==="al-wtab"){ ALS.wtab=a.dataset.v; SHOP.msg=""; SHOP.err=""; lastView=""; renderView(true); if (ALS.wtab==="shop") shopSync(true); return; } // 0.2.89
     if (act==="al-tree"){ ALS.uTree=a.dataset.v; ALS.uSel=""; lastView=""; refresh(); return; }
     if (act==="al-tsel"){ ALS.uSel=a.dataset.key; lastView=""; refresh(); var td=document.querySelector(".tdetail"); if (td && td.getBoundingClientRect().top>window.innerHeight-80) td.scrollIntoView({block:"nearest", behavior:"smooth"}); return; }
     if (act==="al-zoom"){ var zi2=AL_ZOOMS.indexOf(alZ())-(+a.dataset.d), nz=AL_ZOOMS[Math.max(0,Math.min(AL_ZOOMS.length-1,zi2))]; if (nz===alZ()) return;
