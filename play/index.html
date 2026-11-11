@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.94";
+window.IBORY_V="0.2.95";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -500,6 +500,10 @@ nav.tabs button.hasnew{position:relative}nav.tabs button.hasnew::after{content:"
 .shoptile b{font-size:.86rem;line-height:1.2}.shoptile .dur{font-size:.72rem;line-height:1.3;flex:1}.shoptile .btn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:4px}.shoptile.no{opacity:.8}
 .shopic{position:relative;width:52px;height:52px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:radial-gradient(circle at 50% 40%,color-mix(in srgb,var(--brass) 20%,var(--panel)),var(--panel) 78%)}
 .shopic .iic{width:36px;height:36px;image-rendering:pixelated}.shopic .shopegg{width:44px;height:44px}.shopic i{position:absolute;right:-6px;bottom:-4px;font-style:normal;font-size:.72rem;font-weight:700;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:0 5px}
+.citytiles .ovtile{grid-column:1/-1}
+.rpstats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:4px 0 8px}.rpstats div{display:flex;flex-direction:column;align-items:center;padding:7px 2px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);min-width:0}.rpstats b{font:700 1.15rem var(--display);font-variant-numeric:tabular-nums}.rpstats span{font-size:.72rem;color:var(--muted)}.rpstats .bad b{color:var(--red)}.rpstats .good b{color:var(--grass)}
+.rpmods{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 8px}.rpmods span{font-size:.78rem;padding:3px 9px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);white-space:nowrap}.rpmods b{color:var(--ink)}.rphero{margin:0 0 8px;font-size:.88rem}
+.rploot{margin-top:6px;grid-template-columns:repeat(auto-fill,minmax(84px,1fr))}.rploot .rwit i{font-style:normal;font-size:.68rem;color:var(--muted);text-align:center;line-height:1.15;padding:0 2px}
 .bfhead{background:radial-gradient(circle at 50% 0,color-mix(in srgb,var(--brass) 16%,var(--panel)),var(--panel) 70%)}.bfclock{display:flex;align-items:baseline;justify-content:center;gap:8px}.bfclock b{font:700 2rem var(--display);color:var(--brass);font-variant-numeric:tabular-nums}
 .bfscore{display:flex;justify-content:space-between;gap:10px;margin-top:2px}.bfscore div{display:flex;flex-direction:column;min-width:0}.bfscore .r{text-align:right;align-items:flex-end}.bfscore b{font:700 1.35rem var(--display);font-variant-numeric:tabular-nums}.bfscore div:first-child b{color:var(--grass)}.bfscore .r b{color:var(--red)}
 .bftug{height:8px;border-radius:4px;background:color-mix(in srgb,var(--red) 70%,var(--panel));overflow:hidden;margin:6px 0}.bftug i{display:block;height:100%;background:var(--grass);transition:width .4s}
@@ -1861,7 +1865,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.94";
+var APP_VERSION = "0.2.95";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -1958,7 +1962,7 @@ var DEF = {
   quarry:{name:"Quarry",cost:{food:100,lumber:100,stone:250,iron:300},t:45,res:"stone",desc:"Cuts stone for walls, fortifications and the bigger buildings. Walls need a level 2 Quarry."},
   ironmine:{name:"Iron Mine",cost:{food:100,lumber:100,stone:250,iron:300},t:45,res:"iron",desc:"Digs iron for troops, weapons and engines. A level 2 Iron Mine unlocks the Forge."}
 };
-var INSIDE = ["cottage","barracks","academy","feasting","inn","market","stable","forge","workshop","rally","beacon","embassy","warehouse","overlook"];
+var INSIDE = ["cottage","barracks","academy","feasting","inn","market","stable","forge","workshop","rally","beacon","embassy","warehouse"]; // 0.2.95: the Overlook is its own building now (c.ovb), not one of the plots
 var FIELD = ["farm","sawmill","quarry","ironmine"];
 var TECH = {
   agriculture:{g:"Economy",name:"Agriculture",desc:"+10% food per level"},
@@ -2961,7 +2965,7 @@ var NPC = { // troops [worker,warrior,scout,pike,sword,archer,transporter,cav,ca
 function npcResearch(L){ return {archery:L,medicine:L,iron_working:L,compass:L,horseback_riding:L}; }
 // NPC heroes per the reference presets: attack/intelligence 33/33 at levels 1-2, 33/3 at 3-4, 44/44 from level 5 up; NPCs also research Military Tradition to their level
 function npcHero(L){ return L>=5 ? [44,44] : L>=3 ? [33,3] : [33,33]; }
-function bLevel(type){ if (type==="townhall") return S.th; if (type==="walls") return S.wall||0; var m=0; S.inside.concat(S.fields).forEach(function(x){ if (x && x.type===type && x.level>m) m=x.level; }); return m; }
+function bLevel(type){ if (type==="overlook" && S.ovb) return S.ovb.level||0; if (type==="townhall") return S.th; if (type==="walls") return S.wall||0; var m=0; S.inside.concat(S.fields).forEach(function(x){ if (x && x.type===type && x.level>m) m=x.level; }); return m; }
 // Building prerequisites (Town Hall, Walls, Workshop, Forge, Stable, Barracks, Academy from the old wiki; Feasting Hall and Marketplace assumed)
 function beaconLv(){ return bLevel("beacon"); }
 function bestBeacon(){ return maxB("beacon"); } // ally warnings come through your whole realm's signal network
@@ -2975,7 +2979,7 @@ function beaconText(L){ return L>=9?"exact armies, plan and enemy research":L>=7
 var BREQ={beacon:function(){ return [["walls",1]]; },townhall:function(L){ return L>=3?[["walls",L-2]]:[]; }, walls:function(){ return [["quarry",2],["workshop",1]]; },
   workshop:function(){ return [["forge",2]]; }, forge:function(){ return [["ironmine",2]]; }, stable:function(){ return [["farm",5]]; },
   barracks:function(){ return [["rally",1]]; }, academy:function(){ return [["townhall",2]]; }, feasting:function(){ return [["inn",1]]; }, market:function(){ return [["warehouse",1]]; }};
-function buildReqWhy(type,to){ if (type==="overlook" && !dragonsOwned().length && !eggsOwned().length) return "Needs a dragon egg (War Marks shop)"; var f=BREQ[type]; if (!f) return ""; var m=missing(f(to)); return m.length ? "Needs "+m.map(reqName).join(" and ") : ""; }
+function buildReqWhy(type,to){ if (type==="overlook" && !dragonsOwned().length && !eggsOwned().length) return "Needs a dragon egg (War Marks shop)"; if (type==="overlook" && to>MAXLV) return "The Overlook tops out at level "+MAXLV; var f=BREQ[type]; if (!f) return ""; var m=missing(f(to)); return m.length ? "Needs "+m.map(reqName).join(" and ") : ""; }
 function reqMet(r){ return r[0].indexOf("t:")===0 ? (S.tech[r[0].slice(2)]||0)>=r[1] : r[0]==="workshop" ? maxB("workshop")>=r[1] : bLevel(r[0])>=r[1]; } // 0.2.6: one Workshop in any city covers every city (siege engines, walls)
 function missing(reqs){ return reqs.filter(function(r){ return !reqMet(r); }); }
 function reqName(r){ return (r[0].indexOf("t:")===0 ? TECH[r[0].slice(2)].name : DEF[r[0]].name)+" "+r[1]+(r[0]==="workshop"?" (any city)":""); }
@@ -6106,6 +6110,16 @@ function hsB(h,k,def){ var v=hs(h,k)+(h ? dgFx(h,def)[k]||0 : 0); return (def &&
 function dragonHero(t){ var f=null; S.cities.forEach(function(c){ (c.heroes||[]).forEach(function(h){ if (h.dragon===t) f=h; }); }); (S.heroes||[]).forEach(function(h){ if (h.dragon===t) f=h; }); return f; }
 function dragonsOwned(){ return Object.keys(S.dragons||{}).filter(function(t){ return DRAGONS[t]; }); }
 // 0.2.51 (Cody): dragons come as eggs. The shop gives an egg; it waits in the Overlook until you tap Hatch. Pictures: Cody's dragon and egg sets.
+/* 0.2.95 (Cody): the Overlook is a separate building. The moment you own an egg or a dragon every city has one (level 1, free), on its own tile
+   under the city, captured and historic cities included; it no longer takes a plot. An Overlook already built in a plot moves there with its level,
+   its upgrade in progress and anything queued behind it, and the plot is freed. Kept per city as c.ovb = {type:"overlook", level}; slot kind "ov". */
+function ovSync(){ if (typeof S==="undefined" || !S || !S.cities || !(dragonsOwned().length || eggsOwned().length)) return false; var ch=false;
+  S.cities.forEach(function(c){ var k=-1; (c.inside||[]).forEach(function(b,i){ if (b && b.type==="overlook") k=i; });
+    if (k>=0){ var lv=Math.max(1, c.inside[k].level||0); if (!c.ovb || lv>(c.ovb.level||0)) c.ovb={type:"overlook", level:lv}; c.inside[k]=null;
+      (c.builds||[]).forEach(function(b){ if (b.where==="in" && b.idx===k){ b.where="ov"; b.idx=0; } }); (c.bq||[]).forEach(function(q){ if (q.w==="in" && q.i===k){ q.w="ov"; q.i=0; } });
+      c.builds=(c.builds||[]).filter(function(b){ return !(b.where==="ov" && b.to<=c.ovb.level); }); ch=true; }
+    if (!c.ovb){ c.ovb={type:"overlook", level:1}; ch=true; } });
+  return ch; }
 function eggsOwned(){ return Object.keys(S.dragonEggs||{}).filter(function(t){ return DRAGONS[t] && !(S.dragons&&S.dragons[t]); }); }
 function dgImg(t, cls){ return '<img class="'+(cls||'dgimg')+'" src="art/dg-'+t+'.png" alt="">'; }
 function eggImg(t, cls){ return '<img class="'+(cls||'dgimg')+'" src="art/egg-'+t+'.png" alt="">'; }
@@ -10341,7 +10355,7 @@ var CITY_PLOTS=28; // 7 rows of 4
 // 0.2.9: a historic city gets one more row of 4 plots per tier: level 12 one, 14 two, 16 three, Atlantis (18) four
 function cityPlots(c){ return CITY_PLOTS + (c && c.fieldCap ? Math.max(0, Math.round((c.fieldCap-10)/2))*4 : 0); }
 var AUTO_ORDER=[9,11,10,5,8,7,6,4,3,2,1,0]; // default auto-train priority: siege, then archers, then the rest
-var CITY_KEYS = ["autoHeal","alAcad","alBld","tg","fg","autoFort","trainer","researcher","reserve","gate","goals","gorder","wounded","autoTrain","autoMayor","wallHero","builds","bq","rq","presets","mpresets","wall","forts","fortQ","name","res","pop","tax","th","inside","fields","build","research","troops","train","mayor","heroes","innOffers","innRefreshAt"];
+var CITY_KEYS = ["ovb","autoHeal","alAcad","alBld","tg","fg","autoFort","trainer","researcher","reserve","gate","goals","gorder","wounded","autoTrain","autoMayor","wallHero","builds","bq","rq","presets","mpresets","wall","forts","fortQ","name","res","pop","tax","th","inside","fields","build","research","troops","train","mayor","heroes","innOffers","innRefreshAt"];
 function C(){ return S.cities[S.cur]; }
 var techVer=0, techCache={key:"",o:null};
 // Research is empire-wide: levels live in S.techG. A city only enjoys a level its own Academy can support.
@@ -10424,6 +10438,7 @@ var COMP_0222=false;
 try { if (loadRaw && !loadFail && S && !S.comp0222 && !localStorage.getItem("ibory-comp-0222")){ S.comp0222=1; S.real-=8*HOUR; COMP_0222=true; localStorage.setItem("ibory-comp-0222","1"); } } catch(e){}
 var COMP_H=(COMP_0214?8:0)+(COMP_0218?8:0)+(COMP_0222?8:0); // what this open gave, all told
 installProxies(S);
+try { ovSync(); } catch(e){} // 0.2.95: an Overlook in a plot moves to its own tile
 var BOOT_SV=(loadRaw && !loadFail && S.svAt) || 0; // 0.2.94: when the copy this device just opened was saved (0 = a new game, or one saved before 0.2.94)
 if (S.bf && S.bf.active) S.bf.last=Date.now(); // time with the app closed never counts
 S.cities.forEach(function(cc,ci){ withCity(ci,function(){
@@ -10522,7 +10537,7 @@ function stMB(n){ return (n/1048576).toFixed(n<1048576?2:1)+" MB"; }
 function saveErrShow(e){ var first=!saveErr; saveErr=String(e&&e.name||e); if (first || Date.now()-(saveErrShow.at||0)>10*60000){ saveErrShow.at=Date.now(); try { toast(cbOn()?"This device can\u2019t hold your game right now, so it\u2019s saving to the cloud every 2 minutes instead.":"Couldn\u2019t save the game: this browser\u2019s storage is full or blocked. Set up a cloud save in Settings, or export a save code."); } catch(x){} } if (cbOn()) setTimeout(cbAuto, 1000); }
 function saveIfDirty(){ if (S_DIRTY || Date.now()-saveAt>60000) save(); }
 
-function getSlot(w,i){ return w==="wall" ? {type:"walls",level:S.wall||0} : w==="th" ? {type:"townhall",level:S.th} : (w==="in" ? S.inside[i] : S.fields[i]); }
+function getSlot(w,i){ return w==="ov" ? (S.ovb||null) : w==="wall" ? {type:"walls",level:S.wall||0} : w==="th" ? {type:"townhall",level:S.th} : (w==="in" ? S.inside[i] : S.fields[i]); }
 // 0.2.9: Michelangelo's Scripts per upgrade: 1 to reach level 10, then doubling past it (historic cities): 11 takes 2, 12 takes 4 ... 18 takes 256
 function scriptsFor(L){ return L===10 ? 1 : L>10 ? Math.pow(2, L-10) : 0; }
 function costFor(type,L){ var b=DEF[type].cost,o={}; for (var k in b) o[k]=Math.round(b[k]*Math.pow(2,L-1)); var sc=scriptsFor(L); if (sc) o.script=sc; return o; } // the climb to level 10 also takes one Michelangelo’s Script
@@ -11037,7 +11052,7 @@ function swapPlots(w,a,b){
   if (w==="in") S.train.forEach(function(tr){ tr.slot=sw(tr.slot); });
   if (pg && pg.w===w) pg.i=sw(pg.i);
 }
-function viewCity(){
+function viewCity(){ if (ovSync()) save(); // a city taken or founded since gets its Overlook
   if (CITYV==="fields") return cityBack()+fieldsSection();
   if (CITYV==="walls") return cityBack()+fortSection();
   var thBusy = !!buildOn("th",0);
@@ -11056,7 +11071,8 @@ function cityTiles(){
   var wn=workersNeeded(), L=S.wall||0, fb=S.fortQ?FORTS[S.fortQ.f].name:"", fbusy=S.builds.some(function(b){ return b.where==="f"; }), wbusy=!!buildOn("wall",0)||!!S.fortQ;
   return '<div class="reptiles citytiles">'+
     '<button class="reptile" data-act="city-v" data-v="fields"><span class="rtop">'+ICON.farm+'<span class="nm">Fields</span><span class="n">'+used+'/'+slots+'</span></span><span class="ln">'+(wn>0?fmt(wn)+' workers needed':'every field worked')+(fbusy?' \u00b7 building':'')+'</span></button>'+
-    '<button class="reptile" data-act="city-v" data-v="walls"><span class="rtop">'+ICON.walls+'<span class="nm">Walls</span><span class="n">'+L+'</span></span><span class="ln">'+(L?fmt(fortUsed())+' of '+fmt(fortCap())+' space':'not built yet')+(fb?' \u00b7 building '+esc(fb):wbusy?' \u00b7 building':'')+'</span></button></div>';
+    '<button class="reptile" data-act="city-v" data-v="walls"><span class="rtop">'+ICON.walls+'<span class="nm">Walls</span><span class="n">'+L+'</span></span><span class="ln">'+(L?fmt(fortUsed())+' of '+fmt(fortCap())+' space':'not built yet')+(fb?' \u00b7 building '+esc(fb):wbusy?' \u00b7 building':'')+'</span></button>'+
+    (S.ovb?(function(){ var dn=dragonsOwned().length, en=eggsOwned().length; return '<button class="reptile ovtile" data-act="ov-open"><span class="rtop">'+ICON.overlook+'<span class="nm">Overlook</span><span class="n">'+S.ovb.level+'</span></span><span class="ln">'+(en?en+(en===1?' egg to hatch':' eggs to hatch'):dn+(dn===1?' dragon':' dragons'))+(buildOn("ov",0)?' \u00b7 building':'')+'</span></button>'; })():'')+'</div>';
 }
 function fieldsSection(){ // 0.2.49: its own page from the Fields tile
   var slots=fieldSlots(S.th), used=0;
@@ -12958,7 +12974,7 @@ function shopPost(path, body){
 }
 function shopGrant(g){
   if (!g) return;
-  if (g.dragon && DRAGONS[g.dragon] && !S.dragons[g.dragon]){ S.dragonEggs=S.dragonEggs||{}; S.dragonEggs[g.dragon]=1; note("items", "A "+DRAGONS[g.dragon].name+" Dragon egg is waiting in your Overlook. Tap Hatch when you\u2019re ready."); } // 0.2.51: an egg
+  if (g.dragon && DRAGONS[g.dragon] && !S.dragons[g.dragon]){ S.dragonEggs=S.dragonEggs||{}; S.dragonEggs[g.dragon]=1; ovSync(); note("items", "A "+DRAGONS[g.dragon].name+" Dragon egg is waiting in your Overlook (under any city). Tap Hatch when you\u2019re ready."); } // 0.2.51: an egg
   if (g.item) S.items[g.item]=(S.items[g.item]||0)+(g.qty||1);
 }
 // each purchase and gift is applied once (the ids are remembered in the save), then acknowledged so the server stops sending it
@@ -12966,7 +12982,7 @@ function shopApply(st){
   var ids=[], gids=[];
   (st.pending||[]).forEach(function(p){ if (S.shopSeen.indexOf(p.id)<0){ shopGrant(p.grant); S.shopSeen.push(p.id); } ids.push(p.id); });
   (st.gifts||[]).forEach(function(g){ if (S.giftSeen.indexOf(g.id)<0){ S.items[g.item]=(S.items[g.item]||0)+g.qty; S.giftSeen.push(g.id); note("items",String(g.from||"")+" sent you "+fmt(g.qty)+" × "+((ITEMS[g.item]||{}).name||g.item)); } gids.push(g.id); });
-  (st.dragons||[]).forEach(function(t){ if (DRAGONS[t] && !S.dragons[t]){ S.dragonEggs=S.dragonEggs||{}; S.dragonEggs[t]=1; } }); // a restored older save still has the dragons you paid for (as an egg, if it never hatched here)
+  (st.dragons||[]).forEach(function(t){ if (DRAGONS[t] && !S.dragons[t]){ S.dragonEggs=S.dragonEggs||{}; S.dragonEggs[t]=1; } }); if (ovSync()) save(); // a restored older save still has the dragons you paid for (as an egg, if it never hatched here)
   if (S.shopSeen.length>300) S.shopSeen=S.shopSeen.slice(-300);
   if (S.giftSeen.length>300) S.giftSeen=S.giftSeen.slice(-300);
   S.warMarks=st.balance;
@@ -14397,16 +14413,34 @@ function shareReport(){
 }
 function reportDetail(r){ if (r.pvr) return pvRepHtml(r.d); if (r.arena) return arenaRepHtml(r); if (r.rally) return rallyRepHtml(r); return reportDetailBase(r)+killsHtml(r); }
 function modsLine(r){ if (!r.mods || !(r.mods[0]||r.mods[1]||r.mods[2])) return ""; /* 0.2.50: no "+0%" line */ var f=function(v){ return (v>=0?"+":"\u2212")+Math.abs(v)+"%"; };
-  return '<div class="us" style="margin:4px 0;display:flex;flex-wrap:wrap;gap:2px 14px"><span>Your attack <b>'+f(r.mods[0])+'</b></span><span>Defence <b>'+f(r.mods[1])+'</b></span><span>Troop life <b>'+f(r.mods[2])+'</b></span></div>'; }
+  return '<div class="rpmods"><span>Attack <b>'+f(r.mods[0])+'</b></span><span>Defence <b>'+f(r.mods[1])+'</b></span><span>Troop life <b>'+f(r.mods[2])+'</b></span></div>'; } // 0.2.95: three chips
+/* 0.2.95 (Cody): the top of a battle report is four number tiles (lost, wounded, killed, rounds), the bonus chips and one line for the hero; everything
+   won (resources, items with their pictures, a medal) is under Loot at the bottom instead of in the heading. */
+function repStats(r, killed){ var t=function(n,l,c){ return '<div'+(c?' class="'+c+'"':'')+'><b>'+n+'</b><span>'+l+'</span></div>'; };
+  return '<div class="rpstats">'+t(fmt(r.lost||0),"Lost",r.lost?"bad":"")+t(fmt(r.wounded||0),"Wounded","")+t(fmt(killed),"Killed",killed?"good":"")+t(fmt(r.rounds||0),r.rounds===1?"Round":"Rounds","")+'</div>'; }
+function dropParse(t){ var best=null, lo=String(t).toLowerCase(); for (var k in ITEMS){ var nm=String(ITEMS[k].name||"").toLowerCase(); if (!nm || !ITEM_IMG[k]) continue; var sg=nm.replace(/s$/,"");
+    if ((lo.indexOf(nm)>=0 || lo.indexOf(sg)>=0) && (!best || nm.length>best.nm.length)) best={k:k, nm:nm}; }
+  if (!best) return null; var m=lo.match(/^\s*([\d,.]+)\s/); return {k:best.k, n:m?(+m[1].replace(/,/g,"")||1):1}; }
+function repLootHtml(r){ var res=RES.filter(function(k){ return r.loot && r.loot[k]; }), items={}, other=[];
+  (r.drops||[]).forEach(function(t){ var d=dropParse(t); if (d) items[d.k]=(items[d.k]||0)+d.n; else if (!/ medal$/.test(t)) other.push(t); });
+  var md=r.medal!=null && r.medal>=0 ? MEDALS[r.medal] : null, jm=(r.drops||[]).some(function(t){ return t==="a Justice medal"; });
+  if (!res.length && !Object.keys(items).length && !other.length && !md && !jm) return '';
+  var h='<div class="h3" style="margin-top:10px">Loot</div>'+(res.length?repResTiles(r.loot):'');
+  var tiles=Object.keys(items).map(function(k){ return '<span class="rwit" title="'+esc(ITEMS[k].name)+'">'+itemImg(k)+'<b>\u00d7'+fmt(items[k])+'</b><i>'+esc(ITEMS[k].name)+'</i></span>'; });
+  if (md) tiles.push('<span class="rwit">'+alArt("mem-"+md[0],30)+'<b>\u00d71</b><i>'+md[1]+' medal</i></span>');
+  if (jm && !(md && md[0]==="justice")) tiles.push('<span class="rwit">'+alArt("mem-justice",30)+'<b>\u00d71</b><i>Justice medal</i></span>');
+  if (tiles.length) h+='<div class="rwgrid rploot">'+tiles.join("")+'</div>';
+  if (other.length) h+='<p class="dur" style="margin:6px 0 0">'+other.map(esc).join(" \u00b7 ")+'</p>';
+  return h; }
 function reportDetailBase(r){
   if (r.scout) return r.intel ? '<p class="hint">Scouts got through'+(r.lost?' ('+fmt(r.lost)+' lost)':'')+'.</p>'+repScoutUnits(r.intel.inf<3?r.intel.t.map(roughN):r.intel.t, r.intel.inf<3?null:r.intel.f, r.intel.wall)+repResTiles(r.intel.res, true) : '<p class="hint">All '+fmt(r.lost)+' scouts were caught.</p>'; // 0.2.50: icons
   if (r.def) return woundLine(r)+modsLine(r)+'<p class="hint">'+r.rounds+(r.rounds===1?' round.':' rounds.')+''+(r.repaired?' Machinery repaired '+Math.round(r.repaired*100)+'% of lost archer towers (more of other fortifications).':'')+'</p>'+
     '<div class="tscroll"><table class="gt rpt3">'+repTableHead("Yours","Theirs")+'<tbody>'+ /* 0.2.50: unit icons, two-row header */
     U.map(function(u,i){ if (!r.sent[i] && !r.had[i]) return ''; var a1=r.sent[i]-r.left[i], a2=r.had[i]-r.eleft[i]; return '<tr>'+repUnitCell(i)+'<td>'+fmt(r.sent[i])+'</td><td class="'+(a1?'loss':'')+'">'+fmt(a1)+'</td><td>'+fmt(r.had[i])+'</td><td class="'+(a2?'ok':'')+'">'+fmt(a2)+'</td></tr>'; }).join("")+
     FORTN.map(function(n,k){ if (!r.forts[k]) return ''; var lf=r.forts[k]-r.fleft[k]; return '<tr>'+repFortCell(n,"Your ")+'<td>'+fmt(r.forts[k])+'</td><td class="'+(lf?'loss':'')+'">'+fmt(lf)+'</td><td></td><td></td></tr>'; }).join("")+'</tbody></table></div>'+(r.loot&&RES.some(function(k){ return r.loot[k]; })?'<div class="h3" style="margin-top:8px">Plundered</div>'+repResTiles(r.loot):'')+allyRepHtml(r);
-  var loot=RES.reduce(function(a,k){ return a+(r.loot[k]||0); },0);
-  return woundLine(r)+modsLine(r)+'<p class="hint">'+r.rounds+(r.rounds===1?' round.':' rounds.')+''+(r.hero?' '+esc(r.hero)+' led and earned '+fmt(r.xp)+' experience'+(r.xpWait?' (this tile gave experience less than an hour ago: more in '+fmtT(realMs(r.xpWait))+')':'')+'.':' No hero led this army.')+'</p>'+reportTable(r)+
-    (loot?'<div class="h3" style="margin-top:8px">Loot</div>'+repResTiles(r.loot):''); // 0.2.50: resource icons
+  var killed=0; for (var ki=0;ki<12;ki++) killed+=Math.max(0,(r.had[ki]||0)-(r.eleft[ki]||0));
+  return repStats(r, killed)+modsLine(r)+'<p class="rphero">'+(r.hero?'<b>'+esc(r.hero)+'</b> led \u00b7 +'+fmt(r.xp)+' experience'+(r.xpWait?' <span class="dur">(this tile gave experience less than an hour ago: more in '+fmtT(realMs(r.xpWait))+')</span>':''):'<span class="dur">No hero led this army.</span>')+
+    (r.wounded?'<span class="dur"> \u00b7 the wounded wait in the Medic Camp for 24 hours</span>':'')+'</p>'+reportTable(r)+repLootHtml(r); // 0.2.95
 }
 // the Reports tab asks every render tick; the list is only rebuilt when a report arrived or the filter, search, page or a star changed
 function fillRepList(force){
@@ -14496,7 +14530,7 @@ function upgradeBlock(w,i){ // 0.2.49: one layout for every building: header wit
         :'<button class="btn ghost bpgo" data-act="queue-up" data-to="'+tgt+'">'+(many?'Queue to level '+tgt:'Add to queue')+'</button><div class="dur bpq">Starts when a builder is free and you can afford it'+(qn?' \u00b7 '+qn+' already queued':'')+'</div>')+'</div>';
   } else h+='<p class="sub">'+(busy||qn?'Its last level is already underway or queued.':'Fully upgraded.')+'</p>';
   h+=levelGuideHtml(s.type, L);
-  if (L>0 && w!=="th" && w!=="wall"){
+  if (L>0 && w!=="th" && w!=="wall" && w!=="ov"){
     var dw=demolishWhy(w,i);
     h+='<div class="bfoot"><span class="dur">'+(dw?esc(dw):armed==="demolish"?'Nothing is refunded.':'')+'</span><button class="btn ghost danger small" data-act="demolish"'+(dw?' disabled':'')+'>'+(armed==="demolish"?"Tap again to demolish":"Demolish")+'</button></div>';
   }
@@ -15670,7 +15704,8 @@ function renderSheetCore0(){
     var wcp=wcById(sheetFor.id); if (!wcp){ closeSheet(); return; } h=wcSheet(wcp);
   } else if (sheetFor.kind==="report"){
     var rc=sheetFor.c, rr=sheetFor.rep, rv = rc.pv ? (rc.r===1?"Won":"Lost") : rc.sc ? (rc.r===1?"Scouted":"Caught") : rc.d ? (rc.r===1?"Broken":"Held") : (rc.r===1?((rc.l||rc.wd)?"Victory":"Flawless"):rc.r===3?"Stalemate":"Defeat"), rg = rc.d ? rc.r!==1 : rc.r===1;
-    var rex=[]; if (rc.l) rex.push("lost "+fmt(rc.l)); if (rc.k) rex.push("killed "+fmt(rc.k)); if (rc.lo) rex.push((rc.d?"lost ":"")+fmt(rc.lo)+" loot"); if (rc.m>=0) rex.push(MEDALS[rc.m][1]+" medal"); if (rc.g.length) rex.push(rc.g.join(", ")); if (rc.h) rex.push(rc.h+" captured"); if (rc.f) rex.push(rc.f+" taken");
+    var rplain=rr && !rr.arena && !rr.rally && !rr.pvr && !rr.def && !rr.scout; // 0.2.95: a plain attack report shows its totals and loot in the body, so the heading is just when and where
+    var rex=[]; if (rplain){} else if (rc.l) rex.push("lost "+fmt(rc.l)); if (!rplain){ if (rc.k) rex.push("killed "+fmt(rc.k)); if (rc.lo) rex.push((rc.d?"lost ":"")+fmt(rc.lo)+" loot"); if (rc.m>=0) rex.push(MEDALS[rc.m][1]+" medal"); if (rc.g.length) rex.push(rc.g.join(", ")); } if (rc.h) rex.push(rc.h+" captured"); if (rc.f) rex.push(rc.f+" taken");
     // 0.2.50: ✕ in the heading, one line of time and totals, War Wizard as the one main button, Save / Map / Share as icon buttons
     var rpIcoB=function(act, lab, svg, on, extra){ return '<button class="btn ghost small rpib'+(on?' on':'')+'" data-act="'+act+'" aria-label="'+lab+'" title="'+lab+'"'+(extra||'')+'>'+svg+'</button>'; };
     var svgMap='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-5.6-6-11a6 6 0 0 1 12 0c0 5.4-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/></svg>';
@@ -16500,7 +16535,7 @@ document.addEventListener("click",function(e){
   if (act==="upgrade"){ var uc=ctxPlot(), s=getSlot(uc.w,uc.i); if (s && !upgradeWhy(s.type,s.level) && startBuild(uc.w,uc.i,s.type) && +a.dataset.to) bqFill(uc.w,uc.i,s.type,+a.dataset.to); if (uc) delete uc.tgt; closeSheet(); lastView=""; refresh(); return; }
   if (act==="cancel-build" && S.builds[+a.dataset.slot]){
     var bs=+a.dataset.slot, b=S.builds[bs], bc=costFor(b.type,b.to); bc.script = b.sc!=null ? b.sc : (b.to===10 ? 1 : 0); pay(bc,-1); // 0.2.9: give back the Scripts actually paid (builds started before 0.2.9 paid none past 10)
-    if (b.to===1 && b.where!=="th" && b.where!=="wall"){ if (b.where==="in") S.inside[b.idx]=null; else S.fields[b.idx]=null; }
+    if (b.to===1 && b.where!=="th" && b.where!=="wall" && b.where!=="ov"){ if (b.where==="in") S.inside[b.idx]=null; else S.fields[b.idx]=null; }
     S.bq=S.bq.filter(function(it){ return !(it.w===b.where && it.i===b.idx); }); // 0.2.84: and the levels queued behind it, or the queue starts it again at once
     S.builds.splice(bs,1); toastQ("Construction cancelled. Resources returned."); refresh(); return;
   }
@@ -17012,6 +17047,7 @@ document.addEventListener("click",function(e){
   if (act==="hsort"){ var hs0=C().heroSort=C().heroSort||{a:"level",b:"atk"}; if (hs0.a!==a.dataset.k){ hs0.b=hs0.a; hs0.a=a.dataset.k; } save(); lastView=""; renderView(true); return; } // 0.2.49: sort chips on the Heroes tab
   if (act==="off-help"){ OFFHELP=!OFFHELP; lastView=""; renderView(true); return; }
   if (act==="ry-rep-retry"){ var rrp=S.reports.filter(function(x){ return x.id===+a.dataset.id; })[0]; if (rrp){ delete RYREP[rrp.aid+"/"+rrp.rid]; ryRepFetch(rrp); lastSheet=""; renderSheet(); } return; } // 0.2.50
+  if (act==="ov-open"){ if (S.ovb) openSheet({kind:"plot", w:"ov", i:0}); return; }
   if (act==="dg-hatch"){ var ht=a.dataset.t; if (!DRAGONS[ht] || !S.dragonEggs || !S.dragonEggs[ht] || (S.dragons&&S.dragons[ht])) return; var hrow=a.closest(".dgrow"); if (hrow) hrow.classList.add("hatching"); a.disabled=true; // 0.2.51: the egg wobbles and cracks, then the dragon is yours
     setTimeout(function(){ delete S.dragonEggs[ht]; S.dragons[ht]={lv:1}; save(); toastQ("Your "+DRAGONS[ht].name+" Dragon hatched!"); lastSheet=""; renderSheet(); lastView=""; refresh(); }, 900); return; }
   if (act==="hero-fav"){ var fh=heroById(+a.dataset.id); if (fh){ fh.fav=!fh.fav; save(); lastSheet=""; renderSheet(); lastView=""; refresh(); toastQ(fh.fav?fh.name+" is a favourite":fh.name+" is no longer a favourite"); } return; }
