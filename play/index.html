@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.109";
+window.IBORY_V="0.2.110";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1087,6 +1087,7 @@ tr.arwon td{background:rgba(200,160,70,.14)}
 .lbr{flex:none;width:1.9em;text-align:center;color:var(--muted);font-variant-numeric:tabular-nums;font-size:.9rem}.lbnm{flex:1;min-width:0;overflow-wrap:anywhere;font-weight:600;line-height:1.25}.lbrow .lbv{flex:none;font-weight:700;font-variant-numeric:tabular-nums}
 .lbrow .hnm,.lbrow .hst{display:block;font-size:.8em;font-weight:400}
 .dtgrps{margin-top:0}
+.gpsbar .farmadd{flex-wrap:wrap;margin:0 0 6px}.gpsbar{margin-bottom:6px}
 .fmcard .fmhd{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px}.fmcard .fmhdt{flex:1;min-width:0}.fmcard h3{margin:0 0 2px}.fmarmy{margin:0;font-size:.9rem;line-height:1.35}
 .fmcard .rpstats b{font-size:1.02rem;white-space:nowrap}.fmcard .rpstats small{font-size:.72rem;color:var(--muted);font-weight:400}.fmcard .rpstats span{text-align:center;line-height:1.15}
 .fmlv{margin:-2px 0 8px;font-size:.84rem}.fmlab{display:block;font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:8px 0 4px}
@@ -1905,7 +1906,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.109";
+var APP_VERSION = "0.2.110";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -5166,17 +5167,24 @@ function viewMap(){
    Per city (presets are), kept for the session only. */
 var MAPFARM=-1;
 var MAPFARM_COL="#37d3e6";
-function mapFarmIds(){ if (MAPFARM<0) return []; var pr=S.presets&&S.presets[MAPFARM]; return pr ? pr.farm.filter(function(id){ return TILE_BY[id]; }) : []; }
+// MAPFARM: -1 off, -2 every list of this city at once (0.2.110, Cody), otherwise one preset's list
+var MAPFARM_COLS=["#37d3e6","#f2c14e","#ef7d6b","#9be36b","#c792ea","#5aa9ff","#ff9f43","#4ee0b5","#f78fb3","#d6e05a"];
+function mapFarmItems(){ var ps=S.presets||[], out=[], seen={};
+  if (MAPFARM===-2){ ps.forEach(function(pr,pi){ pr.farm.forEach(function(id){ if (!TILE_BY[id] || seen[id]) return; seen[id]=1; out.push({id:id, t:String(pi+1), col:MAPFARM_COLS[pi%MAPFARM_COLS.length]}); }); }); return out; }
+  var pr=MAPFARM>=0&&ps[MAPFARM]; if (!pr) return out; pr.farm.forEach(function(id){ if (TILE_BY[id]) out.push({id:id, t:String(out.length+1), col:MAPFARM_COL}); }); return out; }
+function mapFarmIds(){ return mapFarmItems().map(function(x){ return x.id; }); }
 function mapFarmSummary(){ var ids=mapFarmIds(), c={}, order=[], nm={npc:["NPC city","NPC cities"], ai:["AI lord","AI lords"], hc:["historic city","historic cities"], val:["valley or flat","valleys and flats"], other:["other","others"]};
-  if (!ids.length) return "This preset’s farm list is empty. Add targets from a tile’s card.";
+  if (!ids.length) return MAPFARM===-2?"This city\u2019s farm lists are empty. Add targets from a tile\u2019s card.":"This preset’s farm list is empty. Add targets from a tile’s card.";
   ids.forEach(function(id){ var q=TILE_BY[id], k=nm[q.k]?q.k:VTYPES[q.k]?"val":"other"; if (!c[k]){ c[k]=0; order.push(k); } c[k]++; });
-  return fmt(ids.length)+" target"+(ids.length>1?"s":"")+": "+order.map(function(k){ return c[k]+" "+nm[k][c[k]>1?1:0]; }).join(", ")+". Outlined on the map, numbered in farm order."; }
+  var nl=(S.presets||[]).filter(function(p){ return p.farm.length; }).length;
+  return fmt(ids.length)+" target"+(ids.length>1?"s":"")+(MAPFARM===-2?" in "+nl+" list"+(nl>1?"s":""):"")+": "+order.map(function(k){ return c[k]+" "+nm[k][c[k]>1?1:0]; }).join(", ")+(MAPFARM===-2?". Outlined on the map, each marked with its preset\u2019s number and colour.":". Outlined on the map, numbered in farm order."); }
 function mapFarmHtml(){ var ps=S.presets||[];
   if (MAPFARM<0 && !ps.some(function(p){ return p.farm.length; })) return ''; // 0.2.50: no lists, no row (every option was disabled)
-  var opts='<option value="-1">Off</option>'+ps.map(function(p,i){ var n=p.farm.length; return '<option value="'+i+'"'+(i===MAPFARM?' selected':'')+(n||i===MAPFARM?'':' disabled')+'>'+(i+1)+'. '+esc(p.name)+' ('+n+')</option>'; }).join("");
+  var tot=0, seen={}; ps.forEach(function(p){ p.farm.forEach(function(id){ if (!seen[id]){ seen[id]=1; tot++; } }); });
+  var opts='<option value="-1">Off</option><option value="-2"'+(MAPFARM===-2?' selected':'')+'>All lists ('+tot+')</option>'+ps.map(function(p,i){ var n=p.farm.length; return '<option value="'+i+'"'+(i===MAPFARM?' selected':'')+(n||i===MAPFARM?'':' disabled')+'>'+(i+1)+'. '+esc(p.name)+' ('+n+')</option>'; }).join("");
   return '<span class="mapfarmrow"><select id="mapfarm" aria-label="Show a farm list on the map">'+opts.replace('>Off<','>Farm list: off<')+'</select>'+
-    (MAPFARM>=0 && mapFarmIds().length?'<button class="btn ghost small mffit" data-act="map-farmfit" title="Show all" aria-label="Show all">'+mpIc("zoom",17)+'</button>':'')+'</span>'; }
-function mapFarmStatHtml(){ return MAPFARM>=0?'<p class="dur" id="mapfarmstat">'+esc(mapFarmSummary())+'</p>':''; } // its own line under the strip (0.2.75), so the strip stays one row
+    (MAPFARM!==-1 && mapFarmIds().length?'<button class="btn ghost small mffit" data-act="map-farmfit" title="Show all" aria-label="Show all">'+mpIc("zoom",17)+'</button>':'')+'</span>'; }
+function mapFarmStatHtml(){ return MAPFARM!==-1?'<p class="dur" id="mapfarmstat">'+esc(mapFarmSummary())+'</p>':''; } // its own line under the strip (0.2.75), so the strip stays one row
 function mapFarmRefresh(){ var el=document.getElementById("mapfarmbox"); if (el) el.innerHTML=mapFarmHtml(); var sl=document.getElementById("mapfarmstatbox"); if (sl) sl.innerHTML=mapFarmStatHtml(); requestDraw(); }
 // zoom and pan so the whole list (and the city it farms from) is in view, as far as the zoom allows
 function mapFarmFit(){ var ids=mapFarmIds(), c=document.getElementById("mapc"); if (!ids.length || !c) return;
@@ -5184,11 +5192,11 @@ function mapFarmFit(){ var ids=mapFarmIds(), c=document.getElementById("mapc"); 
   var minx=Math.min.apply(null,xs), maxx=Math.max.apply(null,xs), miny=Math.min.apply(null,ys), maxy=Math.max.apply(null,ys);
   var W=c.clientWidth||360, H=c.clientHeight||360; mv.z=Math.max(6, Math.min(30, Math.min(W/(maxx-minx+3), H/(maxy-miny+3))));
   centerOn((minx+maxx)/2, (miny+maxy)/2); requestDraw(); }
-function mapFarmDraw(g, z, x0, y0, x1, y1){ var ids=mapFarmIds(); if (!ids.length) return; var col=MAPFARM_COL;
-  g.save(); ids.forEach(function(id,i){ var q=TILE_BY[id]; if (q.x<x0-1 || q.x>x1+1 || q.y<y0-1 || q.y>y1+1) return; var x=(q.x-mv.x)*z, y=(q.y-mv.y)*z;
+function mapFarmDraw(g, z, x0, y0, x1, y1){ var its=mapFarmItems(); if (!its.length) return;
+  g.save(); its.forEach(function(it){ var id=it.id, col=it.col, q=TILE_BY[id]; if (q.x<x0-1 || q.x>x1+1 || q.y<y0-1 || q.y>y1+1) return; var x=(q.x-mv.x)*z, y=(q.y-mv.y)*z;
     if (z<10){ var r=Math.max(2.5,z*0.38); g.fillStyle=col; g.strokeStyle="rgba(0,0,0,.75)"; g.lineWidth=1.2; g.beginPath(); g.arc(x+z/2,y+z/2,r,0,Math.PI*2); g.fill(); g.stroke(); return; }
     g.lineWidth=5; g.strokeStyle="rgba(0,0,0,.6)"; g.strokeRect(x+2,y+2,z-4,z-4); g.lineWidth=2.5; g.strokeStyle=col; g.strokeRect(x+2,y+2,z-4,z-4);
-    if (z>=16){ var t=String(i+1), bw=Math.max(14,t.length*7+6); g.fillStyle=col; g.fillRect(x+1,y+1,bw,13); g.font="700 10px sans-serif"; g.fillStyle="#08262b"; g.textAlign="center"; g.textBaseline="middle"; g.fillText(t,x+1+bw/2,y+8); } });
+    if (z>=16){ var t=it.t, bw=Math.max(14,t.length*7+6); g.fillStyle=col; g.fillRect(x+1,y+1,bw,13); g.font="700 10px sans-serif"; g.fillStyle="#08262b"; g.textAlign="center"; g.textBaseline="middle"; g.fillText(t,x+1+bw/2,y+8); } });
   g.restore(); }
 function centerOn(x,y){ var c=document.getElementById("mapc"); if (!c) { mv.x=x; mv.y=y; return; } mv.x=x+0.5-c.clientWidth/mv.z/2; mv.y=y+0.5-c.clientHeight/mv.z/2; clampView(); }
 function clampView(){ var c=document.getElementById("mapc"); if (!c) return;
@@ -5280,7 +5288,7 @@ function drawMini(){
   g.strokeStyle="#fff"; g.lineWidth=1.5; g.strokeRect(mv.x, mv.y, mc.clientWidth/mv.z, mc.clientHeight/mv.z);
   S.cities.forEach(function(ct){ g.fillStyle=ct.id===C().id?"#fff":"#ffe08a"; g.fillRect(ct.x-1,ct.y-1,3,3); });
   (S.bm||[]).forEach(function(b){ var xy=b.id.split(","); g.fillStyle="#000"; g.fillRect(+xy[0]-2,+xy[1]-2,5,5); g.fillStyle="#ffd34d"; g.fillRect(+xy[0]-1,+xy[1]-1,3,3); });
-  mapFarmIds().forEach(function(id){ var q=TILE_BY[id]; g.fillStyle="#000"; g.fillRect(q.x-2,q.y-2,5,5); g.fillStyle=MAPFARM_COL; g.fillRect(q.x-1,q.y-1,3,3); }); // 0.1.243
+  mapFarmItems().forEach(function(it){ var q=TILE_BY[it.id]; g.fillStyle="#000"; g.fillRect(q.x-2,q.y-2,5,5); g.fillStyle=it.col; g.fillRect(q.x-1,q.y-1,3,3); }); // 0.1.243
 }
 /* 0.2.43: map text from a cache. Outlined and filled text was most of a zoomed-in map frame (Cody, Nov 4: full-screen maps lag when
    dragged), so each label (text, font, colours, alignment, screen scale) is drawn once onto a small canvas and stamped after that.
@@ -11772,6 +11780,14 @@ function forgeGear(){ // the piece the open menu is upgrading: the one in the Fo
   if (sheetFor.kind==="gearpick"){ var fh=heroById(sheetFor.hero); return fh?(wornAt(fh,sheetFor.slot)||null):null; }
   return null;
 }
+// 0.2.110 (Cody): sort and filter the pieces you can put in a slot. Kept for the session, the same for every slot.
+var GPS={sort:"spare", stat:""};
+var GPS_SORTS=[["spare","Spare first"],["val","Strongest"],["stars","Stars"],["tier","Tier"]];
+function gpsOrder(a,b){ var sp=(gearUnworn(b)?1:0)-(gearUnworn(a)?1:0), v=gearVal(b)-gearVal(a);
+  if (GPS.sort==="val") return v || sp; if (GPS.sort==="stars") return (b.stars-a.stars) || (b.tier-a.tier) || sp; if (GPS.sort==="tier") return (b.tier-a.tier) || (b.stars-a.stars) || sp; return sp || v; }
+function gpsBar(all){ var cnt={atk:0,pol:0,int:0}; all.forEach(function(g){ cnt[gearStat(g)]=(cnt[gearStat(g)]||0)+1; });
+  return '<div class="gpsbar"><div class="farmadd"><span class="dur">Sort:</span>'+GPS_SORTS.map(function(x){ return '<button class="chipbtn'+(GPS.sort===x[0]?' on':'')+'" data-act="gps-sort" data-v="'+x[0]+'" aria-pressed="'+(GPS.sort===x[0])+'">'+x[1]+'</button>'; }).join("")+'</div>'+
+    '<div class="farmadd"><span class="dur">Show:</span><button class="chipbtn'+(!GPS.stat?' on':'')+'" data-act="gps-stat" data-v="" aria-pressed="'+!GPS.stat+'">All '+all.length+'</button>'+["atk","pol","int"].map(function(k){ return cnt[k]?'<button class="chipbtn'+(GPS.stat===k?' on':'')+'" data-act="gps-stat" data-v="'+k+'" aria-pressed="'+(GPS.stat===k)+'">'+STATN[k]+' '+cnt[k]+'</button>':''; }).join("")+'</div></div>'; }
 function gearPickSheet(hr, slot){
   var ps=posInfo(slot), sl=GEAR_SLOTS.filter(function(x){ return x.k===ps.type; })[0], cur=wornAt(hr,ps.k);
   var opts=S.gear.filter(function(x){ return x.slot===ps.type && x!==cur; }).sort(function(a,b){ return gearVal(b)-gearVal(a); });
@@ -11780,9 +11796,11 @@ function gearPickSheet(hr, slot){
   var cw=craftWhy(0);
   h+='<div class="h3">Craft a new one</div>'+craftStatChips()+'<div class="effect">Common '+sl.name+' of '+STAT_WORD[craftStat]+': +'+GEAR_BASE[0]+' '+STATN[craftStat]+', made from '+MAT_NEED[0]+' '+ITEMS[MAT[0]].name+' (you have '+fmt(S.items[MAT[0]]||0)+'). Upgrade its tier and stars right here afterwards.</div>'+
     '<div class="act"><span class="why">'+cw+'</span><span class="btnrow"><button class="btn ghost small" data-act="gear-craft"'+(cw?' disabled':'')+'>Craft</button><button class="btn small" data-act="gear-craft" data-wear="1"'+(cw?' disabled':'')+'>Craft and wear</button></span></div>';
-  if (opts.length) h+='<div class="h3">'+(cur?'Swap it for':'Equip')+'</div>';
+  if (opts.length) h+='<div class="h3">'+(cur?'Swap it for':'Equip')+'</div>'+gpsBar(opts);
+  var shown=opts.filter(function(g){ return !GPS.stat || gearStat(g)===GPS.stat; });
   if (!opts.length) h+='<p class="hint">No other '+sl.name.toLowerCase()+' in the armory. Craft one above.</p>';
-  else h+='<div class="armgrid">'+opts.sort(function(a,b){ return (gearUnworn(b)?1:0)-(gearUnworn(a)?1:0) || gearVal(b)-gearVal(a); }).map(function(g){ var who=g.on?heroById(g.on):null; if (who===hr) who=null; var d=gearVal(g)-(cur?gearVal(cur):0);
+  else if (!shown.length) h+='<p class="hint">No '+STATN[GPS.stat]+' '+sl.name.toLowerCase()+'s. <button class="link" data-act="gps-stat" data-v="">Show all</button></p>';
+  else h+='<div class="armgrid">'+shown.sort(gpsOrder).map(function(g){ var who=g.on?heroById(g.on):null; if (who===hr) who=null; var d=gearVal(g)-(cur?gearVal(cur):0);
     return '<button class="acell" data-act="gear-on" data-g="'+g.id+'" aria-label="'+esc(gearName(g))+'">'+gearTile(g,{size:60})+'<span class="av"><b>+'+gearVal(g)+' '+STATN[gearStat(g)].slice(0,3)+'</b>'+(cur?' <i class="'+(d>0?'okc':d<0?'badc':'')+'">'+(d>0?'+':'')+d+'</i>':'')+'<br>'+(who?'<i>on '+esc(who.name)+'</i>':'spare')+'</span></button>'; }).join("")+'</div>';
   return h+'<button class="closebtn" data-act="close">Back to '+esc(hr.name)+'\u2019s gear</button>';
 }
@@ -16770,6 +16788,7 @@ document.addEventListener("click",function(e){
     var bi=ord.indexOf(swapWith); ord[at]=swapWith; ord[bi]=gu;
     S.gorder=ord; save(); lastView=""; renderView(true); return;
   }
+  if (act==="gps-sort"||act==="gps-stat"){ if (act==="gps-sort") GPS.sort=a.dataset.v; else GPS.stat=a.dataset.v; var gy=sheetBody?sheetBody.scrollTop:0; lastSheet=""; renderSheet(); if (sheetBody) sheetBody.scrollTop=gy; return; }
   if (act==="craft-stat"){ if (STATN[a.dataset.v]) craftStat=a.dataset.v; lastView=""; renderView(true); if (sheetFor){ lastSheet=""; renderSheet(); } return; }
   if (act==="craft"){ craftTier=0; if (craftWhy(0)) return; S.items[MAT[0]]-=MAT_NEED[0]; var cg=makeGear(0,a.dataset.slot,craftStat); toastQ("Crafted a "+gearName(cg)); save(); lastView=""; renderView(true); return; }
   if (act==="demolish"){
@@ -17470,7 +17489,7 @@ document.addEventListener("change",function(e){ markDirty();
     if (e.target.dataset.simdg==="def" && sim.def.preset!=="custom") sim.def.preset="custom"; lastView=""; renderView(true); return; }
   if (e.target.id==="bqunit"){ BQD.u=+e.target.value; e.target.blur(); lastView=""; renderView(true); return; }
   if (e.target.id==="bqamt"){ BQD.n=e.target.value; bqRefresh(); return; }
-  if (e.target.id==="mapfarm"){ MAPFARM=+e.target.value; e.target.blur(); mapFarmRefresh(); if (MAPFARM>=0) mapFarmFit(); return; } // 0.1.243
+  if (e.target.id==="mapfarm"){ MAPFARM=+e.target.value; e.target.blur(); mapFarmRefresh(); if (MAPFARM!==-1) mapFarmFit(); return; } // 0.1.243
   if (e.target.id==="bmjump"||e.target.id==="cityjump"||e.target.id==="cityjumpfs"){ var bj=e.target.value; e.target.value=""; e.target.blur(); if (bj) mapGo(bj); return; }
   if (e.target.id==="ryfrom"){ RYS.from=+e.target.value; e.target.blur(); lastSheet=""; renderSheet(); return; }
   if (e.target.id==="bplv"){ var bcx=ctxPlot(); if (bcx) bcx.tgt=+e.target.value; e.target.blur(); lastSheet=""; renderSheet(); if (tab==="bldg"){ lastView=""; renderView(true); } return; } // 0.2.83; 0.2.84: the seven page buildings too
