@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.102";
+window.IBORY_V="0.2.103";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1059,7 +1059,18 @@ table.gt.wrap1 th:first-child,table.gt.wrap1 td:first-child{white-space:normal} 
 tr.arwon td{background:rgba(200,160,70,.14)}
 .aitag{display:inline-block;font:700 .66rem/1 sans-serif;letter-spacing:.04em;padding:2px 5px;border-radius:5px;background:#5b2a6e;color:#fff;vertical-align:middle}
 .hms{display:inline-flex;align-items:center;gap:2px}.wvctl .hms{display:flex;width:100%}.wvctl .hms select{width:auto;flex:1;min-width:0}.wvrow .hms{flex:none}.hms select{width:auto;min-width:0;padding-left:6px;padding-right:6px;font-variant-numeric:tabular-nums}.hms b{opacity:.6}
-.wvcity{border:1px solid var(--line);border-radius:10px;padding:6px 10px;margin:6px 0;background:var(--panel2)}.wvcity summary{display:flex;justify-content:space-between;align-items:baseline;gap:8px;cursor:pointer;list-style:none}.wvcity summary::-webkit-details-marker{display:none}.wvcity summary .dur{font-size:.76rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wvcity .wvrow:last-child{border-bottom:0}.wvmv{flex:none;min-width:36px;padding-left:0;padding-right:0}.qlist .wvmv{margin-left:4px}
+.wvcity{border:1px solid var(--line);border-radius:10px;padding:6px 10px;margin:6px 0;background:var(--panel2)}.wvcity summary{display:flex;justify-content:space-between;align-items:baseline;gap:8px;cursor:pointer;list-style:none}.wvcity summary::-webkit-details-marker{display:none}.wvcity summary .dur{font-size:.76rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wvcity .wvrow:last-child{border-bottom:0}.fmcard .fmhd{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px}.fmcard .fmhdt{flex:1;min-width:0}.fmcard h3{margin:0 0 2px}.fmarmy{margin:0;font-size:.9rem;line-height:1.35}
+.fmcard .rpstats b{font-size:1.02rem;white-space:nowrap}.fmcard .rpstats small{font-size:.72rem;color:var(--muted);font-weight:400}.fmcard .rpstats span{text-align:center;line-height:1.15}
+.fmlv{margin:-2px 0 8px;font-size:.84rem}.fmlab{display:block;font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:8px 0 4px}
+.fmseg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.fmseg button{border:0;border-right:1px solid var(--line);background:var(--panel2);color:var(--muted);font:600 .92rem var(--display);padding:10px 2px;min-height:42px;cursor:pointer}.fmseg button:last-child{border-right:0}
+.fmseg button.on{background:var(--brass);color:#1f1a12}
+.fmpick{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:8px}.fmpick label{display:block;min-width:0}.fmpick select{width:100%}
+.fmgo{display:block;width:100%;margin-top:12px}.fmacts{margin-top:8px}.fmacts:empty{display:none}.fmcard .fnote{margin-top:8px}
+.fmlist{display:grid;gap:6px;margin-top:8px}.fmrow{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--panel2);border-radius:10px;padding:6px 8px}
+.fmrow.nx{border-color:var(--brass)}.fmn{flex:none;width:1.7em;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums;font-size:.82rem}
+.fmt{flex:1;min-width:0;display:block;line-height:1.25}.fmt b{font-size:.92rem}.fmt .dur{display:block;font-size:.78rem}.fmbt{flex:none;display:flex;gap:4px}.fmbt .wvmv{width:32px;min-width:32px;height:34px;min-height:34px;padding:0;margin:0;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem}.fmrow{padding-left:4px}.fmt b{white-space:nowrap}
+.wvmv{flex:none;min-width:36px;padding-left:0;padding-right:0}.qlist .wvmv{margin-left:4px}
 .wvlist{display:grid;grid-template-columns:minmax(0,1fr);margin-top:4px;min-width:0}.wvrow{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--line)}.wvt{flex:1;min-width:0;line-height:1.25}
 .wvt .wvs{display:block;margin-left:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wvrow input.wvn{width:60px;flex:none;text-align:center}.wvrow input.wvtime{width:132px;flex:none}
 .wvctl{display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;align-items:end}.wvctl label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:2px}.wvctl input,.wvctl select{width:100%}
@@ -1866,7 +1877,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.102";
+var APP_VERSION = "0.2.103";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -4765,20 +4776,22 @@ function farmRebuild(pis){ // rebuild these presets' lists in order; an NPC neve
 function farmLevelsText(lv){ return Object.keys(lv).map(Number).sort(function(a,b){ return b-a; }).map(function(L){ return "L"+L+" ×"+lv[L]; }).join(", ")||"none"; }
 // 0.2.4: the Farms tab is a hub: the planner's card on top, then a tile per preset; a tile opens that preset's page (FARMV)
 var FARMV=-1;
-function farmCardHtml(pr,pi){
-    var hh=presetHero(pr), hid=hh?hh.id:0, rot=0, lv={}, msg=farmMsg[C().id+":"+pi], m=pr.farmMode?FARM_MODES[pr.farmMode]:null;
-    pr.farm.forEach(function(id){ var fq=TILE_BY[id]; if (fq){ if (presetTotal(pr)) rot+=2*travelMs(pr.t,fq,hid); if (fq.L) lv[fq.L]=(lv[fq.L]||0)+1; } });
-    var h='<div class="unit"><h4>'+esc(pr.name)+'</h4><span class="own" style="font-size:.85rem">'+(pr.auto?'<span class="badge">Auto-farming</span>':'')+'</span>'+
-      '<div class="us"><span>'+presetSummary(pr)+'</span><span>Hero <b>'+(pr.hero===HERO_BEST?'Best attack':pr.hero===HERO_FAST?'Fastest':pr.hero===HERO_ANY?'Any free':hh?esc(hh.name):"none")+'</b>'+(presetAutoHero(pr.hero)?' <span class="dur">('+(hh?'now '+esc(hh.name):'nobody free')+')</span>':'')+'</span></div>'+
-      '<div class="us"><span>Farm list <b>'+pr.farm.length+'</b></span>'+(rot?'<span>Round trip <b>'+fmtT(realMs(rot))+'</b>'+(m?' of '+m.hours+' h':'')+'</span>':'')+(pr.farm.length?'<span>'+farmLevelsText(lv)+'</span>':'')+'</div>'+
-      '<div class="trainrow"><label class="dur" for="fk'+pi+'">Targets</label><select id="fk'+pi+'" data-farmkind="'+pi+'" style="width:auto"><option value="npc"'+(farmKindOf(pr)==="npc"?' selected':'')+'>NPC cities</option><option value="val"'+(farmKindOf(pr)==="val"?' selected':'')+'>Valleys and flats</option></select>'+
-        '<label class="dur" for="fl'+pi+'">Level</label><select id="fl'+pi+'" data-farmlvl="'+pi+'" style="width:auto">'+['<option value="0">Any</option>'].concat([1,2,3,4,5,6,7,8,9,10].map(function(n){ return '<option value="'+n+'"'+(pr.farmLevel===n?' selected':'')+'>Level '+n+'</option>'; })).join("")+'</select></div>'+
-      '<div class="trainrow">'+[["off","Off"],["training","Training"],["resources","Resources"]].map(function(x){ var on=(x[0]==="off")?!pr.farmMode:pr.farmMode===x[0];
-        return '<button class="chipbtn wide'+(on?' on':'')+'" data-act="farm-mode" data-p="'+pi+'" data-m="'+x[0]+'" aria-pressed="'+on+'">'+x[1]+'</button>'; }).join("")+'</div>'+
-      '<div class="trainrow"><button class="btn ghost small" data-act="preset-edit" data-p="'+pi+'">Edit army</button><span hidden></span>'+pclipBtns(0,pi,pr)+
-      (pr.farmMode?'<button class="btn ghost small" data-act="farm-refill" data-p="'+pi+'">Refill list</button>':'')+
-      (pr.farm.length&&presetTotal(pr)?'<button class="btn small'+(pr.auto?' ghost':'')+'" data-act="preset-auto" data-p="'+pi+'">'+(pr.auto?'Stop auto-farm':'Start auto-farm')+'</button>':'')+'</div>'+
-      (msg?'<div class="fnote'+(msg.bad?' bad':'')+'">'+esc(msg.t)+'</div>':(!presetTotal(pr)?'<div class="fnote">No troops set yet. Use Edit army first.</div>':''))+'</div>';
+function farmCardHtml(pr,pi){ // 0.2.103 (Cody): the preset's page in the newer look: a heading with the army, four number tiles, the goal as one segmented row, one main button
+    var hh=presetHero(pr), hid=hh?hh.id:0, rot=0, lv={}, msg=farmMsg[C().id+":"+pi], m=pr.farmMode?FARM_MODES[pr.farmMode]:null, tot=presetTotal(pr), fd=farmDay(pi);
+    pr.farm.forEach(function(id){ var fq=TILE_BY[id]; if (fq){ if (tot) rot+=2*travelMs(pr.t,fq,hid); if (fq.L) lv[fq.L]=(lv[fq.L]||0)+1; } });
+    var heroTxt=(pr.hero===HERO_BEST?'Best attack':pr.hero===HERO_FAST?'Fastest':pr.hero===HERO_ANY?'Any free':hh?esc(hh.name):"no hero")+(presetAutoHero(pr.hero)?' <span class="dur">('+(hh?'now '+esc(hh.name):'nobody free')+')</span>':'');
+    var h='<div class="section fmcard"><div class="fmhd"><div class="fmhdt"><h3>'+esc(pr.name)+(pr.auto?' <span class="badge">Auto-farming</span>':'')+'</h3>'+
+      '<p class="fmarmy">'+(tot?presetSummary(pr):'<span class="dur">No troops set yet</span>')+'</p><p class="fmarmy"><span class="dur">Led by</span> <b>'+heroTxt+'</b></p></div>'+
+      '<button class="btn ghost small" data-act="preset-edit" data-p="'+pi+'">Edit army</button></div>'+
+      repTiles([[fmt(pr.farm.length),pr.farm.length===1?"Target":"Targets",""],[rot?fmtT(realMs(rot)):'–',"Round trip"+(m?" of "+m.hours+" h":""),""],[fd.n?fd.w+'<small> / '+fd.n+'</small>':'–',"Won in 24 h",fd.n&&fd.w<fd.n?"bad":""],[fd.n?fmt(fd.loot):'–',"Loot in 24 h",""]])+
+      (pr.farm.length?'<p class="fmlv dur">'+farmLevelsText(lv)+(fd.n?' · <button class="link" data-act="rep-cat" data-v="atk" data-go="1">See the reports</button>':'')+'</p>':'')+
+      '<div class="fmlab">Goal</div><div class="fmseg" role="group" aria-label="Goal">'+[["off","Off"],["training","Training"],["resources","Resources"]].map(function(x){ var on=(x[0]==="off")?!pr.farmMode:pr.farmMode===x[0];
+        return '<button class="'+(on?'on':'')+'" data-act="farm-mode" data-p="'+pi+'" data-m="'+x[0]+'" aria-pressed="'+on+'">'+x[1]+'</button>'; }).join("")+'</div>'+
+      '<div class="fmpick"><label for="fk'+pi+'"><span class="fmlab">Targets</span><select id="fk'+pi+'" data-farmkind="'+pi+'"><option value="npc"'+(farmKindOf(pr)==="npc"?' selected':'')+'>NPC cities</option><option value="val"'+(farmKindOf(pr)==="val"?' selected':'')+'>Valleys and flats</option></select></label>'+
+        '<label for="fl'+pi+'"><span class="fmlab">Level</span><select id="fl'+pi+'" data-farmlvl="'+pi+'">'+['<option value="0">Any</option>'].concat([1,2,3,4,5,6,7,8,9,10].map(function(n){ return '<option value="'+n+'"'+(pr.farmLevel===n?' selected':'')+'>Level '+n+'</option>'; })).join("")+'</select></label></div>'+
+      (pr.farm.length&&tot?'<button class="btn fmgo'+(pr.auto?' ghost':'')+'" data-act="preset-auto" data-p="'+pi+'">'+(pr.auto?'Stop auto-farm':'Start auto-farm')+'</button>':'')+
+      '<div class="btnrow fmacts">'+(pr.farmMode?'<button class="btn ghost small" data-act="farm-refill" data-p="'+pi+'">Refill list</button>':'')+pclipBtns(0,pi,pr)+'</div>'+
+      (msg?'<div class="fnote'+(msg.bad?' bad':'')+'">'+esc(msg.t)+'</div>':(!tot?'<div class="fnote">No troops set yet. Use Edit army first.</div>':''));
   return h+'</div>'; }
 // a preset's farming over the last 24 hours, from its reports in this city
 function farmDay(pi){ var since=S.gt-DAY, n=0, w=0, loot=0; S.log.forEach(function(c){ if (c.p===pi && c.c===S.name && c.at>since && !c.d){ n++; if (c.r===1) w++; loot+=c.lo||0; } }); return {n:n, w:w, loot:loot}; }
@@ -4794,14 +4807,15 @@ var FMHELP=false; // 0.2.50: the farm planner's how-to, behind its ?
 function viewFarms(){
   if (FARMV>=0 && S.presets[FARMV]){ var pr=S.presets[FARMV], pi=FARMV, n=S.presets.length;
     var fd=farmDay(pi), hh=presetHero(pr), hid=hh?hh.id:0;
-    var list='<details class="section det" data-det="fmlist"'+(DET.fmlist!==false?' open':'')+'><summary><b>Farm list</b> <span class="dur">'+pr.farm.length+' target'+(pr.farm.length===1?'':'s')+'</span></summary>'+
-      (pr.farm.length?'<div class="gearlist">'+pr.farm.map(function(id,k){ var q=TILE_BY[id]; if (!q) return '';
-        return '<div class="gearrow'+(pr.auto&&k===(pr.idx||0)?' t1':'')+'"><span class="gn">'+esc(tileName(q))+(pr.auto&&k===(pr.idx||0)?' <span class="dur">(next)</span>':'')+'</span><span class="gb">('+q.x+', '+q.y+')</span>'+
-          '<span class="dur" style="grid-column:1/-1">'+tdist(q).toFixed(1)+' tiles'+(presetTotal(pr)?' \u00b7 round trip '+fmtT(realMs(2*travelMs(pr.t,q,hid))):'')+'</span>'+
-          '<span class="btnrow" style="grid-column:1/-1;justify-content:flex-end;align-items:center;margin:0"><button class="btn ghost small wvmv" data-act="farm-mv" data-p="'+pi+'" data-k="'+k+'" data-d="-1" aria-label="Move up"'+(k?'':' disabled')+'>\u25B2</button><button class="btn ghost small wvmv" data-act="farm-mv" data-p="'+pi+'" data-k="'+k+'" data-d="1" aria-label="Move down"'+(k<pr.farm.length-1?'':' disabled')+'>\u25BC</button><button class="btn ghost small" data-act="goto-tile" data-tile="'+id+'">Show</button><button class="btn ghost small danger" data-act="farm-remove" data-p="'+pi+'" data-k="'+k+'">Remove</button></span></div>'; }).join("")+'</div>'
+    var list='<details class="section det" data-det="fmlist"'+(DET.fmlist!==false?' open':'')+'><summary><b>Farm list</b> <span class="dur">'+pr.farm.length+' target'+(pr.farm.length===1?'':'s')+(pr.farm.length>1?' \u00b7 hit in this order':'')+'</span></summary>'+
+      (pr.farm.length?'<div class="fmlist">'+pr.farm.map(function(id,k){ var q=TILE_BY[id]; if (!q) return '';
+        var nx=pr.auto&&k===(pr.idx||0); // 0.2.103: one compact row per target: number, name and trip on the left, four small buttons on the right
+        return '<div class="fmrow'+(nx?' nx':'')+'"><span class="fmn">'+(k+1)+'</span><span class="fmt"><b>'+esc(tileName(q))+'</b>'+(nx?' <span class="badge">next</span>':'')+'<span class="dur">('+q.x+', '+q.y+')</span><span class="dur">'+tdist(q).toFixed(1)+' tiles'+(presetTotal(pr)?' \u00b7 '+fmtT(realMs(2*travelMs(pr.t,q,hid))):'')+'</span></span>'+
+          '<span class="fmbt"><button class="btn ghost small wvmv" data-act="farm-mv" data-p="'+pi+'" data-k="'+k+'" data-d="-1" aria-label="Move up"'+(k?'':' disabled')+'>\u25B2</button><button class="btn ghost small wvmv" data-act="farm-mv" data-p="'+pi+'" data-k="'+k+'" data-d="1" aria-label="Move down"'+(k<pr.farm.length-1?'':' disabled')+'>\u25BC</button>'+
+          '<button class="btn ghost small wvmv" data-act="goto-tile" data-tile="'+id+'" aria-label="Show on map" title="Show on map"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-5.600-6-11a6 6 0 0 1 12 0c0 5.400-6 11-6 11z"/><circle cx="12" cy="10" r="2.200"/></svg></button>'+
+          '<button class="btn ghost small danger wvmv" data-act="farm-remove" data-p="'+pi+'" data-k="'+k+'" aria-label="Remove" title="Remove">\u2715</button></span></div>'; }).join("")+'</div>'
         :'<p class="hint">Empty. Pick a goal and tap Refill list, or add NPCs from their map tiles.</p>')+'</details>';
-    return '<div class="albk"><button class="link" data-act="farm-page" data-p="-1">\u2039 Farm planner</button></div>'+pclipBar()+'<div class="unitlist">'+farmCardHtml(pr,pi)+'</div>'+
-      (fd.n?'<p class="hint" style="margin:8px 4px">Last 24 hours: <b>'+fd.w+'</b> won'+(fd.n>fd.w?', <span class="badc">'+(fd.n-fd.w)+' lost</span>':'')+', '+fmt(fd.loot)+' loot. <button class="link" data-act="rep-cat" data-v="atk" data-go="1">See the reports</button></p>':'')+list+
+    return '<div class="albk"><button class="link" data-act="farm-page" data-p="-1">\u2039 Farm planner</button></div>'+pclipBar()+farmCardHtml(pr,pi)+list+
       '<div class="wcnav"><button class="link" data-act="farm-page" data-p="'+((pi+n-1)%n)+'">\u2039 '+esc(S.presets[(pi+n-1)%n].name)+'</button><button class="link" data-act="farm-page" data-p="'+((pi+1)%n)+'">'+esc(S.presets[(pi+1)%n].name)+' \u203a</button></div>'; }
   FARMV=-1;
   var claimed=0, seen={}; S.cities.forEach(function(c){ (c.presets||[]).forEach(function(pr){ pr.farm.forEach(function(id){ if (!seen[id]){ seen[id]=1; claimed++; } }); }); });
