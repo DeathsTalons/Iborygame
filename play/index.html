@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.95";
+window.IBORY_V="0.2.96";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1865,7 +1865,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.95";
+var APP_VERSION = "0.2.96";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -6583,8 +6583,8 @@ function alHomeHtml(al, need){ var now=Date.now(), E=al.econ||{lv:{}}, my=al.my|
     alTile('reinf', alPix('g_shield'), 'Reinforce', out+' sent · '+here+' with you')+
     alTile('city', alBkImg('city',40), 'Alliance City', 'Level '+(E.lv.city||1)+' · '+(bd?esc(alBldgName(bd.k))+' '+alPct(bd.got,bd.need)+'%':'nothing building'))+
     alTile('projects', alPix('build50'), 'Projects', hp.canHelp?hp.canHelp+' to help':nP?nP+' running':'None running', {dot:need.help>0, extra:hp.canHelp?'<button class="btn small altlx" data-act="al-help">Help all</button>':''})+
-    alTile('members', alPix('g_helm'), 'Members', al.members.length+' / '+al.cap+' · '+online+' online'+(need.apps?' · '+need.apps+' applying':''), {dot:need.apps>0})+
     alTile('univ', alBkImg('univ',40), 'University', ul?'Level '+ul+((E.rs||[]).length?' · '+E.rs.length+' researching':''):'Not built', {act:'al-bk', from:'home'})+
+    alTile('members', alPix('g_helm'), 'Members', al.members.length+' / '+al.cap+' · '+online+' online'+(need.apps?' · '+need.apps+' applying':''), {dot:need.apps>0})+
     alTile('arena', alBkImg('arena',40), 'Monster Arena', arl?(nUp?nUp+' up':'Level '+arl)+' · '+(mon.free||0)+' free today':'Not built', {dot:need.arena>0})+
     alTile('inv', alPix('warhorn'), 'Invasions &amp; PvP', alInvLine(), {alert:alInvAlert()})+
     (AW_ON?alTile('war', alPix('u_catapult'), 'Alliance War', (AWS.d&&AWS.d.war&&AWS.d.war.status!=="settled"&&AWS.d.war.status!=="over")?'War on':(AWS.d&&AWS.d.round?'Sign-ups open':'Alliance against alliance')):'')+
