@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.101";
+window.IBORY_V="0.2.102";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1866,7 +1866,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.101";
+var APP_VERSION = "0.2.102";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -7295,15 +7295,14 @@ function arReward(r, m, myM){
   note("alliance","The "+nm+" fell at the Arena! Your share: "+arRewardList(rw)+".");
 }
 function wdRepHtml(r){ var pct0=r.hp0?Math.max(r.result===1?0:1, Math.round(r.hpLeft/r.hp0*100)):0, row=function(l,v){ return '<div class="merow"><span>'+l+'</span><b>'+v+'</b></div>'; }, x=(r.mine||[])[0];
-  var h=(WD_MART[r.lv]?'<div style="text-align:center"><img src="'+WD_MART[r.lv]+'" alt="" style="width:96px;height:96px;object-fit:contain;image-rendering:pixelated"></div>':'')+'<div class="mestats">'+row("Monster","Level "+r.lv+" "+esc(r.mname))+
-    row("Result",r.result===1?'<span class="okc">It fell</span>':'<span class="badc">It survived with '+pct0+'% of its health</span>')+(r.rounds?row("Rounds",fmt(r.rounds)):'')+(r.hp0?row("Health",fmt(r.hp0)):'')+
+  var h=(WD_MART[r.lv]?'<div style="text-align:center"><img src="'+WD_MART[r.lv]+'" alt="" style="width:96px;height:96px;object-fit:contain;image-rendering:pixelated"></div>':'')+monMarchTiles(r,"Health")+'<div class="mestats">'+row("Monster","Level "+r.lv+" "+esc(r.mname))+
+    row("Result",r.result===1?'<span class="okc">It fell</span>':'<span class="badc">It survived with '+pct0+'% of its health</span>')+
     (r.dealt?row("Your damage",fmt(r.dealt)+(r.hp0?' ('+Math.max(r.dealt<r.hp0?0:100, Math.round(r.dealt/r.hp0*1000)/10)+'%)':'')):'')+
-    row("Who fought", r.solo?'You, alone':(r.marches===1?'1 march':fmt(r.marches)+' marches')+(r.host?' in '+esc(r.host)+'\u2019s rally':''))+
-    (r.reward?row("Your share",'a Shield Orb for the Shield Generator'+(arRewardList(r.reward)?', '+esc(arRewardList(r.reward)):'')):'')+'</div>';
-  if (x){ var rows=[]; for (var j=0;j<12;j++) if (x.sent[j]) rows.push('<tr><td>'+U[j].name+'</td><td>'+fmt(x.sent[j])+'</td><td>'+fmt(x.back[j]||0)+'</td><td>'+fmt(x.wounded[j]||0)+'</td></tr>');
+    row("Who fought", r.solo?'You, alone':(r.marches===1?'1 march':fmt(r.marches)+' marches')+(r.host?' in '+esc(r.host)+'\u2019s rally':''))+'</div>';
+  if (x){ var rows=[]; for (var j=0;j<12;j++) if (x.sent[j]) rows.push('<tr>'+repUnitCell(j)+'<td>'+fmt(x.sent[j])+'</td><td>'+fmt(x.back[j]||0)+'</td><td>'+fmt(x.wounded[j]||0)+'</td></tr>');
     h+='<div class="h3" style="margin-top:8px">Your march <span class="dur">from '+esc(x.city)+(x.hero?', led by '+esc(x.hero):'')+'</span></div><div class="tscroll"><table class="gt" style="min-width:0"><thead><tr><th>Troop</th><th>Sent</th><th>Unhurt</th><th>Wounded</th></tr></thead><tbody>'+rows.join("")+'</tbody></table></div>';
     if (x.hero) h+='<p class="dur" style="margin:4px 0 0">'+esc(x.hero)+(r.result!==1?' earned no experience: monsters only give it when they die.':x.xp?' earned <b>'+fmt(x.xp)+'</b> experience.':' earned no experience: only the first hero you send does.')+'</p>'; }
-  return h+'<p class="hint">Nobody dies fighting a server-map monster: the wounded wait in their city\u2019s Medic Camp (heal them within 24 hours).</p>'; }
+  return h+(r.reward?rewLootHtml(r.reward,'Your share also includes a Shield Orb for the Shield Generator.'):'')+'<p class="hint">Nobody dies fighting a server-map monster: the wounded wait in their city\u2019s Medic Camp (heal them within 24 hours).</p>'; }
 // a proper report for every Arena fight you joined, under Reports > Arena
 function arReport(r, myM, T){
   var axRef=xpFirstRef(myM), axFull=r.win ? AR_XP_LV*(r.lv||1) : 0;
@@ -7323,13 +7322,13 @@ function arReport(r, myM, T){
 function arenaRepHtml(r){
   if (r.wd) return wdRepHtml(r);
   var T=r.wiz?{n:r.mname||"Wizard"}:arT(r.type), pct0=r.hp0?Math.round(r.hpLeft/r.hp0*100):0, row=function(l,v){ return '<div class="merow"><span>'+l+'</span><b>'+v+'</b></div>'; };
-  var h='<div class="mestats">'+row("Monster","Level "+r.lv+" "+esc(T.n))+row("Result",r.result===1?'<span class="okc">It fell</span>':'<span class="badc">It survived with '+pct0+'% of its strength</span>')+row("Rounds",fmt(r.rounds))+row("Strength",fmt(r.hp0))+
-    row(r.solo?"Marches":"Who fought", r.solo?fmt(r.marches):fmt(r.marches)+' march'+(r.marches===1?'':'es')+' from '+esc((r.players||[]).join(", ")))+(r.reward?row("Your reward",esc(arRewardList(r.reward))):'')+'</div>';
-  h+=(r.mine||[]).map(function(x,i){ var rows=[]; for (var j=0;j<12;j++) if (x.sent[j]) rows.push('<tr><td>'+U[j].name+'</td><td>'+fmt(x.sent[j])+'</td><td>'+fmt(x.back[j]||0)+'</td><td>'+fmt(x.wounded[j]||0)+'</td></tr>');
+  var h=monMarchTiles(r,"Strength")+'<div class="mestats">'+row("Monster","Level "+r.lv+" "+esc(T.n))+row("Result",r.result===1?'<span class="okc">It fell</span>':'<span class="badc">It survived with '+pct0+'% of its strength</span>')+
+    row(r.solo?"Marches":"Who fought", r.solo?fmt(r.marches):fmt(r.marches)+' march'+(r.marches===1?'':'es')+' from '+esc((r.players||[]).join(", ")))+'</div>';
+  h+=(r.mine||[]).map(function(x,i){ var rows=[]; for (var j=0;j<12;j++) if (x.sent[j]) rows.push('<tr>'+repUnitCell(j)+'<td>'+fmt(x.sent[j])+'</td><td>'+fmt(x.back[j]||0)+'</td><td>'+fmt(x.wounded[j]||0)+'</td></tr>');
     return '<div class="h3" style="margin-top:8px">Your march'+(r.mine.length>1?' '+(i+1):'')+' <span class="dur">from '+esc(x.city)+(x.hero?', led by '+esc(x.hero):'')+'</span></div><div class="tscroll"><table class="gt" style="min-width:0"><thead><tr><th>Troop</th><th>Sent</th><th>Unhurt</th><th>Wounded</th></tr></thead><tbody>'+rows.join("")+'</tbody></table></div>'+
       (!r.wiz && x.hero ? '<p class="dur" style="margin:4px 0 0">'+esc(x.hero)+(x.xpNo?' earned no experience: only the first hero you send to a fight does.':r.result!==1?' earned no experience: monsters only give it when they die.':' earned <b>'+fmt(x.xp||0)+'</b> experience.')+'</p>' : ''); }).join(""); // 0.1.214
   if (r.wiz && r.solo && r.hero) h+='<p class="dur" style="margin:6px 0 0">'+esc(r.hero)+(r.result===1?' led and earned <b>'+fmt(r.xp||0)+'</b> experience.':' led, but earned no experience: monsters only give it when they die.')+'</p>'; // 0.1.213
-  return h+'<p class="hint">Nobody dies '+(r.wiz?'fighting a wizard':'at the Arena')+': the wounded wait in their city\u2019s Medic Camp (heal them within 24 hours).</p>';
+  return h+rewLootHtml(r.reward)+'<p class="hint">Nobody dies '+(r.wiz?'fighting a wizard':'at the Arena')+': the wounded wait in their city\u2019s Medic Camp (heal them within 24 hours).</p>';
 }
 /* ---------- War Wizard for Arena fights (0.1.171): no dice, so it's the fight run again with every round written down.
    v = {n, lv, hp0, win, rounds, blow, hp:[strength before round 1, after 1, ...], out:[damage each round], me:[{i, n:[alive at the start of each round..., at the end], d:[damage each round]}], oth (everyone else, same shape), np} */
@@ -7751,7 +7750,8 @@ function rallyRepHtml(r){ var row=function(l,v){ return '<div class="merow"><spa
   var k=r.aid&&r.rid?r.aid+"/"+r.rid:"", RR=k?RYREP[k]:null, old=r.rid && realMs(S.gt-r.at)>7*864e5;
   if (k && r.wave && !r.wiz && !old && (!r.full || (r.fights&&r.fights.length>1&&!(RR&&RR.waves)))) ryRepFetch(r);
   var h='<div class="mestats">'+row("Target",esc(r.host)+'’s '+esc(r.target))+row("Your wave",r.cancelled?'called off':r.late?'arrived too late':r.idle?'not needed (already wiped out)':(r.wave+' of '+r.waves))+
-    (r.wave?row("Result",r.result===1?'<span class="okc">Won</span>':'<span class="badc">Thrown back</span>')+row("Rounds",fmt(r.rounds)):'')+row("Who fought",esc((r.players||[]).join(", ")||"nobody"))+'</div>';
+    (r.wave?row("Result",r.result===1?'<span class="okc">Won</span>':'<span class="badc">Thrown back</span>'):'')+row("Who fought",esc((r.players||[]).join(", ")||"nobody"))+'</div>';
+  if (r.wave){ var ryS=sum12(r.sent), ryL=Math.max(0,ryS-sum12(r.left)), ryK=sum12(r.killed); h=repTiles([[fmt(ryS),"Sent",""],[fmt(ryL),r.wiz||r.vamp?"Wounded":"Lost",ryL&&!(r.wiz||r.vamp)?"bad":""],[fmt(ryK),"Killed",ryK?"good":""],[fmt(r.rounds||0),r.rounds===1?"Round":"Rounds",""]])+h; }
   if (r.hero) h+='<p class="dur" style="margin:6px 0 0">'+esc(r.hero)+' led '+(r.xpNo?'but earned no experience: only the first hero you send to a rally does':r.xp?'and earned <b>'+fmt(r.xp)+'</b> experience':(r.wave||r.idle)&&(r.wiz||r.vamp)&&!r.win?'but earned no experience: monsters only give it when they die':r.wave?'and earned <b>0</b> experience':'but didn’t fight, so earned no experience')+'.</p>';
   if (r.full){ // the wave's whole battle, the same table as any attack
     h+='<div class="h3" style="margin-top:8px">Your wave <span class="dur">from '+esc(r.city)+'</span></div>'+ryWaveBody(r.full, true);
@@ -7762,12 +7762,12 @@ function rallyRepHtml(r){ var row=function(l,v){ return '<div class="merow"><spa
     if (kr.length) h+='<p class="dur">You killed: '+kr.join(", ")+'.</p>';
     if (r.wave && !r.wiz) h+='<p class="hint">'+(old?'The full report is only kept for 7 days.':RR&&RR.busy?'Loading the full report…':RR&&RR.err?esc(RR.err)+'. <button class="link" data-act="ry-rep-retry" data-id="'+r.id+'">Try again</button>':r.aid&&r.aid!==ALS.aid?'The full report is with the alliance you were in then.':'Loading the full report…')+'</p>';
   }
-  if (r.drops){ var got=(r.medal>=0?[MEDALS[r.medal][1]+" medal"]:[]).concat(r.drops); h+='<p class="'+(got.length?'okc':'dur')+'" style="margin:6px 0">'+(r.nofull?'The garrison wasn’t full when the rally hit, so nothing dropped.':got.length?'Your spoils: '+esc(got.join(", "))+'.':'Your spoils: nothing this time.')+'</p>'; }
+  var ryLoot=''; if (r.drops){ var got=(r.medal>=0?[MEDALS[r.medal][1]+" medal"]:[]).concat(r.drops); ryLoot = got.length && !r.nofull ? repLootHtml(r) : '<div class="h3" style="margin-top:10px">Loot</div><p class="dur" style="margin:6px 0">'+(r.nofull?'The garrison wasn’t full when the rally hit, so nothing dropped.':'Nothing this time.')+'</p>'; }
   if (r.fights && r.fights.length){ var byW={}; if (RR && RR.waves) RR.waves.forEach(function(w){ byW[w.wave]=w; });
     h+='<div class="h3" style="margin-top:8px">Every wave</div>'+r.fights.map(function(f){ var line=f.wave+'. '+esc(f.name)+': '+(f.won?'<span class="okc">won</span>':'thrown back')+', killed '+fmt(f.killed)+', lost '+fmt(f.lost)+' of '+fmt(f.sent), w=byW[f.wave];
       return w ? '<details class="det rywave"><summary class="dur">'+line+'</summary>'+ryWaveBody(w, f.wave===r.wave)+'</details>' : '<p class="dur" style="margin:2px 0">'+line+'</p>'; }).join("");
     if (RR && RR.waves) h+='<p class="hint" style="margin-top:4px">Tap a wave for its full report.</p>'; }
-  return h+'<p class="hint">'+(r.wiz?'Nobody dies fighting a wizard: every loss is wounded':r.vamp?evT(evId()).fight:'Some of the fallen are only wounded')+' and waits in your city’s Medic Camp (heal them within 24 hours).</p>'; }
+  return h+ryLoot+'<p class="hint">'+(r.wiz?'Nobody dies fighting a wizard: every loss is wounded':r.vamp?evT(evId()).fight:'Some of the fallen are only wounded')+' and waits in your city’s Medic Camp (heal them within 24 hours).</p>'; }
 // every second: rally marches that came home (the fallen go through the normal wounded rule)
 function ryTick(){
   var lks0=ryLocks(), lks1=lks0.filter(function(lk){ return !((ALS.d && ALS.aid!==lk.aid) || Date.now()-(lk.at||0)>26*HOUR); }); if (lks1.length!==lks0.length){ S.rallyLocks=lks1; save(); } // left the alliance, or the rally is long over: free the target
@@ -14457,9 +14457,21 @@ function repLootHtml(r){ var res=RES.filter(function(k){ return r.loot && r.loot
   if (tiles.length) h+='<div class="rwgrid rploot">'+tiles.join("")+'</div>';
   if (other.length) h+='<p class="dur" style="margin:6px 0 0">'+other.map(esc).join(" \u00b7 ")+'</p>';
   return h; }
+/* 0.2.102 (Cody): every kind of report gets the same top and bottom as an attack report: number tiles first, and whatever was won as picture tiles
+   under Loot at the end (Arena, server-map monsters, rallies and defences were still the older rows of text). */
+function repTiles(a){ return '<div class="rpstats">'+a.map(function(x){ return '<div'+(x[2]?' class="'+x[2]+'"':'')+'><b>'+x[0]+'</b><span>'+x[1]+'</span></div>'; }).join("")+'</div>'; }
+function sum12(t){ var n=0; for (var i=0;i<12;i++) n+=(t&&t[i])||0; return n; }
+function rewLootHtml(rw, extra){ var ik=rw&&rw.items?Object.keys(rw.items).filter(function(k){ return rw.items[k]; }):[], hasRes=!!(rw&&rw.res&&RES.some(function(k){ return rw.res[k]; }));
+  if (!ik.length && !hasRes && !extra) return '';
+  var h='<div class="h3" style="margin-top:10px">Loot</div>'+(hasRes?repResTiles(rw.res):'');
+  if (ik.length) h+='<div class="rwgrid rploot">'+ik.map(function(k){ var nm=(ITEMS[k]&&ITEMS[k].name)||k; return '<span class="rwit" title="'+esc(nm)+'">'+itemImg(k)+'<b>\u00d7'+fmt(rw.items[k])+'</b><i>'+esc(nm)+'</i></span>'; }).join("")+'</div>';
+  if (extra) h+='<p class="dur" style="margin:6px 0 0">'+extra+'</p>';
+  return h; }
+function monMarchTiles(r, hpLab){ var s=0, w=0; (r.mine||[]).forEach(function(x){ s+=sum12(x.sent); w+=sum12(x.wounded); });
+  return repTiles([[fmt(s),"Sent",""],[fmt(w),"Wounded",""],[fmt(r.rounds||0),r.rounds===1?"Round":"Rounds",""],[fmt(r.hp0||0),hpLab,""]]); }
 function reportDetailBase(r){
   if (r.scout) return r.intel ? '<p class="hint">Scouts got through'+(r.lost?' ('+fmt(r.lost)+' lost)':'')+'.</p>'+repScoutUnits(r.intel.inf<3?r.intel.t.map(roughN):r.intel.t, r.intel.inf<3?null:r.intel.f, r.intel.wall)+repResTiles(r.intel.res, true) : '<p class="hint">All '+fmt(r.lost)+' scouts were caught.</p>'; // 0.2.50: icons
-  if (r.def) return woundLine(r)+modsLine(r)+'<p class="hint">'+r.rounds+(r.rounds===1?' round.':' rounds.')+''+(r.repaired?' Machinery repaired '+Math.round(r.repaired*100)+'% of lost archer towers (more of other fortifications).':'')+'</p>'+
+  if (r.def) return repStats(r, sum12(r.had)-sum12(r.eleft))+modsLine(r)+(r.wounded?'<p class="rphero"><span class="dur">The wounded wait in the Medic Camp for 24 hours</span></p>':'')+(r.repaired?'<p class="hint">Machinery repaired '+Math.round(r.repaired*100)+'% of lost archer towers (more of other fortifications).</p>':'')+
     '<div class="tscroll"><table class="gt rpt3">'+repTableHead("Yours","Theirs")+'<tbody>'+ /* 0.2.50: unit icons, two-row header */
     U.map(function(u,i){ if (!r.sent[i] && !r.had[i]) return ''; var a1=r.sent[i]-r.left[i], a2=r.had[i]-r.eleft[i]; return '<tr>'+repUnitCell(i)+'<td>'+fmt(r.sent[i])+'</td><td class="'+(a1?'loss':'')+'">'+fmt(a1)+'</td><td>'+fmt(r.had[i])+'</td><td class="'+(a2?'ok':'')+'">'+fmt(a2)+'</td></tr>'; }).join("")+
     FORTN.map(function(n,k){ if (!r.forts[k]) return ''; var lf=r.forts[k]-r.fleft[k]; return '<tr>'+repFortCell(n,"Your ")+'<td>'+fmt(r.forts[k])+'</td><td class="'+(lf?'loss':'')+'">'+fmt(lf)+'</td><td></td><td></td></tr>'; }).join("")+'</tbody></table></div>'+(r.loot&&RES.some(function(k){ return r.loot[k]; })?'<div class="h3" style="margin-top:8px">Plundered</div>'+repResTiles(r.loot):'')+allyRepHtml(r);
@@ -15729,7 +15741,7 @@ function renderSheetCore0(){
     var wcp=wcById(sheetFor.id); if (!wcp){ closeSheet(); return; } h=wcSheet(wcp);
   } else if (sheetFor.kind==="report"){
     var rc=sheetFor.c, rr=sheetFor.rep, rv = rc.pv ? (rc.r===1?"Won":"Lost") : rc.sc ? (rc.r===1?"Scouted":"Caught") : rc.d ? (rc.r===1?"Broken":"Held") : (rc.r===1?((rc.l||rc.wd)?"Victory":"Flawless"):rc.r===3?"Stalemate":"Defeat"), rg = rc.d ? rc.r!==1 : rc.r===1;
-    var rplain=rr && !rr.arena && !rr.rally && !rr.pvr && !rr.def && !rr.scout; // 0.2.95: a plain attack report shows its totals and loot in the body, so the heading is just when and where
+    var rplain=rr && !rr.pvr && !rr.scout; // 0.2.95: a plain attack report shows its totals and loot in the body, so the heading is just when and where; 0.2.102: so do Arena, monster, rally and defence reports
     var rex=[]; if (rplain){} else if (rc.l) rex.push("lost "+fmt(rc.l)); if (!rplain){ if (rc.k) rex.push("killed "+fmt(rc.k)); if (rc.lo) rex.push((rc.d?"lost ":"")+fmt(rc.lo)+" loot"); if (rc.m>=0) rex.push(MEDALS[rc.m][1]+" medal"); if (rc.g.length) rex.push(rc.g.join(", ")); } if (rc.h) rex.push(rc.h+" captured"); if (rc.f) rex.push(rc.f+" taken");
     // 0.2.50: ✕ in the heading, one line of time and totals, War Wizard as the one main button, Save / Map / Share as icon buttons
     var rpIcoB=function(act, lab, svg, on, extra){ return '<button class="btn ghost small rpib'+(on?' on':'')+'" data-act="'+act+'" aria-label="'+lab+'" title="'+lab+'"'+(extra||'')+'>'+svg+'</button>'; };
