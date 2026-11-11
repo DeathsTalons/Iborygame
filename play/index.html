@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.99";
+window.IBORY_V="0.2.100";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1059,7 +1059,7 @@ table.gt.wrap1 th:first-child,table.gt.wrap1 td:first-child{white-space:normal} 
 tr.arwon td{background:rgba(200,160,70,.14)}
 .aitag{display:inline-block;font:700 .66rem/1 sans-serif;letter-spacing:.04em;padding:2px 5px;border-radius:5px;background:#5b2a6e;color:#fff;vertical-align:middle}
 .hms{display:inline-flex;align-items:center;gap:2px}.wvctl .hms{display:flex;width:100%}.wvctl .hms select{width:auto;flex:1;min-width:0}.wvrow .hms{flex:none}.hms select{width:auto;min-width:0;padding-left:6px;padding-right:6px;font-variant-numeric:tabular-nums}.hms b{opacity:.6}
-.wvcity{border:1px solid var(--line);border-radius:10px;padding:6px 10px;margin:6px 0;background:var(--panel2)}.wvcity summary{display:flex;justify-content:space-between;align-items:baseline;gap:8px;cursor:pointer;list-style:none}.wvcity summary::-webkit-details-marker{display:none}.wvcity summary .dur{font-size:.76rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wvcity .wvrow:last-child{border-bottom:0}.wvrow .wvmv{flex:none;min-width:36px;padding-left:0;padding-right:0}
+.wvcity{border:1px solid var(--line);border-radius:10px;padding:6px 10px;margin:6px 0;background:var(--panel2)}.wvcity summary{display:flex;justify-content:space-between;align-items:baseline;gap:8px;cursor:pointer;list-style:none}.wvcity summary::-webkit-details-marker{display:none}.wvcity summary .dur{font-size:.76rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wvcity .wvrow:last-child{border-bottom:0}.wvmv{flex:none;min-width:36px;padding-left:0;padding-right:0}.qlist .wvmv{margin-left:4px}
 .wvlist{display:grid;grid-template-columns:minmax(0,1fr);margin-top:4px;min-width:0}.wvrow{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--line)}.wvt{flex:1;min-width:0;line-height:1.25}
 .wvt .wvs{display:block;margin-left:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wvrow input.wvn{width:60px;flex:none;text-align:center}.wvrow input.wvtime{width:132px;flex:none}
 .wvctl{display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;align-items:end}.wvctl label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:2px}.wvctl input,.wvctl select{width:100%}
@@ -1866,7 +1866,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.99";
+var APP_VERSION = "0.2.100";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -4677,7 +4677,7 @@ function presetSheet(pi, mk){
   h+='<label class="chk"><input type="checkbox" id="pnocap"'+(pr.noCap?' checked':'')+'> Don\u2019t capture NPC cities: this preset\u2019s farm hits never take a city, even with room under your title and its loyalty at 0</label>';
   h+='<div class="h3">Farm list ('+pr.farm.length+')</div>';
   if (!pr.farm.length) h+='<p class="hint">Empty. Tap a target on the Map and use "Add to farm list".</p>';
-  else h+='<ol class="qlist">'+pr.farm.map(function(id,k){ var q=TILE_BY[id]; return '<li><span>'+(q?esc(tileName(q)):"Gone")+' <span class="dur">('+id.replace(",",", ")+(q?', '+tdist(q).toFixed(1)+' tiles':'')+')</span>'+(k===pr.idx%pr.farm.length?' <span class="dur">next</span>':'')+'</span><button class="link" data-act="farm-remove" data-p="'+pi+'" data-k="'+k+'">Remove</button></li>'; }).join("")+'</ol>';
+  else h+='<ol class="qlist">'+pr.farm.map(function(id,k){ var q=TILE_BY[id]; return '<li><span>'+(q?esc(tileName(q)):"Gone")+' <span class="dur">('+id.replace(",",", ")+(q?', '+tdist(q).toFixed(1)+' tiles':'')+')</span>'+(k===pr.idx%pr.farm.length?' <span class="dur">next</span>':'')+'</span><button class="btn ghost small wvmv" data-act="farm-mv" data-p="'+pi+'" data-k="'+k+'" data-d="-1" aria-label="Move up"'+(k?'':' disabled')+'>\u25B2</button><button class="btn ghost small wvmv" data-act="farm-mv" data-p="'+pi+'" data-k="'+k+'" data-d="1" aria-label="Move down"'+(k<pr.farm.length-1?'':' disabled')+'>\u25BC</button><button class="link" data-act="farm-remove" data-p="'+pi+'" data-k="'+k+'">Remove</button></li>'; }).join("")+'</ol>';
   h+='<div class="act"><button class="btn ghost danger small" data-act="farm-clear" data-p="'+pi+'"'+(pr.farm.length?'':' disabled')+'>Clear farm list</button><button class="closebtn" data-act="close">Done</button></div>';
   return h;
 }
@@ -4798,7 +4798,7 @@ function viewFarms(){
       (pr.farm.length?'<div class="gearlist">'+pr.farm.map(function(id,k){ var q=TILE_BY[id]; if (!q) return '';
         return '<div class="gearrow'+(pr.auto&&k===(pr.idx||0)?' t1':'')+'"><span class="gn">'+esc(tileName(q))+(pr.auto&&k===(pr.idx||0)?' <span class="dur">(next)</span>':'')+'</span><span class="gb">('+q.x+', '+q.y+')</span>'+
           '<span class="dur" style="grid-column:1/-1">'+tdist(q).toFixed(1)+' tiles'+(presetTotal(pr)?' \u00b7 round trip '+fmtT(realMs(2*travelMs(pr.t,q,hid))):'')+'</span>'+
-          '<span class="btnrow" style="grid-column:1/-1;justify-content:flex-end;margin:0"><button class="btn ghost small" data-act="goto-tile" data-tile="'+id+'">Show</button><button class="btn ghost small danger" data-act="farm-remove" data-p="'+pi+'" data-k="'+k+'">Remove</button></span></div>'; }).join("")+'</div>'
+          '<span class="btnrow" style="grid-column:1/-1;justify-content:flex-end;align-items:center;margin:0"><button class="btn ghost small wvmv" data-act="farm-mv" data-p="'+pi+'" data-k="'+k+'" data-d="-1" aria-label="Move up"'+(k?'':' disabled')+'>\u25B2</button><button class="btn ghost small wvmv" data-act="farm-mv" data-p="'+pi+'" data-k="'+k+'" data-d="1" aria-label="Move down"'+(k<pr.farm.length-1?'':' disabled')+'>\u25BC</button><button class="btn ghost small" data-act="goto-tile" data-tile="'+id+'">Show</button><button class="btn ghost small danger" data-act="farm-remove" data-p="'+pi+'" data-k="'+k+'">Remove</button></span></div>'; }).join("")+'</div>'
         :'<p class="hint">Empty. Pick a goal and tap Refill list, or add NPCs from their map tiles.</p>')+'</details>';
     return '<div class="albk"><button class="link" data-act="farm-page" data-p="-1">\u2039 Farm planner</button></div>'+pclipBar()+'<div class="unitlist">'+farmCardHtml(pr,pi)+'</div>'+
       (fd.n?'<p class="hint" style="margin:8px 4px">Last 24 hours: <b>'+fd.w+'</b> won'+(fd.n>fd.w?', <span class="badc">'+(fd.n-fd.w)+' lost</span>':'')+', '+fmt(fd.loot)+' loot. <button class="link" data-act="rep-cat" data-v="atk" data-go="1">See the reports</button></p>':'')+list+
@@ -14981,7 +14981,7 @@ function viewWar(){
   for (var L=1;L<=10;L++) opts+='<option value="'+L+'"'+(d.preset===String(L)?' selected':'')+'>Level '+L+' NPC city</option>';
   opts+='<option value="custom"'+(d.preset==="custom"?' selected':'')+'>Custom defender</option>';
   var h='<div class="section"><div class="shead wrhead"><h3>Battle simulator</h3><select id="npcsel" aria-label="Defender">'+opts+'</select></div>'+
-    '<div class="wrload"><button class="chipbtn" data-act="sim-mine">My army</button><button class="chipbtn" data-act="sim-myres">My research</button><button class="chipbtn" data-act="sim-mydef">My city defends</button></div>'+
+    '<div class="wrload"><button class="chipbtn" data-act="sim-mine">My army</button><button class="chipbtn" data-act="sim-myres">My research</button><button class="chipbtn" data-act="sim-mydef">My city defends</button><button class="chipbtn" data-act="sim-clear">Clear my troops</button></div>'+
     (SIMW.n>1?'<div class="wrwave"><b>Wave '+SIMW.n+'</b><span class="dur">'+simWaveSum()+'</span><button class="link" data-act="sim-restart">Start over</button></div>':'')+
     '<div class="wrkey"><span><i class="y"></i>top box: you</span><span><i class="e"></i>bottom box: enemy</span></div><div class="wgrid">';
   U.forEach(function(u,i){ var nm=u.name==="Battering Ram"?"Ram":u.name; h+='<div class="wu">'+itemImg("u_"+u.k)+'<span>'+nm+'</span>'+simInput("atk","t",i,a.t[i],' class="y" aria-label="Your '+nm+'"')+simInput("def","t",i,d.t[i],' class="e" aria-label="Enemy '+nm+'"')+'</div>'; });
@@ -16933,6 +16933,8 @@ document.addEventListener("click",function(e){
   if (act==="farm-stop-all"){ S.presets.forEach(function(pr){ pr.auto=false; }); processAuto(); refresh(); return; }
   if (act==="farm-clear-all"){ if (!farmArmed){ farmArmed=true; lastView=""; renderView(true); return; }
     farmArmed=false; S.presets.forEach(function(pr,pi){ pr.farm=[]; pr.idx=0; pr.auto=false; delete farmMsg[C().id+":"+pi]; }); toastQ("Every farm list in "+S.name+" is cleared"); lastView=""; refresh(); return; }
+  if (act==="farm-mv"){ var fm=S.presets[+a.dataset.p], fk=+a.dataset.k, ft=fk+(+a.dataset.d); if (!fm || ft<0 || ft>=fm.farm.length) return; // 0.2.100 (player ask): put the targets in your own order; "next" stays on the same target
+    var fx=fm.farm[fk]; fm.farm[fk]=fm.farm[ft]; fm.farm[ft]=fx; var fi=(fm.idx||0)%fm.farm.length; fm.idx = fi===fk ? ft : fi===ft ? fk : fi; lastSheet=""; renderSheet(); lastView=""; renderView(true); save(); return; }
   if (act==="farm-clear"){ var fc2=S.presets[+a.dataset.p]; fc2.farm=[]; fc2.idx=0; fc2.auto=false; lastSheet=""; renderSheet(); save(); return; }
   if (act==="march-prev"){ var lmp=C().lastMarch; if (!lmp) return; var pav=draftAvail(); marchDraft.t=lmp.t.map(function(n,i){ return Math.min(n,pav[i]||0); }); marchDraft.pk="prev";
     var ph=lmp.hero ? C().heroes.filter(function(x){ return x.id===lmp.hero; })[0] : null; marchDraft.hero = marchDraft.from ? marchDraft.hero : (ph && !ph.away && !seatLocked(ph) ? ph.id : 0); marchDraft.preview=""; keepX("#sheetbody .mpres", function(){ lastSheet=""; renderSheet(); }); return; }
@@ -17016,6 +17018,7 @@ document.addEventListener("click",function(e){
   if (act==="sim-ed"){ SIMED=!SIMED; lastView=""; renderView(true); return; }
   if (act==="sim-loskip"){ var lsu=+a.dataset.u; if (LOW.skip[lsu]) delete LOW.skip[lsu]; else LOW.skip[lsu]=1; S.loSkip=LOW.skip; save(); a.classList.toggle("on",!LOW.skip[lsu]); a.setAttribute("aria-pressed",!LOW.skip[lsu]); return; } // the optimizer's unit toggles
   if (act==="sim-run20"){ runSim(20); return; }
+  if (act==="sim-clear"){ sim.atk.t=[0,0,0,0,0,0,0,0,0,0,0,0]; lastView=""; renderView(true); return; } // 0.2.100 (player ask): empty your side in one tap
   if (act==="sim-mine"){ sim.atk.t=S.troops.slice(); lastView=""; renderView(true); return; }
   if (act==="sim-myres"){ var mm=mayorActive(); sim.atk.r=simResearch(); sim.atk.hatk=hsB(mm,"atk"); sim.atk.hint=hsB(mm,"int"); sim.atk.life=setLife(mm); lastView=""; renderView(true); return; }
   if (act==="speed-finish"){ var fjob=jobFor(sheetFor); if (!fjob) return; var fpn=finishPlan(fjob, sheetFor.target); if (!fpn.ok) return; // 0.2.83
