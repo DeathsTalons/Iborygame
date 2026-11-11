@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.103";
+window.IBORY_V="0.2.104";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -301,7 +301,7 @@ h1{font:700 1.5rem/1.1 var(--display);letter-spacing:.04em;margin:0}
 .speedchip.helpchip{background:var(--brass);color:var(--bg);border-color:var(--brass);font-weight:700}
 .speedchip.helpchip b{color:var(--bg)}
 .speedchip.wtchip{background:var(--red);border-color:var(--red)}
-.dtplaces{display:flex;gap:6px;overflow-x:auto;align-items:center;margin:0 -2px 10px;padding:2px 2px 6px;scrollbar-width:thin} .dtplaces .chipbtn{flex:0 0 auto;font-family:inherit;font-size:.86rem;font-weight:600}
+.dtplaces{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 10px} .dtplaces .chipbtn{flex:0 0 auto;font-family:inherit;font-size:.86rem;font-weight:600}
 .dtg{flex:0 0 auto;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:0 2px 0 6px} .dtg:first-child{padding-left:0}
 .dtitem>summary{color:var(--ink)}
 .dtchips{display:flex;flex-wrap:wrap;gap:6px} .dtchips.sm{margin:2px 0 8px} .dtchips.sm .chipbtn{font-size:.85rem}
@@ -1059,7 +1059,22 @@ table.gt.wrap1 th:first-child,table.gt.wrap1 td:first-child{white-space:normal} 
 tr.arwon td{background:rgba(200,160,70,.14)}
 .aitag{display:inline-block;font:700 .66rem/1 sans-serif;letter-spacing:.04em;padding:2px 5px;border-radius:5px;background:#5b2a6e;color:#fff;vertical-align:middle}
 .hms{display:inline-flex;align-items:center;gap:2px}.wvctl .hms{display:flex;width:100%}.wvctl .hms select{width:auto;flex:1;min-width:0}.wvrow .hms{flex:none}.hms select{width:auto;min-width:0;padding-left:6px;padding-right:6px;font-variant-numeric:tabular-nums}.hms b{opacity:.6}
-.wvcity{border:1px solid var(--line);border-radius:10px;padding:6px 10px;margin:6px 0;background:var(--panel2)}.wvcity summary{display:flex;justify-content:space-between;align-items:baseline;gap:8px;cursor:pointer;list-style:none}.wvcity summary::-webkit-details-marker{display:none}.wvcity summary .dur{font-size:.76rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wvcity .wvrow:last-child{border-bottom:0}.fmcard .fmhd{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px}.fmcard .fmhdt{flex:1;min-width:0}.fmcard h3{margin:0 0 2px}.fmarmy{margin:0;font-size:.9rem;line-height:1.35}
+.wvcity{border:1px solid var(--line);border-radius:10px;padding:6px 10px;margin:6px 0;background:var(--panel2)}.wvcity summary{display:flex;justify-content:space-between;align-items:baseline;gap:8px;cursor:pointer;list-style:none}.wvcity summary::-webkit-details-marker{display:none}.wvcity summary .dur{font-size:.76rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wvcity .wvrow:last-child{border-bottom:0}.pghd{display:flex;align-items:center;gap:12px;margin:-2px 0 12px;padding:12px;border-radius:14px;border:1px solid var(--line);background:radial-gradient(circle at 8% 50%,color-mix(in srgb,var(--brass) 22%,var(--panel)),var(--panel) 62%)}
+.pgic{flex:none;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;color:var(--brass);background:color-mix(in srgb,var(--brass) 14%,transparent);border:1px solid color-mix(in srgb,var(--brass) 45%,transparent)}.pgic svg{width:26px;height:26px}
+.pght{flex:1;min-width:0}.pght h2{margin:0;font-size:1.25rem}.pght .sub{font-size:.82rem;color:var(--muted);line-height:1.3}
+.pgme{flex:none;display:flex;flex-direction:column;align-items:flex-end;line-height:1.1}.pgme b{font:700 1.5rem var(--display);color:var(--brass);font-variant-numeric:tabular-nums}
+.fmseg.two{grid-template-columns:repeat(2,minmax(0,1fr))}.lbsw .fmseg{flex:1;min-width:0}.fmseg .lbyou{background:var(--bg);color:var(--brass)}.fmseg button:not(.on) .lbyou{background:var(--brass);color:var(--bg)}
+.lbsum{margin:8px 0}.lbpod{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;align-items:end;margin:4px 0 8px}
+.lbp{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:16px 4px 8px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);text-align:center;min-width:0;cursor:pointer}
+.lbp b{font-size:.84rem;line-height:1.2;max-width:100%;overflow-wrap:anywhere}.lbp .lbv{font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.lbp.p1{padding-top:24px;padding-bottom:14px;border-color:#d9b44a;background:radial-gradient(circle at 50% 0,color-mix(in srgb,#d9b44a 26%,var(--panel2)),var(--panel2) 75%)}.lbp.p2{border-color:#aab4bd}.lbp.p3{border-color:#b9793f}
+.lbmed{position:absolute;top:-9px;left:50%;transform:translateX(-50%);width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font:700 .78rem var(--display);color:#1f1a12;background:#aab4bd}.p1 .lbmed{background:#d9b44a}.p3 .lbmed{background:#b9793f}
+.lbp.me b,.lbrow.me .lbnm{color:var(--brass)}
+.lblist{display:grid;gap:5px}.lbrow{display:flex;align-items:center;gap:8px;padding:6px 10px 6px 6px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);min-width:0;cursor:pointer}.lbrow.me{border-color:var(--brass)}
+.lbr{flex:none;width:1.9em;text-align:center;color:var(--muted);font-variant-numeric:tabular-nums;font-size:.9rem}.lbnm{flex:1;min-width:0;overflow-wrap:anywhere;font-weight:600;line-height:1.25}.lbrow .lbv{flex:none;font-weight:700;font-variant-numeric:tabular-nums}
+.lbrow .hnm,.lbrow .hst{display:block;font-size:.8em;font-weight:400}
+.dtgrps{margin-top:0}
+.fmcard .fmhd{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px}.fmcard .fmhdt{flex:1;min-width:0}.fmcard h3{margin:0 0 2px}.fmarmy{margin:0;font-size:.9rem;line-height:1.35}
 .fmcard .rpstats b{font-size:1.02rem;white-space:nowrap}.fmcard .rpstats small{font-size:.72rem;color:var(--muted);font-weight:400}.fmcard .rpstats span{text-align:center;line-height:1.15}
 .fmlv{margin:-2px 0 8px;font-size:.84rem}.fmlab{display:block;font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:8px 0 4px}
 .fmseg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--line);border-radius:10px;overflow:hidden}
@@ -1847,7 +1862,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
       <button class="mptile" data-act="ach" data-tab="ach"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="5"/><path d="M8.6 13.2L7 21l5-3 5 3-1.6-7.8"/></svg><span>Achievements</span><b class="mpb" id="abadge"></b></button>
       <button class="mptile" data-act="lb-open" data-tab="lb"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4"/><path d="M12 13v4M9 20h6M10 17h4"/></svg><span>High scores</span></button>
       <button class="mptile" data-act="tab" data-tab="wheel"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2"/><path d="M12 3v7M12 14v7M3 12h7M14 12h7M5.6 5.6l5 5M13.4 13.4l5 5M18.4 5.6l-5 5M10.6 13.4l-5 5"/></svg><span>Wheel</span></button>
-      <button class="mptile" data-act="drops-open"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.1" fill="currentColor"/><circle cx="15" cy="9" r="1.1" fill="currentColor"/><circle cx="9" cy="15" r="1.1" fill="currentColor"/><circle cx="15" cy="15" r="1.1" fill="currentColor"/></svg><span>Drop tables</span></button>
+      <button class="mptile" data-act="drops-open" data-tab="drops"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.1" fill="currentColor"/><circle cx="15" cy="9" r="1.1" fill="currentColor"/><circle cx="9" cy="15" r="1.1" fill="currentColor"/><circle cx="15" cy="15" r="1.1" fill="currentColor"/></svg><span>Drop tables</span></button>
       <button class="mptile" data-act="settings" data-tab="settings"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span>Settings</span></button>
       </div>
     </div>
@@ -1877,7 +1892,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.103";
+var APP_VERSION = "0.2.104";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -9586,7 +9601,8 @@ function cbSection(){
 function lbVal(cat,v){ if (/^hc/.test(cat)) return v?new Date(v).toLocaleDateString(undefined,{month:"short",day:"numeric"})+" "+new Date(v).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"}):"\u2014"; if (cat==="stars") return v+"\u2605"; if (cat==="hero") return lbHSort==="lv" ? "Level "+v : fmt(v||0)+" "+({atk:"Atk",int:"Int",pol:"Pol"}[lbHSort]); return fmt(v||0); }
 var lbAutoKey=""; // 0.2.50: the board last loaded by itself, so a failed load isn't retried in a loop
 function lbSheet(){
-  var h='<div class="head lbhead"><span class="ico">'+ICON.crest+'</span><div style="flex:1"><h2>High scores</h2><div class="sub">Every Ibory player. Swipe or tap a tab to change boards.</div></div><button class="btn ghost small" data-act="close" aria-label="Close">\u2715</button></div>';
+  var d0=lbData[lbKey()], me0=d0&&d0.me&&!(d0.cat==="hero")?d0.me:null; // 0.2.104 (Cody): a banner with your own rank, a podium for the first three, rows as cards
+  var h='<div class="pghd"><span class="pgic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4"/><path d="M12 13v4M9 20h6M10 17h4"/></svg></span><div class="pght"><h2>High scores</h2><div class="sub">'+(d0&&d0.players?fmt(d0.players)+' players on this board':'Every Ibory player')+'</div></div>'+(me0?'<div class="pgme"><b>#'+me0.rank+'</b><span class="dur">'+lbVal(d0.cat,me0.value)+'</span></div>':'')+'<button class="btn ghost small" data-act="close" aria-label="Close">\u2715</button></div>';
   if (!LB_URL) return h+'<p class="hint">High scores aren\u2019t switched on in this version yet.</p><button class="closebtn" data-act="close">Close</button>';
   var listed=lbOn();
   if (S.lb && S.lb.removed) h+='<p class="hint">This save was removed from the high scores, so it isn\u2019t listed. You can still browse the boards.</p>';
@@ -9598,19 +9614,23 @@ function lbSheet(){
   var d=lbData[lbKey()];
   // 0.2.50: your own board is marked on the switch (the "You are on the … boards" line is gone); one ↻ sends your scores and reloads
   var you=listed?'<span class="lbyou">you</span>':'';
-  h+='<div class="lbsw"><div class="speeds"><button data-act="lb-mp" data-v="0" aria-pressed="'+!lbMp()+'">Single player'+(S.mp?'':you)+'</button><button data-act="lb-mp" data-v="1" aria-pressed="'+!!lbMp()+'">Multiplayer'+(S.mp?you:'')+'</button></div>'+
+  h+='<div class="lbsw"><div class="fmseg two"><button class="'+(lbMp()?'':'on')+'" data-act="lb-mp" data-v="0" aria-pressed="'+!lbMp()+'">Single player'+(S.mp?'':you)+'</button><button class="'+(lbMp()?'on':'')+'" data-act="lb-mp" data-v="1" aria-pressed="'+!!lbMp()+'">Multiplayer'+(S.mp?you:'')+'</button></div>'+
     '<button class="btn ghost small lbre" data-act="lb-reload" aria-label="Reload the board"'+(lbBusy?' disabled':'')+'>\u21bb</button></div>';
   h+='<div class="lbtabs" id="lbtabs">'+lbCats().map(function(c){ return '<button class="chipbtn'+(c[0]===lbCat?' on':'')+'" data-act="lb-cat" data-cat="'+c[0]+'">'+c[1]+'</button>'; }).join("")+'</div>';
   if (lbErr && !lbBusy) h+='<p class="why lbstate" title="'+esc(lbErr)+'">Couldn\u2019t load \u00b7 <button class="link strong" data-act="lb-refresh">Retry</button></p>'; // 0.2.50: one short line; the reason is in its title
   if (!d){ if (!lbBusy && !lbErr && lbAutoKey!==lbKey()){ lbAutoKey=lbKey(); setTimeout(function(){ if (lbHere() && !lbBusy) lbFetch(); }, 0); } if (!lbErr) h+='<p class="hint lbstate">Loading\u2026</p>'; } // 0.2.50: an unloaded board loads by itself
   else {
     if (d.cat==="hero") h+='<div class="lbtabs" style="position:static;margin:0 0 6px">'+LB_HSORTS.map(function(o){ return '<button class="chipbtn'+(o[0]===lbHSort?' on':'')+'" data-act="lb-hsort" data-v="'+o[0]+'">'+o[1]+'</button>'; }).join("")+'</div>';
-    h+='<p class="dur">'+(d.first?'The first '+d.first+' to do it, in order. ':d.cat==="hero"&&d.heroes!=null?'Top '+d.rows.length+' of '+fmt(d.heroes)+' heroes from '+fmt(d.players)+' players. ':'Top '+d.rows.length+' of '+fmt(d.players)+' players. ')+(lbBusy?'Refreshing\u2026':'')+'</p>';
+    h+='<p class="dur lbsum">'+(d.first?'The first '+d.first+' to do it, in order. ':d.cat==="hero"&&d.heroes!=null?'Top '+d.rows.length+' of '+fmt(d.heroes)+' heroes from '+fmt(d.players)+' players. ':'Top '+d.rows.length+' of '+fmt(d.players)+' players. ')+(lbBusy?'Refreshing\u2026':'')+'</p>';
     if (!d.rows.length) h+='<p class="hint">Nobody yet. Be the first.</p>';
     else if (d.cat==="hero" && d.heroes!=null) h+='<div class="tscroll"><table class="gt lbt"><tbody>'+d.rows.map(lbHeroRow).join("")+'</tbody></table></div>';
-    else h+='<div class="tscroll"><table class="gt lbt"><tbody>'+d.rows.map(function(r){ return '<tr'+(r.me?' class="me"':'')+'><td>'+r.rank+'</td><td><span class="lbn" data-act="pl-open" role="button" data-k="'+esc(r.ck||"")+'" data-pid="'+(r.pid||0)+'"'+(r.me?' data-me="1"':'')+' data-nm="'+esc(r.name)+'">'+lbAvatar(r)+'<span>'+(r.tag?'<span class="lbtag">['+esc(r.tag)+']</span>':'')+esc(r.name)+(r.me?' (you)':'')+(d.cat==="hero"&&r.hero?'<span class="hnm">'+(r.hid&&r.hu&&r.hk?heroPortrait({id:r.hid, name:r.hero, tier:"legendary"},28,{k:r.hk, hu:r.hu})+' ':'')+esc(r.hero)+'</span>'+lbHeroSt(r):'')+'</span></span></td>'+'<td>'+lbVal(d.cat,r.value)+'</td></tr>'; }).join("")+'</tbody></table></div>';
+    else { var lbAttr=function(r){ return ' data-act="pl-open" role="button" tabindex="0" data-k="'+esc(r.ck||"")+'" data-pid="'+(r.pid||0)+'"'+(r.me?' data-me="1"':'')+' data-nm="'+esc(r.name)+'"'; },
+        lbNm=function(r){ return (r.tag?'<span class="lbtag">['+esc(r.tag)+']</span>':'')+esc(r.name)+(d.cat==="hero"&&r.hero?'<span class="hnm">'+(r.hid&&r.hu&&r.hk?heroPortrait({id:r.hid, name:r.hero, tier:"legendary"},28,{k:r.hk, hu:r.hu})+' ':'')+esc(r.hero)+'</span>'+lbHeroSt(r):''); },
+        pod=d.rows.length>=3 && d.rows[0].rank===1 && d.cat!=="hero" ? d.rows.slice(0,3) : [];
+      if (pod.length) h+='<div class="lbpod">'+[1,0,2].map(function(i){ var r=pod[i]; return '<div class="lbn lbp p'+(i+1)+(r.me?' me':'')+'"'+lbAttr(r)+'><span class="lbmed">'+(i+1)+'</span>'+lbAvatar(r)+'<b>'+lbNm(r)+'</b><span class="lbv">'+lbVal(d.cat,r.value)+'</span></div>'; }).join("")+'</div>';
+      h+='<div class="lblist">'+d.rows.slice(pod.length).map(function(r){ return '<div class="lbn lbrow'+(r.me?' me':'')+'"'+lbAttr(r)+'><span class="lbr">'+r.rank+'</span>'+lbAvatar(r)+'<span class="lbnm">'+lbNm(r)+(r.me?' <span class="lbyou">you</span>':'')+'</span><span class="lbv">'+lbVal(d.cat,r.value)+'</span></div>'; }).join("")+'</div>'; }
     if (d.me && d.cat==="hero" && d.me.hero!=null) h+='<p class="effect">Your best: '+esc(d.me.hero)+', #'+d.me.rank+' with '+lbVal(d.cat,d.me.value)+'.</p>';
-    else if (d.me) h+='<p class="effect">You: '+(d.me.outside?'#'+d.me.rank+', just outside the first '+d.first:'#'+d.me.rank)+' with '+lbVal(d.cat,d.me.value)+'.</p>';
+    else if (d.me && (d.me.outside || !d.rows.some(function(r){ return r.me; }))) h+='<p class="effect">You: '+(d.me.outside?'#'+d.me.rank+', just outside the first '+d.first:'#'+d.me.rank)+' with '+lbVal(d.cat,d.me.value)+'.</p>'; // your rank is in the banner; this line only when you are not in the rows shown
   }
   if (!listed || (S.lb&&S.lb.needAcct&&!cbOn())) return h+'<button class="closebtn" data-act="close">Close</button>';
   h+='<details class="det" data-det="lbme"'+(DET.lbme?' open':'')+'><summary><b>Your entry</b> <span class="dur">as '+esc(S.lb.name)+'</span></summary>'+'<p class="hint">'+(cbOn()?'You\u2019re listed under your account name. To change it, change your name in Settings.':'Everyone is listed automatically. Your name '+(S.lb.nameAuto?'follows your lord\u2019s name until you set one here':'is the one you set')+'.')+' Leaving removes you from every board, and you won\u2019t be added back unless you rejoin.</p>'+
@@ -14065,8 +14085,9 @@ function dtPlaceHtml(P, b){ var q=DT.q.trim().toLowerCase(), h='', groups=[];
   if (q){ var any=false; P.forEach(function(pl){ var placeHit=pl.n.toLowerCase().indexOf(q)>=0, sel=dtSel(pl), rows=dtMerge(pl.rows(sel.L?sel.L.L:0, sel.V?sel.V.id:null)).filter(function(r){ return placeHit || dtMatch(r,q); });
       if (!rows.length) return; any=true; h+='<div class="dtcard"><div class="dthead"><b>'+esc(pl.n)+'</b><span class="dur">'+esc([sel.V&&sel.V.t, sel.L&&sel.L.t].filter(Boolean).join(" \u00b7 "))+'</span><button class="link" data-act="dt-go" data-v="'+pl.id+'">Open</button></div>'+dtRowsHtml(rows)+'</div>'; });
     return any?h:'<p class="hint">Nothing matches \u201c'+esc(DT.q)+'\u201d.</p>'; }
-  h+='<div class="dtplaces" id="dtplaces">'+groups.map(function(g){ return '<span class="dtg">'+g+'</span>'+P.filter(function(p){ return p.g===g; }).map(function(p){ return '<button class="chipbtn'+(p.id===DT.place?' on':'')+'" data-act="dt-place" data-v="'+p.id+'">'+esc(p.n)+'</button>'; }).join(""); }).join("")+'</div>';
-  var pl=dtPlace(P), sel=dtSel(pl);
+  var pl=dtPlace(P), sel=dtSel(pl); // 0.2.104: the groups are tabs and a group's places wrap under them, so nothing hides off the side
+  h+='<div class="altabs dtgrps" role="tablist">'+groups.map(function(g){ return '<button role="tab" aria-selected="'+(g===pl.g)+'" data-act="dt-grp" data-v="'+esc(g)+'">'+esc(g)+'</button>'; }).join("")+'</div>'+
+    '<div class="dtplaces" id="dtplaces">'+P.filter(function(p){ return p.g===pl.g; }).map(function(p){ return '<button class="chipbtn'+(p.id===pl.id?' on':'')+'" data-act="dt-place" data-v="'+p.id+'">'+esc(p.n)+'</button>'; }).join("")+'</div>';
   h+='<div class="dtcard"><div class="dthead"><b>'+esc(pl.n)+'</b><span class="dur">'+esc(pl.u||"")+'</span></div>';
   if (pl.vs) h+='<div class="dtchips sm">'+pl.vs.map(function(v){ return '<button class="chipbtn'+(v===sel.V?' on':'')+'" data-act="dt-v" data-p="'+pl.id+'" data-v="'+esc(v.id)+'">'+esc(v.t)+'</button>'; }).join("")+'</div>';
   if (pl.lvs && pl.lvs.length>1){ var li=pl.lvs.indexOf(sel.L);
@@ -14108,11 +14129,12 @@ function dtItemHtml(P){ var I=dtIndex(P), q=DT.q.trim().toLowerCase(), h='', las
 function dtBonusTxt(){ var a=[]; if (achLv("medal")) a.push("Decorated tier "+achLv("medal")+": item chances \u00d7"+bItems().toFixed(2)); if (achLv("gear")) a.push("Starforged tier "+achLv("gear")+": +"+(bMats()*100).toFixed(0)+" points on gems, a little on materials"); return a; }
 function dtListHtml(){ var b=lootB(DT.base), P=dtPlaces(b); return DT.mode==="item"?dtItemHtml(P):dtPlaceHtml(P,b); }
 function dropsSheet(){
-  var h='<div class="head lbhead"><span class="ico">'+ICON.crest+'</span><div style="flex:1"><h2>Drop tables</h2><div class="sub">Live: read from the same tables the game rolls with</div></div><button class="btn ghost small" data-act="close" aria-label="Close">\u2715</button></div>';
-  h+='<div class="speeds dtmode"><button data-act="dt-mode" data-v="place" aria-pressed="'+(DT.mode==="place")+'">By place</button><button data-act="dt-mode" data-v="item" aria-pressed="'+(DT.mode==="item")+'">By item</button></div>';
+  var h='<div class="pghd"><span class="pgic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.100" fill="currentColor"/><circle cx="15" cy="9" r="1.100" fill="currentColor"/><circle cx="9" cy="15" r="1.100" fill="currentColor"/><circle cx="15" cy="15" r="1.100" fill="currentColor"/></svg></span><div class="pght"><h2>Drop tables</h2><div class="sub">Live: read from the same tables the game rolls with</div></div><button class="btn ghost small" data-act="close" aria-label="Close">\u2715</button></div>';
+  var seg=function(act,opts,cur){ return '<div class="fmseg two">'+opts.map(function(o){ var on=o[0]===cur; return '<button class="'+(on?'on':'')+'" data-act="'+act+'" data-v="'+o[0]+'" aria-pressed="'+on+'">'+o[1]+'</button>'; }).join("")+'</div>'; };
+  h+=seg("dt-mode",[["place","By place"],["item","By item"]],DT.mode);
   h+='<input type="search" id="dtq" placeholder="Search items or places" value="'+esc(DT.q)+'" style="width:100%;margin:8px 0">';
   var bt=dtBonusTxt();
-  h+='<div class="dtbonus">'+(bt.length?'<div class="speeds"><button data-act="dt-base" data-v="0" aria-pressed="'+!DT.base+'">With your bonuses</button><button data-act="dt-base" data-v="1" aria-pressed="'+DT.base+'">Base chances</button></div><p class="dur" style="margin:4px 0 0">'+esc(bt.join(" \u00b7 "))+'</p>':'<p class="dur" style="margin:0">Base chances. The Decorated and Starforged achievements raise them as you earn tiers.</p>')+'</div>';
+  h+='<div class="dtbonus">'+(bt.length?seg("dt-base",[["0","With your bonuses"],["1","Base chances"]],DT.base?"1":"0")+'<p class="dur" style="margin:4px 0 0">'+esc(bt.join(" \u00b7 "))+'</p>':'<p class="dur" style="margin:0">Base chances. The Decorated and Starforged achievements raise them as you earn tiers.</p>')+'</div>';
   return h+'<div id="dtlist">'+dtListHtml()+'</div>';
 }
 /* ---------- player profiles: tap a name (high scores, chat, alliance lists) to see that player ---------- */
@@ -15507,7 +15529,7 @@ function cityStep(d){ var n=S.cities.length; if (n<2) return; var i=((S.cur+d)%n
 function hdPopClose(){ var c=document.getElementById("citybar"), m=document.getElementById("morepanel");
   if (c && !c.hidden){ c.hidden=true; var cp=document.getElementById("cpick"); if (cp) cp.setAttribute("aria-expanded","false"); }
   if (m && !m.hidden){ m.hidden=true; ["moretab","morechip"].forEach(function(id){ var b=document.getElementById(id); if (b) b.setAttribute("aria-expanded","false"); }); } }
-var MORE_TABS={farms:"Farms", reports:"Reports", alliance:"Pact", war:"War Room", college:"War College", wheel:"Wheel", ach:"Achievements", lb:"High scores", quests:"Quests", settings:"Settings", me:"Me"};
+var MORE_TABS={farms:"Farms", reports:"Reports", alliance:"Pact", war:"War Room", college:"War College", wheel:"Wheel", ach:"Achievements", lb:"High scores", drops:"Drop tables", quests:"Quests", settings:"Settings", me:"Me"};
 function hdTick(){ // 0.2.48: the More dots, the Reports count, and the status row shows only when something on it is
   var rn=repUnread(); setText(document.getElementById("repbadge"), rn?String(rn):"");
   var ab=document.getElementById("abadge"), qb=document.getElementById("qbadge"), any=rn>0 || !!(qb&&qb.textContent) || !!(ab&&ab.textContent);
@@ -15526,7 +15548,7 @@ function setTabs(){ renderCityBar(); queueVis();
 
 /* ---------- sheet ---------- */
 var sheet=document.getElementById("sheet"), sheetBody=document.getElementById("sheetbody"), sheetFor=null, lastSheet="", armed=null;
-var PAGES={settings:1,ach:1,quests:1,lb:1,me:1}, pageLast=""; // these four open as tabs; the same builders also work as pop-ups (used on the battlefield)
+var PAGES={settings:1,ach:1,quests:1,lb:1,me:1,drops:1}, pageLast=""; // these four open as tabs; the same builders also work as pop-ups (used on the battlefield)
 function onPage(k){ return sheetFor ? sheetFor.kind===k : tab===k; }
 function goPage(k){ if (bfOn()||pvOn()){ openSheet({kind:k}); return; } closeSheet(); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); arrange=null; warArmed=false; chalArmed=false; bfArmed=false; farmArmed=false; itemsNote=""; armed=null; tab=k; lastView=""; renderView(true); window.scrollTo({top:0}); }
 var SHEET_T=0; // when a window last opened: a phone's tap sends its click after the window is already up, and that click mustn't count as tapping outside it
@@ -16359,13 +16381,14 @@ document.addEventListener("click",function(e){
   if (act==="build-new"){ var bnw=sheetFor.w, bni=sheetFor.i, bnt=a.dataset.type; if (!startBuild(bnw,bni,bnt)) toastQ(DEF[bnt].name+" added to the build queue"); bqFill(bnw,bni,bnt,Math.max(1,+a.dataset.to||1)); closeSheet(); refresh(); return; } // 0.2.83: up to the picked level
   if (act==="tax"){ S.tax=Math.max(0,Math.min(80,S.tax+(+a.dataset.d))); save(); tickText(); lastView=""; renderView(true); return; }
   if (act==="quests"){ goPage("quests"); return; }
-  if (act==="drops-open"){ openSheet({kind:"drops"}); return; }
+  if (act==="drops-open"){ goPage("drops"); return; } // 0.2.104 (Cody): a tab like the high scores, not a full-screen sheet
   if (act==="dt-mode"){ DT.mode=a.dataset.v; lastSheet=""; renderSheet(); return; }
   if (act==="dt-base"){ DT.base=a.dataset.v==="1"; lastSheet=""; renderSheet(); return; }
   if (act==="dt-place"){ DT.place=a.dataset.v; lastSheet=""; renderSheet(); return; }
   if (act==="dt-v"){ DT.v[a.dataset.p]=a.dataset.v; lastSheet=""; renderSheet(); return; }
   if (act==="dt-lv"){ if (a.dataset.v) DT.lv[a.dataset.p]=a.dataset.v; lastSheet=""; renderSheet(); return; }
-  if (act==="dt-go"){ DT.mode="place"; DT.place=a.dataset.v; if (a.dataset.vv) DT.v[a.dataset.v]=a.dataset.vv; if (a.dataset.lv) DT.lv[a.dataset.v]=a.dataset.lv; DT.q=""; lastSheet=""; renderSheet(); var sb=document.getElementById("sheet"); if (sb) sb.scrollTop=0; return; }
+  if (act==="dt-go"){ DT.mode="place"; DT.place=a.dataset.v; if (a.dataset.vv) DT.v[a.dataset.v]=a.dataset.vv; if (a.dataset.lv) DT.lv[a.dataset.v]=a.dataset.lv; DT.q=""; lastSheet=""; renderSheet(); var sb=document.getElementById("sheet"); if (sb) sb.scrollTop=0; if (tab==="drops") window.scrollTo({top:0}); return; }
+  if (act==="dt-grp"){ var dgp=dtPlaces(lootB(DT.base)).filter(function(x){ return x.g===a.dataset.v; })[0]; if (dgp) DT.place=dgp.id; lastSheet=""; renderSheet(); return; }
   if (act==="ry-list"){ openSheet({kind:"rylist"}); return; }
   if (act==="bully-go"){ closeSheet(); tab="alliance"; KGV="bully"; lastView=""; renderView(true); window.scrollTo({top:0}); return; }
   if (act==="fm-help"){ FMHELP=!FMHELP; lastView=""; renderView(true); return; } // 0.2.50
