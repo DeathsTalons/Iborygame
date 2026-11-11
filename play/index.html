@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.107";
+window.IBORY_V="0.2.108";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1059,7 +1059,20 @@ table.gt.wrap1 th:first-child,table.gt.wrap1 td:first-child{white-space:normal} 
 tr.arwon td{background:rgba(200,160,70,.14)}
 .aitag{display:inline-block;font:700 .66rem/1 sans-serif;letter-spacing:.04em;padding:2px 5px;border-radius:5px;background:#5b2a6e;color:#fff;vertical-align:middle}
 .hms{display:inline-flex;align-items:center;gap:2px}.wvctl .hms{display:flex;width:100%}.wvctl .hms select{width:auto;flex:1;min-width:0}.wvrow .hms{flex:none}.hms select{width:auto;min-width:0;padding-left:6px;padding-right:6px;font-variant-numeric:tabular-nums}.hms b{opacity:.6}
-.wvcity{border:1px solid var(--line);border-radius:10px;padding:6px 10px;margin:6px 0;background:var(--panel2)}.wvcity summary{display:flex;justify-content:space-between;align-items:baseline;gap:8px;cursor:pointer;list-style:none}.wvcity summary::-webkit-details-marker{display:none}.wvcity summary .dur{font-size:.76rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wvcity .wvrow:last-child{border-bottom:0}.pghd{display:flex;align-items:center;gap:12px;margin:-2px 0 12px;padding:12px;border-radius:14px;border:1px solid var(--line);background:radial-gradient(circle at 8% 50%,color-mix(in srgb,var(--brass) 22%,var(--panel)),var(--panel) 62%)}
+.wvcity{border:1px solid var(--line);border-radius:10px;padding:6px 10px;margin:6px 0;background:var(--panel2)}.wvcity summary{display:flex;justify-content:space-between;align-items:baseline;gap:8px;cursor:pointer;list-style:none}.wvcity summary::-webkit-details-marker{display:none}.wvcity summary .dur{font-size:.76rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wvcity .wvrow:last-child{border-bottom:0}.conrow{display:flex;align-items:center;gap:10px;width:100%;margin:10px 0;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:radial-gradient(circle at 6% 50%,color-mix(in srgb,#7fb2e0 20%,var(--panel2)),var(--panel2) 60%);color:inherit;font:inherit;text-align:left;cursor:pointer}
+.conrow.has{border-color:var(--brass)}.conric{font-size:1.4rem;color:#bcd6f2;flex:none}.conrt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}.conrt b{font:700 1rem var(--display)}
+.consky{border:1px solid color-mix(in srgb,var(--tc) 45%,var(--line));border-radius:14px;padding:10px;margin:0 0 10px;background:radial-gradient(ellipse at 50% 38%,#1b2740 0,#0e1422 70%,#0a0e18 100%)}
+.conname{display:flex;flex-direction:column;align-items:center;line-height:1.2;margin-bottom:2px}.conname b{font:700 1.15rem var(--display);color:var(--tc);letter-spacing:.04em}.conname .dur{color:#aab3c2;text-align:center;font-size:.8rem}
+.sbslots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.sbslot{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:64px;padding:8px 4px;border-radius:10px;border:1px dashed var(--line);background:var(--panel2);color:inherit;font:inherit;text-align:center;cursor:pointer}
+.sbslot b{font:700 .88rem var(--display);line-height:1.15}.sbslot .dur{font-size:.74rem;line-height:1.2}.sbslot.has{border-style:solid;border-color:#b79be8;background:radial-gradient(circle at 50% 0,color-mix(in srgb,#b79be8 22%,var(--panel2)),var(--panel2) 80%)}.sbslot.on{outline:2px solid var(--brass)}.sbslot.lock{opacity:.55;cursor:default}
+.sbpick{display:grid;gap:6px;margin-top:8px}.sbbook{display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:inherit;font:inherit;text-align:left;cursor:pointer}.sbbook.arm{border-color:var(--red)}.sbbook.arm .dur{color:var(--red)}
+.contabs{row-gap:6px}.consym{font-size:1.5rem;line-height:28px;height:28px}.conmap{display:block;width:100%;max-width:340px;margin:0 auto;touch-action:manipulation}.conmap text{font-family:var(--body);pointer-events:none}
+.contot{margin:6px 0 0}.contot div{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12)}.contot b{color:#fff;font-size:1rem}.contot span{color:#aab3c2;text-align:center;line-height:1.1}
+.ttbox{margin:0 0 8px;padding:6px 10px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}.ttbox summary{cursor:pointer}
+.ttab{width:100%;min-width:0;table-layout:fixed;margin-top:6px}.ttab th:first-child,.ttab td:first-child{width:28%;text-align:left}.ttab th{font-size:.7rem}
+.ttab td{padding:4px 2px;line-height:1.15}.ttab td b{display:block;font-variant-numeric:tabular-nums;font-size:.84rem}.ttab td>span:not(.rpu){display:block;font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.ttab .rpu span{font-size:.86rem}.ttnote{margin:6px 0 2px;font-size:.74rem;line-height:1.3}
+.pghd{display:flex;align-items:center;gap:12px;margin:-2px 0 12px;padding:12px;border-radius:14px;border:1px solid var(--line);background:radial-gradient(circle at 8% 50%,color-mix(in srgb,var(--brass) 22%,var(--panel)),var(--panel) 62%)}
 .pgic{flex:none;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;color:var(--brass);background:color-mix(in srgb,var(--brass) 14%,transparent);border:1px solid color-mix(in srgb,var(--brass) 45%,transparent)}.pgic svg{width:26px;height:26px}
 .pght{flex:1;min-width:0}.pght h2{margin:0;font-size:1.25rem}.pght .sub{font-size:.82rem;color:var(--muted);line-height:1.3}
 .pgme{flex:none;display:flex;flex-direction:column;align-items:flex-end;line-height:1.1}.pgme b{font:700 1.5rem var(--display);color:var(--brass);font-variant-numeric:tabular-nums}
@@ -1892,7 +1905,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.107";
+var APP_VERSION = "0.2.108";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -2157,6 +2170,10 @@ var SIM = (function () {
   var MECHANICAL = [9, 10, 11];
   var MOUNTED = [7, 8];
   var GROUND = [0, 1, 2, 3, 4, 5];
+  // Troop types (0.2.106): which of a side's per-type bonuses a troop uses. These are NOT the research groups above (an Archer is "ranged"
+  // here but Ground for Compass; a Ballista is "siege" here but Ranged for Archery). The Transporter has no type and keeps the side's plain numbers.
+  var TYPE_NAMES = ["ground", "ranged", "mounted", "siege"];
+  var TYPE_OF = [0, 0, 0, 0, 0, 1, -1, 2, 2, 3, 3, 3];
   var FIELD_TYPES = [0, 1, 3, 4, 6, 5, 7, 8, 9, 10, 11]; // every type except Scout
   var LOG_TARGETS = [0, 1, 2, 3, 4, 5];
   var ABATIS_PREF = [7, 8];
@@ -2221,6 +2238,15 @@ var SIM = (function () {
     var defM = f32(orDefault(side.defence_modifier, 1));
     var lifeM = f32(orDefault(side.life_modifier, 1));
     var intel = f32(orDefault(hero.intel, 0));
+    // side.types = {ground:{atk,atkFlat,def,defFlat,guard,life,lifeFlat}, ranged:{…}, mounted:{…}, siege:{…}}: optional, every field optional.
+    // A missing field falls back to the side's own number (attack_modifier, defence_modifier, life_modifier, hero.intel; the flats to 0),
+    // so a side without it fights exactly as before.
+    var types = side.types || null;
+    function tv(i, key, dflt) {
+      if (!types || TYPE_OF[i] < 0) return dflt;
+      var o = types[TYPE_NAMES[TYPE_OF[i]]];
+      return (o && o[key] != null) ? f32(o[key]) : dflt;
+    }
 
     // §4 defense bracket: Y = f32( f32( f32(iw*5+100)/100 ) + f32(intel/100) )
     // Age 2: Intelligence is flat life per troop (added last), not part of the defense bracket; Workers get no Iron Working
@@ -2229,15 +2255,20 @@ var SIM = (function () {
 
     var out = [];
     var i, rec;
+    // Guard (0.2.108): a second, separate layer of defence. Its bonuses add into one pile and the damage taken is divided by (1 + pile):
+    // +100% Guard halves it, +300% quarters it; no cap, never zero. It is applied after the 0.5 floor, so it does not eat into it.
+    function guard(i, d) { var g = tv(i, "guard", 0); return g > 0 ? f32(d / f32(1 + g)) : d; }
     // Step 1: base values and the damage-taken coefficient
     for (i = 0; i < NUM_TYPES; i++) {
       var base = UNIT_BASE[i];
       var G = f32(((RULES.workerNoIW && i === 0) ? Y0 : Y) * f32(base[2]));                       // G = f32( Y × f32(Dv) )
-      var d = f32(f32(1000 - G * defM) / 1000);            // d = f32( f32(1000 − G×defM) / 1000 )
+      var defMi = tv(i, "def", defM), defFlat = tv(i, "defFlat", 0);
+      var d = defFlat ? f32(f32(1000 - f32(f32(G * defMi) + defFlat)) / 1000)   // flat defence: points added after the percentages (10 points = 1% less damage)
+        : f32(f32(1000 - G * defMi) / 1000);              // d = f32( f32(1000 − G×defM) / 1000 )
       out.push({
         life: f32(base[0]),
         attack: f32(base[1]),
-        defense: f32(Math.max(d, MIN_DEFENSE)),            // defense = f32( max(d, 0.5) )
+        defense: guard(i, f32(Math.max(d, MIN_DEFENSE))),  // defense = f32( max(d, 0.5) ), then the Guard layer
         speed: f32(base[3]),
         range: f32(base[4])
       });
@@ -2245,15 +2276,16 @@ var SIM = (function () {
     // Step 2.1: Ground types
     for (i = 0; i < GROUND.length; i++) {
       rec = out[GROUND[i]];
-      rec.life = f32(f32(f32(rec.life * (med * 5 + 100)) * lifeM) / 100);
-      rec.attack = f32(rec.attack * atkM);
+      rec.life = f32(f32(f32(rec.life * (med * 5 + 100)) * tv(GROUND[i], "life", lifeM)) / 100);
+      rec.attack = f32(rec.attack * tv(GROUND[i], "atk", atkM));
       rec.speed = f32(f32(rec.speed * (comp * 10 + 100)) / 100);
     }
     // Step 2.2: Mechanical types
     for (i = 0; i < MECHANICAL.length; i++) {
       rec = out[MECHANICAL[i]];
-      rec.life = RULES.medAll ? f32(f32(f32(rec.life * (med * 5 + 100)) * lifeM) / 100) : f32(rec.life * lifeM); // Age 2: Medicine heals every type
-      rec.attack = f32(rec.attack * atkM);
+      var lmM = tv(MECHANICAL[i], "life", lifeM);
+      rec.life = RULES.medAll ? f32(f32(f32(rec.life * (med * 5 + 100)) * lmM) / 100) : f32(rec.life * lmM); // Age 2: Medicine heals every type
+      rec.attack = f32(rec.attack * tv(MECHANICAL[i], "atk", atkM));
       rec.speed = f32(f32(rec.speed * (hbr * 5 + 100)) / 100);
     }
     // Step 2.3: Ranged types
@@ -2264,11 +2296,13 @@ var SIM = (function () {
     // Step 2.4: Mounted types (same formulas as Mechanical)
     for (i = 0; i < MOUNTED.length; i++) {
       rec = out[MOUNTED[i]];
-      rec.life = RULES.medAll ? f32(f32(f32(rec.life * (med * 5 + 100)) * lifeM) / 100) : f32(rec.life * lifeM); // Age 2: Medicine heals every type
-      rec.attack = f32(rec.attack * atkM);
+      var lmO = tv(MOUNTED[i], "life", lifeM);
+      rec.life = RULES.medAll ? f32(f32(f32(rec.life * (med * 5 + 100)) * lmO) / 100) : f32(rec.life * lmO); // Age 2: Medicine heals every type
+      rec.attack = f32(rec.attack * tv(MOUNTED[i], "atk", atkM));
       rec.speed = f32(f32(rec.speed * (hbr * 5 + 100)) / 100);
     }
-    if (RULES.intLife && intel > 0) for (i = 0; i < NUM_TYPES; i++) out[i].life = f32(out[i].life + intel);
+    if (RULES.intLife) for (i = 0; i < NUM_TYPES; i++) { var lf = tv(i, "lifeFlat", intel); if (lf > 0) out[i].life = f32(out[i].life + lf); }
+    if (types) for (i = 0; i < NUM_TYPES; i++) { var af = tv(i, "atkFlat", 0); if (af) out[i].attack = f32(out[i].attack + af); } // flat attack: added last, like flat life
     return out;
   }
 
@@ -3079,17 +3113,18 @@ function barracksName(sl){ return "Barracks "+(barracksList().indexOf(sl)+1); }
 // no idle Barracks for this unit: the one with queue room that frees up soonest
 function pickQueue(i){ var req=barracksReq(i), best=-1; barracksList().forEach(function(sl){ if (S.inside[sl].level>=req && trainingAt(sl) && bqRoom(sl)>0 && (best<0 || slotFree(sl)<slotFree(best))) best=sl; }); return best; }
 // train on one Barracks: starts now when it's idle, otherwise joins its queue
+function trainDisc(){ return 1/(1+conRole("trainer").def); } // the Drillmaster's Muster arm: what a unit costs to train, as a share of the listed price
 function trainOnWhy(tu,tn,sl){ var u=U[tu], b=S.inside[sl];
   if (!b || b.type!=="barracks") return "No Barracks there";
   if (missing(u.req).length) return "Locked";
   if (b.level<barracksReq(tu)) return "Needs a level "+barracksReq(tu)+" Barracks";
   if (trainingAt(sl) && bqRoom(sl)<1) return "The queue is full ("+bqWaiting(sl)+" / "+b.level+")";
   if (!tn || tn<1) return "Enter an amount";
-  var c={}; for (var k in u.cost) c[k]=u.cost[k]*tn; if (!afford(c)) return "Not enough resources";
+  var c={}, td=trainDisc(); for (var k in u.cost) c[k]=u.cost[k]*tn*td; if (!afford(c)) return "Not enough resources";
   if (idlePop()<u.pop*tn) return "Not enough free people ("+fmt(idlePop())+")";
   return ""; }
 function trainOn(tu,tn,sl){ if (trainOnWhy(tu,tn,sl)) return false; var T=trainTime(tu);
-  var disc=1-0.01*Math.max(0,S.inside[sl].level-10), tc={}; for (var ck in U[tu].cost) tc[ck]=Math.ceil(U[tu].cost[ck]*tn*disc);
+  var disc=(1-0.01*Math.max(0,S.inside[sl].level-10))/(1+conRole("trainer").def), tc={}; for (var ck in U[tu].cost) tc[ck]=Math.ceil(U[tu].cost[ck]*tn*disc);
   pay(tc,1); S.pop -= U[tu].pop*tn;
   if (trainingAt(sl)) S.train.push({slot:sl,u:tu,n:tn,paid:tc,q:true,dur:T*tn,start:0,end:0});
   else S.train.push({slot:sl,u:tu,n:tn,paid:tc,start:S.gt,end:S.gt+T*tn});
@@ -3941,7 +3976,7 @@ setInterval(function(){ try { var ev=evNow(); if (!ev || !EV_TRACK[ev.id] || sav
 var WIZ_LOOT={1:{items:{gemF:[2,12], s15:[1,4]}, res:1e6}, 2:{items:{gemF:[10,20], s60:[1,2]}, res:5e6}}; // a slain wizard, for every player who brought it down
 function wizRoll(L){ var W=WIZ_LOOT[L]||WIZ_LOOT[2], out={items:{}, res:{}}; for (var k in W.items) out.items[k]=qtyRoll(W.items[k]); RES.forEach(function(r){ out.res[r]=W.res; }); return out; }
 function wizRewardText(L){ return L===1 ? "2 to 12 Flawless Gems, 1 to 4 15-minute speed-ups and 1M of each resource" : "10 to 20 Flawless Gems, 1 to 2 1-hour speed-ups and 5M of each resource"; }
-function wizSide(hero){ return {research:simResearch(), hero:{intel:hsB(hero,"int")}, life_modifier:setLife(hero), defence_modifier:bDefend(), attack_modifier:(1+0.05*(S.tech.militarytradition||0)+hsB(hero,"atk")/HERO_ATK_DIV+bAttack()+alFx("pveatk"))}; }
+function wizSide(hero){ return {research:simResearch(), con:conBonus(hero), hero:{intel:hsB(hero,"int")}, life_modifier:setLife(hero), defence_modifier:bDefend(), attack_modifier:(1+0.05*(S.tech.militarytradition||0)+hsB(hero,"atk")/HERO_ATK_DIV+bAttack()+alFx("pveatk"))}; }
 // a march lands on a wizard
 function wizBattle(m){
   var q=TILE_BY[m.tile], L=q.L, hero=m.hero?heroById(m.hero):null, T=wizT(L), joins=[{t:m.t.slice(), side:wizSide(hero)}], f=sarFight(T,L,joins), v=null;
@@ -4396,6 +4431,12 @@ function lootCity(q){ return q.k==="npc"||q.k==="ai"||q.k==="hc"; }
 var MITH_NPC={7:0.01, 8:0.0117, 9:0.0133, 10:0.015};
 function mithUp(q,L,b){ if (q.k!=="npc" || L<7) return 0; var st=L>=10?0.0005+0.0001*b.gear:0; return st+MITH_NPC[Math.min(10,L)]-0.0015; }
 var JUSTICE_NPC10=0.01; // 0.2.29 (Cody): its own 1% roll on every full-garrison win over a level 10 NPC city, on top of the medal roll
+/* Skill books (0.2.106, Cody): a book teaches one hero one skill for good: +10% to one stat of one troop type. Three slots a hero (hero levels 50,
+   100, 150). Bound once read; a new book in a full slot destroys the old one. They drop only from a full win over a level 10 NPC city, 0.1% in all. */
+var SB=[["ground","atk","Spearhead"],["ground","def","Shield Wall"],["ground","hp","Iron Constitution"],["ranged","atk","Volley"],["ranged","def","Pavise"],["ranged","hp","Hardy Bowmen"],
+  ["mounted","atk","Thunder Charge"],["mounted","def","Barding"],["mounted","hp","Destrier\u2019s Heart"],["siege","atk","Barrage"],["siege","def","Mantlets"],["siege","hp","Seasoned Timber"]];
+var SB_P=0.001, SB_PCT=0.10, SB_SLOTS=[50,100,150];
+function sbKey(x){ return "sb_"+x[0]+"_"+x[1]; }
 var DROP_RULES=[
   {k:"gemD", ok:function(q,L){ return !VTYPES[q.k]; }, p:function(q,L,b){ return 0.35+b.mats; }, n:function(q,L){ return [1,1+Math.floor(L/3)]; }},
   {k:"gemF", ok:function(q,L){ return !VTYPES[q.k] && L>=5; }, p:function(q,L,b){ return 0.04+0.01*(L-5)+b.mats; }, n:function(){ return {w:{1:0.7, 2:0.3}}; }},
@@ -4409,6 +4450,7 @@ var DROP_RULES=[
     {k:"codex", ok:function(q,L){ return L>=7; }, t:function(q,L,b){ return 0.002*b.items; }},
     {k:"tome", ok:function(q,L){ return L>=4; }, t:function(q,L,b){ return 0.005*b.items; }},
     {k:"primer", ok:function(){ return true; }, t:function(q,L,b){ return 0.01*b.items; }}]},
+  {one:"Skill books", ok:function(q,L){ return q.k==="npc" && L>=10; }, of:SB.map(function(x,i){ return {k:sbKey(x), ok:function(){ return true; }, t:function(){ return SB_P*(i+1)/SB.length; }}; })},
   {k:"ensign", ok:function(q,L){ return lootCity(q) && L>=10; }, p:function(q,L,b){ return 0.007*b.items; }},
   {k:"marchsp", ok:function(q,L){ return lootCity(q) && L>=7; }, p:function(q,L,b){ return 0.01*b.items; }},
   {k:"gemF", ok:function(q){ return q.k==="monster" && !q.ev; }, p:function(){ return 1; }, n:function(){ return [1,3]; }}, // the day's monsters always drop Flawless Gems
@@ -4496,7 +4538,7 @@ function resolveMarch0(m){
     try { ALS.last=0; alSync(); } catch(e){} return true; }
   var q=TILE_BY[m.tile], cur=current(q), hero=m.hero?heroById(m.hero):null;
   var fullGar = (q.k!=="npc" && q.k!=="ai") || baseOf(q).t.every(function(v,i){ return cur.t[i]>=v; }); // an NPC or AI lord drops nothing but resources unless its troop garrison was full when the fight began
-  var A={troops:m.t.slice(), research:simResearch(), hero:{intel:hsB(hero,"int")}, life_modifier:setLife(hero), defence_modifier:bDefend(), attack_modifier:(1+0.05*(S.tech.militarytradition||0)+hsB(hero,"atk")/HERO_ATK_DIV+bAttack()+alFx("pveatk"))}; // War Memorial: Hunter (map targets are all PvE)
+  var A={troops:m.t.slice(), research:simResearch(), con:conBonus(hero), hero:{intel:hsB(hero,"int")}, life_modifier:setLife(hero), defence_modifier:bDefend(), attack_modifier:(1+0.05*(S.tech.militarytradition||0)+hsB(hero,"atk")/HERO_ATK_DIV+bAttack()+alFx("pveatk"))}; // War Memorial: Hunter (map targets are all PvE)
   var D=npcDef(cur);
   var gateClosed=false;
   var r=SIM.fight(A,D), won=r.result===1, xp=0, i;
@@ -4720,7 +4762,7 @@ function farmClaimed(ignore){ // every NPC already sitting on any preset's list,
   return s;
 }
 // the attacking side of any fight this city sends: its research, hero stats, set bonuses and the city's attack/defence buffs (same shape the server expects)
-function mySide(hero){ return {research:simResearch(), hero:{intel:hsB(hero,"int")}, life_modifier:setLife(hero), defence_modifier:bDefend(), attack_modifier:(1+0.05*(S.tech.militarytradition||0)+hsB(hero,"atk")/HERO_ATK_DIV+bAttack())}; }
+function mySide(hero){ return {research:simResearch(), con:conBonus(hero), hero:{intel:hsB(hero,"int")}, life_modifier:setLife(hero), defence_modifier:bDefend(), attack_modifier:(1+0.05*(S.tech.militarytradition||0)+hsB(hero,"atk")/HERO_ATK_DIV+bAttack())}; }
 function myAttacker(t, hero){ var A={troops:t}, sd=mySide(hero); for (var k in sd) A[k]=sd[k]; return A; }
 function farmAttacker(pr){ return myAttacker(pr.t.slice(), presetHero(pr)); }
 // what a fresh level-L NPC is worth to this preset: experience and plunder per visit, or ok:false if it can't win (cleanly, when the preset pauses on losses)
@@ -4966,8 +5008,8 @@ function aiResearchFull(r){ return {military_tradition:0, iron_working:r.iron_wo
 function cityDefense(c){
   return withCity(cityIndex(c.id), function(){ var m=wallHero();
     var helpT=S.alliance?allyHelpAt(C().id):[0,0,0,0,0,0,0,0,0,0,0,0];
-    return {troops:S.gate==="closed"?[0,0,0,0,0,0,0,0,0,0,0,0]:S.troops.map(function(n,i){ return n+helpT[i]; }), fortifications:S.forts.slice(), wallLevel:S.wall||0, research:simResearch(), hero:{intel:hsB(m,"int",1)}, life_modifier:setLife(m,1),
-      defence_modifier:bDefend(), attack_modifier:(1+0.05*(S.tech.militarytradition||0)+hsB(m,"atk",1)/HERO_ATK_DIV+bAttack()), fortBonus:1+0.1*(S.tech.engineering||0)+0.1*(S.tech.ancientmasonry||0)}; });
+    return {troops:S.gate==="closed"?[0,0,0,0,0,0,0,0,0,0,0,0]:S.troops.map(function(n,i){ return n+helpT[i]; }), fortifications:S.forts.slice(), wallLevel:S.wall||0, research:simResearch(), con:conWall(m), hero:{intel:hsB(m,"int",1)}, life_modifier:setLife(m,1),
+      defence_modifier:bDefend(), attack_modifier:(1+0.05*(S.tech.militarytradition||0)+hsB(m,"atk",1)/HERO_ATK_DIV+bAttack()), fortBonus:(1+0.1*(S.tech.engineering||0)+0.1*(S.tech.ancientmasonry||0))*(1+(m&&m.con&&m.con.wall?conOf(m,"wall").hp:0))}; });
 }
 function wavePick(pool, frac, types){ return pool.map(function(n,i){ return (!types || types.indexOf(i)>=0) ? Math.floor(n*frac) : 0; }); }
 function oneEach(pool, arr){ pool.forEach(function(n,i){ if (n>0 && !arr[i] && i!==2 && i!==6) arr[i]=1; }); return arr; }
@@ -5032,7 +5074,7 @@ function resolveDefense(w){
   withCity(ci, function(){
     var def=cityDefense(C()), A={troops:w.t, research:w.r, attack_modifier:w.am}, shut=S.gate==="closed";
     var rfs=mpShown()?rfHere(C().id):[], rfBefore=rfs.map(function(x){ return x.t.slice(); });
-    if (rfs.length) def.allies=rfs.map(function(x){ var sd=x.side||{}; return {rid:x.id, name:x.from, troops:shut?Z12():x.t.slice(), research:sd.research||{}, hero:sd.hero||{intel:0}, attack_modifier:sd.attack_modifier||1, defence_modifier:sd.defence_modifier||1, life_modifier:sd.life_modifier||1}; });
+    if (rfs.length) def.allies=rfs.map(function(x){ var sd=x.side||{}; return {rid:x.id, name:x.from, troops:shut?Z12():x.t.slice(), research:sd.research||{}, hero:sd.hero||{intel:0}, attack_modifier:sd.attack_modifier||1, defence_modifier:sd.defence_modifier||1, life_modifier:sd.life_modifier||1, con:sd.con}; });
     var before=S.troops.slice(), fBefore=S.forts.slice(), r=SIM.fight(A,def), rec=rfs.length?SIM.last():null, hostLeft=r.parts?r.parts[0]:r.defender;
     var helpT=S.alliance?allyHelpAt(C().id):[0,0,0,0,0,0,0,0,0,0,0,0];
     if (shut){ r.defender=before.slice(); hostLeft=before.slice(); }
@@ -5616,7 +5658,7 @@ function occupyFlats(){
     var tm=travelMs(pr.t,q,phid,"occupy");
     if (S.res.food<marchFood(pr.t,"occupy",tm)){ why="not enough food for rations"; break; }
     if (sent===0){ // one check before anything leaves: would this army beat a flat of this level?
-      var cur=current(q), A={troops:pr.t.slice(), research:simResearch(), hero:{intel:hsB(ph,"int")}, life_modifier:setLife(ph), defence_modifier:bDefend(), attack_modifier:(1+0.05*(S.tech.militarytradition||0)+hsB(ph,"atk")/HERO_ATK_DIV+bAttack())}, wins=0;
+      var cur=current(q), A={troops:pr.t.slice(), research:simResearch(), con:conBonus(ph), hero:{intel:hsB(ph,"int")}, life_modifier:setLife(ph), defence_modifier:bDefend(), attack_modifier:(1+0.05*(S.tech.militarytradition||0)+hsB(ph,"atk")/HERO_ATK_DIV+bAttack())}, wins=0;
       for (var s=0;s<5;s++){ var r=SIM.fight(A,npcDef(cur)); if (r.result===1) wins++; }
       if (wins<5){ toast("That preset lost "+(5-wins)+" of 5 practice fights against a level "+o.lvl+" flat, so nothing was sent"); return; }
     }
@@ -6118,7 +6160,10 @@ var GEM_4={D:[90,85,80,75,70,65,60,55,50,45,40,35,30,25,20], F:[95,94,93,92,91,9
 var FAIL_TO=[0,0,1,1,2,3,4,4,5,0,0,0,0,0,0]; // star count after a failed attempt from each level
 var SET_TIERS=[[15,3.5],[12,2.5],[9,2.0],[6,1.4]]; // star set life (0.1.249; was 9 x1.5, 12 x2, 15 x2.5)
 function starSet(h){ if (!h) return -1; var e=gearIndex()[h.id]; return e && e.n>=GEAR_POS.length ? e.low : -1; }
-function setLife(h,def){ var st=starSet(h), m=1; for (var i=0;i<SET_TIERS.length;i++) if (st>=SET_TIERS[i][0]){ m=SET_TIERS[i][1]; break; } return m*(1+alFx("life"))*(1+dgFx(h,def).life/100); }
+function setMult(h){ var st=starSet(h); for (var i=0;i<SET_TIERS.length;i++) if (st>=SET_TIERS[i][0]) return SET_TIERS[i][1]; return 1; }
+// 0.2.108 (Cody): HP bonuses add up in one pile (alliance research, the dragon, and from here on constellations and skill books); only the star set
+// and Medicine multiply it. Was: star set x alliance x dragon.
+function setLife(h,def){ return setMult(h)*(1+alFx("life")+dgFx(h,def).life/100); }
 function nextSetTier(st){ for (var i=SET_TIERS.length-1;i>=0;i--) if (st<SET_TIERS[i][0]) return SET_TIERS[i]; return null; }
 function gemChance(g,type,n){ var stat=gearStat(g), m=bestFor(stat), mb=m?Math.min(10,hs(m,stat)/40):0;
   return Math.min(99, Math.max(1, GEM_4[type][g.stars]-GEM_STEP[type]*(4-n))+mb+alFx("gemluck")); } // + the Sanctuary of Grace's Halo of Fortune
@@ -6151,14 +6196,14 @@ function hs(h,k){ return h ? h[k]+gearBonus(h,k) : 0; }
    dgFx().spd the march speed and .size the march size. A dragon with def:true only counts while its hero defends or reinforces (def=true). */
 var DRAGONS={
   gale:{name:"Gale",col:"#7ec8e3",fx:{spd:5},txt:"March speed +5% per level"},
-  cinder:{name:"Cinder",col:"#e8743b",fx:{atk:8},txt:"Troop attack +8% per level"},
+  cinder:{name:"Cinder",col:"#e8743b",fx:{atk:16},txt:"Troop attack +8% per level"}, // 0.2.108 (Cody): 16 hero Attack a level, so the 8% is true (a point is worth 0.5% since 0.1.249; it was 8 points = 4%)
   ward:{name:"Ward",col:"#b9a77a",fx:{life:5},txt:"Troop life +5% per level"},
   brood:{name:"Brood",col:"#a67ad6",fx:{size:6},txt:"March size +6% per level"},
-  aegis:{name:"Aegis",col:"#e0c25a",fx:{atk:6,int:6,life:6},def:true,txt:"Only while defending or reinforcing: attack +6%, defense +6% and troop life +6% per level"}
+  aegis:{name:"Aegis",col:"#e0c25a",fx:{atk:12,grd:6,life:6},def:true,txt:"Only while defending or reinforcing: attack +6%, Guard +6% and troop life +6% per level"} // 0.2.108 (Cody): the "defense" share is real now: Guard, in place of 6 Intelligence
 };
 var DRAGON_MAX=5, DRAGON_STONES=[0,0,1,3,7,12]; // stones needed to reach level n
 function dragonOf(h){ var t=h&&h.dragon, d=t&&S.dragons&&S.dragons[t]; return d&&DRAGONS[t] ? {t:t, lv:Math.max(1,Math.min(DRAGON_MAX,d.lv|0)), def:DRAGONS[t]} : null; }
-function dgFx(h,def){ var o={atk:0,int:0,life:0,spd:0,size:0}, d=dragonOf(h); if (!d || (d.def.def && !def)) return o; for (var k in d.def.fx) o[k]=d.def.fx[k]*d.lv; return o; }
+function dgFx(h,def){ var o={atk:0,int:0,life:0,spd:0,size:0,grd:0}, d=dragonOf(h); if (!d || (d.def.def && !def)) return o; for (var k in d.def.fx) o[k]=d.def.fx[k]*d.lv; return o; }
 function hsB(h,k,def){ var v=hs(h,k)+(h ? dgFx(h,def)[k]||0 : 0); return (def && k==="atk" && h) ? v*(1+alFx("whero")) : v; } // War Memorial: Wall Captain
 function dragonHero(t){ var f=null; S.cities.forEach(function(c){ (c.heroes||[]).forEach(function(h){ if (h.dragon===t) f=h; }); }); (S.heroes||[]).forEach(function(h){ if (h.dragon===t) f=h; }); return f; }
 function dragonsOwned(){ return Object.keys(S.dragons||{}).filter(function(t){ return DRAGONS[t]; }); }
@@ -6304,11 +6349,11 @@ var BUFF_ITEM=0.20, BUFF_ITEM_MS=24*HOUR;
 function hornOn(){ return S.hornUntil && S.gt<S.hornUntil; }
 function corsOn(){ return S.corsUntil && S.gt<S.corsUntil; }
 function bDefend(){ return (1+ACH_PCT*achLv("kill"))*(corsOn()?1+(S.corsPow||BUFF_ITEM):1)*(1+alFx("def")); }
-function bTrain(){ return (1+ACH_PCT*achLv("train"))*(awTrainOn()?1.15:1)*(1+alFx("train")); } // Drill Sergeants: a lost war's consolation
+function bTrain(){ return (1+conRole("trainer").atk)*(1+ACH_PCT*achLv("train"))*(awTrainOn()?1.15:1)*(1+alFx("train")); } // Drill Sergeants: a lost war's consolation
 function bHeroXp(){ return (1+ACH_PCT*achLv("hero"))*(1+alFx("heroxp")); }
 function bItems(){ return 1+ACH_PCT*achLv("medal"); }
-function bResearch(){ return (1+ACH_PCT*achLv("tech"))*(1+alFx("research")); }
-function bBuild(){ return (1+ACH_PCT*achLv("city"))*(1+alFx("build")); }
+function bResearch(){ return (1+conRole("researcher").atk)*(1+ACH_PCT*achLv("tech"))*(1+alFx("research")); }
+function bBuild(){ return (1+conRole("mayor").def)*(1+ACH_PCT*achLv("city"))*(1+alFx("build")); }
 function bAttack(){ return ACH_PCT*achLv("conq")+(hornOn()?(S.hornPow||BUFF_ITEM):0)+alFx("atk"); }
 function bMats(){ return ACH_PCT*achLv("gear"); } // flat: +1 percentage point per tier on gem drops (materials and scales have their own smaller steps)
 function bUpkeep(){ return (1-ACH_PCT*achLv("total"))*Math.max(0.5, 1-alFx("upkeep")); }
@@ -6900,7 +6945,7 @@ function rfApply(d){ // acknowledgements, and troops that made it home
   if (done.length){ save(); alPost("/al/reinf/done",{ids:done}).catch(function(){}); }
 }
 function rfSide(ci, hid){ return withCity(ci, function(){ var h=hid?heroById(hid):null;
-  return {research:simResearch(), hero:{intel:hsB(h,"int",1)}, attack_modifier:1+0.05*(S.tech.militarytradition||0)+hsB(h,"atk",1)/HERO_ATK_DIV+bAttack(), defence_modifier:bDefend(), life_modifier:setLife(h,1), hn:h?h.name:"", ha:h?hs(h,"atk"):0}; }); }
+  return {research:simResearch(), con:conBonus(h,1), hero:{intel:hsB(h,"int",1)}, attack_modifier:1+0.05*(S.tech.militarytradition||0)+hsB(h,"atk",1)/HERO_ATK_DIV+bAttack(), defence_modifier:bDefend(), life_modifier:setLife(h,1), hn:h?h.name:"", ha:h?hs(h,"atk"):0}; }); }
 function rfStatusTxt(x){ var now=Date.now(), mins=function(t){ var l=t-now; return l<60000?'under a minute':fmtT(Math.ceil(l/60000)*60000); };
   if (x.st==="go") return 'arriving in '+mins(x.arr); if (x.st==="stay") return x.locked?'holding the walls (invasion)':'stationed'; if (x.st==="back") return x.ret>now?'coming home in '+mins(x.ret):'home'; return x.st; }
 function rfTroops(t){ var a=[]; (t||[]).forEach(function(n,i){ if (n) a.push(fmt(n)+' '+uname(i,n)); }); return a.join(', ')||'none left'; }
@@ -7328,6 +7373,7 @@ function wdRepHtml(r){ var pct0=r.hp0?Math.max(r.result===1?0:1, Math.round(r.hp
     row("Result",r.result===1?'<span class="okc">It fell</span>':'<span class="badc">It survived with '+pct0+'% of its health</span>')+
     (r.dealt?row("Your damage",fmt(r.dealt)+(r.hp0?' ('+Math.max(r.dealt<r.hp0?0:100, Math.round(r.dealt/r.hp0*1000)/10)+'%)':'')):'')+
     row("Who fought", r.solo?'You, alone':(r.marches===1?'1 march':fmt(r.marches)+' marches')+(r.host?' in '+esc(r.host)+'\u2019s rally':''))+'</div>';
+  h+=briefBox(x&&x.b, null);
   if (x){ var rows=[]; for (var j=0;j<12;j++) if (x.sent[j]) rows.push('<tr>'+repUnitCell(j)+'<td>'+fmt(x.sent[j])+'</td><td>'+fmt(x.back[j]||0)+'</td><td>'+fmt(x.wounded[j]||0)+'</td></tr>');
     h+='<div class="h3" style="margin-top:8px">Your march <span class="dur">from '+esc(x.city)+(x.hero?', led by '+esc(x.hero):'')+'</span></div><div class="tscroll"><table class="gt" style="min-width:0"><thead><tr><th>Troop</th><th>Sent</th><th>Unhurt</th><th>Wounded</th></tr></thead><tbody>'+rows.join("")+'</tbody></table></div>';
     if (x.hero) h+='<p class="dur" style="margin:4px 0 0">'+esc(x.hero)+(r.result!==1?' earned no experience: monsters only give it when they die.':x.xp?' earned <b>'+fmt(x.xp)+'</b> experience.':' earned no experience: only the first hero you send does.')+'</p>'; }
@@ -7337,7 +7383,7 @@ function arReport(r, myM, T){
   var axRef=xpFirstRef(myM), axFull=r.win ? AR_XP_LV*(r.lv||1) : 0;
   var mine=myM.map(function(m){ var o=(r.mine&&r.mine[m.ref])||{}, ci=cityIndex(m.city), hh=mHero(m), xp=0;
     if (hh && m.ref===axRef && axFull){ var aups=giveXp(hh, axFull); xp=Math.round(axFull*bHeroXp()); if (aups) note("heroes", hh.name+" reached level "+hh.level+" at the Arena"); }
-    return {city:ci>=0?S.cities[ci].name:"?", hero:hh?hh.name:"", sent:m.t.slice(), back:(o.back||m.t).slice(), wounded:(o.wounded||Z12()).slice(), xp:xp, xpNo:hh&&m.ref!==axRef?1:0}; });
+    return {city:ci>=0?S.cities[ci].name:"?", hero:hh?hh.name:"", sent:m.t.slice(), back:(o.back||m.t).slice(), wounded:(o.wounded||Z12()).slice(), xp:xp, xpNo:hh&&m.ref!==axRef?1:0, b:m.sb||null}; });
   var wd=0, sent=0; mine.forEach(function(x){ wd+=sumT(x.wounded); sent+=sumT(x.sent); });
   mine.forEach(function(x){ if (x.hero){ var h=null; S.cities.forEach(function(c){ (c.heroes||[]).forEach(function(y){ if (y.name===x.hero) h=y; }); }); if (h) heroRec(h, {won:!!r.win, killed:[], lost:x.wounded, label:"the Arena ("+T.n+")"}); } });
   var rw=r.win?(r.reward||{items:{},res:{}}):null, g=[]; if (rw){ for (var k in rw.items) g.push(fmt(rw.items[k])+" "+((ITEMS[k]&&ITEMS[k].name)||k)); var rs=0; for (var q in rw.res) rs+=rw.res[q]; if (rs) g.push(fmt(rw.res.food||0)+" of each resource"); }
@@ -7353,6 +7399,7 @@ function arenaRepHtml(r){
   var T=r.wiz?{n:r.mname||"Wizard"}:arT(r.type), pct0=r.hp0?Math.round(r.hpLeft/r.hp0*100):0, row=function(l,v){ return '<div class="merow"><span>'+l+'</span><b>'+v+'</b></div>'; };
   var h=monMarchTiles(r,"Strength")+'<div class="mestats">'+row("Monster","Level "+r.lv+" "+esc(T.n))+row("Result",r.result===1?'<span class="okc">It fell</span>':'<span class="badc">It survived with '+pct0+'% of its strength</span>')+
     row(r.solo?"Marches":"Who fought", r.solo?fmt(r.marches):fmt(r.marches)+' march'+(r.marches===1?'':'es')+' from '+esc((r.players||[]).join(", ")))+'</div>';
+  h+=briefBox(((r.mine||[])[0]||{}).b, null); // 0.2.108: what your troops fought with (a monster has no table of its own)
   h+=(r.mine||[]).map(function(x,i){ var rows=[]; for (var j=0;j<12;j++) if (x.sent[j]) rows.push('<tr>'+repUnitCell(j)+'<td>'+fmt(x.sent[j])+'</td><td>'+fmt(x.back[j]||0)+'</td><td>'+fmt(x.wounded[j]||0)+'</td></tr>');
     return '<div class="h3" style="margin-top:8px">Your march'+(r.mine.length>1?' '+(i+1):'')+' <span class="dur">from '+esc(x.city)+(x.hero?', led by '+esc(x.hero):'')+'</span></div><div class="tscroll"><table class="gt" style="min-width:0"><thead><tr><th>Troop</th><th>Sent</th><th>Unhurt</th><th>Wounded</th></tr></thead><tbody>'+rows.join("")+'</tbody></table></div>'+
       (!r.wiz && x.hero ? '<p class="dur" style="margin:4px 0 0">'+esc(x.hero)+(x.xpNo?' earned no experience: only the first hero you send to a fight does.':r.result!==1?' earned no experience: monsters only give it when they die.':' earned <b>'+fmt(x.xp||0)+'</b> experience.')+'</p>' : ''); }).join(""); // 0.1.214
@@ -7426,7 +7473,7 @@ function arWhy(n){
 }
 /* 0.2.86 (Cody): every send to the server is instant. The troops, the hero and the march line change at the tap; the server's answer fills in
    the real times, and an error puts everything back. rec.pend marks a march the server has not answered for yet. */
-function optSend(key, rec, cid, t, ens, hero){ var ci=cityIndex(cid);
+function optSend(key, rec, cid, t, ens, hero){ var ci=cityIndex(cid); withCity(ci,function(){ rec.sb=sideBrief(mySide(hero)); }); // 0.2.108: for the report's Troop bonuses table
   withCity(ci,function(){ for (var i=0;i<12;i++) S.troops[i]=Math.max(0,S.troops[i]-t[i]); if (ens && S.items[ens]>0){ S.items[ens]--; rec.ensUsed=ens; } });
   if (hero) hero.away=true; lastMarchSet(ci, t, hero); rec.pend=Date.now(); S[key]=S[key]||[]; S[key].push(rec); save(); closeSheet(); lastView=""; refresh();
   return function(msg){ var L=S[key]||[], i=-1; L.forEach(function(x,k){ if (x.ref===rec.ref) i=k; }); if (i<0) return; L.splice(i,1);
@@ -7754,7 +7801,7 @@ function ryReport(r, m, o, rw, xpOk){
   var rep={id:id, at:S.gt, rally:1, name:name, result:o.wave?(o.won?1:2):0, host:r.host, target:r.name, wave:o.wave||0, waves:(r.fights||[]).length, late:!!o.late, idle:!!o.idle, cancelled:!!o.cancelled, rounds:o.rounds||0,
     sent:m.t.slice(), left:(o.left||m.t).slice(), killed:(o.killed||Z12()).slice(), city:ci>=0?S.cities[ci].name:"?", hero:hh?hh.name:"", players:r.players||[], fights:r.fights||[], def:0, win:!!r.win,
     wiz:r.k==="wiz"?1:0, vamp:r.k==="vamp"?1:0, xp:rxp, xpNo:hh&&!xpOk?1:0, aww:r.k==="wiz"&&o.wave?{rally:1, aid:ALS.aid, mid:r.id}:null,
-    rid:r.id, aid:ALS.aid, wall:0}; // 0.2.50: rid/aid fetch the full wave reports (ryRepFetch)
+    rid:r.id, aid:ALS.aid, wall:0, b:m.sb||null}; // 0.2.50: rid/aid fetch the full wave reports (ryRepFetch)
   if (rw){ rep.drops=rw.drops||[]; rep.medal=rw.medal; rep.nofull=!!rw.nofull;
     var got=(rw.medal>=0?[MEDALS[rw.medal][1]+" medal"]:[]).concat(rw.drops||[]);
     note("rally","The rally on "+r.host+"\u2019s "+r.name+" wiped it out. "+(rw.nofull?"Its garrison wasn\u2019t full when it hit, so nothing dropped.":got.length?"Your share of the spoils: "+got.join(", ")+".":"Nothing dropped for you this time.")); }
@@ -7783,7 +7830,7 @@ function rallyRepHtml(r){ var row=function(l,v){ return '<div class="merow"><spa
   if (r.wave){ var ryS=sum12(r.sent), ryL=Math.max(0,ryS-sum12(r.left)), ryK=sum12(r.killed); h=repTiles([[fmt(ryS),"Sent",""],[fmt(ryL),r.wiz||r.vamp?"Wounded":"Lost",ryL&&!(r.wiz||r.vamp)?"bad":""],[fmt(ryK),"Killed",ryK?"good":""],[fmt(r.rounds||0),r.rounds===1?"Round":"Rounds",""]])+h; }
   if (r.hero) h+='<p class="dur" style="margin:6px 0 0">'+esc(r.hero)+' led '+(r.xpNo?'but earned no experience: only the first hero you send to a rally does':r.xp?'and earned <b>'+fmt(r.xp)+'</b> experience':(r.wave||r.idle)&&(r.wiz||r.vamp)&&!r.win?'but earned no experience: monsters only give it when they die':r.wave?'and earned <b>0</b> experience':'but didn’t fight, so earned no experience')+'.</p>';
   if (r.full){ // the wave's whole battle, the same table as any attack
-    h+='<div class="h3" style="margin-top:8px">Your wave <span class="dur">from '+esc(r.city)+'</span></div>'+ryWaveBody(r.full, true);
+    h+=briefBox(r.full.ab||r.b, r.full.db)+'<div class="h3" style="margin-top:8px">Your wave <span class="dur">from '+esc(r.city)+'</span></div>'+ryWaveBody(r.full, true);
   } else {
     var rows=[]; for (var j=0;j<12;j++) if (r.sent[j]) rows.push('<tr>'+repUnitCell(j)+'<td>'+fmt(r.sent[j])+'</td><td>'+fmt(r.left[j]||0)+'</td><td>'+fmt(Math.max(0,r.sent[j]-(r.left[j]||0)))+'</td></tr>');
     h+='<div class="h3" style="margin-top:8px">Your march <span class="dur">from '+esc(r.city)+(r.hero?', led by '+esc(r.hero):'')+'</span></div><div class="tscroll"><table class="gt" style="min-width:0"><thead><tr><th>Troop</th><th>Sent</th><th>Left</th><th>'+(r.wiz||r.vamp?'Wounded':'Fallen')+'</th></tr></thead><tbody>'+rows.join("")+'</tbody></table></div>';
@@ -8879,7 +8926,7 @@ function wdHome(m){ if (m.res && m.res.pvp) return wbHome(m); var ci=cityIndex(m
   else note("alliance","The "+nm+" survived the fight."+tail); }
 // 0.2.26 (Cody): a report for every server-map monster fight you were in, under Reports with the Arena's (picture, your damage, its health left, your losses, your share)
 function wdReport(m, c, hh, xp){ var r=m.res||{}, R=m.result||{}, L=m.L||1, win=!!(R.win!=null?R.win:r.win), id=S.nextMarchId++, mn=wdMonName(L), name="Server map: level "+L+" "+mn;
-  var mine=[{city:c.name, hero:hh?hh.name:"", sent:(m.t||Z12()).slice(), back:(r.back||m.t||Z12()).slice(), wounded:(r.wounded||Z12()).slice(), xp:xp, xpNo:0}];
+  var mine=[{city:c.name, hero:hh?hh.name:"", sent:(m.t||Z12()).slice(), back:(r.back||m.t||Z12()).slice(), wounded:(r.wounded||Z12()).slice(), xp:xp, xpNo:0, b:m.sb||null}];
   if (hh) heroRec(hh, {won:win, killed:[], lost:mine[0].wounded, label:"a "+mn+" on the server map"});
   var rw=win&&m.reward?{items:Object.assign({},m.reward.items||{}), res:{}}:null, g=[]; if (rw){ g.push("a Shield Orb"); for (var k in rw.items) g.push(fmt(rw.items[k])+" "+((ITEMS[k]&&ITEMS[k].name)||k)); }
   var solo=!!m.solo, n=R.n||1;
@@ -9801,7 +9848,7 @@ function wcdWhy(p,d){
 function wcdRun(p){
   var d=wcdDraftOf(p), why=wcdWhy(p,d); if (why){ toast(why); return; }
   var hero=d.hero?heroById(d.hero):null, shut=p.dz.forts==="shut";
-  var D={troops:shut?[0,0,0,0,0,0,0,0,0,0,0,0]:d.t.slice(), fortifications:d.f.slice(), wallLevel:p.dz.W, research:simResearch(), hero:{intel:hsB(hero,"int",1)}, life_modifier:setLife(hero,1), defence_modifier:bDefend(),
+  var D={troops:shut?[0,0,0,0,0,0,0,0,0,0,0,0]:d.t.slice(), fortifications:d.f.slice(), wallLevel:p.dz.W, research:simResearch(), con:conBonus(hero,1), hero:{intel:hsB(hero,"int",1)}, life_modifier:setLife(hero,1), defence_modifier:bDefend(),
     attack_modifier:(1+0.05*(S.tech.militarytradition||0)+hsB(hero,"atk",1)/HERO_ATK_DIV+bAttack()), fortBonus:1+0.1*(S.tech.engineering||0)+0.1*(S.tech.ancientmasonry||0)};
   var r0=wcRng(WC_SEED), rec=[], r=function(){ var v=r0(); rec.push(v); return v; }, rp=[], lost=0, log=[], held=true;
   for (var w=0; w<p.dz.waves.length; w++){
@@ -10104,7 +10151,7 @@ function genHero(tier, level, spikeStat){
 function xpNeed(L){ return 100*L*L; }
 var VXP_GAP=HOUR, VXP_MULT=0.5; // valley/flat experience: once an hour per tile, at half
 function giveXp(h, xp){
-  xp=Math.round(xp*bHeroXp());
+  xp=Math.round(xp*bHeroXp()*(1+conRole("researcher").hp));
   h.xp += xp; var up=0;
   while (h.level<HERO_MAX && h.xp >= xpNeed(h.level)){ h.xp -= xpNeed(h.level); h.level++; h.pts++; up++; }
   if (h.level>=HERO_MAX) h.xp=0;
@@ -10145,7 +10192,7 @@ function heroById(id){ for (var c=0;c<S.cities.length;c++){ var hs=S.cities[c].h
 function mayor(){ return officer("mayor"); }
 function salary(){ var s=0; S.heroes.forEach(function(h){ s += h.level*20; }); return s; }
 function mayorActive(){ return officerActive("mayor"); }
-function mayorBonus(){ var m=mayorActive(), t=officerActive("trainer"), r=officerActive("researcher"); return {prod: m? hs(m,"pol")*0.003 : 0, build: m? hs(m,"pol")/200 : 0, pop: m? hs(m,"pol")/400 : 0, research: r? hs(r,"int")/200 : 0, train: t? 1-Math.pow(0.9975,hs(t,"atk")) : 0}; }
+function mayorBonus(){ var m=mayorActive(), t=officerActive("trainer"), r=officerActive("researcher"); var cm=conRole("mayor"); return {prod: (m? hs(m,"pol")*0.003 : 0)+cm.atk, build: m? hs(m,"pol")/200 : 0, pop: (m? hs(m,"pol")/400 : 0)+cm.hp, research: r? hs(r,"int")/200 : 0, train: t? 1-Math.pow(0.9975,hs(t,"atk")) : 0}; }
 function hallCap(){ var f=findUnique("feasting"); return f&&f.level>0 ? 4+f.level : 0; }
 function innLv(){ var n=findUnique("inn"); return n?n.level:0; }
 function initials(n){ var p=n.split(" "); return (p[0][0]+(p[p.length-1][0]||"")).toUpperCase(); }
@@ -10197,6 +10244,7 @@ var ITEMS = {
   s480:{name:"8-hour speed-up",min:480,icon:"hourglass"},
   build50:{name:"50% Construction Speed-up",icon:"hammer"},
   primer:{name:"Soldier's Primer",xp:500,icon:"book"},
+  respec:{name:"Tome of Unlearning",icon:"book",desc:"Gives back every constellation point one hero has spent. Use it from that hero's Constellations."},
   tome:{name:"Tome of Wisdom",xp:2000,icon:"book"},
   codex:{name:"War Codex",xp:10000,icon:"book"},
   annals:{name:"Annals of Conquest",xp:50000,icon:"book"},
@@ -10602,7 +10650,7 @@ function getSlot(w,i){ return w==="ov" ? (S.ovb||null) : w==="wall" ? {type:"wal
 function scriptsFor(L){ return L===10 ? 1 : L>10 ? Math.pow(2, L-10) : 0; }
 function costFor(type,L){ var b=DEF[type].cost,o={}; for (var k in b) o[k]=Math.round(b[k]*Math.pow(2,L-1)); var sc=scriptsFor(L); if (sc) o.script=sc; return o; } // the climb to level 10 also takes one Michelangelo’s Script
 function timeFor(type,L){ return DEF[type].t*Math.pow(2,L-1)*1000/(1+0.1*S.tech.construction)/(1+hs(bestFor("pol"),"pol")/200)/bBuild(); }
-function techCost(key,L){ var o={}, base=TECH[key].g==="Economy"?TECH_COST_ECO:TECH_COST; for (var k in base) o[k]=Math.round(base[k]*Math.pow(2,L-1)); return o; }
+function techCost(key,L){ var o={}, base=TECH[key].g==="Economy"?TECH_COST_ECO:TECH_COST; var cdisc=1+conRole("researcher").def; for (var k in base) o[k]=Math.round(base[k]*Math.pow(2,L-1)/cdisc); return o; }
 function techTime(key,L){ return (TECH[key].t||TECH_T)*Math.pow(2,L-1)*1000/(1+0.1*(S.tech.scholarship||0))/(1+hs(bestFor("int"),"int")/200)/bResearch(); }
 function afford(c){ for (var k in c){ var have = k==="script" ? ((S.items&&S.items.script)||0) : S.res[k]; if (have < c[k]) return false; } return true; }
 function pay(c,sign){ for (var k in c){ if (k==="script"){ S.items.script=(S.items.script||0)-sign*c[k]; } else S.res[k] -= sign*c[k]; } }
@@ -12653,7 +12701,7 @@ function bfEnter(cityIdx, allyIds){
     me={name:"You", team:0, slot:0, kind:"me", city:S.name, reserve:cp, r:simResearch(), am:1+0.05*(S.tech.militarytradition||0)+hsB(hero,"atk")/HERO_ATK_DIV+bAttack(),
       dm:bDefend(), life:hero?setLife(hero):1, hint:hsB(hero,"int"), hero:hero?hero.name:null, rally:Math.max(1,bLevel("rally")), iq:200, pts:0, beacon:bLevel("beacon"),
       amBase:1+0.05*(S.tech.militarytradition||0)+bAttack(), inf:S.tech.informatics||0,
-      heroes:(S.heroes||[]).map(function(h){ return {id:h.id, name:h.name, atk:hsB(h,"atk"), int:hsB(h,"int"), life:setLife(h)}; }).sort(function(a,b){ return b.atk-a.atk; })};
+      heroes:(S.heroes||[]).map(function(h){ return {id:h.id, name:h.name, atk:hsB(h,"atk"), int:hsB(h,"int"), life:setLife(h), con:conBonus(h)}; }).sort(function(a,b){ return b.atk-a.atk; })};
   });
   bf.p.push(me);
   allyIds.slice(0,2).forEach(function(id,ix){ var q=TILE_BY[id], cur=current(q), rt=cur.t.slice(); rt[0]=0; rt[6]=0; // their real army
@@ -12737,7 +12785,7 @@ function woundLife(){ return WOUND_LIFE+alFx("healh")*HOUR; }
 function healG(i){ return Math.max(1, Math.round(HEAL_GOLD[i]*Math.max(0.25, 1-alFx("heal")))); }
 // 0.2.37 (Cody): healing also costs 25% of the troop's own resource cost, with the same discounts as the gold; a partial heal goes as far as the scarcest resource allows
 var HEAL_RES_F=0.25, HEAL_RES=U.map(function(u){ var o={}; for (var k in u.cost) o[k]=u.cost[k]*HEAL_RES_F; return o; });
-function healCost1(i){ var d=Math.max(0.25, 1-alFx("heal")), R=HEAL_RES[i], o={}; for (var k in R) o[k]=R[k]*d; o.gold=(o.gold||0)+healG(i); return o; }
+function healCost1(i){ var d=Math.max(0.25, 1-alFx("heal"))/(1+conRole("trainer").hp), R=HEAL_RES[i], o={}; for (var k in R) o[k]=R[k]*d; o.gold=(o.gold||0)+healG(i); return o; }
 function healCan(i, n, have){ var c=healCost1(i), m=n; for (var k in c) if (c[k]>0) m=Math.min(m, Math.floor((have[k]||0)/c[k])); return Math.max(0, m); }
 function healPay(i, n, have, spent){ var c=healCost1(i); for (var k in c){ var v=Math.ceil(c[k]*n); have[k]=Math.max(0,(have[k]||0)-v); if (spent) spent[k]=(spent[k]||0)+v; } }
 function healTxt(o){ return RES.filter(function(k){ return o[k]>0; }).map(function(k){ return fmt(o[k])+" "+RNAME[k].toLowerCase(); }).join(", ")||"nothing"; }
@@ -13118,8 +13166,8 @@ function invCityPack(ci){
       prot:Math.floor(warehouseProtect()), r:simResearch(), mt:S.tech.militarytradition||0, inf:S.tech.informatics||0, rally:Math.max(1,bLevel("rally")), beacon:bLevel("beacon"),
       logi:S.tech.logistics||0, mach:S.tech.machinery||0, buffA:bAttack(), buffD:bDefend(),
       mult:(1+0.1*(S.tech.cartography||0)+0.1*(S.tech.imperialroads||0))*bMarch(), smult:bScout(),
-      heroes:(S.heroes||[]).filter(function(h){ return !h.away; }).map(function(h){ return {id:h.id, name:h.name, atk:hsB(h,"atk"), int:hsB(h,"int"), life:setLife(h), mnt:mountSpd(h)}; }),
-      def:{amod:1+0.05*(S.tech.militarytradition||0)+hsB(m,"atk",1)/HERO_ATK_DIV+bAttack(), dmod:bDefend(), life:setLife(m,1), int:hsB(m,"int",1), fb:1+0.1*(S.tech.engineering||0)+0.1*(S.tech.ancientmasonry||0)}};
+      heroes:(S.heroes||[]).filter(function(h){ return !h.away; }).map(function(h){ return {id:h.id, name:h.name, atk:hsB(h,"atk"), int:hsB(h,"int"), life:setLife(h), con:conBonus(h), mnt:mountSpd(h)}; }),
+      def:{amod:1+0.05*(S.tech.militarytradition||0)+hsB(m,"atk",1)/HERO_ATK_DIV+bAttack(), dmod:bDefend(), life:setLife(m,1), int:hsB(m,"int",1), fb:(1+0.1*(S.tech.engineering||0)+0.1*(S.tech.ancientmasonry||0))*(1+(m&&m.con&&m.con.wall?conOf(m,"wall").hp:0)), con:conWall(m)}}; // 0.2.108: the wall hero's stars, books, Sentinel and Aegis defend here too
   });
   return o;
 }
@@ -13492,7 +13540,7 @@ function pvSnap(ci){
     var cp=S.troops.slice(); cp[0]=0; cp[6]=0; // workers and transporters stay home
     snap={name:lbAutoName(), city:S.name, troops:cp, research:simResearch(), mt:S.tech.militarytradition||0, inf:S.tech.informatics||0,
       rally:Math.max(1,bLevel("rally")), cap:Math.floor(10000*rallyLv()+alFx("marchsize")), beacon:bLevel("beacon"), buffA:bAttack(), buffD:bDefend(), // 0.2.93: cap = what this city can really send
-      heroes:(S.heroes||[]).map(function(h){ return {id:h.id, name:h.name, atk:hsB(h,"atk"), int:hsB(h,"int"), life:setLife(h), size:(dgFx(h)||{}).size||0}; }),
+      heroes:(S.heroes||[]).map(function(h){ return {id:h.id, name:h.name, atk:hsB(h,"atk"), int:hsB(h,"int"), life:setLife(h), con:conBonus(h), size:(dgFx(h)||{}).size||0}; }),
       wint:hsB(wallHero(),"int",1), // 0.2.24: the wall hero's Intelligence counts for the camp's scouts
       items:{marchsp:S.items.marchsp||0}, prestige:Math.floor((S.prestige||0)*totalTH())};
   });
@@ -13608,6 +13656,7 @@ function pvRepHtml(r){ var won=pvRepWon(r), row=function(l,v){ return '<div clas
       if (r.seen.f){ var fr=[]; r.seen.f.forEach(function(n,k){ if (n) fr.push('<tr><td>'+BF_FORTN[k]+'</td><td>'+fmt(n)+'</td></tr>'); }); h+=(fr.length?pvRepTable(["Fortification","Count"], fr):'')+'<p class="dur" style="margin:4px 0 0">'+(r.seen.wall?'Level '+r.seen.wall+' walls.':'No walls.')+'</p>'; } }
     return h; }
   h+='<div class="mestats">'+row("Result", won?'<span class="okc">'+(r.attacker?'You won':'You held')+'</span>':'<span class="badc">'+(r.attacker?'You were thrown back':'You lost it')+'</span>')+row("Battle clock", bfMin(r.t))+row("Rounds", fmt(r.rounds||0))+(r.fb?row("Walls", r.wall?'Level '+r.wall:'None'):'')+'</div>';
+  h+=briefBox(r.attacker?r.ab:r.db, r.attacker?r.db:r.ab); // 0.2.108
   h+='<div class="h3" style="margin-top:8px">Attacker <span class="dur" translate="no">'+esc(r.an||(r.attacker?'You':'Them'))+(r.hn?', led by '+esc(r.hn):'')+'</span></div>'+pvRepSide(r.sent, r.left);
   if (r.dst && r.dst.length) r.dst.forEach(function(x,k){ h+='<div class="h3" style="margin-top:8px">Defender'+(r.dst.length>1?' '+(k+1):'')+' <span class="dur" translate="no">'+esc(r.dn||"")+(x.h?', under '+esc(x.h):', no hero')+'</span></div>'+pvRepSide(x.had, x.left, "Had"); });
   else h+='<div class="h3" style="margin-top:8px">Defender <span class="dur" translate="no">'+esc(r.dn||(r.attacker?'Them':'You'))+'</span></div>'+pvRepSide(r.had, r.eleft, "Had");
@@ -14506,15 +14555,130 @@ function rewLootHtml(rw, extra){ var ik=rw&&rw.items?Object.keys(rw.items).filte
   return h; }
 function monMarchTiles(r, hpLab){ var s=0, w=0; (r.mine||[]).forEach(function(x){ s+=sum12(x.sent); w+=sum12(x.wounded); });
   return repTiles([[fmt(s),"Sent",""],[fmt(w),"Wounded",""],[fmt(r.rounds||0),r.rounds===1?"Round":"Rounds",""],[fmt(r.hp0||0),hpLab,""]]); }
+/* 0.2.106 (Cody): troop types. Every troop is Ground, Ranged, Mounted or Siege (the Transporter has none), and each type has its own attack,
+   defence and HP bonus, as a percentage and as a flat amount. Every buff in the game still applies to all four, so the rows match for now; the
+   table is where type-only buffs will show once heroes can specialise. The numbers are true totals: research is included. */
+/* ---------- constellations (0.2.106, Cody): a hero earns 1 point every 10 levels and spends them on the stars of a constellation. Each of the four
+   troop types has one: three arms of three stars (attack, defence, HP: +1.5% a level, 10 levels a star) and a crown (+0.5% to all three a level),
+   100 points in all for +50% attack, defence and HP for that type's troops under this hero. A hero reaches 100 points at level 1,000, so the
+   natural build is one type first. h.con = {ground:{a1:10,a2:3,...}, ...}. Resetting takes a Tome of Unlearning.
+   The bonus rides on a side as side.con and becomes the engine's side.types just before a fight (conApply), so every fight this phone runs uses it. */
+var CON_STARS=[["a1","Edge I","atk"],["a2","Edge II","atk"],["a3","Edge III","atk"],["d1","Guard I","def"],["d2","Guard II","def"],["d3","Guard III","def"],["h1","Heart I","hp"],["h2","Heart II","hp"],["h3","Heart III","hp"],["cap","Crown","all"]];
+var CON_MAXLV=10, CON_STEP=0.015, CON_CAP=0.005, CON_EVERY=10, CON_NEED=5;
+var CONS={ground:{n:"The Shieldbearer", t:"Ground", u:3, col:"#d9a441", arms:[[-90,0],[150,0.4],[30,-0.4]]}, ranged:{n:"The Longbow", t:"Ranged", u:5, col:"#7fc97a", arms:[[-90,0],[205,-0.55],[-25,0.55]]},
+  mounted:{n:"The Charger", t:"Mounted", u:7, col:"#e0785a", arms:[[180,0.3],[-60,0.35],[55,-0.3]]}, siege:{n:"The Great Engine", t:"Siege", u:9, col:"#7fb2e0", arms:[[-135,0.25],[-45,-0.25],[90,0]]}};
+// The four posts have one each too (Cody): the same ten stars, but the three arms are that post's own bonuses, and they count only while the hero
+// holds the post in a city. `an` = the arms' names, `al` = what each arm raises, `sym` = the tab's mark.
+CONS.mayor={n:"The Steward", t:"Mayor", role:"mayor", sym:"\u2696", col:"#e3c66a", arms:[[-90,0.3],[160,-0.3],[20,0.3]], an:["Harvest","Mason","Hearth"], al:["resource production","building speed","population growth"], as:["Production","Building","Growth"]};
+CONS.researcher={n:"The Scholar", t:"Researcher", role:"researcher", sym:"\u270E", col:"#b79be8", arms:[[-120,0.2],[-30,-0.3],[100,0.2]], an:["Quill","Ledger","Lantern"], al:["research speed","research cost (cheaper)","hero experience in this city"], as:["Speed","Cost","Hero XP"]};
+CONS.trainer={n:"The Drillmaster", t:"Trainer", role:"trainer", sym:"\u2691", col:"#e08fb0", arms:[[180,-0.2],[-70,0.3],[70,-0.3]], an:["Drill","Muster","Salve"], al:["training speed","training cost (cheaper)","healing cost (cheaper)"], as:["Training","Train cost","Heal cost"]};
+CONS.wall={n:"The Sentinel", t:"Wall hero", role:"wallHero", sym:"\u265C", col:"#8fd0c8", arms:[[-90,0],[180,0.5],[0,-0.5]], an:["Spear","Bulwark","Rampart"], al:["attack of the troops defending this city","Guard and HP of the troops defending this city","fortification strength"], as:["Attack","Guard + HP","Forts"]};
+var CON_KEYS=["ground","ranged","mounted","siege"], CON_ALL=CON_KEYS.concat(["mayor","researcher","trainer","wall"]);
+function conRole(key){ var D=CONS[key], h=D&&officerActive(D.role); return h && !h.away && h.con && h.con[key] ? conOf(h,key) : {atk:0,def:0,hp:0}; } // what the city's holder of that post gives right now
+function conWall(m){ var own=conBonus(m,1), w=m&&m.con&&m.con.wall?conOf(m,"wall"):null; if (!w || !(w.atk||w.def)) return own; var out={}; // the Sentinel's arms reach every type of troop on the wall, on top of the hero's own troop stars
+  CON_KEYS.forEach(function(c){ var o=(own&&own[c])||{atk:0,def:0,hp:0}; out[c]={atk:o.atk+w.atk, def:o.def+w.def, hp:o.hp+w.def*setMult(m)}; }); return out; }
+function conPts(h){ return h ? Math.floor((h.level||0)/CON_EVERY) : 0; }
+function conSpent(h){ var n=0; if (h && h.con) for (var c in h.con) for (var k in h.con[c]) n+=h.con[c][k]||0; return n; }
+function conFree(h){ return Math.max(0, conPts(h)-conSpent(h)); }
+function conLv(h,c,k){ return (h && h.con && h.con[c] && h.con[c][k])||0; }
+function conIn(h,c){ var n=0; CON_STARS.forEach(function(st){ n+=conLv(h,c,st[0]); }); return n; }
+function conOpen(h,c,k){ if (k==="cap") return CON_STARS.slice(0,9).every(function(st){ return conLv(h,c,st[0])>=CON_MAXLV; }); var i=+k.charAt(1); return i===1 || conLv(h,c,k.charAt(0)+(i-1))>=CON_NEED; }
+function conOf(h,c){ var o={atk:0,def:0,hp:0}; CON_STARS.forEach(function(st){ var lv=conLv(h,c,st[0]); if (!lv) return; if (st[2]==="all"){ o.atk+=lv*CON_CAP; o.def+=lv*CON_CAP; o.hp+=lv*CON_CAP; } else o[st[2]]+=lv*CON_STEP; }); return o; }
+function conBonus(h, def){ if (!h) return null; var out=null, ag=dgFx(h,def).grd/100; // def: the hero is defending or reinforcing, so an Aegis dragon's Guard counts
+  if (ag){ out={}; CON_KEYS.forEach(function(c){ out[c]={atk:0,def:ag,hp:0}; }); }
+  if (!h.con && !h.books) return out; if (h.con) CON_KEYS.forEach(function(c){ var o=conOf(h,c); if (o.atk||o.def||o.hp){ out=out||{}; if (out[c]){ o.def+=out[c].def; } out[c]=o; } });
+  (h.books||[]).forEach(function(k){ var B=k&&SB_BY[k]; if (!B) return; out=out||{}; var o=out[B.type]=out[B.type]||{atk:0,def:0,hp:0}; o[B.stat]+=SB_PCT; }); // skill books: +10% each, same pile as the stars
+  if (out){ var sm=setMult(h); if (sm!==1) for (var c2 in out) out[c2].hp*=sm; } // the HP share joins the hero's HP pile, which the star set multiplies (conApply just adds it to life_modifier)
+  return out; }
+function conApply(sd){ if (!sd || !sd.con || sd.types) return sd; var T={}, nz=function(v){ return v==null?1:+v; };
+  for (var c in sd.con){ var o=sd.con[c]; T[c]={atk:nz(sd.attack_modifier)+o.atk, guard:o.def, life:nz(sd.life_modifier)+o.hp}; } // attack adds on like every attack buff; HP adds on too (only the star set and Medicine multiply it); the defence share is Guard, the engine's second defence layer, which adds up in its own pile and divides the damage taken by 1 + pile
+  sd.types=T; return sd; }
+(function(){ var f0=SIM.fight, s0=SIM.stats; SIM.fight=function(A,D,o){ conApply(A); conApply(D); if (D && D.allies) D.allies.forEach(conApply); return f0(A,D,o); }; SIM.stats=function(sd,a1){ return s0(conApply(sd),a1); }; })();
+function conSpend(h,c,k,n){ if (!h || !CONS[c]) return 0; var lv=conLv(h,c,k); n=Math.min(n, CON_MAXLV-lv, conFree(h)); if (n<=0 || !conOpen(h,c,k)) return 0; h.con=h.con||{}; h.con[c]=h.con[c]||{}; h.con[c][k]=lv+n; return n; }
+/* each constellation is a picture: where its ten stars sit (cap, then the attack, defence and HP arms from the middle out) and a few faint
+   extra lines that finish the figure. 100 x 100 box. */
+var CON_XY={
+  ground:{cap:[50,52], a:[[50,37],[50,23],[50,9]], d:[[35,43],[24,57],[31,75]], h:[[65,43],[76,57],[69,75]], deco:[[[31,75],[50,90]],[[50,90],[69,75]],[[35,43],[65,43]]]},            // a shield with a spear behind it
+  ranged:{cap:[38,50], a:[[54,50],[70,50],[87,50]], d:[[35,35],[27,21],[15,11]], h:[[35,65],[27,79],[15,88]], deco:[[[15,11],[15,88]],[[87,50],[81,45]],[[87,50],[81,55]]]},            // a drawn bow and its arrow
+  mounted:{cap:[86,50], a:[[68,50],[49,50],[30,50]], d:[[72,37],[55,27],[38,17]], h:[[72,63],[55,73],[38,83]], deco:[[[30,50],[14,50]],[[14,50],[20,44]],[[14,50],[20,56]]]},          // a lance point driving forward
+  siege:{cap:[50,48], a:[[38,37],[27,25],[15,14]], d:[[41,62],[32,74],[22,86]], h:[[59,62],[68,74],[78,86]], deco:[[[22,86],[78,86]],[[50,48],[63,36]],[[63,36],[70,43]],[[70,43],[58,54]],[[15,14],[10,22]]]}, // a trebuchet
+  mayor:{cap:[50,26], a:[[50,42],[50,58],[50,74]], d:[[34,22],[18,26],[18,44]], h:[[66,22],[82,26],[82,44]], deco:[[[9,46],[27,46]],[[73,46],[91,46]],[[38,86],[62,86]],[[50,74],[50,86]]]},  // a pair of scales
+  researcher:{cap:[50,76], a:[[51,60],[56,43],[64,26]], d:[[34,70],[20,64],[13,48]], h:[[66,70],[80,64],[87,48]], deco:[[[13,48],[33,53]],[[33,53],[50,62]],[[87,48],[67,53]],[[67,53],[50,62]],[[64,26],[70,12]]]}, // an open book and a quill
+  trainer:{cap:[28,28], a:[[28,44],[28,60],[28,76]], d:[[44,20],[60,25],[77,19]], h:[[44,40],[60,45],[77,39]], deco:[[[77,19],[77,39]],[[28,28],[28,12]],[[28,76],[28,90]],[[18,90],[38,90]]]}, // a banner on its pole
+  wall:{cap:[50,62], a:[[50,46],[50,30],[50,14]], d:[[35,66],[21,58],[21,40]], h:[[65,66],[79,58],[79,40]], deco:[[[10,82],[90,82]],[[21,58],[21,82]],[[79,58],[79,82]],[[21,40],[14,40]],[[79,40],[86,40]],[[44,14],[56,14]]]}}; // a keep between two towers
+function conStarXY(c){ var X=CON_XY[c]; if (X){ var o2={cap:X.cap}; ["a","d","h"].forEach(function(b){ for (var i=1;i<=3;i++) o2[b+i]=X[b][i-1]; }); return o2; }
+  var out={cap:[50,50]}, A=CONS[c].arms; ["a","d","h"].forEach(function(b,bi){ var ang=A[bi][0]*Math.PI/180, bend=A[bi][1]; for (var i=1;i<=3;i++){ var r=7+i*11.5, a=ang+bend*(i-1)*0.5; out[b+i]=[50+Math.cos(a)*r, 50+Math.sin(a)*r]; } }); return out; }
+function conMapSvg(h,c,sel){ var D=CONS[c], P=conStarXY(c), o='<svg class="conmap" viewBox="0 0 100 100" role="img" aria-label="'+esc(D.n)+'">', seed=c.length*7919+c.charCodeAt(0)*31;
+  for (var i=0;i<46;i++){ seed=(seed*1103515245+12345)&0x7fffffff; var x=seed%1000/10; seed=(seed*1103515245+12345)&0x7fffffff; var y=seed%1000/10; o+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="'+(0.18+(seed%5)*0.07).toFixed(2)+'" fill="#fff" opacity="'+(0.18+(seed%7)*0.06).toFixed(2)+'"/>'; }
+  (CON_XY[c]&&CON_XY[c].deco||[]).forEach(function(L){ o+='<line x1="'+L[0][0]+'" y1="'+L[0][1]+'" x2="'+L[1][0]+'" y2="'+L[1][1]+'" stroke="'+D.col+'" stroke-width="0.500" opacity="0.38" stroke-linecap="round"/>'; });
+  var line=function(a,b,on){ return '<line x1="'+P[a][0].toFixed(1)+'" y1="'+P[a][1].toFixed(1)+'" x2="'+P[b][0].toFixed(1)+'" y2="'+P[b][1].toFixed(1)+'" stroke="'+(on?D.col:'#8a8f98')+'" stroke-width="'+(on?0.9:0.5)+'" opacity="'+(on?0.9:0.35)+'"'+(on?'':' stroke-dasharray="1.500 1.500"')+'/>'; };
+  ["a","d","h"].forEach(function(b){ o+=line("cap",b+1,conLv(h,c,b+1)>0)+line(b+1,b+2,conLv(h,c,b+2)>0)+line(b+2,b+3,conLv(h,c,b+3)>0); });
+  CON_STARS.forEach(function(st){ var k=st[0], lv=conLv(h,c,k), open=conOpen(h,c,k), p=P[k], r=(k==="cap"?5:3.7)+lv*0.06, full=lv>=CON_MAXLV;
+    o+='<g data-act="con-star" data-k="'+k+'" role="button" tabindex="0" aria-label="'+esc(st[1])+', level '+lv+' of '+CON_MAXLV+'" style="cursor:pointer">'+(lv?'<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="'+(r+1.8).toFixed(1)+'" fill="'+D.col+'" opacity="'+(0.10+lv*0.022).toFixed(2)+'"/>':'')+
+      '<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="7" fill="transparent"/>'+
+      '<path d="'+conStarPath(p[0],p[1],r)+'" fill="'+(lv?D.col:open?'#2b3038':'#1c2026')+'" stroke="'+(sel===k?'#fff':lv||open?D.col:'#59606b')+'" stroke-width="'+(sel===k?1.1:0.6)+'" opacity="'+(open||lv?1:0.7)+'"/>'+
+      '<text x="'+p[0].toFixed(1)+'" y="'+(p[1]+r+4.2).toFixed(1)+'" text-anchor="middle" font-size="3.100" fill="'+(full?D.col:'#c9ced6')+'" font-weight="700">'+(lv?(full?'★':lv):open?'+':'')+'</text></g>'; });
+  return o+'</svg>'; }
+function conStarPath(x,y,r){ var d=''; for (var i=0;i<8;i++){ var a=-Math.PI/2+i*Math.PI/4, rr=i%2?r*0.42:r; d+=(i?'L':'M')+(x+Math.cos(a)*rr).toFixed(2)+' '+(y+Math.sin(a)*rr).toFixed(2); } return d+'z'; }
+function conPc(v){ var r=Math.round(v*1000)/10; return '+'+r+'%'; }
+var SB_BY={}; SB.forEach(function(x){ var st=x[1]==="atk"?"attack":x[1]==="def"?"Guard":"HP", ty={ground:"Ground",ranged:"Ranged",mounted:"Mounted",siege:"Siege"}[x[0]];
+  SB_BY[sbKey(x)]={type:x[0], stat:x[1], n:x[2], fx:ty+" "+st+" +"+Math.round(SB_PCT*100)+"%"};
+  ITEMS[sbKey(x)]={name:"Skill Book: "+x[2], icon:"book", desc:"Teaches one hero "+x[2]+" for good: "+ty+" "+st+" +"+Math.round(SB_PCT*100)+"% for the troops they lead. Read it from that hero\u2019s Constellations."}; });
+function sbSlots(h){ var n=0; SB_SLOTS.forEach(function(L){ if ((h.level||0)>=L) n++; }); return n; }
+function sbOwned(h){ return Object.keys(SB_BY).filter(function(k){ return (S.items[k]||0)>0 && (h.books||[]).indexOf(k)<0; }); }
+var CONV={c:"ground", k:"a1", slot:-1};
+function sbHtml(h){ var open=sbSlots(h), bk=h.books||[], o='<div class="section sbsec"><div class="shead"><h3>Skill books</h3><span class="dur">'+bk.filter(Boolean).length+' / '+SB_SLOTS.length+' read</span></div><div class="sbslots">';
+  SB_SLOTS.forEach(function(L,i){ var k=bk[i], B=k&&SB_BY[k]; o+= i>=open ? '<div class="sbslot lock"><b>Locked</b><span class="dur">Hero level '+L+'</span></div>'
+    : '<button class="sbslot'+(B?' has':'')+(CONV.slot===i?' on':'')+'" data-act="sb-slot" data-i="'+i+'"><b>'+(B?esc(B.n):'Empty')+'</b><span class="dur">'+(B?B.fx:'Tap to read a book')+'</span></button>'; });
+  o+='</div>';
+  if (CONV.slot>=0 && CONV.slot<open){ var own=sbOwned(h), cur=bk[CONV.slot]&&SB_BY[bk[CONV.slot]];
+    o+= own.length ? '<div class="sbpick">'+own.map(function(k){ var B=SB_BY[k], arm=armed==="sb:"+k; return '<button class="sbbook'+(arm?' arm':'')+'" data-act="sb-read" data-k="'+k+'"><b>'+esc(B.n)+' <span class="dur">\u00d7'+fmt(S.items[k])+'</span></b><span class="dur">'+(arm?(cur?'Tap again: '+esc(cur.n)+' is destroyed, and this book is bound to '+esc(h.name)+' for good':'Tap again: this book is bound to '+esc(h.name)+' for good'):B.fx)+'</span></button>'; }).join("")+'</div>'
+      : '<p class="why" style="margin:8px 0 0">No skill books to read. They drop, rarely, from level 10 NPC cities.</p>'; }
+  return o+'<p class="dur" style="margin:8px 0 0;font-size:.78rem">A book is bound to the hero who reads it. Reading a new one into a full slot destroys the old one. A Tome of Unlearning does not touch books.</p></div>'; }
+function conSheet(h){ var c=CONS[CONV.c]?CONV.c:"ground", D=CONS[c], free=conFree(h), tot=conPts(h), k=CONV.k, st=CON_STARS.filter(function(x){ return x[0]===k; })[0]||CON_STARS[0]; k=st[0];
+  var lv=conLv(h,c,k), open=conOpen(h,c,k), o=conOf(h,c), nxt=(Math.floor((h.level||0)/CON_EVERY)+1)*CON_EVERY, tomes=S.items.respec||0, spent=conSpent(h);
+  var hh='<div class="pghd"><span class="pgic">'+ICON.crest+'</span><div class="pght"><h2>Constellations</h2><div class="sub">'+esc(h.name)+' · level '+fmt(h.level)+'</div></div><div class="pgme"><b>'+free+'</b><span class="dur">to spend</span></div><button class="btn ghost small" data-act="close" aria-label="Close">✕</button></div>';
+  hh+='<div class="wartabs contabs" style="grid-template-columns:repeat(4,minmax(0,1fr))">'+CON_ALL.map(function(x){ var im=CONS[x].role?null:ITEM_IMG["u_"+U[CONS[x].u].k], n=conIn(h,x); return '<button class="wartab'+(x===c?' on':'')+'" style="--tc:'+CONS[x].col+'" data-act="con-tab" data-v="'+x+'">'+(im?'<img class="iic" src="'+im+'" alt="" style="width:28px;height:28px;image-rendering:pixelated">':'<span class="consym" style="color:'+CONS[x].col+'">'+CONS[x].sym+'</span>')+'<b>'+CONS[x].t+'</b><span class="dur">'+n+' / 100</span></button>'; }).join("")+'</div>';
+  hh+='<div class="consky" style="--tc:'+D.col+'"><div class="conname"><b>'+esc(D.n)+'</b><span class="dur">'+(D.role?'While this hero is a city\u2019s '+D.t.toLowerCase():D.t+' troops under this hero')+' · '+tot+' points earned, next at level '+fmt(nxt)+'</span></div>'+conMapSvg(h,c,k)+
+    '<div class="rpstats contot">'+(D.role?[[D.as[0],o.atk],[D.as[1],o.def],[D.as[2],o.hp]]:[["Attack",o.atk],["Guard",o.def],["HP",o.hp]]).map(function(x){ return '<div><b>'+conPc(x[1])+'</b><span>'+x[0]+'</span></div>'; }).join("")+'<div><b>'+conIn(h,c)+'</b><span>of 100 points</span></div></div></div>';
+  var AI={atk:0,def:1,hp:2}, per=st[2]==="all"?CON_CAP:CON_STEP, what=D.role?(st[2]==="all"?"all three":D.al[AI[st[2]]]):(st[2]==="all"?"attack, Guard and HP":st[2]==="atk"?"attack":st[2]==="def"?"Guard":"HP"),
+    snm=function(x){ return !D.an||x[0]==="cap"?x[1]:D.an[AI[x[2]]]+x[1].slice(x[1].indexOf(" ")); }, need=k==="cap"?"Fill the other nine stars to open the Crown.":"Needs "+CON_STARS.filter(function(x){ return x[0]===k.charAt(0)+(+k.charAt(1)-1); }).map(snm)[0]+" at level "+CON_NEED+".";
+  hh+='<div class="section constar"><div class="shead"><h3>'+esc(snm(st))+'</h3><span class="dur">Level '+lv+' / '+CON_MAXLV+'</span></div>'+
+    '<p class="hint" style="margin:0 0 8px">'+(D.role?what.charAt(0).toUpperCase()+what.slice(1):D.t+' '+what)+' <b>'+conPc(lv*per)+'</b>'+(lv<CON_MAXLV?' → '+conPc((lv+1)*per)+' with the next point':' (full)')+'.</p>'+
+    ((!D.role && (st[2]==="def"||st[2]==="all")) || (c==="wall" && st[2]==="def")?'<p class="dur" style="margin:-4px 0 8px;font-size:.8rem">Guard is defence that always stacks: it adds up from every source and divides the damage these troops take by 1 + the total, so +100% halves it. No cap.</p>':'')+
+    (!open?'<p class="why">'+need+'</p>':lv>=CON_MAXLV?'':'<div class="btnrow"><button class="btn small" data-act="con-add" data-n="1"'+(free?'':' disabled')+'>Add 1 point</button><button class="btn ghost small" data-act="con-add" data-n="10"'+(free?'':' disabled')+'>Fill ('+Math.min(free,CON_MAXLV-lv)+')</button></div>'+(free?'':'<p class="dur" style="margin:6px 0 0">No points to spend. A hero earns one every '+CON_EVERY+' levels.</p>'))+'</div>';
+  hh+=sbHtml(h);
+  hh+='<div class="section"><div class="shead"><h3>Start over</h3><span class="dur">'+fmt(tomes)+' Tome'+(tomes===1?'':'s')+' of Unlearning</span></div><p class="hint" style="margin:0 0 8px">A Tome of Unlearning gives back every point this hero has spent ('+spent+').</p>'+
+    '<div class="btnrow"><button class="btn ghost small danger" data-act="con-reset"'+(spent&&tomes?'':' disabled')+'>'+(armed==="conreset"?'Tap again to reset':'Reset this hero')+'</button>'+(tomes?'':'<span class="dur">Sold in the War Marks shop</span>')+'</div></div>';
+  return hh+'<button class="closebtn" data-act="con-back">Back to '+esc(h.name)+'</button>'; }
+function conRowHtml(h){ var free=conFree(h), b=conBonus(h), best=''; if (b){ var bk=Object.keys(b).sort(function(x,y){ return conIn(h,y)-conIn(h,x); })[0]; best=CONS[bk].n+' · '+conIn(h,bk)+' / 100'; } else if (conSpent(h)){ var rk=CON_ALL.slice().sort(function(x,y){ return conIn(h,y)-conIn(h,x); })[0]; best=CONS[rk].n+' · '+conIn(h,rk)+' / 100'; }
+  return '<button class="conrow'+(free?' has':'')+'" data-act="con-open" data-id="'+h.id+'"><span class="conric">✦</span><span class="conrt"><b>Constellations</b><span class="dur">'+(best||(conPts(h)?'No stars lit yet':'First point at level '+CON_EVERY))+'</span></span>'+(free?'<span class="badge">'+free+' to spend</span>':'')+'<span class="dur">›</span></button>'; }
+var TROOP_TYPE=["ground","ground","ground","ground","ground","ranged","other","mounted","mounted","siege","siege","siege"]; // the same map the Arena uses
+var TTYPES=[["ground","Ground",3],["ranged","Ranged",5],["mounted","Mounted",7],["siege","Siege",9]]; // key, name, the troop whose picture stands for it
+// the part of a side the Troop bonuses table needs (no troops), small enough to keep on a march record or send in a server report
+function sideBrief(sd){ if (!sd) return null; conApply(sd); var R=sd.research||{}; return {research:{iron_working:R.iron_working||0, medicine:R.medicine||0}, attack_modifier:sd.attack_modifier, defence_modifier:sd.defence_modifier, life_modifier:sd.life_modifier, hero:{intel:(sd.hero&&sd.hero.intel)||0}, types:sd.types}; }
+function briefBox(mine, theirs){ var f=function(b){ return b ? conApply(JSON.parse(JSON.stringify(b))) : null; }; return typeBoxHtml(f(mine), f(theirs)); }
+function sideTypeRows(sd){ if (!sd) return null; var R=sd.research||{}, nz=function(v,d){ return v==null||isNaN(+v)?d:+v; };
+  var am=nz(sd.attack_modifier,1), dm=nz(sd.defence_modifier,1), lm=nz(sd.life_modifier,1), intel=nz(sd.hero&&sd.hero.intel,0), iw=1+0.05*nz(R.iron_working,0), med=1+0.05*nz(R.medicine,0), T=sd.types||{};
+  return TTYPES.map(function(k){ var o=T[k[0]]||{}; return {k:k[0], n:k[1], u:k[2], atk:(nz(o.atk,am)-1)*100, atkF:nz(o.atkFlat,0), def:(iw*nz(o.def,dm)-1)*100, defF:nz(o.defFlat,0), grd:nz(o.guard,0)*100, hp:(med*nz(o.life,lm)-1)*100, hpF:nz(o.lifeFlat,intel)}; }); }
+function typeTableHtml(rows, title){ if (!rows) return ''; var pc=function(v){ var r=Math.round(v*10)/10; return (r>=0?'+':'\u2212')+Math.abs(r)+'%'; }, fl=function(v){ var r=Math.round(v); return (r>=0?'+':'\u2212')+fmt(Math.abs(r)); },
+    cell=function(p,f){ return '<td><b>'+pc(p)+'</b><span>'+fl(f)+'</span></td>'; };
+  return '<table class="gt ttab"><thead><tr><th>'+esc(title)+'</th><th>Attack</th><th>Defence</th><th>Guard</th><th>HP</th></tr></thead><tbody>'+rows.map(function(r){ var im=ITEM_IMG["u_"+U[r.u].k];
+    return '<tr><td><span class="rpu">'+(im?'<img class="iic" src="'+im+'" alt="">':'')+'<span>'+r.n+'</span></span></td>'+cell(r.atk,r.atkF)+cell(r.def,r.defF)+'<td><b>'+pc(r.grd)+'</b><span>&nbsp;</span></td>'+cell(r.hp,r.hpF)+'</tr>'; }).join("")+'</tbody></table>'; }
+function typeBoxHtml(mine, theirs, key){ if (!mine && !theirs) return '';
+  return detBox(key||"rptypes", true, '<b>Troop bonuses</b> <span class="dur">by type \u00b7 % and flat</span>', (mine?typeTableHtml(sideTypeRows(mine),"Yours"):'')+(theirs?typeTableHtml(sideTypeRows(theirs),"Theirs"):'')+
+    '<p class="dur ttnote">Totals with research. The small number is the flat bonus per troop. Defence lowers damage taken, down to half at most; Guard then divides what is left (+100% Guard halves it) and has no cap.</p>', "det ttbox"); }
+function repTypesHtml(r){ if (!r.ww || r.scout) return ''; var A=null, D=null; try { A=typeof r.ww.A==="string"?JSON.parse(r.ww.A):r.ww.A; D=typeof r.ww.D==="string"?JSON.parse(r.ww.D):r.ww.D; } catch(e){ return ''; }
+  return typeBoxHtml(r.def?D:A, r.def?A:D); }
 function reportDetailBase(r){
   if (r.scout) return r.intel ? '<p class="hint">Scouts got through'+(r.lost?' ('+fmt(r.lost)+' lost)':'')+'.</p>'+repScoutUnits(r.intel.inf<3?r.intel.t.map(roughN):r.intel.t, r.intel.inf<3?null:r.intel.f, r.intel.wall)+repResTiles(r.intel.res, true) : '<p class="hint">All '+fmt(r.lost)+' scouts were caught.</p>'; // 0.2.50: icons
-  if (r.def) return repStats(r, sum12(r.had)-sum12(r.eleft))+modsLine(r)+(r.wounded?'<p class="rphero"><span class="dur">The wounded wait in the Medic Camp for 24 hours</span></p>':'')+(r.repaired?'<p class="hint">Machinery repaired '+Math.round(r.repaired*100)+'% of lost archer towers (more of other fortifications).</p>':'')+
+  if (r.def) return repStats(r, sum12(r.had)-sum12(r.eleft))+(repTypesHtml(r)||modsLine(r))+(r.wounded?'<p class="rphero"><span class="dur">The wounded wait in the Medic Camp for 24 hours</span></p>':'')+(r.repaired?'<p class="hint">Machinery repaired '+Math.round(r.repaired*100)+'% of lost archer towers (more of other fortifications).</p>':'')+
     '<div class="tscroll"><table class="gt rpt3">'+repTableHead("Yours","Theirs")+'<tbody>'+ /* 0.2.50: unit icons, two-row header */
     U.map(function(u,i){ if (!r.sent[i] && !r.had[i]) return ''; var a1=r.sent[i]-r.left[i], a2=r.had[i]-r.eleft[i]; return '<tr>'+repUnitCell(i)+'<td>'+fmt(r.sent[i])+'</td><td class="'+(a1?'loss':'')+'">'+fmt(a1)+'</td><td>'+fmt(r.had[i])+'</td><td class="'+(a2?'ok':'')+'">'+fmt(a2)+'</td></tr>'; }).join("")+
     FORTN.map(function(n,k){ if (!r.forts[k]) return ''; var lf=r.forts[k]-r.fleft[k]; return '<tr>'+repFortCell(n,"Your ")+'<td>'+fmt(r.forts[k])+'</td><td class="'+(lf?'loss':'')+'">'+fmt(lf)+'</td><td></td><td></td></tr>'; }).join("")+'</tbody></table></div>'+(r.loot&&RES.some(function(k){ return r.loot[k]; })?'<div class="h3" style="margin-top:8px">Plundered</div>'+repResTiles(r.loot):'')+allyRepHtml(r);
   var killed=0; for (var ki=0;ki<12;ki++) killed+=Math.max(0,(r.had[ki]||0)-(r.eleft[ki]||0));
-  return repStats(r, killed)+modsLine(r)+'<p class="rphero">'+(r.hero?'<b>'+esc(r.hero)+'</b> led \u00b7 +'+fmt(r.xp)+' experience'+(r.xpWait?' <span class="dur">(this tile gave experience less than an hour ago: more in '+fmtT(realMs(r.xpWait))+')</span>':''):'<span class="dur">No hero led this army.</span>')+
-    (r.wounded?'<span class="dur"> \u00b7 the wounded wait in the Medic Camp for 24 hours</span>':'')+'</p>'+reportTable(r)+repLootHtml(r); // 0.2.95
+  return repStats(r, killed)+'<p class="rphero">'+(r.hero?'<b>'+esc(r.hero)+'</b> led \u00b7 +'+fmt(r.xp)+' experience'+(r.xpWait?' <span class="dur">(this tile gave experience less than an hour ago: more in '+fmtT(realMs(r.xpWait))+')</span>':''):'<span class="dur">No hero led this army.</span>')+
+    (r.wounded?'<span class="dur"> \u00b7 the wounded wait in the Medic Camp for 24 hours</span>':'')+'</p>'+(repTypesHtml(r)||modsLine(r))+reportTable(r)+repLootHtml(r); // 0.2.95; 0.2.106: the bonuses by troop type
 }
 // the Reports tab asks every render tick; the list is only rebuilt when a report arrived or the filter, search, page or a star changed
 function fillRepList(force){
@@ -14753,7 +14917,7 @@ function barracksPage(slot){ var b=S.inside[slot], lv=b.level, t=trainingAt(slot
       '<div id="bqcost">'+bqCostHtml()+'</div>'+
       '<p id="bqinfo" class="'+(why?'why':'dur')+'">'+(why?esc(why):fmtT(realMs(start-S.gt+T*n))+', done '+trClock(start+T*n))+'</p>'; }
   return h+'</div>'; }
-function bqCostHtml(){ var n=Math.floor(+BQD.n||0); if (BQD.u<0) return ''; var c={}; for (var k in U[BQD.u].cost) c[k]=U[BQD.u].cost[k]*Math.max(1,n); return costTilesHtml(c); } // 0.2.50: cost tiles: one unit until you type an amount
+function bqCostHtml(){ var n=Math.floor(+BQD.n||0); if (BQD.u<0) return ''; var c={}; for (var k in U[BQD.u].cost) c[k]=Math.ceil(U[BQD.u].cost[k]*Math.max(1,n)*trainDisc()); return costTilesHtml(c); } // 0.2.50: cost tiles: one unit until you type an amount
 // typing an amount updates the cost, the button and the time in place (a redraw here would swallow the tap on Train)
 function bqRefresh(){ if (ARMYB<0) return; var n=Math.floor(+BQD.n||0), why=trainOnWhy(BQD.u,n,ARMYB), t=trainingAt(ARMYB), T=trainTime(BQD.u), start=t?slotFree(ARMYB):S.gt;
   var bb=document.getElementById("bqbtn"), inf=document.getElementById("bqinfo"), co=document.getElementById("bqcost");
@@ -14782,13 +14946,13 @@ function trainWhy(i,n,mode){
     return "Every queue is full";
   }
   if (!n || n<1) return "Enter an amount";
-  var c={}; for (var k in u.cost) c[k]=u.cost[k]*n;
+  var c={}, td2=trainDisc(); for (var k in u.cost) c[k]=u.cost[k]*n*td2;
   if (!afford(c)) return "Not enough resources";
   if (idlePop() < u.pop*n) return "Not enough free people ("+fmt(idlePop())+")";
   return "";
 }
 function trainCostHtml(i){ // 0.2.50: cost tiles for one unit, or for the amount typed in the box (red tiles are what you can't cover)
-  var n=Math.floor(trainAmt[i]||0), u=U[i], c={}; for (var k in u.cost) c[k]=u.cost[k]*Math.max(1,n);
+  var n=Math.floor(trainAmt[i]||0), u=U[i], c={}; for (var k in u.cost) c[k]=Math.ceil(u.cost[k]*Math.max(1,n)*trainDisc());
   return '<span class="dur">'+(n>0?'Cost for '+fmt(n):'Cost each')+'</span>'+costTilesHtml(c);
 }
 function updateTrainRow(i){
@@ -15024,7 +15188,7 @@ function simInput(side,key,idx,val,extra){
    Layout only: the fights and the optimizer are the same. */
 var SIMED=false;
 function simSumTxt(x){ var n=SIMK.filter(function(k){ return +x.r[k]>0; }).length, b=[];
-  if (n) b.push(n+' research'); if (+x.hatk) b.push('Atk '+fmt(+x.hatk)); if (+x.hint) b.push('Int '+fmt(+x.hint)); if ((+x.life||1)>1) b.push('star set ×'+(Math.round((+x.life)*100)/100));
+  if (n) b.push(n+' research'); if (+x.hatk) b.push('Atk '+fmt(+x.hatk)); if (+x.hint) b.push('Int '+fmt(+x.hint)); if ((+x.life||1)>1) b.push('star set ×'+(Math.round((+x.life)*100)/100)); if (x.dg&&DRAGONS[x.dg.t]) b.push(DRAGONS[x.dg.t].name+' '+(x.dg.lv||1));
   return b.length?b.join(', '):'none'; }
 function simWaveSum(){ var la=0, ld=0, w=0; SIMW.log.forEach(function(x){ la+=x.la; ld+=x.ld; if (x.won) w++; });
   return 'The enemy is what wave '+(SIMW.n-1)+' left. So far you lost '+fmt(la)+' and they lost '+fmt(ld)+'.'; }
@@ -15048,7 +15212,11 @@ function viewWar(){
     h+='<tr class="sub"><td colspan="3">Leading hero</td></tr>';
     h+='<tr><td>Attack</td><td>'+simInput("atk","hatk",null,a.hatk)+'</td><td>'+simInput("def","hatk",null,d.hatk)+'</td></tr>';
     h+='<tr><td>Intelligence</td><td>'+simInput("atk","hint",null,a.hint)+'</td><td>'+simInput("def","hint",null,d.hint)+'</td></tr>';
-    h+='<tr><td>Star set ×</td><td>'+simInput("atk","life",null,a.life||1)+'</td><td>'+simInput("def","life",null,d.life||1)+'</td></tr></tbody></table>';
+    h+='<tr><td>Star set ×</td><td>'+simInput("atk","life",null,a.life||1)+'</td><td>'+simInput("def","life",null,d.life||1)+'</td></tr>';
+    var dgSel=function(side,x,isDef){ var t=x.dg&&x.dg.t||""; return '<select data-simdg="'+side+'" data-f="t" aria-label="'+(isDef?'Enemy':'Your')+' dragon"><option value="">None</option>'+["cinder","ward","aegis"].filter(function(k){ return isDef || !DRAGONS[k].def; }).map(function(k){ return '<option value="'+k+'"'+(t===k?' selected':'')+'>'+DRAGONS[k].name+'</option>'; }).join("")+'</select>'; },
+      dgLv=function(side,x,isDef){ var lv=x.dg&&x.dg.lv||1; return '<select data-simdg="'+side+'" data-f="lv" aria-label="'+(isDef?'Enemy':'Your')+' dragon level"'+(x.dg&&x.dg.t?'':' disabled')+'>'+[1,2,3,4,5].map(function(n){ return '<option value="'+n+'"'+(lv===n?' selected':'')+'>Level '+n+'</option>'; }).join("")+'</select>'; };
+    h+='<tr class="sub"><td colspan="3">Dragon</td></tr><tr><td>Dragon</td><td>'+dgSel("atk",a,false)+'</td><td>'+dgSel("def",d,true)+'</td></tr><tr><td>Level</td><td>'+dgLv("atk",a,false)+'</td><td>'+dgLv("def",d,true)+'</td></tr></tbody></table>'+
+      '<p class="dur" style="margin:6px 0 0;font-size:.78rem">Cinder adds attack, Ward adds HP, Aegis (defender only) adds attack, Guard and HP. Gale and Brood do not change a fight. If you loaded \u201cMy city defends\u201d, your wall hero\u2019s dragon is already in the numbers.</p>';
   }
   h+='</div>';
   h+='<div class="section"><div class="shead wrhead"><h3>Optimize layers</h3><select id="logoal" aria-label="Optimize for"><option value="n"'+(LOW.goal==="n"?' selected':'')+'>Fewest lost</option><option value="p"'+(LOW.goal==="p"?' selected':'')+'>Least prestige lost</option></select></div>'+
@@ -15060,6 +15228,8 @@ function viewWar(){
 function simSide(x, isDef){
   var o={troops:x.t.map(function(v){return Math.max(0,Math.floor(+v||0));}), research:{}, hero:{intel:+x.hint||0},
     life_modifier:Math.max(1,+x.life||1), attack_modifier:(1+0.05*(+x.r.military_tradition||0)+(+x.hatk||0)/HERO_ATK_DIV)};
+  var dgd=x.dg&&DRAGONS[x.dg.t], dlv=dgd?Math.max(1,Math.min(DRAGON_MAX,+x.dg.lv||1)):0; // 0.2.108 (Cody): a dragon with the hero. Aegis only wakes for the defender.
+  if (dgd && (!dgd.def || isDef)){ var fx=dgd.fx; o.attack_modifier+=(fx.atk||0)*dlv/HERO_ATK_DIV; o.hero.intel+=(fx.int||0)*dlv; o.life_modifier*=1+(fx.life||0)*dlv/100; if (fx.grd){ o.types={}; CON_KEYS.forEach(function(c){ o.types[c]={guard:fx.grd*dlv/100}; }); } }
   SIMK.forEach(function(k){ o.research[k]=Math.max(0,Math.min(20,+x.r[k]||0)); });
   if (isDef){ o.fortifications=x.f.map(function(v){return Math.max(0,Math.floor(+v||0));}); o.wallLevel=Math.max(0,Math.min(18,Math.floor(+x.wall||0))); o.fortBonus=1+0.1*(x.eng||0); }
   return o;
@@ -15114,6 +15284,7 @@ function simResultHtml(){
     });
     h+='<details><summary>Battle log ('+lines.length+' events)</summary><ul class="blog">'+lines.slice(0,400).map(function(l){return '<li>'+l+'</li>';}).join("")+'</ul></details>';
   }
+  if (simOut && simOut.A) h+=typeBoxHtml(simOut.A, simOut.D, "simtypes"); // 0.2.106
   return h+'</div>';
 }
 
@@ -15177,6 +15348,7 @@ var ITEM_GROUPS=[
   ["Building",["script"]],
   ["Gems",["gemD","gemF"]]
 ];
+ITEM_GROUPS.splice(4,0,["Skill books",["respec"].concat(SB.map(sbKey))]); // 0.2.106
 var ITEM_INFO={
   s15:"Cuts 15 minutes off a build, research, training or fortification timer. Use it from the queue.",
   s60:"Cuts 1 hour off a build, research, training or fortification timer. Use it from the queue.",
@@ -15275,7 +15447,7 @@ function viewItems(){
         (pkgState(sel)==="ready"?(rdy.length>1?'<button class="btn small ghost" data-act="claim-pkg" data-pkg="'+sel.id+'">Claim just this</button>':''):'<span class="dur">Opens at Town Hall '+sel.th+'. Resources go to the city you’re viewing.</span>')+'</div>'; }
     h+=(itemsNote?'<div class="inote">'+esc(itemsNote)+'</div>':'')+'</div>';
   } else if (itemsNote) h+='<div class="section"><div class="inote">'+esc(itemsNote)+'</div></div>';
-  var itemDet=function(k){ var n=S.items[k]||0, acts=itemActs(k,n); return '<div class="idet">'+itemImg(k)+'<b>'+ITEMS[k].name+'</b><span class="dur">You have <b>'+fmt(n)+'</b></span><span class="dur d">'+ITEM_INFO[k]+'</span>'+(acts?'<div class="ia">'+acts+'</div>':'')+'</div>'; };
+  var itemDet=function(k){ var n=S.items[k]||0, acts=itemActs(k,n); return '<div class="idet">'+itemImg(k)+'<b>'+ITEMS[k].name+'</b><span class="dur">You have <b>'+fmt(n)+'</b></span><span class="dur d">'+(ITEM_INFO[k]||ITEMS[k].desc)+'</span>'+(acts?'<div class="ia">'+acts+'</div>':'')+'</div>'; };
   var groups=ITEM_GROUPS.map(function(g){ return [g[0], g[1].filter(function(k){ return itemsAll || (S.items[k]||0)>0; })]; }).filter(function(g){ return g[1].length; });
   if (ITFILT && !groups.some(function(g){ return g[0]===ITFILT; })) ITFILT="";
   var keys=[]; groups.forEach(function(g){ if (!ITFILT || g[0]===ITFILT) keys=keys.concat(g[1]); });
@@ -15812,6 +15984,8 @@ function renderSheetCore0(){
     });
     h+='</div><button class="closebtn" data-act="close">Close</button>';
   } else if (sheetFor.kind==="allheroes"){ h=ahSheet();
+  } else if (sheetFor.kind==="con"){
+    var cnh=heroById(sheetFor.id); if (!cnh){ closeSheet(); return; } h=conSheet(cnh);
   } else if (sheetFor.kind==="hero"){
     var hr=heroById(sheetFor.id);
     if (!hr){ closeSheet(); return; }
@@ -15832,7 +16006,7 @@ function renderSheetCore0(){
     if (armed==="best") h+='<div class="effect gpop"><div class="sub">Best of everything: pieces of that stat are taken from other heroes. Only that stat goes on.</div><div class="btnrow">'+["atk","int","pol"].map(function(k){ return '<button class="btn small" data-act="gear-best-go" data-free="0" data-stat="'+k+'">'+STATN[k]+'</button>'; }).join("")+'</div>'+
       '<div class="sub" style="margin-top:6px">Spare pieces only: nothing is taken from another hero.</div><div class="btnrow">'+["atk","int","pol"].map(function(k){ return '<button class="btn ghost small" data-act="gear-best-go" data-free="1" data-stat="'+k+'"'+(freeN?'':' disabled')+'>'+STATN[k]+'</button>'; }).join("")+'<button class="link" data-act="gear-best-cancel">Cancel</button></div></div>';
     if (gsaving) h+='<div class="effect gpop"><div class="sub">Save what '+esc(hr.name)+' wears now into:</div><div class="btnrow">'+Array.apply(null,Array(GEAR_SETS)).map(function(_,i){ var gi=gearSetInfo(hr,i); return '<button class="btn '+(armed==="gsave"+i?'':'ghost ')+'small" data-act="gset-save" data-i="'+i+'">'+(armed==="gsave"+i?'Tap again to overwrite':esc(gearSetName(hr,i))+(gi?' ('+gi.have+')':''))+'</button>'; }).join("")+'<button class="link" data-act="gear-best-cancel">Cancel</button></div></div>';
-    h+=heroRecordHtml(hr);
+    h+=conRowHtml(hr)+heroRecordHtml(hr);
     h+='<div class="act" style="margin-top:14px"><button class="btn ghost danger small" data-act="dismiss"'+(hr.fav?' disabled':'')+'>'+(armed==="dismiss"?"Tap again to dismiss":"Dismiss hero")+'</button>'+(sheetFor.back==="ah"?'<button class="closebtn" data-act="ah-open">Back to all heroes</button>':'')+'</div>'; // 0.1.239: dismiss sits at the very bottom, away from Reset points
   } else {
     var w=sheetFor.w, i=sheetFor.i, s=getSlot(w,i);
@@ -17130,6 +17304,17 @@ document.addEventListener("click",function(e){
   if (act==="ov-open"){ if (S.ovb) openSheet({kind:"plot", w:"ov", i:0}); return; }
   if (act==="dg-hatch"){ var ht=a.dataset.t; if (!DRAGONS[ht] || !S.dragonEggs || !S.dragonEggs[ht] || (S.dragons&&S.dragons[ht])) return; var hrow=a.closest(".dgrow"); if (hrow) hrow.classList.add("hatching"); a.disabled=true; // 0.2.51: the egg wobbles and cracks, then the dragon is yours
     setTimeout(function(){ delete S.dragonEggs[ht]; S.dragons[ht]={lv:1}; save(); toastQ("Your "+DRAGONS[ht].name+" Dragon hatched!"); lastSheet=""; renderSheet(); lastView=""; refresh(); }, 900); return; }
+  if (act==="con-open"){ var coh=heroById(+a.dataset.id); if (coh){ if (conSpent(coh)) CONV.c=CON_ALL.slice().sort(function(x,y){ return conIn(coh,y)-conIn(coh,x); })[0]; armed=null; CONV.slot=-1; openSheet({kind:"con", id:coh.id, back:sheetFor&&sheetFor.kind==="hero"?sheetFor:null}); } return; }
+  if (act==="con-back"){ var cbk=sheetFor&&sheetFor.back, cid=sheetFor&&sheetFor.id; armed=null; if (cbk) openSheet(cbk); else openSheet({kind:"hero", id:cid}); return; }
+  if (act==="sb-slot"){ var si=+a.dataset.i; CONV.slot=CONV.slot===si?-1:si; armed=null; lastSheet=""; renderSheet(); return; }
+  if (act==="sb-read"){ var sh=sheetFor&&heroById(sheetFor.id), sk=a.dataset.k; if (!sh || !SB_BY[sk] || !(S.items[sk]>0) || CONV.slot<0 || CONV.slot>=sbSlots(sh) || (sh.books||[]).indexOf(sk)>=0) return;
+    if (armed!=="sb:"+sk){ armed="sb:"+sk; lastSheet=""; renderSheet(); return; }
+    armed=null; S.items[sk]--; sh.books=sh.books||[]; while (sh.books.length<SB_SLOTS.length) sh.books.push(null); sh.books[CONV.slot]=sk; CONV.slot=-1; save(); toast(sh.name+" learned "+SB_BY[sk].n); lastSheet=""; renderSheet(); lastView=""; renderView(true); return; }
+  if (act==="con-tab"){ CONV.c=a.dataset.v; CONV.k="a1"; armed=null; lastSheet=""; renderSheet(); return; }
+  if (act==="con-star"){ CONV.k=a.dataset.k; armed=null; lastSheet=""; renderSheet(); return; }
+  if (act==="con-add"){ var cah=sheetFor&&heroById(sheetFor.id); if (cah && conSpend(cah, CONV.c, CONV.k, +a.dataset.n||1)){ save(); lastSheet=""; renderSheet(); lastView=""; renderView(true); } return; }
+  if (act==="con-reset"){ var crh=sheetFor&&heroById(sheetFor.id); if (!crh || !conSpent(crh) || !(S.items.respec>0)) return; if (armed!=="conreset"){ armed="conreset"; lastSheet=""; renderSheet(); return; }
+    armed=null; S.items.respec--; crh.con={}; save(); toast(crh.name+"\u2019s stars are dark again: "+conPts(crh)+" points to spend"); lastSheet=""; renderSheet(); lastView=""; renderView(true); return; }
   if (act==="hero-fav"){ var fh=heroById(+a.dataset.id); if (fh){ fh.fav=!fh.fav; save(); lastSheet=""; renderSheet(); lastView=""; refresh(); toastQ(fh.fav?fh.name+" is a favourite":fh.name+" is no longer a favourite"); } return; }
   if (act==="hero-pic"){ var hfi=document.getElementById("heroimgf"); if (hfi) hfi.click(); return; }
   if (act==="hero-picdel"){ var hpd=heroById(sheetFor&&sheetFor.id); if (hpd) heroImageRemove(hpd); return; }
@@ -17272,6 +17457,8 @@ document.addEventListener("input",function(e){ markDirty();
 });
 document.addEventListener("keydown",function(e){ if (e.key==="Enter" && e.target && e.target.id==="gifq"){ e.preventDefault(); GIFS.q=e.target.value.trim(); e.target.blur(); gifLoad(false); return; } if (e.key==="Enter" && e.target && e.target.id==="rxin"){ e.preventDefault(); var rb=document.querySelector('.rxbar [data-act="rx-any"]'); if (rb) rb.click(); return; } if (e.key==="Enter" && e.target && e.target.id==="alchatin"){ e.preventDefault(); alSend(); } if (e.key==="Enter" && e.target && e.target.id==="dockin"){ e.preventDefault(); dockSend(); } if (e.key==="Enter" && e.target && e.target.id==="dmto"){ e.preventDefault(); var dmb=document.querySelector('[data-act="dm-new"]'); if (dmb) dmb.click(); } });
 document.addEventListener("change",function(e){ markDirty();
+  if (e.target && e.target.dataset && e.target.dataset.simdg && sim){ var sx=sim[e.target.dataset.simdg]; sx.dg=sx.dg||{t:"",lv:1}; if (e.target.dataset.f==="t") sx.dg.t=e.target.value; else sx.dg.lv=+e.target.value||1; if (!sx.dg.t) sx.dg=null;
+    if (e.target.dataset.simdg==="def" && sim.def.preset!=="custom") sim.def.preset="custom"; lastView=""; renderView(true); return; }
   if (e.target.id==="bqunit"){ BQD.u=+e.target.value; e.target.blur(); lastView=""; renderView(true); return; }
   if (e.target.id==="bqamt"){ BQD.n=e.target.value; bqRefresh(); return; }
   if (e.target.id==="mapfarm"){ MAPFARM=+e.target.value; e.target.blur(); mapFarmRefresh(); if (MAPFARM>=0) mapFarmFit(); return; } // 0.1.243
