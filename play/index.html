@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.93";
+window.IBORY_V="0.2.94";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1861,7 +1861,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.93";
+var APP_VERSION = "0.2.94";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -9286,16 +9286,21 @@ function cbStats(){
 }
 // is there a newer save from another device? Then it wins: load it (this device's copy is kept for Undo)
 function cbCheck(){
-  if (!cbOn() || CB.busy || CB.checking) return; CB.checking=true;
+  if (!cbOn() || CB.checking) return; if (CB.busy){ if (!CB.checked) setTimeout(cbCheck, 5000); return; } CB.checking=true;
   cbPost("/backup/info",{name:S.cloud.name, token:S.cloud.token}).then(function(r){ return r.json().then(function(d){ return {st:r.status, d:d}; }); }).then(function(o){
-    CB.checking=false; var d=o.d; if (o.st===403 && S.cloud){ S.cloud.token=null; save(); return; } if (!d || !d.ok) return;
+    CB.checking=false; CB.checked=true; var d=o.d; if (o.st===403 && S.cloud){ S.cloud.token=null; save(); return; } if (!d || !d.ok) return;
     S.cloud.info=d.info; if (d.info.display) S.cloud.display=d.info.display; nameOneNote(); nameFollow(); setTimeout(nameOneMaybe, 2500); var L=d.info.latest, mine=S.cloud.rev||0;
+    var first=!CB.bootDone; CB.bootDone=true;
     if (!L || (d.info.rev||0)<=mine) return;
     var other=!L.dev || L.dev==="legacy" || L.dev!==cbDev(), later=L.at>(S.cloud.last||0)+1000;
+    /* 0.2.94 (a player lost 3 hours): this device's copy didn't keep up (its storage was full, so the game was saving to the cloud instead), and
+       on the next open it found its own newer cloud save, only took the number and backed the older game up over it. Now, on the first check after
+       opening, a cloud save made more than 5 minutes after this device's copy is loaded, whichever device made it. (5 minutes: phone and server clocks differ.) */
+    if (first && later && BOOT_SV && L.at>BOOT_SV+5*60000){ cbRestore("latest", {auto:true, at:L.at, own:!other}); return; }
     if (other && later) cbRestore("latest", {auto:true, at:L.at});
     else if (S.cloud.ask){ if (!CB.found) CB.found=d.info; } // 0.2.85: still undecided: don't adopt the account's revision (that let the next auto save overwrite it unasked)
     else { S.cloud.rev=d.info.rev; S.cloud.last=Math.max(S.cloud.last||0, L.at); save(); } // our own save: just catch up on the number
-  }).catch(function(){ CB.checking=false; });
+  }).catch(function(){ CB.checking=false; if (!CB.checked) setTimeout(cbCheck, 30000); }); // 0.2.94: no automatic backup until a check has got through
 }
 function cbOn(){ return !!(LB_URL && S.cloud && S.cloud.token); }
 /* ---------- one name everywhere ----------
@@ -9357,6 +9362,7 @@ function cbSignIn(name, pass, opt){
   opt=opt||{}; if (CB.busy) return; CB.busy=true; cbUi(opt.signin?"Signing in\u2026":"Connecting\u2026", true);
   cbPost("/backup/account",opt.signin?{name:name, pass:pass, signin:1}:{name:name, pass:pass}).then(function(r){ return r.json(); }).then(function(d){
     CB.busy=false; if (!d || !d.ok){ cbUi((d&&d.error)||"Couldn\u2019t reach the backup server"); return; }
+    CB.checked=true; CB.bootDone=true; // 0.2.94: signing in answers the question the opening check asks
     S.cloud={name:d.info.name, token:d.token, last:d.info.latest?d.info.latest.at:0, info:d.info, display:d.info.display||""}; if (d.created) S.nameOneAsked=1; save();
     nameOneNote(); nameFollow(); lbLastSync=0; setTimeout(function(){ lbSync(true); nameOneMaybe(); }, 800);
     if (d.created || !d.info.latest){ CB.found=null; cbSave(false); }
@@ -9396,7 +9402,7 @@ function cbRestore(slot, opt){
     return cbKeepUndo().then(function(){
       CB.busy=false; CB.found=null; CB.conflict=null; CB.msg="";
       cbLoadState(obj, cloud, slot==="latest"?at:Date.now(), rev);
-      toast(opt.auto ? "Loaded your newer game from the cloud, saved on another device "+cbWhen(at)+". Settings can undo it." : "Backup restored. Welcome back, "+TITLES[S.title].name+".");
+      toast(opt.own ? "This device\u2019s last saves didn\u2019t stick, so your newer game from the cloud (backed up "+cbWhen(at)+") is loaded. Settings can undo it." : opt.auto ? "Loaded your newer game from the cloud, saved on another device "+cbWhen(at)+". Settings can undo it." : "Backup restored. Welcome back, "+TITLES[S.title].name+".");
     });
   }).catch(function(e){ CB.busy=false; cbUi(e&&e.message?e.message:"Couldn\u2019t load the backup"); });
 }
@@ -10418,6 +10424,7 @@ var COMP_0222=false;
 try { if (loadRaw && !loadFail && S && !S.comp0222 && !localStorage.getItem("ibory-comp-0222")){ S.comp0222=1; S.real-=8*HOUR; COMP_0222=true; localStorage.setItem("ibory-comp-0222","1"); } } catch(e){}
 var COMP_H=(COMP_0214?8:0)+(COMP_0218?8:0)+(COMP_0222?8:0); // what this open gave, all told
 installProxies(S);
+var BOOT_SV=(loadRaw && !loadFail && S.svAt) || 0; // 0.2.94: when the copy this device just opened was saved (0 = a new game, or one saved before 0.2.94)
 if (S.bf && S.bf.active) S.bf.last=Date.now(); // time with the app closed never counts
 S.cities.forEach(function(cc,ci){ withCity(ci,function(){
   S.train.forEach(function(t){ if (t.q){ t.start=0; t.end=0; } }); // 0.1.234: older saves kept Infinity here, which came back as null
@@ -10489,6 +10496,7 @@ function idbFlush(){ if (IDB.busy || !IDB.pend || IDB.bad || !IDB.db) return; va
   } catch(e){ fail(e); } }
 function idbSave(json, at){ if (IDB.bad || !IDB.db) return false; IDB.pend={json:json, at:at}; idbFlush(); return true; }
 function save(){ mapDirty(); if (saveLocked) return; var json, at=Date.now();
+  S.svAt=at; // 0.2.94: when this copy was written; on the next open it is compared with the cloud's latest (cbCheck)
   try { json=JSON.stringify(S); } catch(e){ saveErrShow(e); return; }
   var inDb=idbSave(json, at);
   try { if (IDB.lsOff) throw new Error("off"); localStorage.setItem(SAVE_KEY, json); try { localStorage.setItem("ibory-lsat", String(at)); } catch(e){} }
@@ -17284,7 +17292,7 @@ setTimeout(updateTabArrows,50);
 setTimeout(function(){ lbSync(true); },4000); setInterval(function(){ if (!document.hidden) lbSync(false); },60000); // 0.1.235: the hide handler already posts once on the way out
 // the cloud save (every 10 minutes, 0.2.18); never before the opening check for a newer save has answered, and not while a conflict waits for a choice
 function cbAuto(){ if (cbOn() && !S.cloud.ask && !CB.busy && CB.checked && !CB.conflict && Date.now()-(S.cloud.last||0)>=cbEvery() && !(S.cloud.lastTry && Date.now()-S.cloud.lastTry<15*60000) && !(S.cloud.retryAt && Date.now()<S.cloud.retryAt)) cbSave(true); }
-setTimeout(function(){ CB.checked=false; cbCheck(); setTimeout(function(){ CB.checked=true; }, 6000); }, 1200); // on open: is there a newer game from another device?
+setTimeout(function(){ CB.checked=false; cbCheck(); }, 1200); // on open: is there a newer game from another device, or a newer one from this device than the copy it opened? 0.2.94: automatic backups wait until that check has answered (it used to be a 6 second timer)
 setTimeout(cbAuto, 8000); setInterval(function(){ if (!document.hidden) cbAuto(); }, 60000);
 // switching away saves to the cloud (so another device can pick up from here); coming back checks for a newer game
 // no cloud save yet: ask (again after "Not now", every few days); never in test browsers
