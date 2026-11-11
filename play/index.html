@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.104";
+window.IBORY_V="0.2.105";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1064,10 +1064,10 @@ tr.arwon td{background:rgba(200,160,70,.14)}
 .pght{flex:1;min-width:0}.pght h2{margin:0;font-size:1.25rem}.pght .sub{font-size:.82rem;color:var(--muted);line-height:1.3}
 .pgme{flex:none;display:flex;flex-direction:column;align-items:flex-end;line-height:1.1}.pgme b{font:700 1.5rem var(--display);color:var(--brass);font-variant-numeric:tabular-nums}
 .fmseg.two{grid-template-columns:repeat(2,minmax(0,1fr))}.lbsw .fmseg{flex:1;min-width:0}.fmseg .lbyou{background:var(--bg);color:var(--brass)}.fmseg button:not(.on) .lbyou{background:var(--brass);color:var(--bg)}
-.lbsum{margin:8px 0}.lbpod{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;align-items:end;margin:4px 0 8px}
+.lbsum{margin:8px 0}.lbpod{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;align-items:stretch;margin:12px 0 8px}
 .lbp{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:16px 4px 8px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);text-align:center;min-width:0;cursor:pointer}
-.lbp b{font-size:.84rem;line-height:1.2;max-width:100%;overflow-wrap:anywhere}.lbp .lbv{font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}
-.lbp.p1{padding-top:24px;padding-bottom:14px;border-color:#d9b44a;background:radial-gradient(circle at 50% 0,color-mix(in srgb,#d9b44a 26%,var(--panel2)),var(--panel2) 75%)}.lbp.p2{border-color:#aab4bd}.lbp.p3{border-color:#b9793f}
+.lbp b{font-size:.84rem;line-height:1.2;max-width:100%;overflow-wrap:anywhere;flex:1}.lbp b .lbtag{display:block;margin:0}.lbp .lbv{font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.lbp.p1{border-color:#d9b44a;background:radial-gradient(circle at 50% 0,color-mix(in srgb,#d9b44a 26%,var(--panel2)),var(--panel2) 75%)}.lbp.p2{border-color:#aab4bd}.lbp.p3{border-color:#b9793f}
 .lbmed{position:absolute;top:-9px;left:50%;transform:translateX(-50%);width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font:700 .78rem var(--display);color:#1f1a12;background:#aab4bd}.p1 .lbmed{background:#d9b44a}.p3 .lbmed{background:#b9793f}
 .lbp.me b,.lbrow.me .lbnm{color:var(--brass)}
 .lblist{display:grid;gap:5px}.lbrow{display:flex;align-items:center;gap:8px;padding:6px 10px 6px 6px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);min-width:0;cursor:pointer}.lbrow.me{border-color:var(--brass)}
@@ -1892,7 +1892,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.104";
+var APP_VERSION = "0.2.105";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -9627,7 +9627,8 @@ function lbSheet(){
     else { var lbAttr=function(r){ return ' data-act="pl-open" role="button" tabindex="0" data-k="'+esc(r.ck||"")+'" data-pid="'+(r.pid||0)+'"'+(r.me?' data-me="1"':'')+' data-nm="'+esc(r.name)+'"'; },
         lbNm=function(r){ return (r.tag?'<span class="lbtag">['+esc(r.tag)+']</span>':'')+esc(r.name)+(d.cat==="hero"&&r.hero?'<span class="hnm">'+(r.hid&&r.hu&&r.hk?heroPortrait({id:r.hid, name:r.hero, tier:"legendary"},28,{k:r.hk, hu:r.hu})+' ':'')+esc(r.hero)+'</span>'+lbHeroSt(r):''); },
         pod=d.rows.length>=3 && d.rows[0].rank===1 && d.cat!=="hero" ? d.rows.slice(0,3) : [];
-      if (pod.length) h+='<div class="lbpod">'+[1,0,2].map(function(i){ var r=pod[i]; return '<div class="lbn lbp p'+(i+1)+(r.me?' me':'')+'"'+lbAttr(r)+'><span class="lbmed">'+(i+1)+'</span>'+lbAvatar(r)+'<b>'+lbNm(r)+'</b><span class="lbv">'+lbVal(d.cat,r.value)+'</span></div>'; }).join("")+'</div>';
+      if (pod.length) h+='<div class="lbpod">'+[0,1,2].map(function(i){ // 0.2.105 (Cody): first on the left, all three the same size
+         var r=pod[i]; return '<div class="lbn lbp p'+(i+1)+(r.me?' me':'')+'"'+lbAttr(r)+'><span class="lbmed">'+(i+1)+'</span>'+lbAvatar(r)+'<b>'+lbNm(r)+'</b><span class="lbv">'+lbVal(d.cat,r.value)+'</span></div>'; }).join("")+'</div>';
       h+='<div class="lblist">'+d.rows.slice(pod.length).map(function(r){ return '<div class="lbn lbrow'+(r.me?' me':'')+'"'+lbAttr(r)+'><span class="lbr">'+r.rank+'</span>'+lbAvatar(r)+'<span class="lbnm">'+lbNm(r)+(r.me?' <span class="lbyou">you</span>':'')+'</span><span class="lbv">'+lbVal(d.cat,r.value)+'</span></div>'; }).join("")+'</div>'; }
     if (d.me && d.cat==="hero" && d.me.hero!=null) h+='<p class="effect">Your best: '+esc(d.me.hero)+', #'+d.me.rank+' with '+lbVal(d.cat,d.me.value)+'.</p>';
     else if (d.me && (d.me.outside || !d.rows.some(function(r){ return r.me; }))) h+='<p class="effect">You: '+(d.me.outside?'#'+d.me.rank+', just outside the first '+d.first:'#'+d.me.rank)+' with '+lbVal(d.cat,d.me.value)+'.</p>'; // your rank is in the banner; this line only when you are not in the rows shown
