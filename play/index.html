@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.114";
+window.IBORY_V="0.2.115";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1660,6 +1660,10 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 .wdview.fs .wdkeyb:not(.on),.wdview.fs .wdkey{bottom:calc(10px + env(safe-area-inset-bottom,0px))}
 .fmline{margin:6px 0 0;font-size:.88rem;color:var(--muted)}.fmline b{color:var(--ink)}.fmline b.okc{color:var(--grass)}
 .fmhelp{margin-top:6px}
+.rotr{border:1px solid var(--line);border-radius:12px;background:var(--panel2);padding:10px;margin-top:8px}.rotr.off{opacity:.78}
+.rot1{display:flex;align-items:center;gap:8px}.rot1 select{flex:1;min-width:0}.rot1 .swt{flex:none}
+.rotg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px}.rotg label{display:flex;flex-direction:column;gap:3px;min-width:0}.rotg label .dur{font-size:.74rem;line-height:1.2}.rotg input{width:100%;min-width:0;box-sizing:border-box;padding-inline:8px;font-size:.92rem}
+.rots{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin-top:8px;font-size:.84rem}.rots .link{margin-inline-start:auto}
 .fmchips{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px}.fmchips .dur{margin-inline-end:4px;font-size:.82rem}
 .lbsw{display:flex;gap:8px;align-items:center;margin-bottom:8px}.lbsw .speeds{flex:1;min-width:0}.lbsw .speeds button{min-width:0}.lbre{flex:none;min-width:42px;font-size:1.1rem;padding:6px 10px}
 .lbyou{display:inline-block;margin-inline-start:6px;padding:1px 6px;border-radius:999px;background:var(--brass);color:var(--bg);font:700 .66rem var(--body);vertical-align:2px;text-transform:uppercase;letter-spacing:.04em}
@@ -1866,6 +1870,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
     <div class="morepanel" id="morepanel" hidden>
       <div class="mph">Places</div><div class="mpgrid" id="mpplaces">
       <button class="mptile" data-act="tab" data-tab="farms"><i data-ico="farm"></i><span>Farms</span></button>
+      <button class="mptile" data-act="tab" data-tab="rotate"><i data-ico="rally"></i><span>Rotation</span></button>
       <button class="mptile" data-act="tab" data-tab="reports"><i data-ico="book"></i><span>Reports</span><b class="mpb" id="repbadge"></b></button>
       <button class="mptile mpkg" data-act="tab" data-tab="alliance"><i data-ico="crest"></i><span>Pact</span></button>
       <button class="mptile" data-act="tab" data-tab="war"><i data-ico="helm"></i><span>War Room</span></button>
@@ -1908,7 +1913,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.114";
+var APP_VERSION = "0.2.115";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -3732,6 +3737,7 @@ function cosmoSheet(){ var coins=COS?COS.coins:null, free=!!(COS&&COS.allFree), 
   if (!COS) return h+'<p class="hint">Loading\u2026</p>';
   h+='<div class="section warhead cosmohead">'+alArt("cosmo",56)+'<div class="warbal"><b>'+fmt(bal)+'</b><span class="dur">Cosmo Coins</span></div><span class="dur warhow">'+(coins?(coins.needTH?'A free coin a day starts once one of your cities has a level '+coins.needTH+' Town Hall.':'Next free coin in '+fmtT(coins.nextIn)+'.'):'')+' More coins: <button class="link" data-act="iv-shop-open">War Marks shop</button></span></div>';
   h+=ajCard(bal);
+  h+=rotCosmoCard();
   var L=cosmoPacks();
   h+='<div class="section" style="margin-top:10px"><h3>Decoration packs</h3><p class="hint" style="margin-top:0">Unlock a pack once and place everything in it on as many map tiles as you like. Only you see your map.'+(free?' Free during the beta.':'')+'</p><div class="shopgrid">'+L.map(function(pk){
     var why=pk.own?"Owned":(!free && bal<pk.price)?"Need "+fmt(pk.price-bal)+" more":"";
@@ -4213,7 +4219,7 @@ function friendlyArrive(m){
   var rtot=RES.reduce(function(a,k){ return a+((m.cargo&&m.cargo[k])||0); },0);
   RES.forEach(function(k){ dest.res[k]+=(m.cargo&&m.cargo[k])||0; });
   if (rtot) msg+=", with "+fmt(rtot)+" resources";
-  note("march",msg);
+  if (!m.rot) note("march",msg); // 0.2.115: troop rotation runs all night, so its arrivals stay quiet (the rule keeps the total)
   return false;
 }
 // loyalty: each victorious attack knocks off 10 (NPC and AI cities); a historic city loses 3 a hit down to 10, then 1 a hit. It holds for an hour after the last one, then recovers 10 per hour
@@ -4710,7 +4716,82 @@ function processAuto(){
     pr.idx=(pr.idx+1) % pr.farm.length;
     launchMarch(id,"attack",pr.t,phid,{preset:pi});
   });
+  processRot();
 }
+/* ---------- troop rotation (0.2.115, Cody) ----------
+   A Cosmo Shop unlock (100 coins, for good). Each city has its own rules: "keep K of this troop here, send the rest to that city in marches
+   of N", with an optional "stop when the target has M". A rule sends an ordinary reinforcement (travel time, rations, army limit, no hero), but
+   on its own slot: one march out per rule, never the Rally Spot's. Rules run with the farm presets (processAuto), so they also run every
+   5 game minutes through a catch-up: feeder cities keep a farming city stocked overnight. */
+var ROT_MAX=12, ROT_ITEM="util:rotation", ROTARM=false, ROTBUSY=false;
+function rotUnl(){ if (COS){ var o=COS.owned.indexOf(ROT_ITEM)>=0; if (!!S.rotUnl!==o) S.rotUnl=o?1:0; return o; } return !!S.rotUnl; } // the server decides; the save remembers it for when the server can't be reached (and for catch-up, before it has answered)
+function rotPrice(){ var p=cosPrice("util","rotation"); return p>=0?p:100; }
+function rotRules(c){ c=c||C(); if (!c.rot) c.rot=[]; return c.rot; }
+function rotById(id){ return rotRules().filter(function(r){ return r.id===id; })[0]; }
+function rotDest(r){ var me=C().id; return S.cities.filter(function(c){ return c.id===r.to && c.id!==me; })[0]||null; }
+function rotOut(r){ var me=C().id; return S.marches.filter(function(m){ return m.rot===r.id && m.city===me; })[0]||null; }
+// everything the target has of that troop: at home, out on its own marches and camps, and rotation marches on their way to it
+function rotDestTotal(dest,u){ var n=dest.troops[u]||0, tid=dest.x+","+dest.y;
+  S.marches.forEach(function(m){ if (m.city===dest.id) n+=m.t[u]||0; else if (m.rot && m.tile===tid && m.phase!=="back") n+=m.t[u]||0; }); return n; }
+function rotCap(){ return armyCap(false,null); }
+function rotSize(r,dest){ var n=Math.min(Math.max(1,r.send||0), rotCap());
+  if (r.stop>0){ var need=r.stop-rotDestTotal(dest,r.u); if (need<=0) return 0; if (need<n){ if (need<Math.max(1,Math.ceil(n/10))) return 0; n=need; } } // top-ups under a tenth of a march wait until they are worth sending
+  return n; }
+function rotWhy(r){ // why this rule isn't sending right now ("" = it will at the next check)
+  var dest=rotDest(r); if (!dest) return "Pick a city to send to";
+  if (!rallyLv()) return "Build a Rally Spot first";
+  if (rotOut(r)) return "A march is on its way to "+dest.name;
+  var n=rotSize(r,dest); if (n<=0) return dest.name+" has enough";
+  var have=S.troops[r.u]||0; if (have-(r.keep||0)<n) return "Waiting for "+fmt((r.keep||0)+n)+" here ("+fmt(have)+" now)";
+  var q=TILE_BY[dest.x+","+dest.y]; if (!q) return "Can’t find that city on the map";
+  var t=rotT(r,n); if (S.res.food<marchFood(t,"reinforce",travelMs(t,q,0,"reinforce"))) return "Waiting for rations";
+  return ""; }
+function rotT(r,n){ var t=[0,0,0,0,0,0,0,0,0,0,0,0]; t[r.u]=n; return t; }
+function processRot(){ if (!rotUnl()) return; var L=C().rot; if (!L || !L.length) return;
+  L.forEach(function(r){ if (!r.on || rotWhy(r)) return; var dest=rotDest(r), n=rotSize(r,dest), q=TILE_BY[dest.x+","+dest.y];
+    var m=launchMarch(q.id,"reinforce",rotT(r,n),0,{}); m.rot=r.id; achStore().tiles-=tdist(q); // not a march you sent yourself: no distance toward achievements
+    r.n=(r.n||0)+n; r.last=S.gt; }); }
+function rotNum(v){ v=Math.floor(+String(v).replace(/[^\d.]/g,"")); return isFinite(v)&&v>0?Math.min(v,1e9):0; }
+function rotBuy(){ if (ROTBUSY) return; if (!cbOn()){ toast("Sign in to your cloud backup first (Settings)"); return; }
+  if (!ROTARM){ ROTARM=true; setTimeout(function(){ if (ROTARM){ ROTARM=false; lastView=""; renderView(true); } },6000); lastView=""; renderView(true); lastSheet=""; renderSheet(); return; }
+  ROTARM=false; ROTBUSY=true; alPost("/cos/buy",{item:ROT_ITEM}).then(function(d){ ROTBUSY=false;
+    if (d && d.ok){ COS=d.state; rotUnl(); save(); toastQ("Troop rotation unlocked"+(d.already?"":"!")); } else toast((d&&d.error)||"Couldn’t buy that");
+    lastView=""; renderView(true); lastSheet=""; renderSheet(); }).catch(function(){ ROTBUSY=false; toast("Can’t reach the server"); lastView=""; renderView(true); }); }
+function rotBuyBtn(){ var pr=rotPrice(), bal=COS&&COS.coins?COS.coins.balance:0, short=!!COS && bal<pr;
+  return '<button class="btn small" data-act="rot-buy"'+(short||ROTBUSY||!cbOn()?' disabled':'')+'>'+(ROTARM?'Tap again: spend '+fmt(pr)+' Cosmo Coins':alArt("cosmo",16)+' Unlock for '+fmt(pr))+'</button>'+
+    '<span class="dur">'+(!cbOn()?'Sign in to your cloud backup (Settings) to buy it.':!COS?'':short?'You have '+fmt(bal)+': '+fmt(pr-bal)+' more needed.':'You have '+fmt(bal)+' Cosmo Coins.')+'</span>'; }
+function rotCosmoCard(){ var own=rotUnl();
+  return '<div class="section ajcard" style="margin-top:10px"><h3>Unlocks</h3><div class="ajrow"><div class="shopic">'+ICON.rally+'</div><div class="ajtxt"><b>Troop rotation</b>'+
+    '<span class="dur">Rules that march troops between your own cities by themselves, even while you are away. Yours for good.</span>'+
+    (own?'<span class="okc">Owned</span>':'')+'</div></div><div class="btnrow">'+(own?'<button class="btn small" data-act="tab" data-tab="rotate">Set up rules</button>':rotBuyBtn())+'</div></div>'; }
+function rotRuleHtml(r){ var dest=rotDest(r), others=S.cities.filter(function(c){ return c.id!==C().id; }), out=rotOut(r), why=r.on?rotWhy(r):"";
+  var st=!r.on?'Off':out?'On the way: '+fmt(sumT(out.t))+' to '+(dest?dest.name:'?'):why?why:'Ready: sends at the next check';
+  return '<div class="rotr'+(r.on?'':' off')+'"><div class="rot1"><select data-rot="u" data-id="'+r.id+'" aria-label="Troop">'+U.map(function(u,i){ return '<option value="'+i+'"'+(i===r.u?' selected':'')+'>'+esc(u.name)+'</option>'; }).join("")+'</select>'+
+    '<span class="dur">to</span><select data-rot="to" data-id="'+r.id+'" aria-label="Send to" translate="no">'+(dest?'':'<option value="0" selected>Pick a city</option>')+others.map(function(c){ return '<option value="'+c.id+'"'+(c.id===r.to?' selected':'')+'>'+esc(c.name)+'</option>'; }).join("")+'</select>'+
+    setSwitch("rot-on", "Rule on", !!r.on).replace('data-act="rot-on"','data-act="rot-on" data-id="'+r.id+'"')+'</div>'+
+    '<div class="rotg"><label><span class="dur">Keep here</span><input type="text" inputmode="numeric" autocomplete="off" data-rot="keep" data-id="'+r.id+'" value="'+(r.keep||0)+'"></label>'+
+    '<label><span class="dur">Per march</span><input type="text" inputmode="numeric" autocomplete="off" data-rot="send" data-id="'+r.id+'" value="'+(r.send||0)+'"></label>'+
+    '<label><span class="dur">Stop at</span><input type="text" inputmode="numeric" autocomplete="off" data-rot="stop" data-id="'+r.id+'" value="'+(r.stop>0?r.stop:'')+'" placeholder="No limit"></label></div>'+
+    '<div class="rots"><span class="'+(r.on&&!why&&!out?'okc':'dur')+'">'+esc(st)+'</span><span class="dur">'+(r.n?fmt(r.n)+' sent so far':'')+'</span><button class="link" data-act="rot-del" data-id="'+r.id+'">Remove</button></div>'+
+    (r.on && (r.send||0)>rotCap()?'<p class="dur" style="margin:4px 0 0">Marches from here carry '+fmt(rotCap())+' at most (the army limit), so that is what each one sends.</p>':'')+'</div>'; }
+function viewRotate(){
+  var h='<div class="section"><div class="shead"><h3>Troop rotation</h3><span class="dur" translate="no">'+esc(S.name)+'</span></div>';
+  if (!rotUnl()) return h+'<p class="hint">Set rules that march troops from one of your cities to another by themselves, even while you are away: keep 50,000 Archers here and send the rest on in marches of 100,000, say. Feeder cities can keep a farming city stocked all night.</p>'+
+    '<p class="hint">Each city has its own page of rules. Rotation marches travel like any reinforcement, but they use their own slots, never the Rally Spot’s. A Cosmo Shop unlock, yours for good.</p><div class="btnrow">'+rotBuyBtn()+'</div></div>';
+  var L=rotRules(), n=S.cities.length;
+  h+='<p class="hint">Rules for '+esc(S.name)+' (switch city at the top for another city’s rules). When this city has more than <b>Keep here</b> plus a full march, it sends one. Each rule has its own slot (one march out at a time), not the Rally Spot\u2019s. Marches carry up to '+fmt(rotCap())+' from here, without a hero, and eat rations.</p>'+
+    '<p class="hint"><b>Stop at</b> counts all the other city has of that troop: home, marching, and on the way. Empty means never stop.</p>';
+  if (n<2) return h+'<p class="why">You need a second city to send troops to.</p></div>';
+  if (!rallyLv()) h+='<p class="why">'+esc(S.name)+' needs a Rally Spot before it can send marches.</p>';
+  h+='</div><div class="section"><div class="shead"><h3>Rules</h3><span class="dur">'+L.length+' / '+ROT_MAX+'</span></div>'+
+    (L.length?L.map(rotRuleHtml).join(""):'<p class="hint">No rules here yet.</p>')+
+    '<div class="btnrow" style="margin-top:8px"><button class="btn small" data-act="rot-add"'+(L.length>=ROT_MAX?' disabled':'')+'>Add a rule</button></div></div>';
+  return h; }
+document.addEventListener("change", function(e){ var t=e.target; if (!t || !t.dataset || !t.dataset.rot) return; var r=rotById(+t.dataset.id); if (!r) return; var k=t.dataset.rot;
+  if (k==="u") r.u=Math.max(0,Math.min(11,+t.value||0)); else if (k==="to") r.to=+t.value||0; else if (k==="send") r.send=Math.max(1,rotNum(t.value)); else r[k]=rotNum(t.value);
+  if (k==="u"||k==="to") r.n=0; save(); if (t.tagName==="SELECT" && t.blur) t.blur();
+  setTimeout(function(){ lastView=""; renderView(true); },0); }); // after the tap that ended the edit has landed: if it went into another box, the page waits (it never redraws under a box being typed in)
+
 function presetSummary(pr){ var parts=[]; pr.t.forEach(function(n,i){ if (n) parts.push(fmt(n)+" "+U[i].name); }); return parts.length?parts.join(", "):"No troops set"; }
 var presetClip=null; // a copied preset: troops, hero choice and the pause-on-loss setting (never the farm list, since an NPC only sits on one list). Kept until you reload, so it can go to another city too.
 /* 0.2.70 (requested: copy one preset to another city): Copy and Paste were there but silent since the toasts went (0.2.54). Now a bar says
@@ -6149,7 +6230,7 @@ function previewMarch(){
 }
 function cityMarches(){ var me=C().id; return S.marches.filter(function(x){ return x.city===me; }); }
 // troops hidden in the woods don't take a Rally Spot slot
-function rallyUsed(){ var me=C().id; return cityMarches().length+(S.alRally||[]).filter(function(m){ return m.city===me && !m.auto; }).length; } // alliance rally marches take a slot while they're out (0.1.142)
+function rallyUsed(){ var me=C().id; return cityMarches().filter(function(m){ return !m.rot; }).length+(S.alRally||[]).filter(function(m){ return m.city===me && !m.auto; }).length; } // alliance rally marches take a slot while they're out (0.1.142)
 function homeTileId(){ return S.map.home[0]+","+S.map.home[1]; }
 function launchMarch(tileId, mission, t, heroId, opt){
   opt=opt||{}; markDirty(); var q=TILE_BY[tileId], tm=opt.tm!=null?opt.tm:travelMs(t,q,heroId,mission), dep=opt.dep!=null?opt.dep:S.gt, food=marchFood(t,mission,tm);
@@ -15792,7 +15873,7 @@ function renderView(force){
   if (v.contains(document.activeElement) && (/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) || document.activeElement.isContentEditable)) return; // 0.2.112 (Cody): only while typing. A tapped hero card (a focusable div) kept focus after its sheet closed and froze the Heroes tab until the next tap elsewhere
   if (tab==="fields") tab="city"; // fields now live under the city, not in the tab bar
   document.body.classList.toggle("bfmode", bfOn()||pvOn());
-  var h = bfOn()?viewBattlefield():pvOn()?viewPvp():tab==="items"?viewItems():tab==="alliance"?viewAlliance():tab==="farms"?viewFarms():tab==="bldg"?viewBuilding():tab==="heroes"?viewHeroes():tab==="army"?viewArmy():tab==="college"?viewCollege():viewCity();
+  var h = bfOn()?viewBattlefield():pvOn()?viewPvp():tab==="items"?viewItems():tab==="alliance"?viewAlliance():tab==="farms"?viewFarms():tab==="rotate"?viewRotate():tab==="bldg"?viewBuilding():tab==="heroes"?viewHeroes():tab==="army"?viewArmy():tab==="college"?viewCollege():viewCity();
   if (h===lastView && !force) return;
   var vsig=tab+"|"+S.cur+"|"+(tab==="bldg"&&pg?pg.w+pg.i:"")+"|"+(tab==="army"?ARMYB:"");
   // 0.2.7: the Army tab redraws every time a batch finishes (every few seconds with auto-train on small batches). Rebuilding the whole page
@@ -15837,7 +15918,7 @@ function cityStep(d){ var n=S.cities.length; if (n<2) return; var i=((S.cur+d)%n
 function hdPopClose(){ var c=document.getElementById("citybar"), m=document.getElementById("morepanel");
   if (c && !c.hidden){ c.hidden=true; var cp=document.getElementById("cpick"); if (cp) cp.setAttribute("aria-expanded","false"); }
   if (m && !m.hidden){ m.hidden=true; ["moretab","morechip"].forEach(function(id){ var b=document.getElementById(id); if (b) b.setAttribute("aria-expanded","false"); }); } }
-var MORE_TABS={farms:"Farms", reports:"Reports", alliance:"Pact", war:"War Room", college:"War College", wheel:"Wheel", ach:"Achievements", lb:"High scores", drops:"Drop tables", quests:"Quests", settings:"Settings", me:"Me"};
+var MORE_TABS={farms:"Farms", rotate:"Rotation", reports:"Reports", alliance:"Pact", war:"War Room", college:"War College", wheel:"Wheel", ach:"Achievements", lb:"High scores", drops:"Drop tables", quests:"Quests", settings:"Settings", me:"Me"};
 function hdTick(){ // 0.2.48: the More dots, the Reports count, and the status row shows only when something on it is
   var rn=repUnread(); setText(document.getElementById("repbadge"), rn?String(rn):"");
   var ab=document.getElementById("abadge"), qb=document.getElementById("qbadge"), any=rn>0 || !!(qb&&qb.textContent) || !!(ab&&ab.textContent);
@@ -16484,6 +16565,10 @@ document.addEventListener("click",function(e){
   if (act==="dpick-show"){ closeSheet(); MPOP.hide=false; selectTile(a.dataset.tile, true); return; }
   if (act==="deco-open"){ cosSync(); openSheet({kind:"deco", tile:a.dataset.tile}); return; }
   if (act==="deco-buy"){ decoBuy(a.dataset.pack); return; }
+  if (act==="rot-buy"){ rotBuy(); return; }
+  if (act==="rot-add"){ var rL=rotRules(); if (rL.length<ROT_MAX && rotUnl()){ var ro=S.cities.filter(function(c){ return c.id!==C().id; })[0]; S.nextRotId=(S.nextRotId||0)+1; rL.push({id:S.nextRotId, u:5, to:ro?ro.id:0, keep:0, send:Math.max(1,Math.min(10000,rotCap()||10000)), stop:0, on:false, n:0}); save(); lastView=""; renderView(true); } return; }
+  if (act==="rot-del"){ var rD=rotRules(), rdi=rD.indexOf(rotById(+a.dataset.id)); if (rdi>=0){ rD.splice(rdi,1); save(); lastView=""; renderView(true); } return; }
+  if (act==="rot-on"){ var rO=rotById(+a.dataset.id); if (rO){ rO.on=!rO.on; save(); lastView=""; renderView(true); } return; }
   if (act==="cosmo-open"){ openSheet({kind:"cosmo"}); cosSync(true); return; } // 0.2.90
   if (act==="aj-open"){ openSheet({kind:"aj"}); cosSync(true); return; } // 0.2.91
   if (act==="aj-buy"){ ajPost("/cos/aj/buy", {}, "Auto-join is active"); return; }
