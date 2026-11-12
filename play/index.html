@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.111";
+window.IBORY_V="0.2.112";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1906,7 +1906,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.111";
+var APP_VERSION = "0.2.112";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -4914,8 +4914,9 @@ function wavesSheet(){ if (!waveDraft.times) waveDraft.times=[]; wvNorm(waveDraf
   order.forEach(function(ci){ var c=S.cities[ci]; withCity(ci, function(){ if (!rallyLv() && ci!==cur) return; // other cities only once they have a Rally Spot
       var sc=ci===fci?1:Math.max(1,dL)/Math.max(1,tdist(q));
       var rows='', n=0; S.mpresets.forEach(function(pr,pi){ if (!presetTotal(pr) && !(d.w[wvKey(c.id,pi)]>0)) return; var ph=presetHero(pr), tm=presetTotal(pr)?travelMs(pr.t,q,ph?ph.id:0)*sc:0, k=wvKey(c.id,pi); n+=d.w[k]||0;
-        rows+='<div class="wvrow"><div class="wvt"><b>'+esc(pr.name)+'</b><span class="dur wvs" title="'+esc(presetSummary(pr))+'">'+(tm?'travel '+fmtT(realMs(tm))+' · ':'')+presetSummary(pr)+'</span></div><input class="wvn" type="number" inputmode="numeric" min="0" max="10" data-wave="'+k+'" value="'+(d.w[k]||"")+'" placeholder="0" aria-label="Waves from '+esc(pr.name)+' in '+esc(c.name)+'"></div>'; });
-      h+='<details class="wvcity"'+(ci===cur||n?' open':'')+'><summary><b translate="no">'+esc(c.name)+'</b><span class="dur">'+(ci===fci?dL.toFixed(1)+' tiles':'joins in '+esc(S.cities[fci].name))+' · marches '+rallyUsed()+' / '+rallyLv()+(n?' · <b>'+n+'</b> chosen':'')+'</span></summary><div class="wvlist">'+(rows||'<p class="dur" style="margin:4px 0">No march presets with troops here. Make one at this city’s Rally Spot.</p>')+'</div></details>'; }); });
+        rows+='<div class="wvrow"><div class="wvt"><b>'+esc(pr.name)+'</b><span class="dur wvs" title="'+esc(presetSummary(pr))+'">'+(tm?'travel '+fmtT(realMs(tm))+' · ':'')+presetSummary(pr)+'</span></div><input class="wvn" type="number" inputmode="numeric" min="0" max="'+Math.max(10,rallyLv())+'" data-wave="'+k+'" value="'+(d.w[k]||"")+'" placeholder="0" aria-label="Waves from '+esc(pr.name)+' in '+esc(c.name)+'"></div>'; });
+      var wvDk="wvc"+c.id, wvOp=DET[wvDk]===undefined?(ci===cur||n):DET[wvDk]; /* 0.2.112 (Cody, kuku): the sheet redraws every second (its clocks), and each redraw put the city blocks back to their default, so a tapped city opened and shut; now it remembers */
+      h+='<details class="wvcity" data-det="'+wvDk+'"'+(wvOp?' open':'')+'><summary><b translate="no">'+esc(c.name)+'</b><span class="dur">'+(ci===fci?dL.toFixed(1)+' tiles':'joins in '+esc(S.cities[fci].name))+' · marches '+rallyUsed()+' / '+rallyLv()+(n?' · <b>'+n+'</b> chosen':'')+'</span></summary><div class="wvlist">'+(rows||'<p class="dur" style="margin:4px 0">No march presets with troops here. Make one at this city’s Rally Spot.</p>')+'</div></details>'; }); });
   if (clk){ var pl0=wavePlan(true);
     h+='<div class="wvctl"><div><label for="wstart">First lands at</label>'+hmsIn('id="wstart"', d.start||wvClock(pl0.earliest))+'</div><div><label for="wevery">Then every (seconds)</label><input type="number" inputmode="numeric" id="wevery" min="0" value="'+(d.every!=null?d.every:1)+'"></div></div>'+
       '<div class="btnrow" style="margin:0"><button class="btn ghost small" data-act="waves-fill">Fill in the times</button><span class="dur">Earliest any wave can land: '+wvClock(pl0.earliest)+'</span></div>';
@@ -15687,7 +15688,7 @@ function renderView(force){
         else if (asl){ amn.scrollLeft=asl[0]; amn.scrollTop=asl[1]; } else alMapCenter(amn); } }
     fillAlChat(); setTabs(); return;
   }
-  if (v.contains(document.activeElement) && document.activeElement.tagName!=="BUTTON") return;
+  if (v.contains(document.activeElement) && (/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) || document.activeElement.isContentEditable)) return; // 0.2.112 (Cody): only while typing. A tapped hero card (a focusable div) kept focus after its sheet closed and froze the Heroes tab until the next tap elsewhere
   if (tab==="fields") tab="city"; // fields now live under the city, not in the tab bar
   document.body.classList.toggle("bfmode", bfOn()||pvOn());
   var h = bfOn()?viewBattlefield():pvOn()?viewPvp():tab==="items"?viewItems():tab==="alliance"?viewAlliance():tab==="farms"?viewFarms():tab==="bldg"?viewBuilding():tab==="heroes"?viewHeroes():tab==="army"?viewArmy():tab==="college"?viewCollege():viewCity();
@@ -15786,7 +15787,7 @@ function lbTE(e){ if (!lbSwipe || !lbHere() || !lbOn()) return; var t=e.changedT
   if (Math.abs(dx)<60 || Math.abs(dx)<Math.abs(dy)*1.5) return; var ks=lbCats().map(function(c){ return c[0]; }), i=ks.indexOf(lbCat); i=(i+(dx<0?1:-1)+ks.length)%ks.length; lbFetch(ks[i]); }
 [sheet, document.getElementById("view")].forEach(function(el){ el.addEventListener("touchstart",lbTS,{passive:true}); el.addEventListener("touchend",lbTE,{passive:true}); });
 sheet.addEventListener("cancel",function(e){ if (sheetFor && sheetFor.kind==="gearpick" && sheetFor.back!=null){ e.preventDefault(); sheetBack(); } });
-sheet.addEventListener("close",function(){ sheetFor=null; });
+sheet.addEventListener("close",function(){ sheetFor=null; if (tab==="heroes"){ lastView=""; renderView(true); } }); // 0.2.112: a rename shows on the hero grid as soon as the sheet closes
 
 function effectLine(type,L,only){
   var d=DEF[type], nx=L+1, top=only||L>=cityMax();
@@ -17456,7 +17457,7 @@ document.addEventListener("input",function(e){ markDirty();
   if (e.target.dataset.unit!=null && e.target.tagName==="INPUT"){ var iu=+e.target.dataset.unit; trainAmt[iu]=Math.max(0,Math.floor(+e.target.value||0)); updateTrainRow(iu); }
   if (e.target.dataset.ptroop!=null){ sheetPreset().t[+e.target.dataset.ptroop]=Math.max(0,Math.floor(+e.target.value||0)); save(); }
   if (e.target.dataset.pfield==="name"){ sheetPreset().name=e.target.value.trim()||((sheetFor.m?"March ":"Preset ")+(sheetFor.p+1)); save(); }
-  if (e.target.dataset.wave!=null){ waveDraft.w=waveDraft.w||{}; waveDraft.w[e.target.dataset.wave]=Math.max(0,Math.min(10,Math.floor(+e.target.value||0))); // patched in place, so typing never closes the keyboard
+  if (e.target.dataset.wave!=null){ waveDraft.w=waveDraft.w||{}; var wvCi=cityIndex(+String(e.target.dataset.wave).split(":")[0]), wvMx=Math.max(10, wvCi<0?0:withCity(wvCi,rallyLv)); waveDraft.w[e.target.dataset.wave]=Math.max(0,Math.min(wvMx,Math.floor(+e.target.value||0))); /* 0.2.112 (Cody, kuku): one preset could only be sent 10 times, so a level 14 historic city fell short of its 14 marches; now up to that city's Rally Spot level */ // patched in place, so typing never closes the keyboard
     if (waveDraft.mode==="clock"){ var wvt=document.getElementById("wvtimes"); if (wvt){ wvt.innerHTML=wavesTimesHtml(wavePlan(true)); lastSheet=wavesSheet(); } }
     else { var wvo=document.getElementById("wvorder"); if (wvo){ wvo.innerHTML=wavesOrderHtml(wavePlan(true)); lastSheet=wavesSheet(); } }
     updateWaveInfo(); }
