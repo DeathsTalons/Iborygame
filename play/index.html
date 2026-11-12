@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.118";
+window.IBORY_V="0.2.119";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1660,6 +1660,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 .wdview.fs .wdkeyb:not(.on),.wdview.fs .wdkey{bottom:calc(10px + env(safe-area-inset-bottom,0px))}
 .fmline{margin:6px 0 0;font-size:.88rem;color:var(--muted)}.fmline b{color:var(--ink)}.fmline b.okc{color:var(--grass)}
 .fmhelp{margin-top:6px}
+.simhero{display:grid;grid-template-columns:1fr;gap:8px}.simhero label{display:flex;flex-direction:column;gap:3px;min-width:0}.simhero select{width:100%;min-width:0}
 .rotr{border:1px solid var(--line);border-radius:12px;background:var(--panel2);padding:10px;margin-top:8px}.rotr.off{opacity:.78}
 .rot1{display:flex;align-items:center;gap:8px}.rot1 select{flex:1;min-width:0}.rot1 .swt{flex:none}
 .rotg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px}.rotg label{display:flex;flex-direction:column;gap:3px;min-width:0}.rotg label .dur{font-size:.74rem;line-height:1.2}.rotg input{width:100%;min-width:0;box-sizing:border-box;padding-inline:8px;font-size:.92rem}
@@ -1913,7 +1914,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.118";
+var APP_VERSION = "0.2.119";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -15424,6 +15425,15 @@ function setPreset(L){ simWaveReset();
   if (L==="custom") return;
   var n=NPC[+L]; sim.def.t=n.t.slice(); sim.def.f=n.f.slice(); sim.def.wall=+L; sim.def.r=npcSimResearch(+L); var nh2=npcHero(+L); sim.def.r.military_tradition=0; sim.def.hatk=Math.round(+L*5*HERO_ATK_DIV/100+nh2[0]); sim.def.hint=nh2[1]; sim.def.eng=+L;
 }
+// 0.2.119 (Cody): your side can be led by one of your own heroes (any city; the enemy stays typed in by hand). Picking one fills Attack, Intelligence and Star set with what that hero
+// brings right now, gear and dragon included (so the Dragon rows are cleared: it's already in the numbers), as attacker or as defender.
+function simHeroSel(side,x){ var isDef=side==="def", all=[]; S.cities.forEach(function(c){ c.heroes.forEach(function(h){ all.push({h:h,c:c}); }); });
+  all.sort(function(p,q){ return hs(q.h,"atk")-hs(p.h,"atk"); }); var cur=x.hid&&heroById(x.hid)?x.hid:0;
+  return '<label><span class="dur">'+(isDef?'Enemy':'Your hero')+'</span><select data-simhero="'+side+'" aria-label="'+(isDef?'Hero leading the defense':'Hero leading your attack')+'" translate="no"><option value="0">'+(cur?'Type the numbers':'Pick a hero\u2026')+'</option>'+
+    all.map(function(e){ return '<option value="'+e.h.id+'"'+(e.h.id===cur?' selected':'')+'>'+esc(e.h.name)+' \u00b7 Atk '+Math.round(hsB(e.h,"atk",isDef))+(S.cities.length>1?' \u00b7 '+esc(e.c.name):'')+'</option>'; }).join("")+'</select></label>'; }
+function simHeroSet(side,id){ var x=sim[side], isDef=side==="def"; if (!id){ delete x.hid; return; } var hi=null, ci=0; S.cities.forEach(function(c,i){ c.heroes.forEach(function(h){ if (h.id===id){ hi=h; ci=i; } }); }); if (!hi) return;
+  withCity(ci, function(){ x.hatk=Math.round(hsB(hi,"atk",isDef)); x.hint=Math.round(hsB(hi,"int",isDef)); x.life=Math.round(setLife(hi,isDef)*1000)/1000; }); x.dg=null; x.hid=id;
+  if (isDef && sim.def.preset!=="custom") sim.def.preset="custom"; }
 function simInput(side,key,idx,val,extra){
   var v='<input type="number" inputmode="decimal" min="0" data-sim="'+side+'" data-key="'+key+'"'+(idx!=null?' data-idx="'+idx+'"':'')+' value="'+(val?val:"")+'" placeholder="0"'+(extra||'')+'>';
   return v;
@@ -15434,7 +15444,7 @@ function simInput(side,key,idx,val,extra){
    Layout only: the fights and the optimizer are the same. */
 var SIMED=false;
 function simSumTxt(x){ var n=SIMK.filter(function(k){ return +x.r[k]>0; }).length, b=[];
-  if (n) b.push(n+' research'); if (+x.hatk) b.push('Atk '+fmt(+x.hatk)); if (+x.hint) b.push('Int '+fmt(+x.hint)); if ((+x.life||1)>1) b.push('star set ×'+(Math.round((+x.life)*100)/100)); if (x.dg&&DRAGONS[x.dg.t]) b.push(DRAGONS[x.dg.t].name+' '+(x.dg.lv||1));
+  var sh=x.hid&&heroById(x.hid); if (n) b.push(n+' research'); if (sh) b.push(esc(sh.name)); if (+x.hatk) b.push('Atk '+fmt(+x.hatk)); if (+x.hint) b.push('Int '+fmt(+x.hint)); if ((+x.life||1)>1) b.push('star set ×'+(Math.round((+x.life)*100)/100)); if (x.dg&&DRAGONS[x.dg.t]) b.push(DRAGONS[x.dg.t].name+' '+(x.dg.lv||1));
   return b.length?b.join(', '):'none'; }
 function simWaveSum(){ var la=0, ld=0, w=0; SIMW.log.forEach(function(x){ la+=x.la; ld+=x.ld; if (x.won) w++; });
   return 'The enemy is what wave '+(SIMW.n-1)+' left. So far you lost '+fmt(la)+' and they lost '+fmt(ld)+'.'; }
@@ -15456,13 +15466,14 @@ function viewWar(){
     h+='<table class="simtab"><colgroup><col><col style="width:30%"><col style="width:30%"></colgroup><thead><tr><th></th><th>You</th><th>Enemy</th></tr></thead><tbody>';
     SIMTECH.forEach(function(t,i){ h+='<tr><td>'+({"Military Tradition":"Mil. Tradition","Horseback Riding":"Horse Riding"}[t[1]]||t[1])+'</td><td>'+simInput("atk","r",SIMK[i],a.r[SIMK[i]])+'</td><td>'+simInput("def","r",SIMK[i],d.r[SIMK[i]])+'</td></tr>'; });
     h+='<tr class="sub"><td colspan="3">Leading hero</td></tr>';
+    h+='<tr><td colspan="3"><div class="simhero">'+simHeroSel("atk",a)+'</div></td></tr>'; // 0.2.119 (Cody): pick one of your heroes instead of typing the numbers
     h+='<tr><td>Attack</td><td>'+simInput("atk","hatk",null,a.hatk)+'</td><td>'+simInput("def","hatk",null,d.hatk)+'</td></tr>';
     h+='<tr><td>Intelligence</td><td>'+simInput("atk","hint",null,a.hint)+'</td><td>'+simInput("def","hint",null,d.hint)+'</td></tr>';
     h+='<tr><td>Star set ×</td><td>'+simInput("atk","life",null,a.life||1)+'</td><td>'+simInput("def","life",null,d.life||1)+'</td></tr>';
     var dgSel=function(side,x,isDef){ var t=x.dg&&x.dg.t||""; return '<select data-simdg="'+side+'" data-f="t" aria-label="'+(isDef?'Enemy':'Your')+' dragon"><option value="">None</option>'+["cinder","ward","aegis"].filter(function(k){ return isDef || !DRAGONS[k].def; }).map(function(k){ return '<option value="'+k+'"'+(t===k?' selected':'')+'>'+DRAGONS[k].name+'</option>'; }).join("")+'</select>'; },
       dgLv=function(side,x,isDef){ var lv=x.dg&&x.dg.lv||1; return '<select data-simdg="'+side+'" data-f="lv" aria-label="'+(isDef?'Enemy':'Your')+' dragon level"'+(x.dg&&x.dg.t?'':' disabled')+'>'+[1,2,3,4,5].map(function(n){ return '<option value="'+n+'"'+(lv===n?' selected':'')+'>Level '+n+'</option>'; }).join("")+'</select>'; };
     h+='<tr class="sub"><td colspan="3">Dragon</td></tr><tr><td>Dragon</td><td>'+dgSel("atk",a,false)+'</td><td>'+dgSel("def",d,true)+'</td></tr><tr><td>Level</td><td>'+dgLv("atk",a,false)+'</td><td>'+dgLv("def",d,true)+'</td></tr></tbody></table>'+
-      '<p class="dur" style="margin:6px 0 0;font-size:.78rem">Cinder adds attack, Ward adds HP, Aegis (defender only) adds attack, Guard and HP. Gale and Brood do not change a fight. If you loaded \u201cMy city defends\u201d, your wall hero\u2019s dragon is already in the numbers.</p>';
+      '<p class="dur" style="margin:6px 0 0;font-size:.78rem">Cinder adds attack, Ward adds HP, Aegis (defender only) adds attack, Guard and HP. Gale and Brood do not change a fight. If you loaded \u201cMy city defends\u201d or picked your hero, that hero\u2019s dragon is already in the numbers.</p>';
   }
   h+='</div>';
   h+='<div class="section"><div class="shead wrhead"><h3>Optimize layers</h3><select id="logoal" aria-label="Optimize for"><option value="n"'+(LOW.goal==="n"?' selected':'')+'>Fewest lost</option><option value="p"'+(LOW.goal==="p"?' selected':'')+'>Least prestige lost</option></select></div>'+
@@ -17704,11 +17715,13 @@ document.addEventListener("input",function(e){ markDirty();
   if (e.target.dataset.sim){
     var sd=sim[e.target.dataset.sim], key=e.target.dataset.key, ix=e.target.dataset.idx, val=+e.target.value||0;
     if (key==="t"||key==="f") sd[key][+ix]=val; else if (key==="r") sd.r[ix]=val; else sd[key]=val;
+    if ((key==="hatk"||key==="hint"||key==="life") && sd.hid){ delete sd.hid; var hsel=document.querySelector('[data-simhero="'+e.target.dataset.sim+'"]'); if (hsel) hsel.value="0"; } // typed over: no longer that hero
     if (e.target.dataset.sim==="def" && sim.def.preset!=="custom"){ sim.def.preset="custom"; var sel=document.getElementById("npcsel"); if (sel) sel.value="custom"; }
   }
 });
 document.addEventListener("keydown",function(e){ if (e.key==="Enter" && e.target && e.target.id==="gifq"){ e.preventDefault(); GIFS.q=e.target.value.trim(); e.target.blur(); gifLoad(false); return; } if (e.key==="Enter" && e.target && e.target.id==="rxin"){ e.preventDefault(); var rb=document.querySelector('.rxbar [data-act="rx-any"]'); if (rb) rb.click(); return; } if (e.key==="Enter" && e.target && e.target.id==="alchatin"){ e.preventDefault(); alSend(); } if (e.key==="Enter" && e.target && e.target.id==="dockin"){ e.preventDefault(); dockSend(); } if (e.key==="Enter" && e.target && e.target.id==="dmto"){ e.preventDefault(); var dmb=document.querySelector('[data-act="dm-new"]'); if (dmb) dmb.click(); } });
 document.addEventListener("change",function(e){ markDirty();
+  if (e.target && e.target.dataset && e.target.dataset.simhero && sim){ simHeroSet(e.target.dataset.simhero, +e.target.value||0); e.target.blur(); simOut=null; lastView=""; renderView(true); return; }
   if (e.target && e.target.dataset && e.target.dataset.simdg && sim){ var sx=sim[e.target.dataset.simdg]; sx.dg=sx.dg||{t:"",lv:1}; if (e.target.dataset.f==="t") sx.dg.t=e.target.value; else sx.dg.lv=+e.target.value||1; if (!sx.dg.t) sx.dg=null;
     if (e.target.dataset.simdg==="def" && sim.def.preset!=="custom") sim.def.preset="custom"; lastView=""; renderView(true); return; }
   if (e.target.id==="bqunit"){ BQD.u=+e.target.value; e.target.blur(); lastView=""; renderView(true); return; }
