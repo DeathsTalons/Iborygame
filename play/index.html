@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.117";
+window.IBORY_V="0.2.118";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1913,7 +1913,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.117";
+var APP_VERSION = "0.2.118";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -7844,7 +7844,7 @@ function alArenaHtml(al){ var E=al.econ, A=arCat(), my=al.my, now=Date.now(); if
   h+='<div class="section"><div class="shead"><h3>Monster Arena</h3><span class="dur">'+(lv?'Level '+lv+' · '+nLive+' / '+mon.slots+' up':'')+'</span></div>';
   if (!lv) return h+'<div class="act"><span class="dur">Not built yet.</span><button class="btn small" data-act="al-bk" data-v="arena" data-from="home">Build it</button></div></div>';
   h+='<p class="hint" style="margin:0">Summon a monster and the alliance has '+Math.round(A.window/60000)+' minutes to march here; then everyone fights it at once. Nobody dies: losses come home wounded.'+alMore("ar")+'</p>'+
-    (alMoreOn("ar")?'<p class="hint" style="margin:6px 0 0">Everyone marches from their kingdom square. If it falls, everyone who joined gets the same reward. Arena marches need a hero but don’t use your Rally Spot: you have <b>'+arSlots()+'</b> Arena slots (Arena Marshals adds more). '+(mon.free?'Free summons left today: <b>'+mon.free+'</b>. ':'The free summons are used up. ')+'They come back in '+fmtT(Math.max(0,mon.resetAt-now))+' (the daily reset, midnight Eastern; Monster Lore adds more). After that, each summon costs its resource from the bank: 10 million at level 1, ten times more each level. A monster’s level can’t pass the Arena’s, and each level needs a kill of the one before. The Arena holds one monster per Arena slot at a time.</p>':'')+'</div>';
+    (alMoreOn("ar")?'<p class="hint" style="margin:6px 0 0">Everyone marches from their kingdom square. If it falls, everyone who joined gets the same reward. Arena marches need a hero but don’t use your Rally Spot: you have <b>'+arSlots()+'</b> Arena slots (Arena Marshals adds more). '+(mon.free?'Free summons left today: <b>'+mon.free+'</b>. ':'The free summons are used up. ')+'They come back in '+fmtT(Math.max(0,mon.resetAt-now))+' (the daily reset, midnight Eastern; Monster Lore adds more). You can also pay from the bank while free ones are left, to save them for when more of the alliance is online. After that, each summon costs its resource from the bank: 10 million at level 1, ten times more each level. A monster’s level can’t pass the Arena’s, and each level needs a kill of the one before. The Arena holds one monster per Arena slot at a time.</p>':'')+'</div>';
   var fights=arLive(); if (fights.length) h+='<div class="rcards">'+fights.map(function(c){ return arCardHtml(c, now); }).join("")+'</div>';
   if (!A.types.some(function(t){ return t.k===ARS; })) ARS=A.types[0].k;
   var T=A.types.filter(function(t){ return t.k===ARS; })[0], best=mon.best[T.k]||0, top=Math.min(lv, best+1), pick=Math.max(1,Math.min(top, ARL[T.k]||top)), L=T.lv[pick-1]||{}, full=nLive>=mon.slots;
@@ -7852,9 +7852,12 @@ function alArenaHtml(al){ var E=al.econ, A=arCat(), my=al.my, now=Date.now(); if
   h+='<div class="armons">'+A.types.map(function(t){ var b=mon.best[t.k]||0; return '<button class="armon'+(t.k===T.k?' on':'')+'" data-act="al-armon" data-k="'+t.k+'" aria-pressed="'+(t.k===T.k)+'">'+(AR_ART[t.k]?'<img src="'+AR_ART[t.k]+'" alt="">':ICON.crest)+'<b>'+esc(t.n)+'</b><span>'+(b?'killed '+b:'new')+'</span></button>'; }).join("")+'</div>';
   if (!my.can.monster) h+='<p class="why" style="margin:6px 0 0">Your rank can’t summon monsters.</p>';
   else h+='<div class="arstep"><button class="btn ghost small" data-act="al-arlv" data-k="'+T.k+'" data-d="-1"'+(pick<=1?' disabled':'')+' aria-label="Lower level">−</button><b>Level '+pick+'</b><button class="btn ghost small" data-act="al-arlv" data-k="'+T.k+'" data-d="1"'+(pick>=top?' disabled':'')+' aria-label="Higher level">+</button>'+
-      '<span class="dur">'+(mon.free?'free today':fmt(L.cost||0)+' '+RNAME[T.res].toLowerCase()+' from the bank')+'</span></div>'+
+      '<span class="dur">'+(mon.free?'free, or '+fmt(L.cost||0)+' '+RNAME[T.res].toLowerCase()+' from the bank':fmt(L.cost||0)+' '+RNAME[T.res].toLowerCase()+' from the bank')+'</span></div>'+
     '<p class="dur" style="margin:4px 0 0">'+(L.reward?'Reward: '+esc(L.reward)+'.':'')+(pick>=top&&top<lv?' Kill level '+top+' to unlock the next.':'')+'</p>'+
-    '<div class="act"><span class="why">'+(full?'The Arena is full.':'')+'</span><button class="btn" data-act="al-summon" data-type="'+T.k+'"'+(full?' disabled':'')+'>Summon level '+pick+' '+esc(T.n)+'</button></div>';
+    '<div class="act"><span class="why">'+(full?'The Arena is full.':'')+'</span>'+
+      (mon.free?'<button class="btn ghost" data-act="al-summon" data-pay="1" data-type="'+T.k+'"'+(full?' disabled':'')+' title="Pay from the bank and save the free summons for later">Pay '+fmt(L.cost||0)+'</button>':'')+ // 0.2.118 (Cody): paid summons without spending the free ones
+      '<button class="btn" data-act="al-summon" data-type="'+T.k+'"'+(full?' disabled':'')+'>'+(mon.free?'Summon free':'Summon level '+pick+' '+esc(T.n))+'</button></div>'+
+    (mon.free?'<p class="dur" style="margin:4px 0 0;text-align:end">Pay from the bank to save the free summons for when more of the alliance is online.</p>':'');
   if (my.can.bank){ if (!ARG){ ARG={}; RES.forEach(function(k){ ARG[k]=String(Math.floor((E.guard&&E.guard[k])||0)); }); }
     h+='<details class="det" data-det="arguard"'+(DET.arguard?' open':'')+'><summary><b>Keep back from paid summons</b></summary><p class="hint" style="margin:4px 0">Paid summons can’t take the bank below these. Free summons and research aren’t affected.</p>'+
       '<div class="albank">'+RES.map(function(k){ return '<div class="albt"><span class="albi" title="'+RNAME[k]+'">'+ICON[k]+'</span><span class="albv"><b>'+fmt(Math.floor(E.bank[k]||0))+'</b><span class="dur">in the bank</span></span><input type="number" min="0" inputmode="numeric" data-arguard="'+k+'" value="'+esc(ARG[k])+'" aria-label="'+RNAME[k]+' to keep back"></div>'; }).join("")+'</div>'+
@@ -16928,7 +16931,7 @@ document.addEventListener("click",function(e){
     if (act==="al-arena-go" && soloArOn()){ closeSheet(); tab="alliance"; KGV="arena"; lastView=""; refresh(); window.scrollTo({top:0}); return; }
     if (act==="al-arena-go"){ closeSheet(); tab="guild"; ALS.sub="rally"; lastView=""; refresh(); window.scrollTo({top:0}); ALS.last=0; alSync(); return; } // 0.2.4: monster fights are joined from Rallies (the Arena page only summons)
     if (act==="al-arena-send"){ var smid=+a.dataset.mid; if (!arById(smid)){ toast("The window has closed"); return; } openMarch(homeTileId(),"arena",smid); return; }
-    if (act==="al-summon"){ var smt=a.dataset.type, sml=Math.max(1, +(ARL[smt]||0) || Math.min((alMine().econ.lv.arena||1), ((arMon().best[smt]||0)+1))); alDo("/al/summon",{type:smt, lv:sml},"Summoned! 5 minutes to march"); return; }
+    if (act==="al-summon"){ var smt=a.dataset.type, sml=Math.max(1, +(ARL[smt]||0) || Math.min((alMine().econ.lv.arena||1), ((arMon().best[smt]||0)+1))); var smp=a.dataset.pay==="1"; alDo("/al/summon",{type:smt, lv:sml, pay:smp},smp?"Summoned from the bank! 5 minutes to march":"Summoned! 5 minutes to march"); return; }
     if (act==="al-guard"){ var gd={}; RES.forEach(function(k){ gd[k]=Math.max(0,Math.floor(+(ARG&&ARG[k])||0)); }); alDo("/al/guard",{res:gd},"Saved",function(){ ARG=null; }); return; }
     if (act==="al-send"){ alSend(); return; }
     if (act==="al-mem-sel"){ MEM_SEL=a.dataset.k; lastView=""; renderView(true); return; } // 0.2.88
