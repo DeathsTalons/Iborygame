@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.115";
+window.IBORY_V="0.2.116";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1913,7 +1913,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.115";
+var APP_VERSION = "0.2.116";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -4744,12 +4744,15 @@ function rotWhy(r){ // why this rule isn't sending right now ("" = it will at th
   var n=rotSize(r,dest); if (n<=0) return dest.name+" has enough";
   var have=S.troops[r.u]||0; if (have-(r.keep||0)<n) return "Waiting for "+fmt((r.keep||0)+n)+" here ("+fmt(have)+" now)";
   var q=TILE_BY[dest.x+","+dest.y]; if (!q) return "Can’t find that city on the map";
-  var t=rotT(r,n); if (S.res.food<marchFood(t,"reinforce",travelMs(t,q,0,"reinforce"))) return "Waiting for rations";
+  var t=rotT(r,n); if (S.res.food<marchFood(t,"reinforce",rotTravel(t,q))) return "Waiting for rations";
   return ""; }
+// 0.2.115 (Cody): rotation marches travel at the speed of your best Intelligence hero from any city (the hero stays where they are: only the speed counts)
+function rotHero(){ var best=null, bi=-1; S.cities.forEach(function(c){ c.heroes.forEach(function(h){ var v=hs(h,"int"); if (v>bi){ bi=v; best=h; } }); }); return best; }
+function rotTravel(t,q){ var h=rotHero(); return travelMs(t,q,h?h.id:0,"reinforce"); }
 function rotT(r,n){ var t=[0,0,0,0,0,0,0,0,0,0,0,0]; t[r.u]=n; return t; }
 function processRot(){ if (!rotUnl()) return; var L=C().rot; if (!L || !L.length) return;
   L.forEach(function(r){ if (!r.on || rotWhy(r)) return; var dest=rotDest(r), n=rotSize(r,dest), q=TILE_BY[dest.x+","+dest.y];
-    var m=launchMarch(q.id,"reinforce",rotT(r,n),0,{}); m.rot=r.id; achStore().tiles-=tdist(q); // not a march you sent yourself: no distance toward achievements
+    var rt=rotT(r,n), m=launchMarch(q.id,"reinforce",rt,0,{tm:rotTravel(rt,q)}); m.rot=r.id; achStore().tiles-=tdist(q); // not a march you sent yourself: no distance toward achievements
     r.n=(r.n||0)+n; r.last=S.gt; }); }
 function rotNum(v){ v=Math.floor(+String(v).replace(/[^\d.]/g,"")); return isFinite(v)&&v>0?Math.min(v,1e9):0; }
 function rotBuy(){ if (ROTBUSY) return; if (!cbOn()){ toast("Sign in to your cloud backup first (Settings)"); return; }
@@ -4779,7 +4782,7 @@ function viewRotate(){
   if (!rotUnl()) return h+'<p class="hint">Set rules that march troops from one of your cities to another by themselves, even while you are away: keep 50,000 Archers here and send the rest on in marches of 100,000, say. Feeder cities can keep a farming city stocked all night.</p>'+
     '<p class="hint">Each city has its own page of rules. Rotation marches travel like any reinforcement, but they use their own slots, never the Rally Spot’s. A Cosmo Shop unlock, yours for good.</p><div class="btnrow">'+rotBuyBtn()+'</div></div>';
   var L=rotRules(), n=S.cities.length;
-  h+='<p class="hint">Rules for '+esc(S.name)+' (switch city at the top for another city’s rules). When this city has more than <b>Keep here</b> plus a full march, it sends one. Each rule has its own slot (one march out at a time), not the Rally Spot\u2019s. Marches carry up to '+fmt(rotCap())+' from here, without a hero, and eat rations.</p>'+
+  h+='<p class="hint">Rules for '+esc(S.name)+' (switch city at the top for another city’s rules). When this city has more than <b>Keep here</b> plus a full march, it sends one. Each rule has its own slot (one march out at a time), not the Rally Spot\u2019s. Marches carry up to '+fmt(rotCap())+' from here and eat rations. They travel at the speed of your best Intelligence hero ('+(rotHero()?'<span translate="no">'+esc(rotHero().name)+'</span>, Int '+hs(rotHero(),"int"):'you have no hero yet')+'), who stays where they are.</p>'+
     '<p class="hint"><b>Stop at</b> counts all the other city has of that troop: home, marching, and on the way. Empty means never stop.</p>';
   if (n<2) return h+'<p class="why">You need a second city to send troops to.</p></div>';
   if (!rallyLv()) h+='<p class="why">'+esc(S.name)+' needs a Rally Spot before it can send marches.</p>';
