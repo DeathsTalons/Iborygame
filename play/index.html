@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.113";
+window.IBORY_V="0.2.114";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1908,7 +1908,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.113";
+var APP_VERSION = "0.2.114";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -4468,7 +4468,7 @@ var DROP_RULES=[
     {k:"s60", ok:function(){ return true; }, t:function(q,L,b){ return 0.005*b.items; }},
     {k:"s15", ok:function(){ return true; }, t:function(q,L,b){ return 0.009*b.items; }}]},
   {k:"build50", ok:function(q,L){ return q.k==="npc" && L>=10; }, p:function(q,L,b){ return 0.001*b.items; }},
-  {k:"teleport", ok:function(q){ return q.k==="npc"||q.k==="ai"; }, p:function(q,L,b){ return 0.015*b.items; }}
+  {k:"teleport", ok:function(q){ return q.k==="npc"||q.k==="ai"; }, p:function(q,L,b){ return (q.k==="npc"?0.005:0.015)*b.items; }} // 0.2.114 (Cody): 0.5% from NPC cities (was 1.5%); defending allies gives them now
 ];
 // quantities
 function qtySum(n){ var t=0; for (var k in n.w) t+=n.w[k]; return t; }
@@ -11988,8 +11988,9 @@ function spawnBully(){
 // a bully's camp is a real fortified city: big defensive garrison, full fortifications, high walls and a strong hero
 var CAMP_MIX=[0,.27,.03,.15,.1,.25,0,.1,0,.05,0,.05];
 function buildCamp(B, b, allyTroops){
-  var mine=0; S.cities.forEach(function(c){ mine+=sumT(c.troops); });
-  var grow=1+0.15*b.wins, smart=0.7+b.iq/200, size=Math.round(Math.max(150000, (allyTroops||0)*3, mine*0.5)*grow*smart*bullySizeMul(b));
+  // 0.2.114 (Cody): sized off what you can send, not what you own. It was the biggest of 150,000, three times the ally's army and half of all
+  // your troops (x up to 1.5), against marches capped at 10,000 x Rally Spot level: nobody could take one. Now 3 (dull) to 5 (sharp) full marches.
+  var grow=1+0.15*b.wins, smart=0.7+b.iq/200, size=campSize(b);
   B.garrison=bullyMix(b,"def").map(function(w){ return Math.round(size*w); });
   B.forts=[16000,8000,5500,3300,2000].map(function(n){ return Math.round(n*grow*smart); });
   B.wall=Math.min(10, 8+(b.iq>110?1:0)+(b.iq>140?1:0));
@@ -11997,6 +11998,15 @@ function buildCamp(B, b, allyTroops){
   B.campStart=sumT(B.garrison)+B.forts.reduce(function(a,c){ return a+c; },0);
   B.treasury=Math.round((200000+size*8)*grow);
 }
+function campMarch(){ var best=1; S.cities.forEach(function(c,ci){ best=Math.max(best, withCity(ci, rallyLv)); }); return 10000*best; } // your biggest plain march: no ensign, dragon or alliance bonus
+function campSize(b){ return Math.round(campMarch()*(3+2*Math.max(0,Math.min(1,(b.iq-60)/100)))*(1+0.15*b.wins)*bullySizeMul(b)); }
+// strongholds and war camps raised before 0.2.114 shrink to the new size once (what was already killed stays killed)
+function campRefit(){ var A=S.alliance; if (!A || A.fit114) return; A.fit114=1;
+  var cut=function(X, b, mul){ if (!X || !X.garrison || !b) return 0; var cur=sumT(X.garrison), want=Math.round(campSize(b)*mul); if (cur<=want) return 0; var before=X.garrison.slice();
+    X.garrison=X.garrison.map(function(n){ return Math.round(n*want/cur); }); var gone=cur-sumT(X.garrison); X.campStart=Math.max(1,(X.campStart||cur)-gone); if (X.gar0) X.gar0=X.gar0.map(function(n,i){ return Math.max(X.garrison[i], Math.round(n*want/cur)); });
+    return ptsOf(before.map(function(n,i){ return n-X.garrison[i]; })); };
+  if (A.bully) cut(A.bully, bullyOf(), 1);
+  if (A.war && A.war.active) A.war.enemies.forEach(function(E){ if (E.out) return; var d=cut(E, rosterById(E.rid), WAR_SOFT); if (d) A.war.total0=Math.max(1, A.war.total0-d); }); }
 function bullyOf(){ var A=AL(); if (!A||!A.bully) return null; for (var i=0;i<A.roster.length;i++) if (A.roster[i].id===A.bully.rid) return A.roster[i]; return null; }
 function planWave(){
   var A=AL(), B=A.bully, b=bullyOf(); if (!B||!b) return;
@@ -12038,27 +12048,30 @@ function bullyWave(){
   var share=sumT(mine)/Math.max(1,sumT(dt)), gain=0;
   if (sumT(mine)>0 && held) qbump("allyDef");
   if (sumT(mine)>0){ gain=(150+650*Math.min(1,share*2)+(held?400:0))*(0.6+b.iq/200); addRep(gain, (held?"helped "+q.ai.name+" hold against ":"stood with "+q.ai.name+" against ")+b.name); }
+  var dsp=(sumT(mine)>0 && held)?giveSpoils(defSpoils(Math.min(1,share*2))):[], hadGuards=sumT(mine)>0;
   addReport({id:S.nextMarchId++, at:S.gt, def:true, ally:true, name:b.name+" vs "+q.ai.name+(sumT(mine)?" (your guards)":""), result:held?2:1, rounds:r.rounds, kb:r.kb,
-    sent:mine, left:mine.map(function(n,k){ return dt[k]?Math.round(n*r.defender[k]/dt[k]):0; }), had:w.t.slice(), eleft:r.attacker.slice(), forts:[0,0,0,0,0], fleft:[0,0,0,0,0], loot:{food:0,lumber:0,stone:0,iron:0,gold:0}, lost:myLost, medal:-1, drops:[]});
-  note("alliance",q.ai.name+(held?" held off ":" was overrun by ")+b.name+(gain?". +"+fmt(Math.round(gain))+" pact reputation":"")+(myLost?". You lost "+fmt(myLost)+" troops":""));
+    sent:mine, left:mine.map(function(n,k){ return dt[k]?Math.round(n*r.defender[k]/dt[k]):0; }), had:w.t.slice(), eleft:r.attacker.slice(), forts:[0,0,0,0,0], fleft:[0,0,0,0,0], loot:{food:0,lumber:0,stone:0,iron:0,gold:0}, lost:myLost, medal:-1, drops:dsp});
+  note("alliance",q.ai.name+(held?" held off ":" was overrun by ")+b.name+(gain?". +"+fmt(Math.round(gain))+" pact reputation":"")+(dsp.length?". Spoils: "+dsp.join(", "):"")+(myLost?". You lost "+fmt(myLost)+" troops":""));
   if (held && !sumT(r.attacker)) b.losses++; else if (!held) b.wins++;
-  if (sumT(B.army)<200){ b.losses++; addRep(300*(0.6+b.iq/200), "drove off "+b.name); endBully("was broken and fled"); return; }
+  if (sumT(B.army)<200){ b.losses++; addRep(300*(0.6+b.iq/200), "drove off "+b.name);
+    if (hadGuards){ var drv=giveSpoils(driveSpoils()); note("alliance","Your guards broke "+b.name+"\u2019s army for good. Spoils: "+drv.join(", ")+"."); }
+    endBully("was broken and fled"); return; }
   planWave();
 }
 /* ---------- alliance war ---------- */
 // Declared from the Kingdom tab at 50% reputation, once every two weeks. Three to five rivals pitch war camps
 // in North March for seven days and raid you and your allies. Points are prestige: every enemy troop you kill
 // earns, every one of yours lost costs. Rep only ever rises. Win (earned > lost) for a Banishment Order.
-var WAR_DAYS=7, WAR_COOLDOWN_DAYS=14, WAR_REP_FULL=15000, WAR_ALLY_MUL=1.5, WAR_PTS=100, WAR_SOFT=0.6;
+var WAR_DAYS=7, WAR_COOLDOWN_DAYS=14, WAR_REP_FULL=15000 /* 0.2.114 (Cody): every rung of spoils tripled; the reputation stays at 15,000 */, WAR_ALLY_MUL=1.5, WAR_PTS=100, WAR_SOFT=0.6;
 // Kills behind your own walls are the cheapest in the game, so they count for less than kills you go out and get.
 var WAR_HOME_MUL=0.5, WAR_SHUT_MUL=0.2;
 var WAR_LADDER=[
-  {p:5,  r:{s15:4, s60:1, gemD:10, ingot:1}},
-  {p:10, r:{s60:2, marchsp:1, gemD:15, gemF:2, ingot:2}},
-  {p:20, r:{s150:1, marchsp:2, gemF:5, ingot:3}},
-  {p:35, r:{s150:2, s480:1, marchsp:2, gemF:8, ingot:4, mithril:1}},
-  {p:50, r:{s480:2, marchsp:3, gemF:12, ingot:5, mithril:2}},
-  {p:75, r:{s480:3, marchsp:4, gemF:20, ingot:6, mithril:3, starmetal:1}}
+  {p:5,  r:{s15:12, s60:3, gemD:30, ingot:3}},
+  {p:10, r:{s60:6, marchsp:3, gemD:45, gemF:6, ingot:6}},
+  {p:20, r:{s150:3, marchsp:6, gemF:15, ingot:9}},
+  {p:35, r:{s150:6, s480:3, marchsp:6, gemF:24, ingot:12, mithril:3}},
+  {p:50, r:{s480:6, marchsp:9, gemF:36, ingot:15, mithril:6}},
+  {p:75, r:{s480:9, marchsp:12, gemF:60, ingot:18, mithril:9, starmetal:3}}
 ];
 function W(){ return S.alliance && S.alliance.war; }
 function warOn(){ var w=W(); return !!(w && w.active); }
@@ -13798,7 +13811,7 @@ function pvDone(){
   return h+pvReports()+pvLog(25);
 }
 function nextAllianceEvent(){
-  var A=S.alliance; if (!A) return null; var best=null;
+  var A=S.alliance; if (!A) return null; var best=null; if (!A.fit114) try { campRefit(); } catch(e){ A.fit114=1; }
   function take(t,o){ if (!best || t<best.t){ o.t=t; best=o; } }
   if (A.bully){ if (A.bully.next && A.bully.next.arr<=A.bully.until) take(A.bully.next.arr,{w:"wave"}); else take(A.bully.until,{w:"end"}); }
   if (A.war && A.war.active){ var w=A.war;
@@ -13823,6 +13836,12 @@ function bullyBase(){
     res:{food:tr,lumber:tr,stone:tr,iron:tr,gold:tr}, am:1+0.05*B.tech+B.hero[0]/HERO_ATK_DIV, hint:B.hero[1], fb:1+0.1*B.tech};
 }
 // you attacked the bully's camp
+/* 0.2.114 (Cody): spoils for defending an ally, not only reputation. A wave your guards helped hold pays a pack that grows with your share of
+   the defence (s: 0 to 1, full at half the defenders being yours); breaking the bully's army for good pays one book or material and a City Teleport. */
+var DEF_TELE=0.2, DEF_MSP=0.3;
+function defSpoils(s){ var r={s15:2+Math.round(2*s), gemD:5+Math.round(10*s)}; if (s>=0.5) r.s60=1; if (Math.round(2*s)) r.gemF=Math.round(2*s); if (Math.random()<DEF_MSP) r.marchsp=1; if (Math.random()<DEF_TELE) r.teleport=1; return r; }
+function driveSpoils(){ var g=Math.random()<0.5?"books":"mats", r={teleport:1}; r[pickW(BULLY_LOOT[g])]=1; return r; }
+function giveSpoils(r){ var names=[]; for (var k in r){ S.items[k]=(S.items[k]||0)+r[k]; names.push((r[k]>1?r[k]+" \u00d7 ":"")+ITEMS[k].name); } return names; }
 var BULLY_LOOT={books:{tome:0.5, codex:0.35, annals:0.15}, mats:{mithril:0.75, starmetal:0.25}}; // taking a stronghold: one of each group, by weight
 function bullyCampBattle(m){
   var A=AL(), B=A.bully, b=bullyOf(), q=TILE_BY[m.tile], hero=m.hero?heroById(m.hero):null;
@@ -13868,7 +13887,7 @@ var KGV=""; // the page open, "" for the hub
 var KG_MORE={}, KG_REN=false, KG_REPQ=false; // 0.2.50: rules opened with More (and ally cards opened with ⋯), the name being edited, the reputation ?
 var PK_IMG={allies:"art/items/pk_allies.png", bully:"art/items/pk_bully.png", war:"art/items/warhorn.png", bf:"art/items/pk_keep.png", chal:"art/items/g_gauntlets.png",
   keep:"art/items/pk_keep.png", banner:"art/items/pk_banner.png", infirm:"art/items/pk_infirm.png"};
-function pkImg(k, px){ if (k==="arena") return alBkImg("arena", px); var u=PK_IMG[k]; return u ? '<img class="iic" src="'+u+'" width="'+px+'" height="'+px+'" alt="">' : ''; }
+function pkImg(k, px){ if (k==="arena") return alBkImg("arena", px); if (k==="shop") return '<img class="iic" src="'+ITEM_IMG.dstone+'" width="'+px+'" height="'+px+'" alt="">'; var u=PK_IMG[k]; return u ? '<img class="iic" src="'+u+'" width="'+px+'" height="'+px+'" alt="">' : ''; }
 // two lines of rules with More, or the full rules with Less
 function pkRules(k, short, full){ var on=!!KG_MORE[k]; return '<p class="hint pkrules">'+(on?full:short)+' <button class="link" data-act="kg-more" data-k="'+k+'" aria-expanded="'+on+'">'+(on?'Less':'More')+'</button></p>'; }
 // title and status line of a section built for the old long page, so its tile can show the same state
@@ -13885,7 +13904,7 @@ function kgTop(){
     '<div class="kgtoday"><span class="dur">Today</span>'+
     '<span class="kgt'+(d.res?' done':'')+'">'+(d.res?'✓ ':'')+'Send 10k+ resources to an ally <b>'+(d.res?'done':'+50')+'</b></span>'+
     '<span class="kgt'+(d.guard?' done':'')+'">'+(d.guard?'✓ ':'')+'Station troops with an ally <b>'+(d.guard?'done':'+60')+'</b></span>'+
-    '<span class="kgt">Defend an ally from a bully <b>+150 to +1,200 a wave</b></span></div></div>';
+    '<span class="kgt">Defend an ally from a bully <b>+150 to +1,200 a wave, and spoils</b></span></div></div>';
   return h; }
 // 0.2.50: the nearest AI lord who isn't an ally yet, for the Allies page's empty state (rings out from your city)
 function pkNearLord(){ var h=TILE_BY[homeTileId()]; if (!h) return null;
@@ -13927,6 +13946,46 @@ function kgBully(){ var A=AL(), b=bullyOf(), B=A.bully, h='';
 function kgLog(){ var A=AL(), h='';
   if (!A.log.length) return '<div class="section"><h3>Pact log</h3><p class="hint">Nothing has happened in the pact yet.</p></div>';
   return '<div class="section"><h3>Pact log</h3>'+A.log.slice(0,40).map(function(l){ return '<p class="hint">'+gameClock(l.at)+': '+esc(l.t)+'</p>'; }).join("")+'</div>'; }
+/* 0.2.114 (Cody): the Reputation shop, on the Pact tab. The War Marks shop's goods (not the Courier Writ or Cosmo Coins, which live on the server)
+   for reputation, at five times the marks price, so a dragon comes slower this way. It runs on the device: single players can use it, and
+   multiplayer players have both shops. Spending never lowers your reputation: what you can spend is reputation minus A.repSpent, as with marks. */
+var REP_X=5, REP_SHOP=[
+  {k:"dragon_gale", name:"Gale Dragon", desc:"A wind dragon: its hero’s marches fly faster. Needs the Overlook to house it.", cost:20000, grant:{dragon:"gale"}, once:1, grp:"Dragons"},
+  {k:"dragon_cinder", name:"Cinder Dragon", desc:"A fire dragon: its hero’s troops hit harder.", cost:20000, grant:{dragon:"cinder"}, once:1, grp:"Dragons"},
+  {k:"dragon_ward", name:"Ward Dragon", desc:"A stone dragon: its hero’s troops take less damage.", cost:20000, grant:{dragon:"ward"}, once:1, grp:"Dragons"},
+  {k:"dragon_brood", name:"Brood Dragon", desc:"A war-mother: its hero can lead bigger marches.", cost:20000, grant:{dragon:"brood"}, once:1, grp:"Dragons"},
+  {k:"dragon_aegis", name:"Aegis Dragon", desc:"A guardian: big bonuses, but only while its hero is defending or reinforcing.", cost:20000, grant:{dragon:"aegis"}, once:1, grp:"Dragons"},
+  {k:"dstone", name:"Dragon Stone", desc:"Levels a dragon up. Level 2 takes 1 stone, then 3, 7 and 12 more (level 5 is the top).", cost:20000, grant:{item:"dstone", qty:1}, grp:"Dragons"},
+  {k:"marchsp", name:"March Speed-up", desc:"Brings one march home or to its target faster.", cost:500, grant:{item:"marchsp", qty:1}, grp:"Marches"},
+  {k:"msize50", name:"March Size +50%", desc:"One march can carry 50% more troops. Use it when you send the march.", cost:3000, grant:{item:"msize50", qty:1}, lim:{n:2, days:7}, grp:"Marches"},
+  {k:"msize100", name:"March Size +100%", desc:"One march can carry twice the troops. Use it when you send the march.", cost:6000, grant:{item:"msize100", qty:1}, lim:{n:1, days:7}, grp:"Marches"},
+  {k:"warhorn2", name:"Great War Horn", desc:"Every troop you command attacks 40% harder for 24 hours.", cost:2500, grant:{item:"warhorn2", qty:1}, grp:"Marches"},
+  {k:"corselet2", name:"Great Corselet", desc:"Every troop you command defends 40% better for 24 hours.", cost:2500, grant:{item:"corselet2", qty:1}, grp:"Marches"},
+  {k:"respec", name:"Tome of Unlearning", desc:"Gives back every constellation point one hero has spent.", cost:25000, grant:{item:"respec", qty:1}, grp:"Heroes"},
+  {k:"s60", name:"1-hour speed-up", desc:"", cost:250, grant:{item:"s60", qty:1}, grp:"Speed-ups"},
+  {k:"s480", name:"8-hour speed-up", desc:"", cost:1800, grant:{item:"s480", qty:1}, grp:"Speed-ups"},
+  {k:"mithril", name:"Mithril", desc:"Gear material.", cost:1500, grant:{item:"mithril", qty:1}, lim:{n:5, days:7}, grp:"Materials"},
+  {k:"starmetal", name:"Star Metal", desc:"Gear material.", cost:3000, grant:{item:"starmetal", qty:1}, lim:{n:3, days:7}, grp:"Materials"},
+  {k:"gemF5", name:"Flawless Gem pack", desc:"Five Flawless Gems.", cost:4000, grant:{item:"gemF", qty:5}, lim:{n:3, days:7}, grp:"Materials"}];
+var REPSHOP_MSG="";
+function repCost(c){ return c.cost*REP_X; }
+function repBal(){ var A=AL(); return Math.max(0, Math.floor(A.rep)-(A.repSpent||0)); }
+function repLeft(c){ var A=AL(); if (!c.lim) return 0; var since=S.gt-c.lim.days*DAY; return Math.max(0, c.lim.n-(A.repBuys||[]).filter(function(x){ return x.k===c.k && x.at>since; }).length); }
+function repOwned(c){ var t=c.grant.dragon; return !!(t && ((S.dragons&&S.dragons[t]) || (S.dragonEggs&&S.dragonEggs[t]))); }
+function repWhy(c){ return repOwned(c)?"Owned":c.lim&&repLeft(c)<1?"Sold out this week":repBal()<repCost(c)?"Need "+fmt(repCost(c)-repBal())+" more":""; }
+function repBuy(k){ var c=REP_SHOP.filter(function(x){ return x.k===k; })[0], A=AL(); if (!c || repWhy(c)) return;
+  A.repSpent=(A.repSpent||0)+repCost(c); A.repBuys=(A.repBuys||[]).filter(function(x){ return x.at>S.gt-8*DAY; }); A.repBuys.push({k:c.k, at:S.gt});
+  shopGrant(c.grant); var dg=c.grant.dragon&&DRAGONS[c.grant.dragon]; REPSHOP_MSG=dg?"Bought the "+dg.name+" Dragon egg. Hatch it in the Overlook.":"Bought "+c.name+"."; A_log("Spent "+fmt(repCost(c))+" reputation: "+(dg?dg.name+" Dragon egg":c.name)); toastQ(REPSHOP_MSG); save(); }
+function kgShop(){ var A=AL(), h='<div class="section warshop"><div class="shead"><h3>Reputation shop</h3><span class="dur">'+fmt(repBal())+' to spend</span></div>'+
+    '<div class="shopstats"><span><b>'+fmt(Math.floor(A.rep))+'</b><i>Reputation</i></span><span><b>'+fmt(A.repSpent||0)+'</b><i>Spent</i></span><span><b>'+fmt(repBal())+'</b><i>To spend</i></span></div>'+
+    '<p class="hint">Spending here never lowers your reputation: the bar, what it unlocks and the high scores all keep every point you have earned.</p>'+(REPSHOP_MSG?'<div class="inote">'+esc(REPSHOP_MSG)+'</div>':'');
+  var groups=[]; REP_SHOP.forEach(function(c){ var g=groups.filter(function(x){ return x[0]===c.grp; })[0]; if (!g){ g=[c.grp,[]]; groups.push(g); } g[1].push(c); });
+  groups.forEach(function(g){
+    h+='<div class="section" style="margin-top:10px"><h3>'+esc(g[0])+'</h3><div class="shopgrid">'+g[1].map(function(c){ var why=repWhy(c), dgt=c.grant.dragon||"", dgD=DRAGONS[dgt];
+      return '<div class="shoptile'+(why?' no':'')+'"><div class="shopic">'+shopIcon(c.grant.item?{k:c.k, item:c.grant.item}:c)+(c.grant.qty>1?'<i>×'+c.grant.qty+'</i>':'')+'</div><b>'+(dgD?esc(dgD.name+' Dragon egg'):esc(c.name))+'</b>'+
+        (c.desc?'<span class="dur">'+esc(c.desc)+(dgD?' Hatch it in the Overlook when you like.':'')+(c.lim?' ('+repLeft(c)+' of '+c.lim.n+' left this week)':'')+'</span>':'')+
+        '<button class="btn small" data-act="rep-buy" data-k="'+c.k+'"'+(why?' disabled':'')+'>'+fmt(repCost(c))+' rep</button>'+(why?'<span class="shopcost">'+esc(why)+'</span>':'')+'</div>'; }).join("")+'</div></div>'; });
+  return h+'</div>'; }
 function kgPages(){ var A=AL(), b=bullyOf(), B=A.bully, P=[];
   var gu=allyTiles().filter(function(q){ return guardsAt(q.id).length; }).length, help=(A.help||[]).filter(function(x){ return S.gt<x.until; }).length, tq=B&&B.target?TILE_BY[B.target]:null;
   P.push({k:"allies", name:"Allies", n:A.allies.length+'<small>/'+Math.min(ALLY_MAX,maxB("embassy"))+'</small>', html:kgAllies,
@@ -13937,6 +13996,7 @@ function kgPages(){ var A=AL(), b=bullyOf(), B=A.bully, P=[];
     var html=x[2](), hd=kgHead(html), ln=hd.d;
     P.push({k:x[0], name:x[1], html:function(){ return html; }, line:esc(ln.charAt(0).toUpperCase()+ln.slice(1)), alert:hd.alert, lock:hd.lock}); });
   if (soloArOn()){ var sa=sarState(), lv=arLive().length; P.push({k:"arena", name:"Monster Arena", html:function(){ return '<div id="soloar"></div>'+soloArenaHtml(); }, alert:lv>0, line:lv?lv+' monster'+(lv>1?'s':'')+' up':(sa.lv?'Level '+sa.lv:'Not built yet')}); }
+  P.push({k:"shop", name:"Reputation shop", html:kgShop, line:fmt(repBal())+' reputation to spend'});
   P.push({k:"log", name:"Pact log", html:kgLog, tile:false}); // 0.2.50: no tile; its last two lines sit under the tiles, with All
   return P; }
 function viewAlliance(){
@@ -14150,6 +14210,8 @@ function dtPlaces(b){ var P=[], gt=Math.min(12,2+(S.th||1));
     note:"Only while the event runs."});
   P.push({id:"bully", g:"Map", n:"Bully strongholds", u:"per stronghold taken", rows:function(){ var r=[]; for (var g in BULLY_LOOT){ var w=BULLY_LOOT[g], t=0, k; for (k in w) t+=w[k]; for (k in w) r.push({k:k, p:w[k]/t, n:1, note:"one "+(g==="books"?"book":"material")+" each time"}); }
     r.push({k:"res", p:1, n:"a fifth of its treasury, up to what your army can carry"}); return r; }});
+  P.push({id:"allydef", g:"Map", n:"Defending an ally", u:"per bully wave your guards help hold", rows:function(){ return [{k:"s15", p:1, n:"2 to 4"}, {k:"gemD", p:1, n:"5 to 15"}, {k:"s60", p:1, n:1, note:"when at least a quarter of the defenders are yours"}, {k:"gemF", p:1, n:"up to 2", note:"with a bigger share of the defence"}, {k:"marchsp", p:DEF_MSP, n:1}, {k:"teleport", p:DEF_TELE, n:1},
+    {k:"teleport", p:1, n:1, note:"when the bully\u2019s army is broken for good, with one book or material"}]; }});
   // Arena: solo from its own tables; multiplayer from the server's catalogue (text)
   if (soloArOn()) P.push({id:"sar", g:"Alliance", n:"Monster Arena", u:"per monster slain", vs:SAR_TYPES.map(function(T){ return {id:T.k, t:T.n}; }), lvs:lv(dtRange(1,SAR.maxLv)),
     rows:function(L,v){ var R=sarLoot(v,L), r=R.items.map(function(it){ return {k:it.k, p:it.p, n:it.n}; }); if (R.res) r.push({k:"res", p:1, n:fmt(R.res)+" of each resource"}); return r; }});
@@ -16649,7 +16711,8 @@ document.addEventListener("click",function(e){
   if (act==="bully-go"){ closeSheet(); tab="alliance"; KGV="bully"; lastView=""; renderView(true); window.scrollTo({top:0}); return; }
   if (act==="fm-help"){ FMHELP=!FMHELP; lastView=""; renderView(true); return; } // 0.2.50
   if (act==="farm-page"){ FARMV=+a.dataset.p; farmArmed=false; lastView=""; renderView(true); window.scrollTo({top:0}); return; }
-  if (act==="kg-page"){ KGV=a.dataset.v||""; lastView=""; renderView(true); window.scrollTo({top:0}); return; }
+  if (act==="rep-buy"){ repBuy(a.dataset.k); lastView=""; renderView(true); return; }
+  if (act==="kg-page"){ REPSHOP_MSG=""; KGV=a.dataset.v||""; lastView=""; renderView(true); window.scrollTo({top:0}); return; }
   // 0.2.50: the Pact tab: rename on the heading, the reputation ?, More on long rules (and ⋯ on ally cards), find an AI lord to invite
   if (act==="kg-ren"){ KG_REN=true; lastView=""; renderView(true); var kri=document.getElementById("allyname2"); if (kri){ kri.focus(); kri.select(); } return; }
   if (act==="kg-repq"){ KG_REPQ=!KG_REPQ; lastView=""; renderView(true); return; }
