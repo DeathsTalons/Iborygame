@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.110";
+window.IBORY_V="0.2.111";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1906,7 +1906,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.110";
+var APP_VERSION = "0.2.111";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -4370,7 +4370,7 @@ function captureCity(q, troops){
     CAP_FIELDS.forEach(function(t,i){ for (var k=0;k<3;k++) nc.fields[i*3+k]={type:t,level:L}; });
     capFill(nc, L); nc.cap={k:q.k, L:L};
   } else {
-    nc.fieldCap=L; nc.th=L; nc.wall=L; while (nc.inside.length<cityPlots(nc)) nc.inside.push(null); ["farm","sawmill","quarry","ironmine"].forEach(function(t,i){ nc.fields[i]={type:t,level:L}; }); // 0.1.204: and walls at its level too // a historic city: Town Hall and one field of each kind at its level, the rest empty (0.1.194: the Town Hall used to start at 1)
+    nc.fieldCap=L; presetsFit(nc); nc.th=L; nc.wall=L; while (nc.inside.length<cityPlots(nc)) nc.inside.push(null); ["farm","sawmill","quarry","ironmine"].forEach(function(t,i){ nc.fields[i]={type:t,level:L}; }); // 0.1.204: and walls at its level too // a historic city: Town Hall and one field of each kind at its level, the rest empty (0.1.194: the Town Hall used to start at 1)
   }
   S.cities.push(nc); delete S.map.hit[q.id]; delete S.map.loy[q.id]; delete S.map.npc[q.id];
   if (DMON_PER[nc.fieldCap] && S.map.monsters){ S.map.monsters.day=-1; } // 0.2.51: 16s and Atlantis draw them too
@@ -4401,7 +4401,8 @@ function scoutArrive(m){
   var sent=m.t.slice(), left=m.t.slice(); left[2]=as-aLost;
   addReport({id:S.nextMarchId++, at:S.gt, scout:true, name:tileName(q), tile:q.id, result:ok?1:2, rounds:0, sent:sent, left:left, had:cur.t.slice(), eleft:cur.t.slice(), forts:[0,0,0,0,0], fleft:[0,0,0,0,0],
     loot:{food:0,lumber:0,stone:0,iron:0,gold:0}, medal:-1, drops:[], lost:aLost, hero:sh?sh.name:null, xp:sxp, intel:snap});
-  note("march",ok ? "Scouts report back from "+tileName(q)+(aLost?" ("+fmt(aLost)+" lost)":"")+"." : "Your scouts were caught at "+tileName(q)+". Send more, or research Informatics.");
+  var swd=woundFrom(m.city, sent, left, false); if (swd && S.reports[0] && S.reports[0].scout) S.reports[0].wounded=swd; // 0.2.111 (Cody): scouts lost scouting get the usual wound share too
+  note("march",ok ? "Scouts report back from "+tileName(q)+(aLost?" ("+fmt(aLost)+" lost"+(swd?", "+fmt(swd)+" only wounded":"")+")":"")+"." : "Your scouts were caught at "+tileName(q)+(swd?" ("+fmt(swd)+" only wounded, in the Medic Camp)":"")+". Send more, or research Informatics.");
   if (left[2]<=0) return false;
   m.t=left; m.loot={}; m.phase="back"; m.bs=S.gt; m.ret=S.gt+m.travel; return true;
 }
@@ -4721,11 +4722,11 @@ function pclipBtns(m,pi,pr){ var k=pclipKey(m,pi), mine=presetClip && presetClip
   return '<button class="btn ghost small" data-act="preset-copy"'+ma+' data-p="'+pi+'"'+(presetTotal(pr)?'':' disabled')+'>'+(mine?'Copied \u2713':'Copy')+'</button>'+
     (presetClip && !mine?'<button class="btn ghost small" data-act="preset-paste"'+ma+' data-p="'+pi+'">'+(PASTED===k?'Pasted \u2713':'Paste')+'</button>':''); }
 function presetsSection(){
-  var h='<div class="section"><div class="shead"><h3>March presets</h3><span class="dur">'+esc(S.name)+'</span></div><p class="hint">Ten per city for marches you send yourself: load one on the march screen, stack them into timed waves from a target on the Map, or occupy flats with one. Farming has its own ten presets, on the <button class="link" data-act="tab" data-tab="farms">Farms tab</button>.</p>'+pclipBar()+'<div class="unitlist">';
+  var h='<div class="section"><div class="shead"><h3>March presets</h3><span class="dur">'+esc(S.name)+'</span></div><p class="hint">'+(S.mpresets.length>10?S.mpresets.length+' here, one for every march this historic city can send,':'Ten per city')+' for marches you send yourself (put them in any order with the arrows): load one on the march screen, stack them into timed waves from a target on the Map, or occupy flats with one. Farming has its own presets, on the <button class="link" data-act="tab" data-tab="farms">Farms tab</button>.</p>'+pclipBar()+'<div class="unitlist">';
   S.mpresets.forEach(function(pr,pi){ var hh=presetHero(pr);
     h+='<div class="unit"><h4>'+esc(pr.name)+'</h4><span class="own" style="font-size:.85rem">'+(presetTotal(pr)?fmt(presetTotal(pr))+' troops':'')+'</span>'+
       '<div class="us"><span>'+presetSummary(pr)+'</span><span>Hero <b>'+(pr.hero===HERO_BEST?'Best attack':pr.hero===HERO_FAST?'Fastest':pr.hero===HERO_ANY?'Any free':hh?esc(hh.name):"none")+'</b>'+(presetAutoHero(pr.hero)?' <span class="dur">('+(hh?'now '+esc(hh.name):'nobody free')+')</span>':'')+'</span></div>'+
-      '<div class="trainrow"><button class="btn ghost small" data-act="preset-edit" data-m="1" data-p="'+pi+'">Edit</button>'+pclipBtns(1,pi,pr)+
+      '<div class="trainrow"><button class="btn ghost small wvmv" data-act="mp-mv" data-p="'+pi+'" data-d="-1" aria-label="Move up"'+(pi?'':' disabled')+'>\u25B2</button><button class="btn ghost small wvmv" data-act="mp-mv" data-p="'+pi+'" data-d="1" aria-label="Move down"'+(pi<S.mpresets.length-1?'':' disabled')+'>\u25BC</button><button class="btn ghost small" data-act="preset-edit" data-m="1" data-p="'+pi+'">Edit</button>'+pclipBtns(1,pi,pr)+
       (presetTotal(pr)>armyCap()?'<span class="why">Over the '+fmt(armyCap())+'-troop march limit</span>':'')+'</div></div>';
   });
   return h+'</div></div>';
@@ -8727,7 +8728,7 @@ function wbSendBody(W, body){ var path="/wd/b/attack";
 // a server-map march with a fight against players comes home: the dead (a share only wounded, by Medicine), plunder, a scout's report
 function wbHome(m){ var ci=cityIndex(m.city); if (ci<0) ci=S.cur; var c=S.cities[ci], r=m.res||{}, back=r.back||m.t, n=0, nm=m.name||"the target";
   withCity(ci, function(){ for (var i=0;i<12;i++){ var k=back[i]||0; S.troops[i]+=k; n+=k; } if (r.loot) RES.forEach(function(k){ S.res[k]+=r.loot[k]||0; }); });
-  var wd=r.scout?0:woundFrom(c.id, m.t, back, false), lost=Math.max(0, sumT(m.t)-n), hh=m.hero?heroById(m.hero):null; if (hh) hh.away=false;
+  var wd=woundFrom(c.id, m.t, back, false), lost=Math.max(0, sumT(m.t)-n), hh=m.hero?heroById(m.hero):null; if (hh) hh.away=false;
   var tail=" Back in "+c.name+": "+fmt(n)+" troops"+(lost?", "+fmt(lost)+" fell"+(wd?" ("+fmt(wd)+" only wounded, in the Medic Camp)":""):"")+".", lt=r.loot?RES.reduce(function(a,k){ return a+(r.loot[k]||0); },0):0;
   if (r.scout){ var I=r.intel; note("alliance", r.ok&&I ? "Scouting "+(r.of||nm)+": "+(I.npc?"its guard holds ":I.marches!=null?I.marches+" garrison march"+(I.marches===1?"":"es")+" ("+(I.names||[]).join(", ")+") with ":"")+wbTroopTxt(I.t)+(I.f?", fortifications "+fmt(I.f.reduce(function(a,b){ return a+b; },0)):"")+(I.wall?", wall level "+I.wall:"")+(I.gate==="closed"?", gate shut":"")+(I.res?", about "+fmt(RES.reduce(function(a,k){ return a+(I.res[k]||0); },0))+" resources to take":"")+"."
       : "Your scouts were caught at "+(r.of||nm)+": none came back."); return; }
@@ -10471,7 +10472,7 @@ function migrate(s){
   if (Array.isArray(s.cities)) s.cities.forEach(function(cc){ if (Array.isArray(cc.mpresets)) return; // 0.2.4: march presets split from farm presets; each city's start as copies of its presets (troops, hero, name)
     cc.mpresets=(cc.presets||[]).slice(0,NPRESETS).map(function(p,i){ return {name:p.name||("March "+(i+1)), t:(p.t||[]).slice(0,12).concat([0,0,0,0,0,0,0,0,0,0,0,0]).slice(0,12), hero:p.hero||0}; });
     while (cc.mpresets.length<NPRESETS) cc.mpresets.push({name:"March "+(cc.mpresets.length+1), t:[0,0,0,0,0,0,0,0,0,0,0,0], hero:0}); });
-  if (Array.isArray(s.cities)) s.cities.forEach(function(cc){ if (cc.wallHero===undefined) cc.wallHero=null; }); // 0.1.115: the wall hero post starts empty (until now the mayor led the defense)
+  if (Array.isArray(s.cities)) s.cities.forEach(function(cc){ if (cc.wallHero===undefined) cc.wallHero=null; presetsFit(cc); }); // 0.1.115: the wall hero post starts empty (until now the mayor led the defense)
   s.me=s.me||{img:"",frame:"",city:"",march:""}; s.frames=s.frames||[]; FRAMES_FOR_ALL.forEach(function(f){ if (s.frames.indexOf(f)<0) s.frames.push(f); });
   return s;
 }
@@ -10504,6 +10505,11 @@ function newCity(id,name,x,y){
     build:null,research:null,troops:[0,0,0,0,0,0,0,0,0,0,0,0],train:[],tg:[],fg:[],autoFort:false,autoHeal:false,alAcad:false,alBld:0,mayor:null,trainer:null,researcher:null,wallHero:null,heroes:[],innOffers:[],innRefreshAt:0,wall:0,forts:[0,0,0,0,0],fortQ:null,builds:[],bq:[],rq:[],presets:newPresets(),mpresets:newMPresets(),autoMayor:true,goals:[0,0,0,0,0,0,0,0,0,0,0,0],gorder:AUTO_ORDER.slice(),wounded:[],autoTrain:false,gate:"open",reserve:{food:0,lumber:0,stone:0,iron:0,gold:0}};
 }
 var NPRESETS=10;
+// 0.2.111 (Cody): a city has as many march and farm presets as marches it can ever send: ten, or a historic city's level (its Rally Spot goes that high)
+function presetN(c){ return Math.max(NPRESETS, (c&&c.fieldCap)||0); }
+function presetsFit(c){ if (!c) return; var n=presetN(c);
+  if (Array.isArray(c.mpresets)) while (c.mpresets.length<n) c.mpresets.push({name:"March "+(c.mpresets.length+1), t:[0,0,0,0,0,0,0,0,0,0,0,0], hero:0});
+  if (Array.isArray(c.presets)) while (c.presets.length<n) c.presets.push({name:"Preset "+(c.presets.length+1), t:[0,0,0,0,0,0,0,0,0,0,0,0], hero:0, farm:[], auto:false, idx:0, stopOnLoss:true}); }
 function newMPresets(){ var a=[]; for (var i=0;i<NPRESETS;i++) a.push({name:"March "+(i+1), t:[0,0,0,0,0,0,0,0,0,0,0,0], hero:0}); return a; } // 0.2.4: march presets, separate from the farm presets
 function newPresets(){ var a=[]; for (var i=0;i<NPRESETS;i++) a.push({name:"Preset "+(i+1), t:[0,0,0,0,0,0,0,0,0,0,0,0], hero:0, farm:[], auto:false, idx:0, stopOnLoss:true}); return a; }
 var BUILDERS=2;
@@ -14697,7 +14703,8 @@ function typeBoxHtml(mine, theirs, key){ if (!mine && !theirs) return '';
 function repTypesHtml(r){ if (!r.ww || r.scout) return ''; var A=null, D=null; try { A=typeof r.ww.A==="string"?JSON.parse(r.ww.A):r.ww.A; D=typeof r.ww.D==="string"?JSON.parse(r.ww.D):r.ww.D; } catch(e){ return ''; }
   return typeBoxHtml(r.def?D:A, r.def?A:D); }
 function reportDetailBase(r){
-  if (r.scout) return r.intel ? '<p class="hint">Scouts got through'+(r.lost?' ('+fmt(r.lost)+' lost)':'')+'.</p>'+repScoutUnits(r.intel.inf<3?r.intel.t.map(roughN):r.intel.t, r.intel.inf<3?null:r.intel.f, r.intel.wall)+repResTiles(r.intel.res, true) : '<p class="hint">All '+fmt(r.lost)+' scouts were caught.</p>'; // 0.2.50: icons
+  var swn=r.wounded?' '+fmt(r.wounded)+' of them are only wounded, in the Medic Camp.':'';
+  if (r.scout) return r.intel ? '<p class="hint">Scouts got through'+(r.lost?' ('+fmt(r.lost)+' lost).'+swn:'.')+'</p>'+repScoutUnits(r.intel.inf<3?r.intel.t.map(roughN):r.intel.t, r.intel.inf<3?null:r.intel.f, r.intel.wall)+repResTiles(r.intel.res, true) : '<p class="hint">All '+fmt(r.lost)+' scouts were caught.'+swn+'</p>'; // 0.2.50: icons
   if (r.def) return repStats(r, sum12(r.had)-sum12(r.eleft))+(repTypesHtml(r)||modsLine(r))+(r.wounded?'<p class="rphero"><span class="dur">The wounded wait in the Medic Camp for 24 hours</span></p>':'')+(r.repaired?'<p class="hint">Machinery repaired '+Math.round(r.repaired*100)+'% of lost archer towers (more of other fortifications).</p>':'')+
     '<div class="tscroll"><table class="gt rpt3">'+repTableHead("Yours","Theirs")+'<tbody>'+ /* 0.2.50: unit icons, two-row header */
     U.map(function(u,i){ if (!r.sent[i] && !r.had[i]) return ''; var a1=r.sent[i]-r.left[i], a2=r.had[i]-r.eleft[i]; return '<tr>'+repUnitCell(i)+'<td>'+fmt(r.sent[i])+'</td><td class="'+(a1?'loss':'')+'">'+fmt(a1)+'</td><td>'+fmt(r.had[i])+'</td><td class="'+(a2?'ok':'')+'">'+fmt(a2)+'</td></tr>'; }).join("")+
@@ -16472,6 +16479,12 @@ document.addEventListener("click",function(e){
   if (act==="wc-addwave"){ var wa=wcById(sheetFor&&sheetFor.id); if (!wa) return; var wd=wcDraftOf(wa); if (wd.waves.length<wa.waves) wd.waves.push({t:[0,0,0,0,0,0,0,0,0,0,0,0], hero:0}); lastSheet=""; renderSheet(); return; }
   if (act==="wc-clearwave"){ var wcr=wcById(sheetFor&&sheetFor.id); if (!wcr) return; var wcd=wcDraftOf(wcr), wcw=wcd.waves[+a.dataset.wave]; if (wcw) wcw.t=Z12(); lastSheet=""; renderSheet(); return; }
   if (act==="march-clear"){ marchDraft.t=Z12(); delete marchDraft.pk; if (marchDraft.cargo) for (var ck in marchDraft.cargo) marchDraft.cargo[ck]=0; lastSheet=""; renderSheet(); return; }
+  if (act==="mp-mv"){ var mi=+a.dataset.p, mj=mi+(+a.dataset.d), MP=S.mpresets; if (!MP[mi] || !MP[mj]) return; // 0.2.111 (Cody): reorder march presets; anything pointing at a preset by its place follows it
+    var mx=MP[mi]; MP[mi]=MP[mj]; MP[mj]=mx; var sw=function(v){ return v===mi?mj:v===mj?mi:v; }, me=C().id;
+    S.marches.forEach(function(m){ if (m.city===me && m.label!=null) m.label=sw(m.label); });
+    if (S.occ && S.occ.p!=null) S.occ.p=sw(S.occ.p);
+    if (waveDraft && waveDraft.w){ var nw={}; for (var wk in waveDraft.w){ var pr0=wk.split(":"); nw[+pr0[0]===me?pr0[0]+":"+sw(+pr0[1]):wk]=waveDraft.w[wk]; } waveDraft.w=nw; waveDraft.seq=null; }
+    save(); lastSheet=""; renderSheet(); lastView=""; renderView(true); return; }
   if (act==="preset-clear"){ var pcl=presetsOf(a.dataset.m)[+a.dataset.p]; if (pcl){ pcl.t=Z12(); save(); } lastSheet=""; renderSheet(); return; }
   if (act==="rf-clear"){ RF.t={}; lastView=""; renderView(true); lastSheet=""; renderSheet(); return; }
   if (act==="wc-delwave"){ var wr=wcById(sheetFor&&sheetFor.id); if (!wr) return; var wd2=wcDraftOf(wr); if (wd2.waves.length>1) wd2.waves.splice(+a.dataset.wave,1); lastSheet=""; renderSheet(); return; }
