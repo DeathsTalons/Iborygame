@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.116";
+window.IBORY_V="0.2.117";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1913,7 +1913,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.116";
+var APP_VERSION = "0.2.117";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -4698,6 +4698,28 @@ function farmXpOk(id, pr, hid){ var q=TILE_BY[id]; if (!q || !VTYPES[q.k]) retur
 function farmFullOk(id, pr, hid){ var q=TILE_BY[id]; if (!q || (q.k!=="npc" && q.k!=="ai")) return true; // valleys and historic cities always drop
   var arr=S.gt+travelMs(pr.t,q,hid); if (garFullAt(q)>arr) return false;
   return !S.marches.some(function(m){ return m.tile===id && (m.mission==="attack"||m.mission==="conquer") && m.phase!=="back" && m.phase!=="stay"; }); } // one of yours will hit it first
+/* 0.2.117 (Cody: "I've had to hunt down why a preset won't go"): why an auto-farming preset isn't sending right now, in the order processAuto checks.
+   Returns {out:true} while one of its marches is out (that's normal), {t:"why", soft:1} when it still sends but not quite as set, {t:"why"} when it waits, or null. */
+function farmWhy(pr,pi){ if (!pr.auto) return null;
+  if (S.marches.some(function(m){ return m.city===C().id && m.preset===pi; })) return {out:true};
+  if (!rallyLv()) return {t:"Waiting: "+S.name+" has no Rally Spot."};
+  if (!pr.farm.length) return {t:"Waiting: the farm list is empty. Refill it or add targets from the map."};
+  var tot=presetTotal(pr); if (!tot) return {t:"Waiting: no troops set. Use Edit army."};
+  if (tot>armyCap()) return {t:"Waiting: the army ("+tot.toLocaleString()+") is over "+S.name+"\u2019s army limit of "+armyCap().toLocaleString()+". Make it smaller or raise the Rally Spot."};
+  for (var i=0;i<12;i++) if (pr.t[i]>(S.troops[i]||0)){ var outN=0; S.marches.forEach(function(m){ if (m.city===C().id) outN+=m.t[i]||0; });
+    return {t:"Waiting for troops: it sends "+fmt(pr.t[i])+" "+U[i].name+"s and "+fmt(Math.floor(S.troops[i]||0))+" are home"+(outN?" ("+fmt(outN)+" out on marches)":"")+"."}; }
+  if (rallyUsed()>=rallyLv()) return {t:"Waiting for a march slot. "+rallyFullWhy()};
+  var h=pr.hero>0?heroById(pr.hero):null;
+  if (h && C().heroes.indexOf(h)>=0){
+    if (seatLocked(h)){ var of=officeOf(h); return {t:"Waiting: "+h.name+" holds the "+(of?of[1]:"office")+" seat you picked, which keeps a hero home. Unseat them (Heroes tab, Offices) or pick another hero for this preset."}; }
+    if (h.away) return {t:"Waiting for "+h.name+" to come home."}; }
+  var ph=presetHero(pr), phid=ph&&!ph.away&&!seatLocked(ph)?ph.id:0;
+  var nid=pr.farm[pr.idx % pr.farm.length], nq=nid&&TILE_BY[nid]; if (nq){ var need=marchFood(pr.t,"attack",travelMs(pr.t,nq,phid)); if (S.res.food<need) return {t:"Waiting for rations: the next march eats "+fmt(need)+" food and "+S.name+" has "+fmt(Math.max(0,S.res.food))+"."}; }
+  if (FARM_WAIT[C().id+":"+pi]) return {t:pr.xpOnly&&pr.fullOnly?"Waiting: no target on the list is at full garrison and paying experience yet.":pr.xpOnly?"Waiting: every valley on the list has paid experience in the last hour.":"Waiting: no target on the list will be at full garrison when the march lands."};
+  if (pr.hero>0 && !h) return {t:"Sends without a hero: the hero it names is gone.", soft:1};
+  if (pr.hero>0 && h && C().heroes.indexOf(h)<0) return {t:"Sends without a hero: "+h.name+" lives in another city now.", soft:1};
+  if (presetAutoHero(pr.hero) && !phid) return {t:"Sends without a hero: none is free in "+S.name+" (away, or kept home by a seat you picked).", soft:1};
+  return {t:"Sends at the next check.", soft:1, ready:1}; }
 function processAuto(){
   var rl=rallyLv(); if (!rl) return;
   S.presets.forEach(function(pr,pi){
@@ -4936,13 +4958,15 @@ function farmCardHtml(pr,pi){ // 0.2.103 (Cody): the preset's page in the newer 
         '<label for="fl'+pi+'"><span class="fmlab">Level</span><select id="fl'+pi+'" data-farmlvl="'+pi+'">'+['<option value="0">Any</option>'].concat([1,2,3,4,5,6,7,8,9,10].map(function(n){ return '<option value="'+n+'"'+(pr.farmLevel===n?' selected':'')+'>Level '+n+'</option>'; })).join("")+'</select></label></div>'+
       (pr.farm.length&&tot?'<button class="btn fmgo'+(pr.auto?' ghost':'')+'" data-act="preset-auto" data-p="'+pi+'">'+(pr.auto?'Stop auto-farm':'Start auto-farm')+'</button>':'')+
       '<div class="btnrow fmacts">'+(pr.farmMode?'<button class="btn ghost small" data-act="farm-refill" data-p="'+pi+'">Refill list</button>':'')+pclipBtns(0,pi,pr)+'</div>'+
+      (function(){ var fw=farmWhy(pr,pi); return fw&&!fw.out&&!fw.ready?'<div class="fnote'+(fw.soft?'':' bad')+'" role="status">'+esc(fw.t)+'</div>':''; })()+
       (msg?'<div class="fnote'+(msg.bad?' bad':'')+'">'+esc(msg.t)+'</div>':(!tot?'<div class="fnote">No troops set yet. Use Edit army first.</div>':''));
   return h+'</div>'; }
 // a preset's farming over the last 24 hours, from its reports in this city
 function farmDay(pi){ var since=S.gt-DAY, n=0, w=0, loot=0; S.log.forEach(function(c){ if (c.p===pi && c.c===S.name && c.at>since && !c.d){ n++; if (c.r===1) w++; loot+=c.lo||0; } }); return {n:n, w:w, loot:loot}; }
+function farmWhyShort(t){ t=t.replace(/^Waiting( for)?:? ?/,""); var i=t.search(/[.:(]/); t=i>0?t.slice(0,i):t; return t.charAt(0).toUpperCase()+t.slice(1); }
 function farmTileHtml(pr,pi){ var tot=presetTotal(pr), m=pr.farmMode?FARM_MODES[pr.farmMode]:null, d=farmDay(pi), st, cls='';
   if (!tot){ st='No troops set'; cls=' idle'; }
-  else if (pr.auto){ st='<b class="okc">Auto-farming</b>'+(FARM_WAIT[C().id+":"+pi]?' <span class="dur">'+(pr.xpOnly&&pr.fullOnly?'\u00b7 waiting':pr.xpOnly?'\u00b7 waiting for the hour':'\u00b7 waiting for a full garrison')+'</span>':''); cls=' run'; } // 0.2.35: says when every target on the list is held back
+  else if (pr.auto){ var fw=farmWhy(pr,pi); st=fw&&!fw.out&&!fw.soft?'<b class="badc">Waiting</b> <span class="dur">\u00b7 '+esc(farmWhyShort(fw.t))+'</span>':'<b class="okc">Auto-farming</b>'; cls=' run'; } // 0.2.35: says when every target on the list is held back
   else if (pr.farm.length) st='Ready \u00b7 not running';
   else st=m?'Goal set \u00b7 list empty':'No farm list';
   return '<button class="reptile fmtile'+cls+'" data-act="farm-page" data-p="'+pi+'"><span class="rtop"><span class="nm">'+esc(pr.name)+'</span><span class="n">'+(pr.farm.length?pr.farm.length:'')+'</span></span>'+
