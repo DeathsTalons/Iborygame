@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.112";
+window.IBORY_V="0.2.113";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1100,6 +1100,7 @@ tr.arwon td{background:rgba(200,160,70,.14)}
 .fmrow.nx{border-color:var(--brass)}.fmn{flex:none;width:1.7em;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums;font-size:.82rem}
 .fmt{flex:1;min-width:0;display:block;line-height:1.25}.fmt b{font-size:.92rem}.fmt .dur{display:block;font-size:.78rem}.fmbt{flex:none;display:flex;gap:4px}.fmbt .wvmv{width:32px;min-width:32px;height:34px;min-height:34px;padding:0;margin:0;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem}.fmrow{padding-left:4px}.fmt b{white-space:nowrap}
 .wvmv{flex:none;min-width:36px;padding-left:0;padding-right:0}.qlist .wvmv{margin-left:4px}
+.myry{margin:8px 0}.myw{border-left:3px solid var(--line);padding-left:8px}.myw.out{border-left-color:#e05a4f}.myw.back{border-left-color:var(--brass,#d7b058)}.myw .btn{flex:none}.myw .wvt .wvs{white-space:normal}
 .wvlist{display:grid;grid-template-columns:minmax(0,1fr);margin-top:4px;min-width:0}.wvrow{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--line)}.wvt{flex:1;min-width:0;line-height:1.25}
 .wvt .wvs{display:block;margin-left:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wvrow input.wvn{width:60px;flex:none;text-align:center}.wvrow input.wvtime{width:132px;flex:none}
 .wvctl{display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;align-items:end}.wvctl label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:2px}.wvctl input,.wvctl select{width:100%}
@@ -1844,6 +1845,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
     <button class="speedchip" data-act="settings" id="speedtag" style="display:none;color:var(--red)" aria-label="Testing speed is on"></button>
     <button class="speedchip iconchip helpchip" data-act="al-help" id="helpchip" style="display:none" aria-label="Help your alliance" title="Help your alliance"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12V6.5a1.5 1.5 0 0 1 3 0V11M11 10.5V4.5a1.5 1.5 0 0 1 3 0V11M14 10.5V5.5a1.5 1.5 0 0 1 3 0V12M17 11.5V9a1.5 1.5 0 0 1 3 0v5c0 4-3 7-7 7-3 0-4.6-1.4-6.2-4l-2.2-3.6a1.5 1.5 0 0 1 2.6-1.5L8 14"/></svg><b id="helpn"></b></button>
     <button class="speedchip iconchip helpchip" data-act="al-arena-go" id="monchip" style="display:none" aria-label="A monster is waiting at your alliance's Arena" title="Monster Arena"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19l4-14M10.5 20l3-15M16 19l3-12"/></svg><b id="monn"></b></button>
+    <button class="speedchip iconchip helpchip" data-act="myry-open" id="myrychip" style="display:none" aria-label="My rallies under way" title="My rallies"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h10M7 21h10M8 3c0 5 8 5 8 9s-8 4-8 9M16 3c0 5-8 5-8 9s8 4 8 9"/></svg><b id="myryn"></b></button>
     <button class="speedchip iconchip helpchip" data-act="ry-list" id="rychip" style="display:none" aria-label="Rallies you haven't joined" title="Rallies"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 21V4"/><path d="M6 4h11l-2 4 2 4H6"/></svg><b id="ryn"></b></button>
     <button class="speedchip iconchip helpchip wtchip" data-act="bully-go" id="bullychip" style="display:none" aria-label="A bully is marching on an ally" title="Bully attack"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="M13 19l6-6M16 16l4 4M19 21l2-2"/></svg><b id="bullyn"></b></button>
     <button class="speedchip iconchip helpchip wtchip" data-act="wt-open" id="wtchip" style="display:none" aria-label="Attacks heading for your alliance" title="Watchtower"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><b id="wtn"></b></button>
@@ -1906,7 +1908,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.112";
+var APP_VERSION = "0.2.113";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -4899,6 +4901,41 @@ function viewFarms(){
    any city's preset, put them in the order they should hit, and they land one after another (or at the clock times you set), each leaving its own
    city at the right moment. Each wave is still its own march and its own fight against what the last one left, with its own city's Rally Spot slots,
    march limit, troops, food and heroes. waveDraft.w = {"<city id>:<preset index>": count}; waveDraft.seq = the hitting order (wave keys). */
+/* 0.2.113 (Cody, kuku): My rallies. Every wave launched together from the My rally screen carries the same rally number (m.wr) and its place in
+   the hitting order (m.wk), so one window can follow the whole rally across cities and call it off. Nothing about the fights changes. */
+function marchRecallCore(mm, quiet){ var say=quiet?function(){}:toastQ; // inside the march's own city (withCity)
+  mm.rep=false; // recalling a repeating march ends the repeat
+  var refund={}; RES.forEach(function(k){ refund[k]=(mm.cargo&&mm.cargo[k])||0; }); if (mm.mission==="found") RES.forEach(function(k){ refund[k]+=10000; });
+  if (mm.phase==="wait"){
+    for (var i=0;i<12;i++) S.troops[i]+=mm.t[i]; RES.forEach(function(k){ S.res[k]+=refund[k]; }); S.res.food+=mm.food||0;
+    var wh=mm.hero?heroById(mm.hero):null; if (wh) wh.away=false; if (mm.ensign){ var rk=ensKey(mm.ensign); S.items[rk]=(S.items[rk]||0)+1; }
+    S.marches=S.marches.filter(function(x){ return x!==mm; }); say("Wave cancelled; troops and rations returned");
+  } else if (mm.phase==="stay" && mm.mission==="hide"){
+    for (var hj=0;hj<12;hj++) S.troops[hj]+=mm.t[hj]; S.marches=S.marches.filter(function(x){ return x!==mm; }); reconcileHeroes();
+    say("Troops back from the woods");
+  } else if (mm.phase==="stay"){
+    mm.phase="back"; mm.bs=S.gt; mm.ret=S.gt+mm.travel; mm.loot={}; say((mm.mission==="station"?"Camp packed up":"Guards recalled")+", home in "+fmtT(realMs(mm.travel)));
+  } else if (mm.phase==="out"){
+    mm.phase="back"; mm.bs=S.gt; mm.ret=S.gt+Math.max(1,Math.min(S.gt-mm.dep, mm.reach?mm.travel:Infinity)); mm.loot=refund; say("Army turned back, home in "+fmtT(realMs(mm.ret-S.gt))); // a timed wave waiting at the target walks back the whole way
+  }
+}
+function myRallies(){ var by={}, out=[]; S.marches.forEach(function(m){ if (m.wr==null) return; if (!by[m.wr]){ by[m.wr]={id:m.wr, tile:m.tile, ms:[]}; out.push(by[m.wr]); } by[m.wr].ms.push(m); });
+  out.forEach(function(r){ r.ms.sort(function(a,b){ return (a.wk||0)-(b.wk||0); }); r.live=r.ms.filter(function(m){ return m.phase==="wait"||m.phase==="out"; }); }); return out.sort(function(a,b){ return a.id-b.id; }); }
+function myRallyWave(m){ var left=function(t){ return fmtT(realMs(Math.max(0,t-S.gt))); };
+  if (m.phase==="wait") return {st:"Leaves in "+left(m.dep), sub:"lands at "+wvClock(m.arr), cls:"", btn:"Cancel"};
+  if (m.phase==="out" && m.reach && S.gt>=m.reach) return {st:"Waiting at the target", sub:"hits in "+left(m.arr)+" ("+wvClock(m.arr)+")", cls:"out", btn:"Recall"};
+  if (m.phase==="out") return {st:"Marching", sub:"lands in "+left(m.arr)+" ("+wvClock(m.arr)+")", cls:"out", btn:"Recall"};
+  return {st:"Coming home", sub:"back in "+left(m.ret), cls:"back", btn:""}; }
+function myRallySheet(){ var L=myRallies(), h='<div class="head"><span class="ico">'+ICON.hourglass+'</span><div><h2>My rallies</h2><div class="sub">every wave you launched together, from all your cities</div></div></div>';
+  if (!L.length) return h+'<p class="hint">No rally under way. Start one from a target on the Map: tap it, then My rally.</p><button class="closebtn" data-act="close">Close</button>';
+  L.forEach(function(r){ var q=TILE_BY[r.tile], nx=r.live.length?Math.min.apply(null,r.live.map(function(m){ return m.arr; })):0, arm=armed==="myry"+r.id;
+    h+='<div class="section myry"><div class="shead"><h3>'+esc(q?tileName(q):r.tile)+'</h3><span class="dur">'+(q?'('+q.x+', '+q.y+')':'')+'</span></div>'+
+      '<p class="dur" style="margin:0 0 4px">'+(r.live.length? '<b>'+r.live.length+'</b> of '+r.ms.length+' wave'+(r.ms.length>1?'s':'')+' still to hit \u00b7 next in <b>'+fmtT(realMs(Math.max(0,nx-S.gt)))+'</b>' : 'Every wave has hit or turned back; they are on the way home. The fights are in Reports.')+'</p><div class="wvlist">'+
+      r.ms.map(function(m){ var w=myRallyWave(m), c=S.cities[cityIndex(m.city)], pn=c&&m.label!=null&&c.mpresets&&c.mpresets[m.label]?c.mpresets[m.label].name:"", hn=marchHeroName(m);
+        return '<div class="wvrow myw '+w.cls+'"><div class="wvt"><b>'+((m.wk||0)+1)+'. <span translate="no">'+esc((S.cities.length>1&&c?c.name+' \u00b7 ':'')+(pn||"Wave"))+'</span></b><span class="dur wvs">'+fmt(sumT(m.t))+' troops'+(hn?' \u00b7 '+esc(hn):'')+'</span><span class="dur wvs"><b>'+w.st+'</b> \u00b7 '+w.sub+'</span></div>'+
+          (w.btn?'<button class="btn ghost small" data-act="march-recall" data-m="'+m.id+'">'+w.btn+'</button>':'')+'</div>'; }).join("")+'</div>'+
+      '<div class="btnrow" style="margin-top:8px"><button class="btn ghost small" data-act="goto-tile" data-tile="'+r.tile+'">Show on map</button>'+(r.live.length?'<button class="btn ghost danger small" data-act="myry-cancel" data-r="'+r.id+'">'+(arm?'Tap again: call off '+r.live.length+' wave'+(r.live.length>1?'s':''):'Call off the rally')+'</button>':'')+'</div></div>'; });
+  return h+'<p class="hint">Calling off cancels waves that have not left (troops and rations come back at once) and turns round the ones on the road or waiting at the target. Waves that already hit are not undone.</p><button class="closebtn" data-act="close">Close</button>'; }
 function wvKey(cid, pi){ return cid+":"+pi; }
 function wvFromCi(d){ var fi=cityIndex(d.from); return fi<0?S.cur:fi; } // 0.2.109 (Cody): a solo rally sets out from one city, like an alliance rally
 function wvNorm(d){ if (d.from==null) d.from=C().id; if (!d.w){ d.w={}; if (d.n){ d.n.forEach(function(n,pi){ if (n) d.w[wvKey(C().id,pi)]=n; }); delete d.n; } } return d; } // a draft in the old one-city form (counts per preset of the city you are in)
@@ -4907,6 +4944,7 @@ function wavesSheet(){ if (!waveDraft.times) waveDraft.times=[]; wvNorm(waveDraf
   var clk=d.mode==="clock", fci=wvFromCi(d), dL=withCity(fci,function(){ return tdist(q); });
   if (S.cities.length>1) h+='<div class="rfrow" style="margin-bottom:6px"><span class="dur">Rally from</span><span class="rfchips">'+S.cities.map(function(c,i){ return '<button class="chipbtn wide'+(i===fci?' on':'')+'" data-act="waves-from" data-v="'+c.id+'" aria-pressed="'+(i===fci)+'" translate="no">'+esc(c.name)+'</button>'; }).join("")+'</span></div>'+
     '<p class="dur" style="margin:0 0 8px;font-size:.8rem">Every wave sets out from <b translate="no">'+esc(S.cities[fci].name)+'</b> ('+dL.toFixed(1)+' tiles away). Troops from your other cities join there at once and go straight home from the fight, like an alliance rally.</p>';
+  var myN=myRallies().length; if (myN) h+='<p class="dur" style="margin:0 0 6px"><button class="link" data-act="myry-open">'+myN+' rall'+(myN>1?'ies':'y')+' under way: follow or call off</button></p>';
   h+='<div class="farmadd" style="margin-bottom:6px"><button class="chipbtn'+(clk?'':' on')+'" data-act="waves-mode" data-v="gap">One after another</button><button class="chipbtn'+(clk?' on':'')+'" data-act="waves-mode" data-v="clock">Set landing times</button></div>';
   h+='<p class="hint">'+(clk?'Set waves beside any city’s preset, then each wave’s landing time to the second (same-second waves hit in list order). Waves leave now and wait at the target: no rations, can’t be attacked, can be recalled, up to 24 hours.':'Set waves beside any city’s preset, then put them in the order they should hit. Each lands the chosen seconds after the one before, and each waits at the launch city until it is time to leave.')+'</p>';
   // one block per city (the one you are in first, open), one line per preset that has troops: name, travel and troops, and the wave count
@@ -11118,6 +11156,7 @@ function tickText(){
   var hcp=document.getElementById("helpchip"); if (hcp){ var hn=(alMine()&&ALS.d.help)?ALS.d.help.canHelp:0, hd=hn?"":"none"; if (hcp.style.display!==hd) hcp.style.display=hd; setText(document.getElementById("helpn"), hn?String(hn):""); }
   var evc=document.getElementById("evchip"); if (evc){ var evo=evNow(), evd=evo&&EV_TRACK[evo.id]?"":"none"; if (evc.style.display!==evd) evc.style.display=evd;
     if (evo && evc.dataset.ev!==evo.id){ evc.dataset.ev=evo.id; evc.setAttribute("aria-label", evo.name); if (evo.id==="thanks"){ var esv=evc.querySelector("svg"); if (esv) esv.outerHTML='<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M20.7 3.3c-5.8-.6-10.6 2.1-13.2 7.2-1.2 2.4-1.9 5-2.1 7.6L3.3 20.2l1.1 1.1 2.1-2.1c2.6-.2 5.2-.9 7.6-2.1 5.1-2.6 7.8-7.4 7.2-13.2-.1-.3-.3-.5-.6-.6zM8.1 17.1l7.5-7.5-1.1-1.1-7.5 7.5c.3-2.2 1-4.3 2-6.2 2.1-4.1 5.7-6.4 10.2-6.6-.2 4.5-2.5 8.1-6.6 10.2-1.9 1-4 1.7-6.2 2l1.7 1.7z"/></svg>'; evc.classList.add("ev-thanks"); } } if (evo&&EV_TRACK[evo.id]){ var evkn=evk(evo.id).n; setText(document.getElementById("evn"), evkn<EV_TRACK[evo.id].max?String(evkn):"\u2713"); } }
+  var myc=document.getElementById("myrychip"); if (myc){ var myl=myRallies().length, myd=myl?"":"none"; if (myc.style.display!==myd) myc.style.display=myd; setText(document.getElementById("myryn"), myl?String(myl):""); if (sheetFor && sheetFor.kind==="myrally") renderSheet(); }
   var ryc=document.getElementById("rychip"); if (ryc){ var ryl=ryOn()?ryOpen().length:0, ryd=ryl?"":"none"; if (ryc.style.display!==ryd) ryc.style.display=ryd; setText(document.getElementById("ryn"), ryl?String(ryl):""); if (sheetFor && sheetFor.kind==="rylist") renderSheet(); }
   var wtc=document.getElementById("wtchip"); if (wtc){ var wtl=alMine()?wtList().length:0, wtd=wtl?"":"none"; if (wtc.style.display!==wtd) wtc.style.display=wtd; setText(document.getElementById("wtn"), wtl?String(wtl):""); if (sheetFor && sheetFor.kind==="watch") renderSheet(); }
   var buc=document.getElementById("bullychip"); if (buc){ var BU=S.alliance&&S.alliance.bully, bnx=BU&&BU.next&&bullyOf()?BU.next:null, bud=bnx?"":"none"; if (buc.style.display!==bud) buc.style.display=bud; if (bnx){ setText(document.getElementById("bullyn"), fmtT(realMs(Math.max(0,bnx.arr-S.gt)))); var btq=TILE_BY[bnx.target], bln=bullyOf().name+" is marching on "+(btq&&btq.ai?btq.ai.name:"an ally"); if (buc.title!==bln){ buc.title=bln; buc.setAttribute("aria-label",bln); } } }
@@ -15742,7 +15781,7 @@ function hdTick(){ // 0.2.48: the More dots, the Reports count, and the status r
   var ab=document.getElementById("abadge"), qb=document.getElementById("qbadge"), any=rn>0 || !!(qb&&qb.textContent) || !!(ab&&ab.textContent);
   ["moredot","moretabdot"].forEach(function(id){ var d=document.getElementById(id); if (d && d.hidden===any) d.hidden=!any; });
   var sr=document.getElementById("statusrow"); if (!sr) return;
-  var vis=!!document.getElementById("mchip").innerHTML || !!document.getElementById("threats").innerHTML || ["speedtag","helpchip","monchip","rychip","bullychip","wtchip"].some(function(id){ var c=document.getElementById(id); return c && c.style.display!=="none"; });
+  var vis=!!document.getElementById("mchip").innerHTML || !!document.getElementById("threats").innerHTML || ["speedtag","helpchip","monchip","rychip","myrychip","bullychip","wtchip"].some(function(id){ var c=document.getElementById(id); return c && c.style.display!=="none"; });
   if (sr.hidden===vis) sr.hidden=!vis; }
 function queueVis(){ var qd=document.querySelector(".queue"); if (qd) qd.style.display=(tab==="city"||tab==="bldg")?"":"none"; }
 function setTabs(){ renderCityBar(); queueVis();
@@ -15975,6 +16014,8 @@ function renderSheetCore0(){
     h=ryCallSheet();
   } else if (sheetFor.kind==="msg"){
     h='<div class="head"><span class="ico">'+ICON.crest+'</span><div><h2>'+esc(sheetFor.title||"")+'</h2></div></div><p>'+esc(sheetFor.body||"")+'</p><button class="closebtn" data-act="close">OK</button>';
+  } else if (sheetFor.kind==="myrally"){
+    h=myRallySheet();
   } else if (sheetFor.kind==="waves"){
     if (sheetBody.contains(document.activeElement) && (document.activeElement.tagName==="INPUT"||document.activeElement.tagName==="SELECT") && lastSheet) return;
     h=wavesSheet();
@@ -17079,20 +17120,7 @@ document.addEventListener("click",function(e){
         S.items.marchsp--; if (mm.phase==="out") mm.arr=S.gt+(mm.arr-S.gt)/2; else mm.ret=S.gt+(mm.ret-S.gt)/2;
         toastQ("March hastened: half the remaining time"); return;
       }
-      mm.rep=false; // recalling a repeating march ends the repeat
-      var refund={}; RES.forEach(function(k){ refund[k]=(mm.cargo&&mm.cargo[k])||0; }); if (mm.mission==="found") RES.forEach(function(k){ refund[k]+=10000; });
-      if (mm.phase==="wait"){
-        for (var i=0;i<12;i++) S.troops[i]+=mm.t[i]; RES.forEach(function(k){ S.res[k]+=refund[k]; }); S.res.food+=mm.food||0;
-        var wh=mm.hero?heroById(mm.hero):null; if (wh) wh.away=false; if (mm.ensign){ var rk=ensKey(mm.ensign); S.items[rk]=(S.items[rk]||0)+1; }
-        S.marches=S.marches.filter(function(x){ return x!==mm; }); toastQ("Wave cancelled; troops and rations returned");
-      } else if (mm.phase==="stay" && mm.mission==="hide"){
-        for (var hj=0;hj<12;hj++) S.troops[hj]+=mm.t[hj]; S.marches=S.marches.filter(function(x){ return x!==mm; }); reconcileHeroes();
-        toastQ("Troops back from the woods");
-      } else if (mm.phase==="stay"){
-        mm.phase="back"; mm.bs=S.gt; mm.ret=S.gt+mm.travel; mm.loot={}; toastQ((mm.mission==="station"?"Camp packed up":"Guards recalled")+", home in "+fmtT(realMs(mm.travel)));
-      } else if (mm.phase==="out"){
-        mm.phase="back"; mm.bs=S.gt; mm.ret=S.gt+Math.max(1,Math.min(S.gt-mm.dep, mm.reach?mm.travel:Infinity)); mm.loot=refund; toastQ("Army turned back, home in "+fmtT(realMs(mm.ret-S.gt))); // a timed wave waiting at the target walks back the whole way
-      }
+      marchRecallCore(mm);
     });
     save(); refresh(); return;
   }
@@ -17219,11 +17247,15 @@ document.addEventListener("click",function(e){
   if (act==="waves-open"){ waveDraft={tile:a.dataset.tile, w:{}, gap:1, mission:"attack", from:C().id}; openSheet({kind:"waves"}); return; }
   if (act==="waves-mv"){ var mpl=wavePlan(true), mk=+a.dataset.k, mto=mk+(+a.dataset.d); if (mto<0 || mto>=mpl.list.length) return; var ms=mpl.list.map(function(w){ return w.key; }), mt=ms[mk]; ms[mk]=ms[mto]; ms[mto]=mt; waveDraft.seq=ms;
     var wg0=document.getElementById("wgap"); if (wg0) waveDraft.gap=Math.max(0,Math.floor(+wg0.value||0)); lastSheet=""; renderSheet(); updateWaveInfo(); return; }
-  if (act==="waves-go"){ var pl=wavePlan(); if (pl.why) return; var wq=TILE_BY[waveDraft.tile];
-    if (pl.clock){ pl.list.forEach(function(w){ withCity(w.ci, function(){ var lm=launchMarch(waveDraft.tile, waveDraft.mission, w.t, w.hero, {label:w.pi, tm:w.travel, via:w.via}); lm.reach=lm.arr; lm.arr=w.arr; lm.timed=1; }); });
-      toastQ(pl.list.length+" wave"+(pl.list.length>1?"s":"")+" on the way to "+tileName(wq)+": first lands at "+wvClock(pl.first)); closeSheet(); refresh(); return; }
-    pl.list.forEach(function(w){ withCity(w.ci, function(){ launchMarch(waveDraft.tile, waveDraft.mission, w.t, w.hero, {dep:w.dep, label:w.pi, tm:w.travel, via:w.via}); var lm=S.marches[S.marches.length-1]; lm.arr=w.arr; }); });
-    toastQ(pl.list.length+" wave"+(pl.list.length>1?"s":"")+" set to land on "+tileName(wq)+" starting in "+fmtT(realMs(pl.first-S.gt))); closeSheet(); refresh(); return; }
+  if (act==="waves-go"){ var pl=wavePlan(); if (pl.why) return; var wq=TILE_BY[waveDraft.tile], wrid=S.nextMarchId; // 0.2.113: the rally's number (its first march's id)
+    if (pl.clock){ pl.list.forEach(function(w,wk){ withCity(w.ci, function(){ var lm=launchMarch(waveDraft.tile, waveDraft.mission, w.t, w.hero, {label:w.pi, tm:w.travel, via:w.via}); lm.reach=lm.arr; lm.arr=w.arr; lm.timed=1; lm.wr=wrid; lm.wk=wk; }); });
+      toastQ(pl.list.length+" wave"+(pl.list.length>1?"s":"")+" on the way to "+tileName(wq)+": first lands at "+wvClock(pl.first)); armed=null; openSheet({kind:"myrally"}); refresh(); return; }
+    pl.list.forEach(function(w,wk){ withCity(w.ci, function(){ launchMarch(waveDraft.tile, waveDraft.mission, w.t, w.hero, {dep:w.dep, label:w.pi, tm:w.travel, via:w.via}); var lm=S.marches[S.marches.length-1]; lm.arr=w.arr; lm.wr=wrid; lm.wk=wk; }); });
+    toastQ(pl.list.length+" wave"+(pl.list.length>1?"s":"")+" set to land on "+tileName(wq)+" starting in "+fmtT(realMs(pl.first-S.gt))); armed=null; openSheet({kind:"myrally"}); refresh(); return; }
+  if (act==="myry-open"){ armed=null; openSheet({kind:"myrally"}); return; }
+  if (act==="myry-cancel"){ var mrid=+a.dataset.r, mrk="myry"+mrid; if (armed!==mrk){ armed=mrk; lastSheet=""; renderSheet(); return; } armed=null;
+    var mrl=S.marches.filter(function(m){ return m.wr===mrid && (m.phase==="wait"||m.phase==="out"); }); mrl.forEach(function(m){ withCity(cityIndex(m.city), function(){ marchRecallCore(m, true); }); });
+    toastQ("Rally called off: "+mrl.length+" wave"+(mrl.length===1?"":"s")+" cancelled or turned back"); reconcileHeroes(); save(); lastSheet=""; refresh(); return; }
   if (act==="march-open"){ openMarch(a.dataset.tile, a.dataset.mission); return; }
   if (act==="march-help"){ MHELP=!MHELP; lastSheet=""; renderSheet(); return; } // 0.2.50: the march screen's ?
   if (act==="march-max"){ var mu=+a.dataset.unit, room=armyCap(marchDraft.ensign, marchDraft.hero?heroById(marchDraft.hero):null)-marchDraft.t.reduce(function(x,y,k){ return x+(k===mu?0:y); },0), mall=Math.max(0,Math.min(draftAvail()[mu],room)); marchDraft.t[mu]=(marchDraft.t[mu]===mall && mall>0)?0:mall; /* 0.2.50: a unit tile; tapping it again when it's all sent clears it */ var mi=sheetBody.querySelector('[data-march="'+mu+'"]'); if (mi) mi.value=marchDraft.t[mu]; marchDraft.preview=""; updateMarchInfo(); return; }
