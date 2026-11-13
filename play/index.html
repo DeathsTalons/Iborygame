@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.122";
+window.IBORY_V="0.2.123";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1914,7 +1914,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.122";
+var APP_VERSION = "0.2.123";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -5502,7 +5502,15 @@ function drawMap(){
   var g=c.getContext("2d"); if (!g) return; MCH.use++;
   var pinch=!!(drag && drag.pinch), moving=!!(drag && (drag.moved || drag.pinch)), cur=MCH.sets[0];
   if (Date.now()-MCH.at>60000){ MCH.at=Date.now(); mapDirty(); } // the safety net: anything a hook missed is right within a minute
-  if (!cur || cur.dpr!==dpr || (pinch ? (z<cur.z*0.66 || z>cur.z*1.5) : Math.abs(z-cur.z)>1e-6)){ cur={z:z, dpr:dpr, n:mchN(z), map:{}}; MCH.sets.unshift(cur); while (MCH.sets.length>2) mchDrop(MCH.sets.pop()); }
+  /* 0.2.123 (Cody: "the map gets flashy zooming in and out"): a wheel turn counts as zooming for a moment, like a pinch, so its blocks stretch
+     instead of starting a new set every notch; and when a set has to go, the one showing least of the view goes, not simply the oldest, so a
+     quick in-and-out never strands the view on the one-pixel overview. */
+  var zooming=pinch || Date.now()-(MCH.zt||0)<350;
+  if (!cur || cur.dpr!==dpr || (zooming ? (z<cur.z*0.66 || z>cur.z*1.5) : Math.abs(z-cur.z)>1e-6)){ cur={z:z, dpr:dpr, n:mchN(z), map:{}}; MCH.sets.unshift(cur);
+    while (MCH.sets.length>3){ var vxE=mv.x+W/z, vyE=mv.y+H/z, worst=1, wc=Infinity; for (var si0=1; si0<MCH.sets.length; si0++){ var s0=MCH.sets[si0], r0=mchRange(s0, mv.x, mv.y, vxE, vyE), cnt=0, tot=0;
+        if (s0.dpr===dpr) for (var cy0=r0[1]; cy0<=r0[3]; cy0++) for (var cx0=r0[0]; cx0<=r0[2]; cx0++){ tot++; var c0=s0.map[cx0+","+cy0]; if (c0 && c0.cv && c0.ok) cnt++; }
+        var cov=tot?cnt/tot:0; if (cov<wc || (cov===wc && si0>worst)){ wc=cov; worst=si0; } }
+      mchDrop(MCH.sets.splice(worst,1)[0]); } }
   var vx1=mv.x+W/z, vy1=mv.y+H/z, R=mchRange(cur, mv.x, mv.y, vx1, vy1), need=[], fq=(MCH.focus && Date.now()-MCH.focusAt<4000)?MCH.focus.split(","):null,
     fx=fq?+fq[0]:mv.x+W/z/2, fy=fq?+fq[1]:mv.y+H/z/2, cn=cur.n;
   for (var cy=R[1]-(moving?0:1); cy<=R[3]+(moving?0:1); cy++) for (var cx=R[0]-(moving?0:1); cx<=R[2]+(moving?0:1); cx++){ // a ring of blocks round the view is drawn ahead while you're not touching it
@@ -5516,8 +5524,6 @@ function drawMap(){
   else MCH.pending=false;
   if (MCH.sets.length>1 && !moving){ var full=true; for (var cy2=R[1]; cy2<=R[3] && full; cy2++) for (var cx2=R[0]; cx2<=R[2]; cx2++){ var c2=cur.map[cx2+","+cy2]; if (!c2 || !c2.cv){ full=false; break; } }
     if (full) while (MCH.sets.length>1) mchDrop(MCH.sets.pop()); } // the new set covers the view: let the old one go
-  if (MCH.px>MCH.max){ var all=[]; MCH.sets.forEach(function(s){ for (var k in s.map){ var ch=s.map[k]; if (ch.cv && ch.use<MCH.use) all.push(ch); } }); all.sort(function(a,b){ return a.use-b.use; });
-    for (var ai=0; ai<all.length && MCH.px>MCH.max*0.8; ai++) mchFree(all[ai]); }
   // paint: the current set's blocks; where one isn't drawn yet, the overview (one pixel a tile) and the old set's blocks go under it
   g.setTransform(1,0,0,1,0,0); g.globalAlpha=1; g.imageSmoothingEnabled=false;
   g.fillStyle=getComputedStyle(document.documentElement).getPropertyValue("--panel2").trim()||"#333"; g.fillRect(0,0,c.width,c.height);
@@ -5539,7 +5545,11 @@ function drawMap(){
     else { var sc0=k0*dpr/cur.dpr; g.drawImage(ch3.cv, dx, dy, ch3.cv.width*sc0, ch3.cv.height*sc0); } });
   MCH.sets.forEach(function(s){ var r=mchRange(s, mv.x-2, mv.y-1, vx1+2, vy1+3); for (var cy5=r[1]; cy5<=r[3]; cy5++) for (var cx5=r[0]; cx5<=r[2]; cx5++){ var ch5=s.map[cx5+","+cy5]; if (ch5 && ch5.ok && ch5.mons && ch5.mons.length) mons.push.apply(mons, ch5.mons); } }); // monsters stand up to two tiles past their own, so blocks just off screen count
   g.imageSmoothingEnabled=true;
-  drawMapCore(c, {overlay:true, dpr:dpr, mons:mons}); DECO_ANIM=anim; }
+  drawMapCore(c, {overlay:true, dpr:dpr, mons:mons}); DECO_ANIM=anim;
+  // 0.2.123: memory is given back after the paint, once this frame's blocks are marked as used: before, the blocks on screen (last used a frame ago)
+  // could be the ones freed, and the view fell back to the overview for a frame (the flash while zooming)
+  if (MCH.px>MCH.max){ var all=[]; MCH.sets.forEach(function(s){ for (var k in s.map){ var ch=s.map[k]; if (ch.cv && ch.use<MCH.use) all.push(ch); } }); all.sort(function(a,b){ return a.use-b.use; });
+    for (var ai=0; ai<all.length && MCH.px>MCH.max*0.8; ai++) mchFree(all[ai]); } }
 function drawMapCore(c, OV){ var GR=!!(OV && OV.ground), OL=!!(OV && OV.overlay); // GR: one saved block's ground; OL: the moving things over the blocks
   var dpr=OV?OV.dpr:(window.devicePixelRatio||1)*MAP_K, W=OV&&OV.W?OV.W:(c.clientWidth||360), H=OV&&OV.H?OV.H:(c.clientHeight||360); if (OV && OV.cv) c=OV.cv;
   if (c.width!==Math.round(W*dpr) || c.height!==Math.round(H*dpr)){ c.width=Math.round(W*dpr); c.height=Math.round(H*dpr); }
@@ -5746,7 +5756,8 @@ function zoomTo(z){ var c=document.getElementById("mapc"); if (!c) return; zoomA
 function zoomAt(z, px, py){ // keep the map point under (px,py) fixed while zooming
   if (!isFinite(z) || !isFinite(px) || !isFinite(py)) return;
   var wx=mv.x+px/mv.z, wy=mv.y+py/mv.z;
-  mv.z=Math.max(6,Math.min(44,z)); mv.x=wx-px/mv.z; mv.y=wy-py/mv.z; clampView(); requestDraw(); }
+  mv.z=Math.max(6,Math.min(44,z)); mv.x=wx-px/mv.z; mv.y=wy-py/mv.z; clampView(); requestDraw();
+  if (!(drag && drag.pinch)){ MCH.zt=Date.now(); clearTimeout(MCH.zto); MCH.zto=setTimeout(requestDraw, 380); } } // a wheel turn: redraw sharp once it stops
 function findNearest(type, lvl){
   var home=S.map.home, best=null, bd=Infinity;
   for (var r=1; r<Math.max(MAPW,MAPH); r++){
@@ -7634,7 +7645,8 @@ function arHome(m){ if (m.auto) return; // 0.2.91: a credit scout: nothing comes
 }
 function arWhy(n){
   var d=marchDraft, cur=arById(d.mid); if (!cur) return "The monster\u2019s window has closed";
-  if ((S.alArena||[]).filter(function(m){ return !m.auto; }).length>=arSlots()) return "Every Arena slot is in use ("+arSlots()+")";
+  if (soloArOn()){ if ((S.alArena||[]).filter(function(m){ return !m.auto; }).length>=arSlots()) return "Every Arena slot is in use ("+arSlots()+")"; }
+  else if (wbSlotsUsed()>=wbSlotsCap()) return "Your server-map march slots are full ("+wbSlotsCap()+", Arena marches included)";
   if (!n) return "Choose some troops";
   if (n>armyCap(d.ensign, d.hero?heroById(d.hero):null)) return "Army limit is "+fmt(armyCap(d.ensign, d.hero?heroById(d.hero):null))+" troops"+(ensKey(d.ensign)?" (with the "+ITEMS[ensKey(d.ensign)].name+")":"");
   var av=draftAvail(); for (var i=0;i<12;i++) if (d.t[i]>av[i]) return "Not enough "+U[i].name+"s";
@@ -7666,7 +7678,7 @@ function arSend(){
     S.alArena=S.alArena||[]; S.alArena.push({ref:ref, aid:"solo", mid:sc.id, city:cid, hero:hero?hero.id:0, t:t, dep:Date.now(), arrive:arr, travel:trv, ends:sc.ends, st:"out", keep:d.keep?1:0});
     save(); toastQ("Marching to the Arena: arrives in "+fmtT(trv)); closeSheet(); lastView=""; refresh(); return;
   }
-  var est=Math.round(arTravelEst(d.hero||0)), am=arById(d.mid)||{}, body={mid:d.mid, ref:ref, t:t, side:side, speed:alSpeed(d.hero)};
+  var est=Math.round(arTravelEst(d.hero||0)), am=arById(d.mid)||{}, body={mid:d.mid, ref:ref, t:t, side:side, speed:alSpeed(d.hero), slots:wbSlotsBase()};
   var undo=optSend("alArena", {ref:ref, aid:ALS.aid, mid:d.mid, city:cid, hero:hero?hero.id:0, t:t, dep:Date.now(), arrive:Date.now()+est, travel:est, ends:am.ends||(Date.now()+est+60000), st:"out", keep:d.keep?1:0}, cid, t, ens, hero);
   alPost("/al/arena/join",body).then(function(r){
     if (r.error){ undo(r.error); return; }
@@ -7823,11 +7835,11 @@ function arCardHtml(cur, now){ var T=arT(cur.type), tot=0; cur.joins.forEach(fun
     '<span class="rcn">Summoned by '+esc(cur.by)+' \u00b7 '+cur.joins.length+' march'+(cur.joins.length===1?'':'es')+' \u00b7 '+fmt(tot)+' troops</span></span></button>'; }
 function arDetailSheet(){ var cur=arLive().filter(function(c){ return c.id===sheetFor.mid; })[0], now=Date.now();
   if (!cur) return '<div class="head"><span class="ico">'+ICON.rally+'</span><div style="flex:1"><h2>Arena fight</h2><div class="sub">finished</div></div>'+alX()+'</div><p class="hint">This fight is over. Its results are in your Reports.</p>';
-  var T=arT(cur.type), full=(S.alArena||[]).length>=arSlots(), mineM=(S.alArena||[]).filter(function(m){ return m.mid===cur.id; });
+  var T=arT(cur.type), full=wbSlotsUsed()>=wbSlotsCap(), mineM=(S.alArena||[]).filter(function(m){ return m.mid===cur.id; });
   return '<div class="head rchead">'+(AR_ART[T.k]?'<img class="rcimg" src="'+AR_ART[T.k]+'" alt="">':'<span class="rcimg rcico">'+ICON.rally+'</span>')+'<div style="flex:1;min-width:0"><h2>Arena: level '+cur.lv+' '+esc(T.n)+'</h2><div class="sub">Closes in <b class="arleft" data-ends="'+cur.ends+'">'+fmtT(Math.max(0,cur.ends-now))+'</b> \u00b7 summoned by '+esc(cur.by)+'</div>'+ryBar(cur.at||cur.ends-3600e3, cur.ends, now)+'</div>'+alX()+'</div>'+
     '<p class="hint" style="margin:0 0 4px">'+esc(T.d||"")+'</p>'+
     ((T.lv[cur.lv-1])?'<p class="dur" style="margin:0 0 6px">Reward if it falls: '+esc(T.lv[cur.lv-1].reward)+'.</p>':'')+
-    '<div class="btnrow"><button class="btn small" data-act="al-arena-send" data-mid="'+cur.id+'"'+(full?' disabled':'')+'>Send a march</button><span class="dur">'+(full?'Every Arena slot is in use':'Travel about '+fmtT(arTravelEst("best"))+' from your kingdom')+'</span></div>'+
+    '<div class="btnrow"><button class="btn small" data-act="al-arena-send" data-mid="'+cur.id+'"'+(full?' disabled':'')+'>Send a march</button><span class="dur">'+(full?'Your server-map march slots are full ('+wbSlotsCap()+')':'Travel about '+fmtT(arTravelEst("best"))+' from your kingdom')+'</span></div>'+
     (cur.joins.length?'<div class="h3" style="margin-top:8px">On the way ('+cur.joins.length+')</div>'+cur.joins.map(function(j){ return '<p class="dur" style="margin:2px 0"><b>'+esc(j.name)+'</b>'+(j.auto?' <span class="aitag">auto</span>':'')+': '+fmt(j.n)+' troops'+(j.arrive>now?', arriving in '+fmtT(j.arrive-now):', arrived')+'</p>'; }).join(""):'<p class="dur">Nobody has marched yet.</p>')+
     (mineM.length?'<div class="h3" style="margin-top:8px">Your marches in it</div>'+mineM.map(function(m){ var hh=m.hero?heroById(m.hero):null, ci=cityIndex(m.city); return '<div class="bq"><span><b>'+fmt(sumT(m.t))+' troops</b> from '+esc(ci>=0?S.cities[ci].name:"?")+(hh?' led by '+esc(hh.name):'')+'<br><span class="dur">'+arStatus(m)+'</span></span></div>'; }).join(""):''); }
 function alRallyHtml(al){
@@ -7848,13 +7860,13 @@ function alRallyHtml(al){
 // 0.2.50: the Monster Arena has its own page: the fights that are up, then the monsters as pixel cards with a level stepper and Summon
 function alArenaHtml(al){ var E=al.econ, A=arCat(), my=al.my, now=Date.now(); if (!E || !A || !E.mon) return '<div class="section"><p class="hint">Loading the Arena…</p></div>';
   var mon=E.mon, lv=E.lv.arena||0, nLive=(mon.live||[]).length, h='';
-  h+='<div class="section"><div class="shead"><h3>Monster Arena</h3><span class="dur">'+(lv?'Level '+lv+' · '+nLive+' / '+mon.slots+' up':'')+'</span></div>';
+  h+='<div class="section"><div class="shead"><h3>Monster Arena</h3><span class="dur">'+(lv?'Level '+lv+' · '+nLive+' up':'')+'</span></div>';
   if (!lv) return h+'<div class="act"><span class="dur">Not built yet.</span><button class="btn small" data-act="al-bk" data-v="arena" data-from="home">Build it</button></div></div>';
   h+='<p class="hint" style="margin:0">Summon a monster and the alliance has '+Math.round(A.window/60000)+' minutes to march here; then everyone fights it at once. Nobody dies: losses come home wounded.'+alMore("ar")+'</p>'+
-    (alMoreOn("ar")?'<p class="hint" style="margin:6px 0 0">Everyone marches from their kingdom square. If it falls, everyone who joined gets the same reward. Arena marches need a hero but don’t use your Rally Spot: you have <b>'+arSlots()+'</b> Arena slots (Arena Marshals adds more). '+(mon.free?'Free summons left today: <b>'+mon.free+'</b>. ':'The free summons are used up. ')+'They come back in '+fmtT(Math.max(0,mon.resetAt-now))+' (the daily reset, midnight Eastern; Monster Lore adds more). You can also pay from the bank while free ones are left, to save them for when more of the alliance is online. After that, each summon costs its resource from the bank: 10 million at level 1, ten times more each level. A monster’s level can’t pass the Arena’s, and each level needs a kill of the one before. The Arena holds one monster per Arena slot at a time.</p>':'')+'</div>';
+    (alMoreOn("ar")?'<p class="hint" style="margin:6px 0 0">Everyone marches from their kingdom square. If it falls, everyone who joined gets the same reward. Arena marches need a hero and use your server-map march slots (<b>'+wbSlotsUsed()+' / '+wbSlotsCap()+'</b> in use: your capital\u2019s Rally Spot level, plus Arena Marshals), not your Rally Spot. '+(mon.free?'Free summons left today: <b>'+mon.free+'</b>. ':'The free summons are used up. ')+'They come back in '+fmtT(Math.max(0,mon.resetAt-now))+' (the daily reset, midnight Eastern; Monster Lore adds more). You can also pay from the bank while free ones are left, to save them for when more of the alliance is online. After that, each summon costs its resource from the bank: 10 million at level 1, ten times more each level. A monster’s level can’t pass the Arena’s, and each level needs a kill of the one before. Any number of monsters can be up at once.</p>':'')+'</div>';
   var fights=arLive(); if (fights.length) h+='<div class="rcards">'+fights.map(function(c){ return arCardHtml(c, now); }).join("")+'</div>';
   if (!A.types.some(function(t){ return t.k===ARS; })) ARS=A.types[0].k;
-  var T=A.types.filter(function(t){ return t.k===ARS; })[0], best=mon.best[T.k]||0, top=Math.min(lv, best+1), pick=Math.max(1,Math.min(top, ARL[T.k]||top)), L=T.lv[pick-1]||{}, full=nLive>=mon.slots;
+  var T=A.types.filter(function(t){ return t.k===ARS; })[0], best=mon.best[T.k]||0, top=Math.min(lv, best+1), pick=Math.max(1,Math.min(top, ARL[T.k]||top)), L=T.lv[pick-1]||{}, full=false; // 0.2.123 (Cody): any number of monsters at once
   h+='<div class="section"><div class="shead"><h3>Summon</h3><span class="dur">'+mon.free+' of '+mon.freeMax+' free today</span></div>';
   h+='<div class="armons">'+A.types.map(function(t){ var b=mon.best[t.k]||0; return '<button class="armon'+(t.k===T.k?' on':'')+'" data-act="al-armon" data-k="'+t.k+'" aria-pressed="'+(t.k===T.k)+'">'+(AR_ART[t.k]?'<img src="'+AR_ART[t.k]+'" alt="">':ICON.crest)+'<b>'+esc(t.n)+'</b><span>'+(b?'killed '+b:'new')+'</span></button>'; }).join("")+'</div>';
   if (!my.can.monster) h+='<p class="why" style="margin:6px 0 0">Your rank can’t summon monsters.</p>';
@@ -8667,7 +8679,8 @@ function wdMyMarches(){ var mine={}; ((WDS.d&&WDS.d.mine)||[]).forEach(function(
     if (j.st==="go" && j.rs==="open" && j.caller && !j.solo){ r.cancel=j.rid; if (tk==="bld"||tk==="cap") r.order=j.rid; } // 0.2.35: the caller can call the rally off until it leaves (everyone heads home)
     else if (j.st==="out"){ r.what=(tk==="sc"?"Scouting ":tk==="gar"?"Marching to ":"Attacking ")+tn; r.end=j.hit; r.hasten=!!(j.solo||j.caller); r.recall=!!j.solo; }
     else { r.what="Heading home"; r.end=j.home; r.hasten=j.home>now; }
-    return r; }); }
+    return r; }).concat(arMpOut().map(function(m){ var c=arById(m.mid), T=c?arT(c.type):null, nm=c?"the level "+c.lv+" "+T.n:"the Arena monster", now2=Date.now(); // 0.2.123: Arena marches use these slots, so they're listed here too
+      return {m:m, j:null, nm:nm, what:m.st==="back"?"Heading home from the Arena":now2<m.arrive?"To the Arena: "+nm:"At the Arena: "+nm, end:m.st==="back"?m.home:now2<m.arrive?m.arrive:(m.ends||0), hasten:false, recall:false}; })); }
 function wdMarchListHtml(){ var L=wdMyMarches(); if (!L.length) return ''; var open=WDS.mlOpen!==false, sp=S.items.marchsp||0;
   var h='<div class="wdml"><button class="wdmlh" data-act="wd-mltog" aria-expanded="'+open+'">'+(open?'\u25be':'\u25b8')+' Marches ('+L.length+')</button>';
   if (open) h+=L.map(function(r){ var hh=r.m.hero?heroById(r.m.hero):null, id=r.j&&r.j.id;
@@ -8794,8 +8807,11 @@ function wbRel(aid){ var d=WDS.d; if (!d || !aid) return ""; var me=d.me.aid; if
 function wbFx(k){ var B=S.wdOn && S.wdBuf; if (!B) return 0; var v=B[k]||0;
   if (k==="train"||k==="wound"||k==="heal"||k==="heroxp") v+=B["b_"+k]||0; return v; }
 function wbBldNm(i){ var b=WDS.d&&WDS.d.bk&&WDS.d.bk[i]; return b ? (b.k==="throne"?"the Throne":"the "+b.n) : "a building"; }
-function wbSlotsCap(){ var n=1; withCity(wdCapIdx(), function(){ n=Math.max(1, bLevel("rally")); }); return n; }
-function wbSlotsUsed(){ return (S.wdM||[]).length; }
+function wbSlotsBase(){ var n=1; withCity(wdCapIdx(), function(){ n=Math.max(1, bLevel("rally")); }); return Math.min(30,n); } // what the server is told: it adds the alliance's own slots
+// 0.2.123 (Cody): Arena marches use server-map march slots, and the alliance's Arena Marshals / Free Companies / Patriots add server-map slots
+function wbSlotsCap(){ return wbSlotsBase()+(S.alMember&&S.alFx?(S.alFx.arenaslots||0):0); }
+function arMpOut(){ return (S.alArena||[]).filter(function(m){ return !m.auto && m.aid!=="solo"; }); }
+function wbSlotsUsed(){ return (S.wdM||[]).length+arMpOut().length; }
 // the day a building resets, in words
 var WB_DAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 function wbWhen(ms){ var s=Math.max(0, ms-Date.now()); return s>=48*3600e3 ? Math.ceil(s/864e5)+" days" : fmtT(s); }
@@ -8867,7 +8883,7 @@ function wbTarget(W){ var D=WDS.d; if (!D) return null;
   var b=D.bk&&D.bk[W.i]; return b?{to:[b.x+1,b.y+1], L:0, name:b.k==="throne"?"the Throne":"the "+b.n, b:W}:null; }
 function wbWhy(W, d, n){ var D=WDS.d; if (!D.me.wild) return "Move your capital into the Wilds first";
   if (W.tk==="sc" && (n!==d.t[2] || !n)) return "A scouting party is scouts only";
-  if (wbSlotsUsed()>=wbSlotsCap()) return "Your server-map march slots are full ("+wbSlotsCap()+": your capital’s Rally Spot)";
+  if (wbSlotsUsed()>=wbSlotsCap()) return "Your server-map march slots are full ("+wbSlotsCap()+", Arena marches included)";
   return ""; }
 function wbMarchTxt(W, tg, D, mult){ var t=fmtT(wdTripMs([D.me.x,D.me.y],tg.to,mult));
   return W.tk==="gar" ? "Travel about "+t+" to "+tg.name+"; your troops stay there as its garrison until you recall them."
@@ -9046,7 +9062,7 @@ function wdWhy(n){ var d=marchDraft, D=WDS.d, tg=wdTarget(), hero=d.hero?heroByI
   if (n>armyCap(d.ensign, hero)) return "Army limit is "+fmt(armyCap(d.ensign, hero))+" troops";
   var av=draftAvail(); for (var i=0;i<12;i++) if (d.t[i]>av[i]) return "Not enough "+U[i].name+"s";
   if (d.wd.kind==="b"){ var wbw=wbWhy(d.wd, d, n); if (wbw) return wbw; }
-  else if (wbSlotsUsed()>=wbSlotsCap()) return "Your server-map march slots are full ("+wbSlotsCap()+": your capital\u2019s Rally Spot)";
+  else if (wbSlotsUsed()>=wbSlotsCap()) return "Your server-map march slots are full ("+wbSlotsCap()+", Arena marches included)";
   if (d.wd.kind==="join" && tg.r.tk && tg.r.tk!=="mon" && !D.me.wild) return "Move your capital into the Wilds first";
   if (d.wd.kind==="join" && !tg.r.mine && Date.now()+wdTripMs([D.me.x,D.me.y], tg.to, wdMult(d.t,d.hero))>tg.r.leave) return "Too far to make it before the rally leaves";
   return ""; }
@@ -9062,7 +9078,7 @@ function wdMarchHead(){ var d=marchDraft, tg=wdTarget(), L=tg?tg.L:1;
   return '<div class="head"><span class="ico">'+ICON.rally+'</span><div><h2>'+(d.wd.kind==="join"?"Join the rally on the level "+L+" "+esc(wdMonName(L)):d.wd.mins?"Call your alliance onto the level "+L+" "+esc(wdMonName(L)):"Attack the level "+L+" "+esc(wdMonName(L)))+'</h2><div class="sub">on the server map, from your capital</div></div></div><p class="hint">'+wdRwTxt(L)+'</p>'; }
 function wdSend(){ var d=marchDraft; if (wdWhy(sumT(d.t)) || WDS.sending) return;
   var W=d.wd, hero=d.hero?heroById(d.hero):null, cid=C().id, t=d.t.slice(), ens=ensKey(d.ensign), mult=wdMult(t,d.hero), ref="w"+cid+"-"+Date.now().toString(36)+Math.floor(Math.random()*1e6).toString(36), tg=wdTarget();
-  var body={ref:ref, t:t, side:mySide(hero), mult:mult, cos:myLook("march")||"", slots:wbSlotsCap()}, path="/wd/rjoin";
+  var body={ref:ref, t:t, side:mySide(hero), mult:mult, cos:myLook("march")||"", slots:wbSlotsBase()}, path="/wd/rjoin";
   if (W.kind==="join") body.rid=W.rid; else if (W.kind==="b") path=wbSendBody(W, body); else { body.mon=W.mon; body.mins=W.mins||0; path="/wd/rally"; }
   var undo=optSend("wdM", {ref:ref, rid:W.rid, city:cid, hero:hero?hero.id:0, t:t, dep:Date.now(), st:"out", L:tg?tg.L:0, tk:W.kind==="b"?W.tk:(tg&&tg.r&&tg.r.tk)||"mon", name:W.kind==="b"?(tg?tg.name:""):(tg&&tg.r&&tg.r.tname)||""}, cid, t, ens, hero); // 0.2.86: at the tap (0.2.71: Previous works for server map marches too)
   if (wdVisible()) wdPaint();
