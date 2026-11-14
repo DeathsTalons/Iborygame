@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.125";
+window.IBORY_V="0.2.126";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1914,7 +1914,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.125";
+var APP_VERSION = "0.2.126";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -15452,6 +15452,10 @@ function initSim(){ simWaveReset(); if (S.loSkip) LOW.skip=S.loSkip; // a clean 
 function setPreset(L){ simWaveReset();
   sim.def.preset=L;
   if (L==="custom") return;
+  var hm=/^hc(\d+):(\d+)$/.exec(L); if (hm){ // 0.2.126 (Cody): every historic city level and garrison as a War Room preset, the same defenders the map's cities field (baseOf)
+    var hL=+hm[1], set=HC_SET[hL], cb=set.combos[+hm[2]], ht=[0,set.w,0,0,0,set.a,0,0,0,0,0,0]; ht[cb[0]]=set.ps; ht[cb[1]]=set.cp; ht[cb[2]]=set.m;
+    sim.def.t=ht; sim.def.f=HC_FORTS.slice(); sim.def.wall=10; sim.def.r={military_tradition:0,iron_working:10,medicine:10,compass:10,horseback_riding:10,archery:10};
+    sim.def.hatk=Math.round(0.5*HERO_ATK_DIV+set.hero[0]); sim.def.hint=set.hero[1]; sim.def.eng=10; sim.def.dg=null; delete sim.def.hid; return; }
   var n=NPC[+L]; sim.def.t=n.t.slice(); sim.def.f=n.f.slice(); sim.def.wall=+L; sim.def.r=npcSimResearch(+L); var nh2=npcHero(+L); sim.def.r.military_tradition=0; sim.def.hatk=Math.round(+L*5*HERO_ATK_DIV/100+nh2[0]); sim.def.hint=nh2[1]; sim.def.eng=+L;
 }
 // 0.2.119 (Cody): your side can be led by one of your own heroes (any city; the enemy stays typed in by hand). Picking one fills Attack, Intelligence and Star set with what that hero
@@ -15480,7 +15484,11 @@ function simWaveSum(){ var la=0, ld=0, w=0; SIMW.log.forEach(function(x){ la+=x.
 function viewWar(){
   if (!sim) initSim();
   var a=sim.atk, d=sim.def, opts='';
+  opts+='<optgroup label="NPC cities">';
   for (var L=1;L<=10;L++) opts+='<option value="'+L+'"'+(d.preset===String(L)?' selected':'')+'>Level '+L+' NPC city</option>';
+  opts+='</optgroup>';
+  [12,14,16,18].forEach(function(hL){ opts+='<optgroup label="Level '+hL+' historic cities">'; HC_SET[hL].combos.forEach(function(cb,ci){ var v="hc"+hL+":"+ci; // the garrisons rotate daily between these
+    opts+='<option value="'+v+'"'+(d.preset===v?' selected':'')+'>Level '+hL+' historic: '+cb.map(function(i){ return U[i].name; }).join(", ")+'</option>'; }); opts+='</optgroup>'; });
   opts+='<option value="custom"'+(d.preset==="custom"?' selected':'')+'>Custom defender</option>';
   var h='<div class="section"><div class="shead wrhead"><h3>Battle simulator</h3><select id="npcsel" aria-label="Defender">'+opts+'</select></div>'+
     '<div class="wrload"><button class="chipbtn" data-act="sim-mine">My army</button><button class="chipbtn" data-act="sim-myres">My research</button><button class="chipbtn" data-act="sim-mydef">My city defends</button><button class="chipbtn" data-act="sim-clear">Clear my troops</button></div>'+
