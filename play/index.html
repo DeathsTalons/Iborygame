@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.124";
+window.IBORY_V="0.2.125";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1914,7 +1914,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.124";
+var APP_VERSION = "0.2.125";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -4749,7 +4749,7 @@ function processAuto(){
    of N", with an optional "stop when the target has M". A rule sends an ordinary reinforcement (travel time, rations, army limit, no hero), but
    on its own slot: one march out per rule, never the Rally Spot's. Rules run with the farm presets (processAuto), so they also run every
    5 game minutes through a catch-up: feeder cities keep a farming city stocked overnight. */
-var ROT_MAX=12, ROT_ITEM="util:rotation", ROTARM=false, ROTBUSY=false;
+var ROT_MAX=12, ROT_ITEM="util:rotation", ROTARM=false, ROTBUSY=false, ROTCLIP=null; // ROTCLIP (0.2.125, Cody): rules copied from one city, to paste into others
 function rotUnl(){ if (COS && Array.isArray(COS.owned)){ var o=COS.owned.indexOf(ROT_ITEM)>=0; if (!!S.rotUnl!==o) S.rotUnl=o?1:0; return o; } return !!S.rotUnl; } // the server decides; the save remembers it for when the server can't be reached (and for catch-up, before it has answered)
 function rotPrice(){ var p=cosPrice("util","rotation"); return p>=0?p:100; }
 function rotRules(c){ c=c||C(); if (!c.rot) c.rot=[]; return c.rot; }
@@ -4814,7 +4814,10 @@ function viewRotate(){
   if (!rallyLv()) h+='<p class="why">'+esc(S.name)+' needs a Rally Spot before it can send marches.</p>';
   h+='</div><div class="section"><div class="shead"><h3>Rules</h3><span class="dur">'+L.length+' / '+ROT_MAX+'</span></div>'+
     (L.length?L.map(rotRuleHtml).join(""):'<p class="hint">No rules here yet.</p>')+
-    '<div class="btnrow" style="margin-top:8px"><button class="btn small" data-act="rot-add"'+(L.length>=ROT_MAX?' disabled':'')+'>Add a rule</button></div></div>';
+    '<div class="btnrow" style="margin-top:8px"><button class="btn small" data-act="rot-add"'+(L.length>=ROT_MAX?' disabled':'')+'>Add a rule</button>'+
+      (L.length?'<button class="btn small ghost" data-act="rot-copy">Copy rules</button>':'')+
+      (ROTCLIP&&ROTCLIP.from!==C().id?'<button class="btn small ghost" data-act="rot-paste"'+(L.length>=ROT_MAX?' disabled':'')+'>Paste '+ROTCLIP.rules.length+' from <span translate="no">'+esc(ROTCLIP.name)+'</span></button>':'')+'</div>'+
+    (ROTCLIP&&ROTCLIP.from===C().id?'<p class="dur" style="margin:6px 0 0">Copied. Switch to another city and paste them there.</p>':'')+'</div>';
   return h; }
 document.addEventListener("change", function(e){ var t=e.target; if (!t || !t.dataset || !t.dataset.rot) return; var r=rotById(+t.dataset.id); if (!r) return; var k=t.dataset.rot;
   if (k==="u") r.u=Math.max(0,Math.min(11,+t.value||0)); else if (k==="to") r.to=+t.value||0; else if (k==="send") r.send=Math.max(1,rotNum(t.value)); else r[k]=rotNum(t.value);
@@ -16633,6 +16636,10 @@ document.addEventListener("click",function(e){
   if (act==="deco-open"){ cosSync(); openSheet({kind:"deco", tile:a.dataset.tile}); return; }
   if (act==="deco-buy"){ decoBuy(a.dataset.pack); return; }
   if (act==="rot-buy"){ rotBuy(); return; }
+  if (act==="rot-copy"){ ROTCLIP={from:C().id, name:S.name, rules:rotRules().map(function(r){ return {u:r.u, to:r.to, keep:r.keep, send:r.send, stop:r.stop, on:r.on}; })}; toastQ("Copied "+ROTCLIP.rules.length+" rule"+(ROTCLIP.rules.length===1?"":"s")); lastView=""; renderView(true); return; }
+  if (act==="rot-paste"){ if (!ROTCLIP || !rotUnl()) return; var pL=rotRules(), me=C().id, added=0, self=0, full=0;
+    ROTCLIP.rules.forEach(function(r){ if (r.to===me){ self++; return; } if (pL.length>=ROT_MAX){ full++; return; } S.nextRotId=(S.nextRotId||0)+1; pL.push({id:S.nextRotId, u:r.u, to:r.to, keep:r.keep, send:r.send, stop:r.stop, on:r.on, n:0}); added++; });
+    save(); toastQ("Pasted "+added+" rule"+(added===1?"":"s")+(self?" ("+self+" sent troops here, so left out)":"")+(full?" ("+full+" didn\u2019t fit: "+ROT_MAX+" rules a city)":"")); lastView=""; renderView(true); return; }
   if (act==="rot-add"){ var rL=rotRules(); if (rL.length<ROT_MAX && rotUnl()){ var ro=S.cities.filter(function(c){ return c.id!==C().id; })[0]; S.nextRotId=(S.nextRotId||0)+1; rL.push({id:S.nextRotId, u:5, to:ro?ro.id:0, keep:0, send:Math.max(1,Math.min(10000,rotCap()||10000)), stop:0, on:false, n:0}); save(); lastView=""; renderView(true); } return; }
   if (act==="rot-del"){ var rD=rotRules(), rdi=rD.indexOf(rotById(+a.dataset.id)); if (rdi>=0){ rD.splice(rdi,1); save(); lastView=""; renderView(true); } return; }
   if (act==="rot-on"){ var rO=rotById(+a.dataset.id); if (rO){ rO.on=!rO.on; save(); lastView=""; renderView(true); } return; }
