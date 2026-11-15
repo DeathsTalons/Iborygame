@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.128";
+window.IBORY_V="0.2.129";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1660,7 +1660,9 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 .wdview.fs .wdkeyb:not(.on),.wdview.fs .wdkey{bottom:calc(10px + env(safe-area-inset-bottom,0px))}
 .fmline{margin:6px 0 0;font-size:.88rem;color:var(--muted)}.fmline b{color:var(--ink)}.fmline b.okc{color:var(--grass)}
 .fmhelp{margin-top:6px}
-.simmine{display:flex;gap:8px;align-items:flex-start;margin-top:8px;font-size:.88rem;line-height:1.3;white-space:normal;max-width:100%}.simmine input{margin-top:2px;flex:none}.simmine span.simml{min-width:0;flex:1}
+/* 0.2.129: plain block layout (Samsung Internet squeezed the flex text of this box into a one-letter column at the table's edge) */
+table.simtab td.simherotd{text-align:left;overflow-wrap:normal;word-break:normal;white-space:normal}
+.simmine{display:block;margin-top:8px;font-size:.88rem;line-height:1.35;text-align:left;white-space:normal;overflow-wrap:normal;word-break:normal;writing-mode:horizontal-tb}table.simtab .simmine input,.simmine input{display:inline-block;width:auto;padding:0;min-width:0;height:auto;vertical-align:-2px;margin:0 8px 0 0;float:none}.simmine span.simml{display:inline}
 .simhero{display:grid;grid-template-columns:1fr;gap:8px}.simhero label{display:flex;flex-direction:column;gap:3px;min-width:0}.simhero select{width:100%;min-width:0}
 .rotr{border:1px solid var(--line);border-radius:12px;background:var(--panel2);padding:10px;margin-top:8px}.rotr.off{opacity:.78}
 .rot1{display:flex;align-items:center;gap:8px}.rot1 select{flex:1;min-width:0}.rot1 .swt{flex:none}
@@ -1915,7 +1917,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.128";
+var APP_VERSION = "0.2.129";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -7481,7 +7483,7 @@ function soloArenaHtml(){
       '<div class="btnrow"><button class="btn small" data-act="al-arena-send" data-mid="'+cur.id+'"'+(full?' disabled':'')+'>Send a march</button><span class="dur">'+(full?'Every Arena slot is in use':'Travel about '+fmtT(arTravelEst("best"))+' from your city')+'</span></div>'+
       (cur.joins.length?'<p class="dur">'+cur.joins.length+' march'+(cur.joins.length>1?'es':'')+' on the way: '+fmt(cur.joins.reduce(function(a,j){ return a+j.n; },0))+' troops</p>':'<p class="dur">Nothing has marched yet.</p>')+'</div>'; });
   if (mine.length) h+='<div class="section"><div class="shead"><h3>Your Arena marches</h3><span class="dur">'+(S.alArena||[]).length+' / '+SAR.slots+' slots</span></div>'+mine.map(function(m){ var hh=m.hero?heroById(m.hero):null, ci=cityIndex(m.city);
-    return '<div class="bq"><span><b>'+fmt(sumT(m.t))+' troops</b> from '+esc(ci>=0?S.cities[ci].name:"?")+(hh?' led by '+esc(hh.name):'')+'<br><span class="dur">'+arStatus(m)+'</span></span></div>'; }).join("")+'</div>';
+    return '<div class="bq"><span><b>'+fmt(sumT(m.t))+' troops</b> from '+esc(ci>=0?S.cities[ci].name:"?")+(hh?' led by '+esc(hh.name):'')+'<br><span class="dur">'+arStatus(m)+'</span></span>'+arRecallBtn(m)+'</div>'; }).join("")+'</div>';
   if (A.lv){
     h+='<div class="section"><div class="shead"><h3>Summon</h3><span class="dur">'+A.live.length+' / '+SAR.slots+' up · '+mon.free+' of '+SAR.free+' free today</span></div>'+
       '<p class="hint">'+(mon.free?'Free summons left today: <b>'+mon.free+'</b>. ':'The free summons are used up. ')+'They come back at the daily reset, in '+fmtT(Math.max(0,mon.resetAt-now))+'. After that, each summon costs its resource from the city you’re looking at: 10 million at level 1, ten times more each level. A monster’s level can’t pass the Arena’s, and each level needs a kill of the one before.</p>';
@@ -7517,6 +7519,13 @@ function alPaceHero(hid){ if (hid!=null && hid!=="best") return hid; if (hid!=="
 function arTravelEst(hid){ hid=alPaceHero(hid); if (soloArOn()) return SAR.travel0*1000/alSpeed(hid); var al=alMine(), c=arCat(), M=al&&al.map; if (!c||!M) return 60000; var me=alMyTile(M), b=(M.b||[]).filter(function(x){ return x.k==="arena"; })[0], bs=M.bs||3;
   var d=me&&b?Math.hypot(me.x-(b.x+(bs-1)/2), me.y-(b.y+(bs-1)/2)):0; return (c.travel0+c.travelTile*d)*1000/alSpeed(hid); }
 function arSlots(){ var m=arMon(); return m?m.slots:5; }
+// 0.2.129 (Cody): a march sent to the Arena can be recalled until its monster is fought: it leaves the fight and walks home (as far back as it had come)
+function arCanRecall(m){ return m && !m.auto && m.st==="out" && !m.pend && Date.now()<(m.ends||0); }
+function arRecallBtn(m){ return arCanRecall(m)?'<button class="link" data-act="ar-recall" data-ref="'+esc(m.ref)+'">Recall</button>':''; }
+function arRecallDone(m){ var now=Date.now(); m.st="back"; m.back=m.t.slice(); m.wounded=m.t.map(function(){ return 0; }); m.home=now+(now<m.arrive?Math.max(0,now-(m.dep||now)):(m.travel||60000)); m.recalled=1; save(); toastQ("Recalled: home in "+fmtT(m.home-now)); lastView=""; lastSheet=""; refresh(); try { renderSheet(); } catch(e){} }
+function arRecall(ref){ var m=(S.alArena||[]).filter(function(x){ return x.ref===ref; })[0]; if (!arCanRecall(m)) return;
+  if (m.aid==="solo"){ var sc=(S.soloAr&&S.soloAr.live||[]).filter(function(c){ return c.id===m.mid; })[0]; if (sc) sc.joins=sc.joins.filter(function(j){ return j.ref!==ref; }); arRecallDone(m); return; }
+  m.pend=1; alPost("/al/arena/recall",{ref:ref}).then(function(d){ delete m.pend; if (d && d.ok) arRecallDone(m); else { toast((d&&d.error)||"Couldn\u2019t recall"); lastView=""; refresh(); } }).catch(function(){ delete m.pend; toast("Can\u2019t reach the server"); }); }
 function arStatus(m){ var now=Date.now(); return m.st==="back" ? 'coming home, '+fmtT(Math.max(0,m.home-now)) : now<m.arrive ? 'arrives in '+fmtT(m.arrive-now) : 'at the Arena, waiting for the fight'; }
 function arRewardList(rw){ if (!rw) return ""; var out=[]; for (var k in rw.items) out.push(fmt(rw.items[k])+" "+((ITEMS[k]&&ITEMS[k].name)||k)); var rs=0; for (var r in rw.res) rs+=rw.res[r]; if (rs) out.push(fmt(rw.res.food||0)+" of each resource"); return out.join(", "); }
 var ARS=""; // the Arena page's picked monster
@@ -7846,7 +7855,7 @@ function arDetailSheet(){ var cur=arLive().filter(function(c){ return c.id===she
     ((T.lv[cur.lv-1])?'<p class="dur" style="margin:0 0 6px">Reward if it falls: '+esc(T.lv[cur.lv-1].reward)+'.</p>':'')+
     '<div class="btnrow"><button class="btn small" data-act="al-arena-send" data-mid="'+cur.id+'"'+(full?' disabled':'')+'>Send a march</button><span class="dur">'+(full?'Your server-map march slots are full ('+wbSlotsCap()+')':'Travel about '+fmtT(arTravelEst("best"))+' from your kingdom')+'</span></div>'+
     (cur.joins.length?'<div class="h3" style="margin-top:8px">On the way ('+cur.joins.length+')</div>'+cur.joins.map(function(j){ return '<p class="dur" style="margin:2px 0"><b>'+esc(j.name)+'</b>'+(j.auto?' <span class="aitag">auto</span>':'')+': '+fmt(j.n)+' troops'+(j.arrive>now?', arriving in '+fmtT(j.arrive-now):', arrived')+'</p>'; }).join(""):'<p class="dur">Nobody has marched yet.</p>')+
-    (mineM.length?'<div class="h3" style="margin-top:8px">Your marches in it</div>'+mineM.map(function(m){ var hh=m.hero?heroById(m.hero):null, ci=cityIndex(m.city); return '<div class="bq"><span><b>'+fmt(sumT(m.t))+' troops</b> from '+esc(ci>=0?S.cities[ci].name:"?")+(hh?' led by '+esc(hh.name):'')+'<br><span class="dur">'+arStatus(m)+'</span></span></div>'; }).join(""):''); }
+    (mineM.length?'<div class="h3" style="margin-top:8px">Your marches in it</div>'+mineM.map(function(m){ var hh=m.hero?heroById(m.hero):null, ci=cityIndex(m.city); return '<div class="bq"><span><b>'+fmt(sumT(m.t))+' troops</b> from '+esc(ci>=0?S.cities[ci].name:"?")+(hh?' led by '+esc(hh.name):'')+'<br><span class="dur">'+arStatus(m)+'</span></span>'+arRecallBtn(m)+'</div>'; }).join(""):''); }
 function alRallyHtml(al){
   var Y=ryData(); if (!Y) return '<div class="section"><p class="hint">Loading rallies…</p></div>';
   var now=Date.now(), live=ryLive(), w=ryWait("hc"), h='';
@@ -8685,12 +8694,12 @@ function wdMyMarches(){ var mine={}; ((WDS.d&&WDS.d.mine)||[]).forEach(function(
     else if (j.st==="out"){ r.what=(tk==="sc"?"Scouting ":tk==="gar"?"Marching to ":"Attacking ")+tn; r.end=j.hit; r.hasten=!!(j.solo||j.caller); r.recall=!!j.solo; }
     else { r.what="Heading home"; r.end=j.home; r.hasten=j.home>now; }
     return r; }).concat(arMpOut().map(function(m){ var c=arById(m.mid), T=c?arT(c.type):null, nm=c?"the level "+c.lv+" "+T.n:"the Arena monster", now2=Date.now(); // 0.2.123: Arena marches use these slots, so they're listed here too
-      return {m:m, j:null, nm:nm, what:m.st==="back"?"Heading home from the Arena":now2<m.arrive?"To the Arena: "+nm:"At the Arena: "+nm, end:m.st==="back"?m.home:now2<m.arrive?m.arrive:(m.ends||0), hasten:false, recall:false}; })); }
+      return {m:m, j:null, nm:nm, what:m.st==="back"?"Heading home from the Arena":now2<m.arrive?"To the Arena: "+nm:"At the Arena: "+nm, end:m.st==="back"?m.home:now2<m.arrive?m.arrive:(m.ends||0), hasten:false, recall:false, arref:arCanRecall(m)?m.ref:""}; })); }
 function wdMarchListHtml(){ var L=wdMyMarches(); if (!L.length) return ''; var open=WDS.mlOpen!==false, sp=S.items.marchsp||0;
   var h='<div class="wdml"><button class="wdmlh" data-act="wd-mltog" aria-expanded="'+open+'">'+(open?'\u25be':'\u25b8')+' Marches ('+L.length+')</button>';
   if (open) h+=L.map(function(r){ var hh=r.m.hero?heroById(r.m.hero):null, id=r.j&&r.j.id;
     return '<div class="wdmlr"><div class="wdml1"><span class="wdmlw" title="'+esc(r.what)+'">'+esc(r.what)+'</span>'+(r.end?'<b data-wdend="'+r.end+'">'+fmtT(Math.max(0,r.end-Date.now()))+'</b>':'')+'</div><div class="dur">'+fmt(sumT(r.m.t))+' troops'+(hh?' \u00b7 '+esc(hh.name):'')+'</div>'+
-      (id&&(r.hasten||r.recall||r.cancel||r.order)?'<div class="wdmlb">'+(r.hasten?'<button class="link strong" data-act="wd-mhasten" data-id="'+id+'"'+(sp?'':' disabled')+' title="Speed up'+(sp?' ('+sp+' left)':'')+'">Speed up</button>':'')+(r.recall?'<button class="link" data-act="wd-mrecall" data-id="'+id+'">Recall</button>':'')+(r.order?'<button class="link" data-act="wb-order" data-rid="'+r.order+'">Wave order</button>':'')+(r.cancel?'<button class="link danger" data-act="wd-rcall" data-rid="'+r.cancel+'">'+(WDS.armOff===r.cancel?'Tap again to call it off':'Call off the rally')+'</button>':'')+'</div>':'')+'</div>'; }).join("");
+      (r.arref?'<div class="wdmlb"><button class="link" data-act="ar-recall" data-ref="'+esc(r.arref)+'">Recall</button></div>':'')+(id&&(r.hasten||r.recall||r.cancel||r.order)?'<div class="wdmlb">'+(r.hasten?'<button class="link strong" data-act="wd-mhasten" data-id="'+id+'"'+(sp?'':' disabled')+' title="Speed up'+(sp?' ('+sp+' left)':'')+'">Speed up</button>':'')+(r.recall?'<button class="link" data-act="wd-mrecall" data-id="'+id+'">Recall</button>':'')+(r.order?'<button class="link" data-act="wb-order" data-rid="'+r.order+'">Wave order</button>':'')+(r.cancel?'<button class="link danger" data-act="wd-rcall" data-rid="'+r.cancel+'">'+(WDS.armOff===r.cancel?'Tap again to call it off':'Call off the rally')+'</button>':'')+'</div>':'')+'</div>'; }).join("");
   return h+'</div>'; }
 function wdMarchTick(){ var els=document.querySelectorAll("[data-wdend]"), now=Date.now(); for (var i=0;i<els.length;i++){ var t=fmtT(Math.max(0,+els[i].dataset.wdend-now)); if (els[i].textContent!==t) els[i].textContent=t; } }
 setInterval(wdMarchTick, 1000);
@@ -15512,7 +15521,7 @@ function viewWar(){
     h+='<table class="simtab"><colgroup><col><col style="width:30%"><col style="width:30%"></colgroup><thead><tr><th></th><th>You</th><th>Enemy</th></tr></thead><tbody>';
     SIMTECH.forEach(function(t,i){ h+='<tr><td>'+({"Military Tradition":"Mil. Tradition","Horseback Riding":"Horse Riding"}[t[1]]||t[1])+'</td><td>'+simInput("atk","r",SIMK[i],a.r[SIMK[i]])+'</td><td>'+simInput("def","r",SIMK[i],d.r[SIMK[i]])+'</td></tr>'; });
     h+='<tr class="sub"><td colspan="3">Leading hero</td></tr>';
-    h+='<tr><td colspan="3"><div class="simhero">'+simHeroSel("atk",a)+'</div><label class="simmine"><input type="checkbox" data-simmine="atk"'+(a.mine?' checked':'')+'><span class="simml">Add my other bonuses <span class="dur">(constellations, skill books, achievements, Warhorn, Corselet, alliance)</span></span></label>'+
+    h+='<tr><td colspan="3" class="simherotd"><div class="simhero">'+simHeroSel("atk",a)+'</div><label class="simmine"><input type="checkbox" data-simmine="atk"'+(a.mine?' checked':'')+'><span class="simml">Add my other bonuses <span class="dur">(constellations, skill books, achievements, Warhorn, Corselet, alliance)</span></span></label>'+
       (d.mine?'<label class="simmine"><input type="checkbox" data-simmine="def" checked> Defender: my bonuses</label>':'')+'</td></tr>'; // 0.2.119 (Cody): pick one of your heroes instead of typing the numbers
     h+='<tr><td>Attack</td><td>'+simInput("atk","hatk",null,a.hatk)+'</td><td>'+simInput("def","hatk",null,d.hatk)+'</td></tr>';
     h+='<tr><td>Intelligence</td><td>'+simInput("atk","hint",null,a.hint)+'</td><td>'+simInput("def","hint",null,d.hint)+'</td></tr>';
@@ -16663,6 +16672,7 @@ document.addEventListener("click",function(e){
   if (act==="dpick-show"){ closeSheet(); MPOP.hide=false; selectTile(a.dataset.tile, true); return; }
   if (act==="deco-open"){ cosSync(); openSheet({kind:"deco", tile:a.dataset.tile}); return; }
   if (act==="deco-buy"){ decoBuy(a.dataset.pack); return; }
+  if (act==="ar-recall"){ arRecall(a.dataset.ref); return; }
   if (act==="rot-buy"){ rotBuy(); return; }
   if (act==="rot-copy"){ ROTCLIP={from:C().id, name:S.name, rules:rotRules().map(function(r){ return {u:r.u, to:r.to, keep:r.keep, send:r.send, stop:r.stop, on:r.on}; })}; toastQ("Copied "+ROTCLIP.rules.length+" rule"+(ROTCLIP.rules.length===1?"":"s")); lastView=""; renderView(true); return; }
   if (act==="rot-paste"){ if (!ROTCLIP || !rotUnl()) return; var pL=rotRules(), me=C().id, added=0, self=0, full=0;
