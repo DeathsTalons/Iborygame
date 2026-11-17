@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.130";
+window.IBORY_V="0.2.131";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1668,6 +1668,7 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 table.simtab td.simherotd{text-align:left;overflow-wrap:normal;word-break:normal;white-space:normal}
 .simmine{display:block;margin-top:8px;font-size:.88rem;line-height:1.35;text-align:left;white-space:normal;overflow-wrap:normal;word-break:normal;writing-mode:horizontal-tb}table.simtab .simmine input,.simmine input{display:inline-block;width:auto;padding:0;min-width:0;height:auto;vertical-align:-2px;margin:0 8px 0 0;float:none}.simmine span.simml{display:inline}
 .simhero{display:grid;grid-template-columns:1fr;gap:8px}.simhero label{display:flex;flex-direction:column;gap:3px;min-width:0}.simhero select{width:100%;min-width:0}
+.fsortbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 0 4px}.fsortbar .fsort{max-width:62%}
 .fsorthd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px}.fsorthd .h3{margin:0}.fsort{width:auto;max-width:55%;font-size:.85rem}
 .wvrowb{border-bottom:1px solid var(--line)}.wvrowb .wvrow{border-bottom:0}.wvens{padding:0 0 8px}.wvens select{width:100%;font-size:.85rem}
 .rotr{border:1px solid var(--line);border-radius:12px;background:var(--panel2);padding:10px;margin-top:8px}.rotr.off{opacity:.78}
@@ -1923,7 +1924,7 @@ table.simtab td.simherotd{text-align:left;overflow-wrap:normal;word-break:normal
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.130";
+var APP_VERSION = "0.2.131";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -4859,6 +4860,7 @@ function presetsSection(){
   return h+'</div></div>';
 }
 // 0.2.130 (Cody): sort a farm preset's list. It reorders the list for good (move targets by hand after if you like); the next march starts from the top.
+function farmSortSel(pr,pi){ return pr.farm.length>1?'<select class="fsort" data-fsort="'+pi+'" aria-label="Sort the farm list"><option value="">Sort\u2026</option><option value="near">Nearest first</option><option value="far">Farthest first</option><option value="lvhi">Highest level first</option><option value="lvlo">Lowest level first</option><option value="kind">By kind, then nearest</option></select>':''; }
 function farmSort(pr, how){ var key=function(id){ var q=TILE_BY[id]; return q?{d:tdist(q), L:q.L||0, k:tileName(q).replace(/^Level \d+ /,"")}:{d:1e9, L:-1, k:"~"}; };
   var ks={}; pr.farm.forEach(function(id){ ks[id]=key(id); });
   var cmp={near:function(a,b){ return ks[a].d-ks[b].d; }, far:function(a,b){ return ks[b].d-ks[a].d; }, lvhi:function(a,b){ return ks[b].L-ks[a].L || ks[a].d-ks[b].d; }, lvlo:function(a,b){ return ks[a].L-ks[b].L || ks[a].d-ks[b].d; }, kind:function(a,b){ return ks[a].k<ks[b].k?-1:ks[a].k>ks[b].k?1:ks[a].d-ks[b].d; }}[how];
@@ -4888,7 +4890,7 @@ function presetSheet(pi, mk){
   h+='<label class="chk"><input type="checkbox" id="pfull"'+(pr.fullOnly?' checked':'')+'> Only hit NPC cities and AI lords at full garrison: auto-farm skips any that won\u2019t be full when the march lands (no medals or items drop otherwise) and waits if none will be</label>';
   h+='<label class="chk"><input type="checkbox" id="pxp"'+(pr.xpOnly?' checked':'')+'> Only hit valleys and flats that will pay experience: a tile pays the hero once an hour, so auto-farm skips any still on its hour when the march lands, and waits if none is ready (or no hero is free)</label>';
   h+='<label class="chk"><input type="checkbox" id="pnocap"'+(pr.noCap?' checked':'')+'> Don\u2019t capture NPC cities: this preset\u2019s farm hits never take a city, even with room under your title and its loyalty at 0</label>';
-  h+='<div class="fsorthd"><div class="h3">Farm list ('+pr.farm.length+')</div>'+(pr.farm.length>1?'<select class="fsort" data-fsort="'+pi+'" aria-label="Sort the farm list"><option value="">Sort\u2026</option><option value="near">Nearest first</option><option value="far">Farthest first</option><option value="lvhi">Highest level first</option><option value="lvlo">Lowest level first</option><option value="kind">By kind, then nearest</option></select>':'')+'</div>';
+  h+='<div class="fsorthd"><div class="h3">Farm list ('+pr.farm.length+')</div>'+farmSortSel(pr,pi)+'</div>';
   if (!pr.farm.length) h+='<p class="hint">Empty. Tap a target on the Map and use "Add to farm list".</p>';
   else h+='<ol class="qlist">'+pr.farm.map(function(id,k){ var q=TILE_BY[id]; return '<li><span>'+(q?esc(tileName(q)):"Gone")+' <span class="dur">('+id.replace(",",", ")+(q?', '+tdist(q).toFixed(1)+' tiles':'')+')</span>'+(k===pr.idx%pr.farm.length?' <span class="dur">next</span>':'')+'</span><button class="btn ghost small wvmv" data-act="farm-mv" data-p="'+pi+'" data-k="'+k+'" data-d="-1" aria-label="Move up"'+(k?'':' disabled')+'>\u25B2</button><button class="btn ghost small wvmv" data-act="farm-mv" data-p="'+pi+'" data-k="'+k+'" data-d="1" aria-label="Move down"'+(k<pr.farm.length-1?'':' disabled')+'>\u25BC</button><button class="link" data-act="farm-remove" data-p="'+pi+'" data-k="'+k+'">Remove</button></li>'; }).join("")+'</ol>';
   h+='<div class="act"><button class="btn ghost danger small" data-act="farm-clear" data-p="'+pi+'"'+(pr.farm.length?'':' disabled')+'>Clear farm list</button><button class="closebtn" data-act="close">Done</button></div>';
@@ -5014,6 +5016,7 @@ function viewFarms(){
   if (FARMV>=0 && S.presets[FARMV]){ var pr=S.presets[FARMV], pi=FARMV, n=S.presets.length;
     var fd=farmDay(pi), hh=presetHero(pr), hid=hh?hh.id:0;
     var list='<details class="section det" data-det="fmlist"'+(DET.fmlist!==false?' open':'')+'><summary><b>Farm list</b> <span class="dur">'+pr.farm.length+' target'+(pr.farm.length===1?'':'s')+(pr.farm.length>1?' \u00b7 hit in this order':'')+'</span></summary>'+
+      (pr.farm.length>1?'<div class="fsortbar"><span class="dur">Sort the list</span>'+farmSortSel(pr,pi)+'</div>':'')+ // 0.2.131 (Cody): the sort pick on the farm page too, not only in Edit army
       (pr.farm.length?'<div class="fmlist">'+pr.farm.map(function(id,k){ var q=TILE_BY[id]; if (!q) return '';
         var nx=pr.auto&&k===(pr.idx||0); // 0.2.103: one compact row per target: number, name and trip on the left, four small buttons on the right
         return '<div class="fmrow'+(nx?' nx':'')+'"><span class="fmn">'+(k+1)+'</span><span class="fmt"><b>'+esc(tileName(q))+'</b>'+(nx?' <span class="badge">next</span>':'')+'<span class="dur">('+q.x+', '+q.y+')</span><span class="dur">'+tdist(q).toFixed(1)+' tiles'+(presetTotal(pr)?' \u00b7 '+fmtT(realMs(2*travelMs(pr.t,q,hid))):'')+'</span></span>'+
