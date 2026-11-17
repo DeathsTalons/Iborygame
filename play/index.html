@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.133";
+window.IBORY_V="0.2.134";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1668,6 +1668,11 @@ textarea{font:.8rem/1.3 ui-monospace,Menlo,monospace;width:100%;margin-top:8px;p
 table.simtab td.simherotd{text-align:left;overflow-wrap:normal;word-break:normal;white-space:normal}
 .simmine{display:block;margin-top:8px;font-size:.88rem;line-height:1.35;text-align:left;white-space:normal;overflow-wrap:normal;word-break:normal;writing-mode:horizontal-tb}table.simtab .simmine input,.simmine input{display:inline-block;width:auto;padding:0;min-width:0;height:auto;vertical-align:-2px;margin:0 8px 0 0;float:none}.simmine span.simml{display:inline}
 .simhero{display:grid;grid-template-columns:1fr;gap:8px}.simhero label{display:flex;flex-direction:column;gap:3px;min-width:0}.simhero select{width:100%;min-width:0}
+.bfpick{margin:8px 0;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}.bfpick .shead{margin:0}
+.bfpkc{margin:6px 0 2px;font-weight:700}.bfpkl{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.bfpkh{display:flex;flex-direction:column;gap:0;padding:6px 8px 6px 30px;border:1px solid var(--line);border-radius:8px;position:relative;min-width:0;cursor:pointer}
+.bfpkh input{position:absolute;left:8px;top:9px;width:auto;margin:0}.bfpkh span{overflow-wrap:anywhere;line-height:1.2;font-weight:600}.bfpkh small{color:var(--muted);font-size:.75rem}
+.bfpkh.on{border-color:var(--brass);background:rgba(200,160,60,.08)}
 .fsortbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 0 4px}.fsortbar .fsort{max-width:62%}
 .fsorthd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px}.fsorthd .h3{margin:0}.fsort{width:auto;max-width:55%;font-size:.85rem}
 .wvrowb{border-bottom:1px solid var(--line)}.wvrowb .wvrow{border-bottom:0}.wvens{padding:0 0 8px}.wvens select{width:100%;font-size:.85rem}
@@ -1924,7 +1929,7 @@ table.simtab td.simherotd{text-align:left;overflow-wrap:normal;word-break:normal
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.133";
+var APP_VERSION = "0.2.134";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -12982,12 +12987,12 @@ function bfEnter(cityIdx, allyIds){
   // you: a copy of one city
   var me=null;
   withCity(cityIdx, function(){
-    var hero=null, best=-1; (S.heroes||[]).forEach(function(h){ var a=hs(h,"atk"); if (a>best){ best=a; hero=h; } });
-    var cp=S.troops.slice(); cp[0]=0; cp[6]=0; // workers and transporters stay home
+    var hero=null, best=-1, pk=bfPickIds(); pk.forEach(function(id){ var h=heroById(id), a=h?hs(h,"atk"):-1; if (a>best){ best=a; hero=h; } }); // 0.2.134: the best of the heroes you picked
+    var cp=bfAllTroops(); // 0.2.134: every city's troops
     me={name:"You", team:0, slot:0, kind:"me", city:S.name, reserve:cp, r:simResearch(), am:1+0.05*(S.tech.militarytradition||0)+hsB(hero,"atk")/HERO_ATK_DIV+bAttack(),
       dm:bDefend(), life:hero?setLife(hero):1, hint:hsB(hero,"int"), hero:hero?hero.name:null, rally:Math.max(1,bLevel("rally")), iq:200, pts:0, beacon:bLevel("beacon"),
       amBase:1+0.05*(S.tech.militarytradition||0)+bAttack(), inf:S.tech.informatics||0,
-      heroes:(S.heroes||[]).map(function(h){ return {id:h.id, name:h.name, atk:hsB(h,"atk"), int:hsB(h,"int"), life:setLife(h), con:conBonus(h)}; }).sort(function(a,b){ return b.atk-a.atk; })};
+      heroes:bfPickedSnaps(false).sort(function(a,b){ return b.atk-a.atk; })};
   });
   bf.p.push(me);
   allyIds.slice(0,2).forEach(function(id,ix){ var q=TILE_BY[id], cur=current(q), rt=cur.t.slice(); rt[0]=0; rt[6]=0; // their real army
@@ -13268,7 +13273,7 @@ function bfSection(){
     '<div class="pkbld">'+[["keep","The Keep","most points"],["banner","War Banner","marches +"+Math.round((BF_BANNER-1)*100)+"%"],["infirm","Infirmary","heals "+Math.round(BF_HEAL*100)+"% of losses"]].map(function(x){ return '<span class="pkbc">'+pkImg(x[0],28)+'<span><b>'+x[1]+'</b><small>'+x[2]+'</small></span></span>'; }).join("")+'</div>'; // 0.2.50: two lines + More, the three buildings as icon chips
   if (last) h+='<p class="hint">Last battlefield: '+(last.win?'<b>won</b>':'lost')+', '+fmt(last.us)+' to '+fmt(last.them)+'. You scored '+fmt(last.mine)+'.</p>';
   if (!why && allies.length>=2){
-    h+='<div class="farmadd" style="margin-top:6px"><label for="bfcity" class="dur">City</label><select id="bfcity">'+S.cities.map(function(c,i){ return '<option value="'+i+'"'+(i===S.cur?' selected':'')+'>'+esc(c.name)+' ('+fmt(sumT(c.troops))+')</option>'; }).join("")+'</select></div>'+
+    h+='<div class="farmadd" style="margin-top:6px"><label for="bfcity" class="dur">Command city</label><select id="bfcity">'+S.cities.map(function(c,i){ return '<option value="'+i+'"'+(i===S.cur?' selected':'')+'>'+esc(c.name)+'</option>'; }).join("")+'</select></div><p class="dur" style="margin:0 0 6px">Research, Rally Spot, Beacon Tower and buffs come from this city.</p>'+bfPickHtml()+
       '<div class="farmadd"><label class="dur">Allies</label>'+[0,1].map(function(n){ return '<select id="bfally'+n+'">'+allies.map(function(q,i){ return '<option value="'+q.id+'"'+(i===n?' selected':'')+'>'+esc(q.ai.name)+'</option>'; }).join("")+'</select>'; }).join("")+'</div>';
   }
   h+='<div class="pkrow"><span class="dur">Battlefield presets: '+bfPresets().filter(function(pr){ return sumT(pr.t)>0; }).length+' of '+BF_NPRE+' set</span><button class="btn ghost small" data-act="bfpre-open">Edit presets</button></div>';
@@ -13821,13 +13826,34 @@ function pvBuild(){
     for (var i=0;i<n;i++){ var c={id:-1, p:1, b:b, t:e.t||Z12(), dep:e.dep, arr:e.arr!=null?e.arr:Infinity, back:false}; if (tp!=null) c.tp=0; bf.m.push(c); } });
   return bf;
 }
+/* 0.2.134 (Cody): the Battlefield brings every city's troops, and you pick the heroes (from any city) before the fight, so nothing gets shuffled.
+   The city you pick still gives the research, Rally Spot, Beacon Tower and buffs. S.bfPick: the hero ids picked (none saved yet = the 30 best by attack). */
+var BF_HMAX=30;
+function bfAllHeroes(){ var o=[]; S.cities.forEach(function(c,ci){ (c.heroes||[]).forEach(function(h){ o.push({h:h, ci:ci}); }); }); return o; }
+function bfPickIds(){ var all=bfAllHeroes(), ids;
+  if (!Array.isArray(S.bfPick)) ids=all.slice().sort(function(a,b){ return hsB(b.h,"atk")-hsB(a.h,"atk"); }).slice(0,BF_HMAX).map(function(x){ return x.h.id; });
+  else { var have={}; all.forEach(function(x){ have[x.h.id]=1; }); ids=S.bfPick.filter(function(id){ return have[id]; }).slice(0,BF_HMAX); }
+  return ids; }
+function bfAllTroops(){ var t=Z12(); S.cities.forEach(function(c){ for (var i=0;i<12;i++) t[i]+=(c.troops&&c.troops[i])||0; }); t[0]=0; t[6]=0; return t; } // workers and transporters stay home
+function bfHeroSnapOf(x, full){ var o=null; withCity(x.ci, function(){ var h=x.h; o={id:h.id, name:h.name, atk:hsB(h,"atk"), int:hsB(h,"int"), life:setLife(h), con:conBonus(h)}; if (full) o.size=(dgFx(h)||{}).size||0; }); return o; }
+function bfPickedSnaps(full){ var ids=bfPickIds(), by={}; bfAllHeroes().forEach(function(x){ by[x.h.id]=x; }); return ids.map(function(id){ return bfHeroSnapOf(by[id], full); }); }
+function bfPickHtml(){ var ids=bfPickIds(), on={}, all=bfAllHeroes(); ids.forEach(function(id){ on[id]=1; });
+  var h='<div class="bfpick"><div class="shead"><b>Heroes you bring</b><span class="dur">'+ids.length+' of '+Math.min(BF_HMAX, all.length)+'</span></div>'+
+    '<div class="btnrow" style="margin:2px 0 6px"><button class="btn ghost small" data-act="bfpick-all">Best '+Math.min(BF_HMAX, all.length)+'</button><button class="btn ghost small" data-act="bfpick-none">None</button></div>';
+  S.cities.forEach(function(c,ci){ var hs=(c.heroes||[]).slice().sort(function(a,b){ return hsB(b,"atk")-hsB(a,"atk"); }); if (!hs.length) return;
+    h+='<div class="dur bfpkc">'+esc(c.name)+'</div><div class="bfpkl">'+hs.map(function(x){ return '<label class="bfpkh'+(on[x.id]?' on':'')+'"><input type="checkbox" data-bfpick="'+x.id+'"'+(on[x.id]?' checked':'')+'><span translate="no">'+esc(x.name)+'</span><small>Lv '+x.level+' \u00b7 Atk '+hs0(x)+'</small></label>'; }).join("")+'</div>'; });
+  return h+'<p class="dur" style="margin:6px 0 0">Troops: all your cities, '+fmt(sumT(bfAllTroops()))+' in all.</p></div>'; }
+function hs0(x){ return fmt(hsB(x,"atk")); }
+function bfPickSet(ids){ S.bfPick=ids.slice(0,BF_HMAX); save(); bfPickSync(); lastView=""; refresh(); }
+var bfPickT=0; function bfPickSync(){ if (!(pvOn() && PV.v && PV.v.status==="lobby")) return; clearTimeout(bfPickT); bfPickT=setTimeout(function(){ var ci=S.pvp.ci!=null?S.pvp.ci:S.cur;
+  pvPost("snap", pvWith({snap:pvSnap(ci)})).then(function(j){ PV.err=j.error||""; lastView=""; refresh(); }); }, 700); }
 function pvSnap(ci){
   var snap=null;
   withCity(ci, function(){
-    var cp=S.troops.slice(); cp[0]=0; cp[6]=0; // workers and transporters stay home
+    var cp=bfAllTroops(); // 0.2.134: every city's troops
     snap={name:lbAutoName(), city:S.name, troops:cp, research:simResearch(), mt:S.tech.militarytradition||0, inf:S.tech.informatics||0,
       rally:Math.max(1,bLevel("rally")), cap:Math.floor(10000*rallyLv()+alFx("marchsize")), beacon:bLevel("beacon"), buffA:bAttack(), buffD:bDefend(), // 0.2.93: cap = what this city can really send
-      heroes:(S.heroes||[]).map(function(h){ return {id:h.id, name:h.name, atk:hsB(h,"atk"), int:hsB(h,"int"), life:setLife(h), con:conBonus(h), size:(dgFx(h)||{}).size||0}; }),
+      heroes:bfPickedSnaps(true), // 0.2.134: the heroes you picked, from any city
       wint:hsB(wallHero(),"int",1), // 0.2.24: the wall hero's Intelligence counts for the camp's scouts
       items:{marchsp:S.items.marchsp||0}, prestige:Math.floor((S.prestige||0)*totalTH())};
   });
@@ -13880,14 +13906,14 @@ function pvCollect(){
   PV.board.at=0; pvClear(); save();
 }
 function pvCitySel(id, sel){
-  return '<div class="farmadd"><label for="'+id+'" class="dur">City</label><select id="'+id+'">'+S.cities.map(function(c,i){ return '<option value="'+i+'"'+(i===sel?' selected':'')+'>'+esc(c.name)+' ('+fmt(sumT(c.troops))+')</option>'; }).join("")+'</select></div>';
+  return '<div class="farmadd"><label for="'+id+'" class="dur">Command city</label><select id="'+id+'">'+S.cities.map(function(c,i){ return '<option value="'+i+'"'+(i===sel?' selected':'')+'>'+esc(c.name)+'</option>'; }).join("")+'</select></div><p class="dur" style="margin:0 0 6px">Research, Rally Spot, Beacon Tower and buffs come from this city.</p>'+bfPickHtml();
 }
 function pvWhy(){ return !LB_URL?"Needs the online server":bfOn()?"Finish your Battlefield first":""; }
 function pvSection(){
   var why=pvWhy(); pvBoardLoad(false);
   var bd=PV.board.data, me=bd&&bd.me;
   var h='<div class="section"><div class="shead"><h3>PvP Battlefield</h3><span class="dur">'+(me&&me.games?'rating '+me.rating:'')+'</span></div>'+
-    '<p class="hint">You against another player on the Battlefield for 25 minutes. A copy of one city fights, so your real troops never die. Create a match and send the code, or join theirs.'+alMore("pv")+'</p>'+
+    '<p class="hint">You against another player on the Battlefield for 25 minutes. A copy of your army fights (every city\u2019s troops, and the heroes you pick), so your real troops never die. Create a match and send the code, or join theirs.'+alMore("pv")+'</p>'+
     (alMoreOn("pv")?'<p class="hint">March Speed-ups you use are used up for real. The server keeps the clock, so it runs whether or not you\u2019re looking; if you drop for a minute, an autopilot plays for you until you\u2019re back. Building guards are sized to the smaller side: about three of its full marches, behind level 10 walls and traps.</p>':'')+
     '<p class="hint">'+(me&&me.games?'Your rating: <b>'+me.rating+'</b>'+(me.rank?', #'+me.rank+' of '+fmt(bd.players):'')+' ('+pvRec(me)+').':'Your rating starts at 1,000 and moves after your first rated match.')+(me&&me.off?' You\u2019re off the rating board.':'')+'</p>'+
     '<div class="btnrow"><button class="btn ghost small" data-act="pv-board">Rating board</button><button class="btn ghost small" data-act="bfpre-open">Presets ('+bfPresets().filter(function(pr){ return sumT(pr.t)>0; }).length+' of '+BF_NPRE+')</button><button class="btn ghost small" data-act="bf-rewards">Rewards</button>'+(PV.idClash?'<button class="btn ghost small danger" data-act="pv-newid">Start a fresh rating</button>':'')+'</div>'+
@@ -13914,7 +13940,7 @@ function pvLobby(){
   h+='<div class="section"><h3>Players</h3><div class="gearlist">'+[0,1].map(function(i){ var p=v.players[i];
     if (!p) return '<div class="gearrow"><span class="gn">Waiting for an opponent…</span></div>';
     return '<div class="gearrow'+(p.ready?' t3':'')+'"><span class="gn">'+plName(p.name,0,i===me)+(i===me?' (you)':'')+'</span><span class="gb">'+(p.ready?'Ready':'Not ready')+'</span><span class="dur" style="grid-column:1/-1">'+esc(p.city)+', about '+fmt(p.army||0)+' troops.'+(p.rating!=null?' Rating '+p.rating+'.':' No rating.')+'</span></div>'; }).join("")+'</div><p class="hint">The match counts for ratings if you both have one and haven\u2019t already played 3 rated matches together today.</p></div>';
-  h+='<div class="section"><h3>Your army</h3><p class="hint">Changing city unreadies you. Your troops, research, heroes, Rally Spot and Beacon Tower are copied the moment you pick.</p>'+pvCitySel("pvcity2", S.pvp.ci!=null?S.pvp.ci:S.cur)+
+  h+='<div class="section"><h3>Your army</h3><p class="hint">Every city\u2019s troops come along. Changing the command city or the heroes unreadies you; everything is copied the moment you pick.</p>'+pvCitySel("pvcity2", S.pvp.ci!=null?S.pvp.ci:S.cur)+
     (PV.err?'<p class="why">'+esc(PV.err)+'</p>':'')+
     '<div class="btnrow" style="margin:6px 0"><button class="btn ghost small" data-act="bfpre-open">Presets ('+bfPresets().filter(function(pr){ return sumT(pr.t)>0; }).length+' of '+BF_NPRE+')</button><button class="btn ghost small" data-act="bf-rewards">Rewards</button></div>'+
     '<div class="act"><button class="btn ghost danger" data-act="pv-leave">'+(PV_LEAVE_ARMED?'Tap again: leave':'Leave')+'</button><button class="btn'+(mine.ready?' ghost':'')+'" data-act="pv-ready">'+(mine.ready?'Not ready':'Ready')+'</button></div></div>';
@@ -17454,6 +17480,8 @@ document.addEventListener("click",function(e){
     if (!al[0] || !al[1] || al[0]===al[1]){ toast("Pick two different allies"); return; }
     if (!bfArmed){ bfArmed=true; lastView=""; renderView(true); var r0=document.getElementById("bfcity"), r1=document.getElementById("bfally0"), r2=document.getElementById("bfally1"); if (r0) r0.value=String(ci); if (r1) r1.value=al[0]; if (r2) r2.value=al[1]; return; }
     bfArmed=false; if (bfEnter(ci, al)){ closeSheet(); window.scrollTo({top:0}); } save(); lastView=""; refresh(); return; }
+  if (act==="bfpick-all"){ S.bfPick=null; bfPickSet(bfPickIds()); return; }
+  if (act==="bfpick-none"){ bfPickSet([]); return; }
   if (act==="bf-send"){ if (!bfAny()) return; bfDraft=null; bfSimTxt=""; bfMode="troops"; bfDraftHero=null; openSheet({kind:"bfsend", b:+a.dataset.b}); return; }
   if (act==="bf-scout"){ if (!bfAny()) return; bfDraft=null; bfSimTxt=""; bfMode="scout"; openSheet({kind:"bfsend", b:-1, tp:+a.dataset.p}); return; }
   if (act==="bf-all"){ if (!bfAny()) return; var mea=BF().p[0], ui=+a.dataset.unit; if (!bfDraft) bfDraft=Z12();
@@ -17881,6 +17909,9 @@ document.addEventListener("change",function(e){ markDirty();
   if (e.target.id==="ivhero"){ IV.hero=+e.target.value; return; }
   if (e.target.id==="ivsafe"){ var sv=+e.target.value; e.target.blur(); invPost("setsafe",{hours:sv}).then(function(j){ if (!j.error) toast("Cooldown after being invaded: "+(sv>=168?sv/24+" days":sv+" hours")); invTake(j); }); return; }
   if (e.target.dataset && e.target.dataset.loskip!=null){ var lsk=+e.target.dataset.loskip; if (e.target.checked) delete LOW.skip[lsk]; else LOW.skip[lsk]=1; S.loSkip=LOW.skip; save(); var lsum=e.target.closest("details"); if (lsum){ var off=LO_TYPES.filter(function(i){ return LOW.skip[i]; }); lsum.querySelector("summary").textContent="Layers may use: "+(off.length?"all but "+off.map(function(i){ return U[i].name; }).join(", "):"every troop"); } return; }
+  if (e.target.dataset && e.target.dataset.bfpick!=null){ var bpi=+e.target.dataset.bfpick, bpl=bfPickIds(), bpx=bpl.indexOf(bpi);
+    if (e.target.checked && bpx<0){ if (bpl.length>=BF_HMAX){ e.target.checked=false; toast("You can bring "+BF_HMAX+" heroes at most"); return; } bpl.push(bpi); } else if (!e.target.checked && bpx>=0) bpl.splice(bpx,1);
+    bfPickSet(bpl); return; }
   if (e.target.id==="pvcity2" && pvOn() && PV.v && PV.v.status==="lobby"){ var pnc=+e.target.value; e.target.blur(); S.pvp.ci=pnc; save();
     pvPost("snap", pvWith({snap:pvSnap(pnc)})).then(function(j){ PV.err=j.error||""; if (!j.error) toastQ("Bringing "+S.cities[pnc].name); lastView=""; refresh(); }); return; }
   if (e.target.id==="bfhero" && bfAny()){ bfDraftHero=+e.target.value; bfSimTxt=""; lastSheet=""; renderSheet(); }
