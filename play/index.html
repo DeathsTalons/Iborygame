@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.132";
+window.IBORY_V="0.2.133";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1924,7 +1924,7 @@ table.simtab td.simherotd{text-align:left;overflow-wrap:normal;word-break:normal
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.132";
+var APP_VERSION = "0.2.133";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -10885,7 +10885,7 @@ function save(){ mapDirty(); if (saveLocked) return; var json, at=Date.now();
     if (!done){ saveErrShow(e); return; } } }
   S_DIRTY=false; saveAt=Date.now(); if (saveErr){ saveErr=""; } if (stCap && save.capKept!==stCap){ try { localStorage.setItem("ibory-stcap", String(stCap)); save.capKept=stCap; } catch(e){} } }
 function stTrim(step){ var b, n=0;
-  if (step===0){ S.reports.forEach(function(r,i){ if (i>=30 && !r.fav && r.ww){ delete r.ww; n++; } }); return n>0; } // War Wizard replays on all but the newest 30
+  if (step===0){ S.reports.forEach(function(r,i){ if (!r.fav && r.ww && (i>=30 || isFarmRep(r))){ delete r.ww; n++; } }); return n>0; } // War Wizard replays on all but the newest 30, farm hits first (0.2.133)
   if (step===1){ b=S.reports.length; trimKeepFav(S.reports,100); return S.reports.length<b; }
   if (step===2){ b=S.log.length; trimKeepFav(S.log,2000); return S.log.length<b; }
   if (step===3){ b=S.log.length+S.reports.length; trimKeepFav(S.log,500); trimKeepFav(S.reports,30); return S.log.length+S.reports.length<b; }
@@ -13790,6 +13790,7 @@ function pvPost(path, body){
 }
 function pvTake(v){
   try { if (pvOn() && S.pvp.code) heroPvpReports("pv", S.pvp.code, v.reports, null); } catch(e){}
+  try { if (pvOn() && S.pvp.code && v.players && v.me!=null && v.reports && v.reports.length) pvFileReports(v); } catch(e){}
   var old=PV.v; PV.v=v; PV.at=Date.now(); if (v.now) PV.skew=v.now-PV.at;
   PV.bf=pvBuild();
   if (!old || !pvOn()) { PV.logKey=v.log&&v.log[0]?v.log[0].t+"|"+v.log[0].s:""; return; }
@@ -13952,8 +13953,11 @@ function pvRepHtml(r){ var won=pvRepWon(r), row=function(l,v){ return '<div clas
 function pvRepSheet(){ var r=sheetFor.r; return '<div class="head"><span class="ico">'+pkImg("bf",32)+'</span><div style="flex:1"><h2>'+esc(pvRepTitle(r))+'</h2><div class="sub">PvP Battlefield</div></div><button class="btn ghost small" data-act="close" aria-label="Close">✕</button></div>'+pvRepHtml(r)+
     (r.cap?'<div class="btnrow" style="margin-top:8px"><button class="btn ghost small" data-act="pv-ww2">War Wizard</button></div>':'')+'<button class="closebtn" data-act="close">Close</button>'; }
 // file every report of the match under Reports (without the War Wizard recording, which is big)
-function pvFileReports(v){ var foe=(v.players[1-v.me]||{}).name||"your opponent";
-  (v.reports||[]).slice().reverse().forEach(function(r){ var id=S.nextMarchId++, d={}; for (var k in r) if (k!=="cap") d[k]=r[k]; var won=pvRepWon(r), name="PvP: "+pvRepTitle(r)+" ("+foe+")";
+/* 0.2.133 (Cody missed a defense report): the server only sends the newest 30 while a match runs, and reports used to be filed only at the end,
+   so a busy hour lost the older ones. Now each report is filed as soon as a view brings it (keys kept in S.pvp.filed), and the end files whatever is left. */
+function pvRepKey(r){ return [r.t, r.attacker?1:0, r.scout?1:0, r.name, sumT(r.sent||[]), sumT(r.had||[]), r.lost||0].join("|"); }
+function pvFileReports(v){ var foe=(v.players[1-v.me]||{}).name||"your opponent", pv=S.pvp||{}, seen={}; pv.filed=pv.filed||[]; pv.filed.forEach(function(k){ seen[k]=1; });
+  (v.reports||[]).slice().reverse().forEach(function(r){ var key=pvRepKey(r); if (seen[key]) return; seen[key]=1; pv.filed.push(key); if (pv.filed.length>400) pv.filed.splice(0, pv.filed.length-400); var id=S.nextMarchId++, d={}; for (var k in r) if (k!=="cap") d[k]=r[k]; var won=pvRepWon(r), name="PvP: "+pvRepTitle(r)+" ("+foe+")";
     var lost=r.scout?(r.attacker?r.lost||0:0):sumT(killedOf(r.attacker?r.sent:r.had, r.attacker?r.left:r.eleft)), kill=r.scout?(r.attacker?0:r.lost||0):sumT(killedOf(r.attacker?r.had:r.sent, r.attacker?r.eleft:r.left));
     S.reports.unshift({id:id, at:S.gt, pvr:1, name:name, result:won?1:2, d:d, def:r.attacker?0:1}); 
     S.log.unshift({id:id, at:S.gt, pv:1, sc:0, n:name, tile:null, r:won?1:2, d:0, l:lost, k:kill, lo:0, m:-1, g:[], h:null, f:null, o:0, c:C().name, sent:r.sent?sumT(r.sent):0}); });
@@ -14709,7 +14713,15 @@ function addReport(rep){
 }
 function gameClock(t){ t+=(S.dayOff||0); var d=Math.floor(t/DAY)+1, m=Math.floor(t%DAY/60000); return "Day "+d+", "+String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0"); }
 // saved (favorite) reports never roll off, and keep their full battle detail
-function trimKeepFav(arr,cap){ var over=arr.length-cap; for (var i=arr.length-1;i>=0 && over>0;i--) if (!arr[i].fav){ arr.splice(i,1); over--; } }
+/* 0.2.133 (Cody): farm preset hits go first. Full reports keep only the newest FARM_FULL farm hits (the summary line stays in the list),
+   so a monster, PvP or hand-sent report isn't pushed out by an hour of auto-farming; when a list is still over its cap, farm hits leave before anything else. */
+var FARM_FULL=50;
+function isFarmRep(x){ return x && (x.pre!=null || x.p!=null) && !x.fav; }
+function trimKeepFav(arr,cap){ var i, over;
+  if (arr===S.reports){ var nf=0; for (i=0;i<arr.length;i++) if (isFarmRep(arr[i]) && ++nf>FARM_FULL){ arr.splice(i,1); i--; } }
+  over=arr.length-cap; if (over<=0) return;
+  if (arr===S.reports || arr===S.log) for (i=arr.length-1;i>=0 && over>0;i--) if (isFarmRep(arr[i])){ arr.splice(i,1); over--; }
+  for (i=arr.length-1;i>=0 && over>0;i--) if (!arr[i].fav){ arr.splice(i,1); over--; } }
 var KEEP_MISSIONS={attack:1, conquer:1, occupy:1, scout:1, arena:1, rally:1};
 function keepRep(id){ S.log.forEach(function(c){ if (c.id===id) c.fav=1; }); S.reports.forEach(function(r){ if (r.id===id) r.fav=1; }); var rl=document.getElementById("replist"); if (rl) rl._sig=""; }
 // 0.1.211: the Monsters filter: Arena fights, wizards, map monsters and vampires (solo or in a rally), old reports too (by name)
