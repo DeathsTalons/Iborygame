@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.131";
+window.IBORY_V="0.2.132";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1924,7 +1924,7 @@ table.simtab td.simherotd{text-align:left;overflow-wrap:normal;word-break:normal
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.131";
+var APP_VERSION = "0.2.132";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -7635,7 +7635,7 @@ function arenaRepHtml(r){
   h+=(r.mine||[]).map(function(x,i){ var rows=[]; for (var j=0;j<12;j++) if (x.sent[j]) rows.push('<tr>'+repUnitCell(j)+'<td>'+fmt(x.sent[j])+'</td><td>'+fmt(x.back[j]||0)+'</td><td>'+fmt(x.wounded[j]||0)+'</td></tr>');
     return '<div class="h3" style="margin-top:8px">Your march'+(r.mine.length>1?' '+(i+1):'')+' <span class="dur">from '+esc(x.city)+(x.hero?', led by '+esc(x.hero):'')+'</span></div><div class="tscroll"><table class="gt" style="min-width:0"><thead><tr><th>Troop</th><th>Sent</th><th>Unhurt</th><th>Wounded</th></tr></thead><tbody>'+rows.join("")+'</tbody></table></div>'+
       (!r.wiz && x.hero ? '<p class="dur" style="margin:4px 0 0">'+esc(x.hero)+(x.xpNo?' earned no experience: only the first hero you send to a fight does.':r.result!==1?' earned no experience: monsters only give it when they die.':' earned <b>'+fmt(x.xp||0)+'</b> experience.')+'</p>' : ''); }).join(""); // 0.1.214
-  if (r.wiz && r.solo && r.hero) h+='<p class="dur" style="margin:6px 0 0">'+esc(r.hero)+(r.result===1?' led and earned <b>'+fmt(r.xp||0)+'</b> experience.':' led, but earned no experience: monsters only give it when they die.')+'</p>'; // 0.1.213
+  if (r.wiz && r.solo && r.hero) h+='<p class="dur" style="margin:6px 0 0">'+esc(r.hero)+(r.result===1?' led and earned <b>'+fmt(r.xp||0)+'</b> experience'+xpSplit(r)+'.':' led, but earned no experience: monsters only give it when they die.')+'</p>'; // 0.1.213
   return h+rewLootHtml(r.reward)+'<p class="hint">Nobody dies '+(r.wiz?'fighting a wizard':'at the Arena')+': the wounded wait in their city\u2019s Medic Camp (heal them within 24 hours).</p>';
 }
 /* ---------- War Wizard for Arena fights (0.1.171): no dice, so it's the fight run again with every round written down.
@@ -8064,7 +8064,7 @@ function rallyRepHtml(r){ var row=function(l,v){ return '<div class="merow"><spa
   var h='<div class="mestats">'+row("Target",esc(r.host)+'’s '+esc(r.target))+row("Your wave",r.cancelled?'called off':r.late?'arrived too late':r.idle?'not needed (already wiped out)':(r.wave+' of '+r.waves))+
     (r.wave?row("Result",r.result===1?'<span class="okc">Won</span>':'<span class="badc">Thrown back</span>'):'')+row("Who fought",esc((r.players||[]).join(", ")||"nobody"))+'</div>';
   if (r.wave){ var ryS=sum12(r.sent), ryL=Math.max(0,ryS-sum12(r.left)), ryK=sum12(r.killed); h=repTiles([[fmt(ryS),"Sent",""],[fmt(ryL),r.wiz||r.vamp?"Wounded":"Lost",ryL&&!(r.wiz||r.vamp)?"bad":""],[fmt(ryK),"Killed",ryK?"good":""],[fmt(r.rounds||0),r.rounds===1?"Round":"Rounds",""]])+h; }
-  if (r.hero) h+='<p class="dur" style="margin:6px 0 0">'+esc(r.hero)+' led '+(r.xpNo?'but earned no experience: only the first hero you send to a rally does':r.xp?'and earned <b>'+fmt(r.xp)+'</b> experience':(r.wave||r.idle)&&(r.wiz||r.vamp)&&!r.win?'but earned no experience: monsters only give it when they die':r.wave?'and earned <b>0</b> experience':'but didn’t fight, so earned no experience')+'.</p>';
+  if (r.hero) h+='<p class="dur" style="margin:6px 0 0">'+esc(r.hero)+' led '+(r.xpNo?'but earned no experience: only the first hero you send to a rally does':r.xp?'and earned <b>'+fmt(r.xp)+'</b> experience'+xpSplit(r):(r.wave||r.idle)&&(r.wiz||r.vamp)&&!r.win?'but earned no experience: monsters only give it when they die':r.wave?'and earned <b>0</b> experience':'but didn’t fight, so earned no experience')+'.</p>';
   if (r.full){ // the wave's whole battle, the same table as any attack
     h+=briefBox(r.full.ab||r.b, r.full.db)+'<div class="h3" style="margin-top:8px">Your wave <span class="dur">from '+esc(r.city)+'</span></div>'+ryWaveBody(r.full, true);
   } else {
@@ -10395,6 +10395,10 @@ var VXP_GAP=HOUR, VXP_MULT=0.5; // valley/flat experience: once an hour per tile
 // 0.2.130 (Cody): everything that multiplies hero experience, so reports show what the hero really got: achievements, the alliance and the
 // Scholar constellation's experience arm on this city's researcher (that last one was missing from the reports)
 function xpMul(){ return bHeroXp()*(1+conRole("researcher").hp); }
+function xpParts(){ var c=conRole("researcher").hp, a=ACH_PCT*achLv("hero"), l=alFx("heroxp"), o=[]; // 0.2.132 (Cody): what each experience bonus added, kept with the report
+  if (c) o.push(["The Scholar",c]); if (a) o.push(["Court of Generals",a]); if (l) o.push(["Alliance",l]); return o; }
+function xpSplit(r){ if (!r || !r.xp || !r.xpk || !r.xpk.length) return ""; var m=1; r.xpk.forEach(function(p){ m*=1+p[1]; }); var base=Math.round(r.xp/m), up=r.xp-base; if (up<=0) return "";
+  return ' <span class="dur xpsplit">('+fmt(base)+' base + '+fmt(up)+' from bonuses: '+r.xpk.map(function(p){ return esc(p[0])+' +'+(Math.round(p[1]*1000)/10)+'%'; }).join(', ')+')</span>'; }
 function giveXp(h, xp){
   xp=Math.round(xp*xpMul());
   h.xp += xp; var up=0;
@@ -14696,6 +14700,7 @@ function addPvpLog(win, us, them, why, tiers){
   S.log.unshift(c); trimKeepFav(S.log, LOG_CAP);
 }
 function addReport(rep){
+  if (rep.xp>0 && rep.hero && rep.xpk==null) rep.xpk=xpParts();
   if (rep.kb && !rep.ww){ var cap=SIM.capFor(rep.kb); if (cap) rep.ww=cap; }
   if (rep.ww && !rep.scout && !rep.ally && !rep.mods){ var ms=null, mp=function(v){ return Math.round(((v==null?1:+v)-1)*1000)/10; }; try { ms=JSON.parse(rep.def?rep.ww.D:rep.ww.A); } catch(e){} if (ms) rep.mods=[mp(ms.attack_modifier),mp(ms.defence_modifier),mp(ms.life_modifier)]; } // your side's total bonuses, kept with the report
   if (pendingWound && !rep.scout){ rep.wounded=(rep.wounded||0)+pendingWound; } pendingWound=0;
@@ -15009,7 +15014,7 @@ function reportDetailBase(r){
     U.map(function(u,i){ if (!r.sent[i] && !r.had[i]) return ''; var a1=r.sent[i]-r.left[i], a2=r.had[i]-r.eleft[i]; return '<tr>'+repUnitCell(i)+'<td>'+fmt(r.sent[i])+'</td><td class="'+(a1?'loss':'')+'">'+fmt(a1)+'</td><td>'+fmt(r.had[i])+'</td><td class="'+(a2?'ok':'')+'">'+fmt(a2)+'</td></tr>'; }).join("")+
     FORTN.map(function(n,k){ if (!r.forts[k]) return ''; var lf=r.forts[k]-r.fleft[k]; return '<tr>'+repFortCell(n,"Your ")+'<td>'+fmt(r.forts[k])+'</td><td class="'+(lf?'loss':'')+'">'+fmt(lf)+'</td><td></td><td></td></tr>'; }).join("")+'</tbody></table></div>'+(r.loot&&RES.some(function(k){ return r.loot[k]; })?'<div class="h3" style="margin-top:8px">Plundered</div>'+repResTiles(r.loot):'')+allyRepHtml(r);
   var killed=0; for (var ki=0;ki<12;ki++) killed+=Math.max(0,(r.had[ki]||0)-(r.eleft[ki]||0));
-  return repStats(r, killed)+'<p class="rphero">'+(r.hero?'<b>'+esc(r.hero)+'</b> led \u00b7 +'+fmt(r.xp)+' experience'+(r.xpWait?' <span class="dur">(this tile gave experience less than an hour ago: more in '+fmtT(realMs(r.xpWait))+')</span>':''):'<span class="dur">No hero led this army.</span>')+
+  return repStats(r, killed)+'<p class="rphero">'+(r.hero?'<b>'+esc(r.hero)+'</b> led \u00b7 +'+fmt(r.xp)+' experience'+xpSplit(r)+(r.xpWait?' <span class="dur">(this tile gave experience less than an hour ago: more in '+fmtT(realMs(r.xpWait))+')</span>':''):'<span class="dur">No hero led this army.</span>')+
     (r.wounded?'<span class="dur"> \u00b7 the wounded wait in the Medic Camp for 24 hours</span>':'')+'</p>'+(repTypesHtml(r)||modsLine(r))+reportTable(r)+repLootHtml(r); // 0.2.95; 0.2.106: the bonuses by troop type
 }
 // the Reports tab asks every render tick; the list is only rebuilt when a report arrived or the filter, search, page or a star changed
