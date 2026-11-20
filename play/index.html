@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.134";
+window.IBORY_V="0.2.135";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -441,7 +441,10 @@ details.rep summary{list-style-position:outside;line-height:1.35}
 .kgtoday{display:flex;flex-direction:column;gap:3px;margin-top:8px;font-size:.84rem}.kgt{color:var(--ink)}.kgt b{color:var(--brass);font-weight:600;margin-left:4px}.kgt.done{color:var(--muted)}.kgt.done b{color:var(--grass)}
 .kgrep{margin:4px 0 0}.kgtile.lock{opacity:.62}.kgtile .n small{font-size:.72rem;color:var(--muted);font-weight:500}
 .fmstats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:4px 0 2px;text-align:center}.fmstats div{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 2px}.fmstats b{display:block;font:700 1.05rem var(--display)}.fmstats span{font-size:.74rem;color:var(--muted)}
-.fmtile.run{border-color:var(--grass);box-shadow:inset 0 0 0 1px var(--grass)}.fmtile.idle{opacity:.62}.fmtile .ln b{font-weight:700}
+.fmtile{cursor:default;gap:8px}.fmth{display:flex;gap:8px;align-items:center;min-width:0}.fmtn{display:flex;flex-direction:column;min-width:0}.fmtn .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fmtn .dur{font-size:.8rem;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow-wrap:anywhere}
+.fmnoh{width:44px;height:44px;border-radius:12px;border:1px dashed var(--line);flex:none}.fmts{display:flex;justify-content:space-between;gap:6px;font-size:.85rem;min-width:0}.fmts .n{color:var(--brass);font-weight:700}
+.fmtb{display:grid;grid-template-columns:1fr 1fr;gap:6px}.fmtb .btn{width:100%;min-height:36px;margin:0}
+.fmtile.run{border-color:var(--grass);box-shadow:inset 0 0 0 1px var(--grass)}.fmtile.idle .fmts>span:first-child{color:var(--muted)}.fmtile .ln b{font-weight:700}
 .reptiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .reptile{display:flex;flex-direction:column;gap:3px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);cursor:pointer;font:inherit;color:inherit;text-align:left;min-width:0}
 .reptile .rtop{display:flex;align-items:center;gap:4px 8px;min-width:0} .reptile .rtop .nm{flex:1} /* 0.2.47: the count stays on the title row ("PvP & invasions" wrapped and dropped it to its own line) */ /* 0.2.11: a long name pushes the count down a line instead of splitting a word */.reptile svg{width:22px;height:22px;color:var(--brass);flex:none}
@@ -1929,7 +1932,7 @@ table.simtab td.simherotd{text-align:left;overflow-wrap:normal;word-break:normal
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.134";
+var APP_VERSION = "0.2.135";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -5008,14 +5011,15 @@ function farmCardHtml(pr,pi){ // 0.2.103 (Cody): the preset's page in the newer 
 // a preset's farming over the last 24 hours, from its reports in this city
 function farmDay(pi){ var since=S.gt-DAY, n=0, w=0, loot=0; S.log.forEach(function(c){ if (c.p===pi && c.c===S.name && c.at>since && !c.d){ n++; if (c.r===1) w++; loot+=c.lo||0; } }); return {n:n, w:w, loot:loot}; }
 function farmWhyShort(t){ t=t.replace(/^Waiting( for)?:? ?/,""); var i=t.search(/[.:(]/); t=i>0?t.slice(0,i):t; return t.charAt(0).toUpperCase()+t.slice(1); }
-function farmTileHtml(pr,pi){ var tot=presetTotal(pr), m=pr.farmMode?FARM_MODES[pr.farmMode]:null, d=farmDay(pi), st, cls='';
+function farmTileHtml(pr,pi){ var tot=presetTotal(pr), st, cls=''; // 0.2.135 (Cody): hero, status, target count, Start/Stop and Edit; only the buttons act (the card itself doesn't, so a stray tap can't change anything)
   if (!tot){ st='No troops set'; cls=' idle'; }
-  else if (pr.auto){ var fw=farmWhy(pr,pi); st=fw&&!fw.out&&!fw.soft?'<b class="badc">Waiting</b> <span class="dur">\u00b7 '+esc(farmWhyShort(fw.t))+'</span>':'<b class="okc">Auto-farming</b>'; cls=' run'; } // 0.2.35: says when every target on the list is held back
-  else if (pr.farm.length) st='Ready \u00b7 not running';
-  else st=m?'Goal set \u00b7 list empty':'No farm list';
-  return '<button class="reptile fmtile'+cls+'" data-act="farm-page" data-p="'+pi+'"><span class="rtop"><span class="nm">'+esc(pr.name)+'</span><span class="n">'+(pr.farm.length?pr.farm.length:'')+'</span></span>'+
-    '<span class="ln">'+st+'</span><span class="ln">'+(m?esc(pr.farmMode.charAt(0).toUpperCase()+pr.farmMode.slice(1))+(farmKindOf(pr)==="val"?' \u00b7 valleys':'')+(pr.farmLevel?' \u00b7 level '+pr.farmLevel:''):'No goal')+(tot?' \u00b7 '+fmt(tot)+' troops':'')+'</span>'+
-    (d.n?'<span class="ln">24 h: <b>'+d.w+'</b> won'+(d.n>d.w?', <span class="badc">'+(d.n-d.w)+' lost</span>':'')+' \u00b7 '+fmt(d.loot)+' loot</span>':'')+'</button>'; }
+  else if (pr.auto){ var fw=farmWhy(pr,pi); st=fw&&!fw.out&&!fw.soft?'<b class="badc">Waiting</b> <span class="dur">\u00b7 '+esc(farmWhyShort(fw.t))+'</span>':'<b class="okc">Auto-farming</b>'; cls=' run'; }
+  else st='Not running';
+  var h=pr.hero?presetHero(pr):null, auto=pr.hero?presetAutoHero(pr.hero):false;
+  var hn=!pr.hero?'No hero':h?(auto?(pr.hero===HERO_BEST?'Best':pr.hero===HERO_FAST?'Fastest':'Any')+': ':'')+h.name:(auto?'No free hero':'Hero away');
+  return '<div class="reptile fmtile'+cls+'"><span class="fmth">'+(h?heroPortrait(h,44):'<span class="fmnoh" aria-hidden="true"></span>')+'<span class="fmtn"><span class="nm">'+esc(pr.name)+'</span><span class="dur" translate="no">'+esc(hn)+'</span></span></span>'+
+    '<span class="fmts"><span>'+st+'</span><span class="n">'+(pr.farm.length||'')+'</span></span>'+
+    '<span class="fmtb"><button class="btn small'+(pr.auto?' ghost danger':'')+'" data-act="farm-start" data-p="'+pi+'">'+(pr.auto?'Stop':'Start')+'</button><button class="btn ghost small" data-act="farm-page" data-p="'+pi+'">Edit</button></span></div>'; }
 var FMHELP=false; // 0.2.50: the farm planner's how-to, behind its ?
 function viewFarms(){
   if (FARMV>=0 && S.presets[FARMV]){ var pr=S.presets[FARMV], pi=FARMV, n=S.presets.length;
@@ -17556,6 +17560,12 @@ document.addEventListener("click",function(e){
   if (act==="preset-paste"){ var ppp=presetsOf(a.dataset.m)[+a.dataset.p]; if (!ppp || !presetClip) return;
     ppp.t=presetClip.t.slice(); if (presetClip.name) ppp.name=presetClip.name; PASTED=pclipKey(a.dataset.m,+a.dataset.p); if (!a.dataset.m && !presetClip.m){ ppp.stopOnLoss=presetClip.stopOnLoss; ppp.noCap=presetClip.noCap; } ppp.hero=(presetClip.hero>0 && !C().heroes.some(function(x){ return x.id===presetClip.hero; })) ? 0 : presetClip.hero; // farm settings only travel farm to farm; the hero comes along when this city has it
     toastQ("Pasted "+presetClip.name+" onto "+ppp.name); save(); lastView=""; refresh(); return; }
+  if (act==="farm-start"){ var fsi=+a.dataset.p, fsp=S.presets[fsi]; if (!fsp) return; // 0.2.135: the farm planner card's Start/Stop
+    if (fsp.auto){ fsp.auto=false; toastQ(fsp.name+" stopped"); processAuto(); lastView=""; refresh(); return; }
+    if (!presetTotal(fsp)){ toast(fsp.name+" has no troops yet. Tap Edit to set them."); return; }
+    var fsg=""; if (!fsp.farmMode){ fsp.farmMode="training"; fsg=" (goal: Training)"; }
+    if (!fsp.farm.length){ farmRebuild([fsi]); if (!fsp.farm.length){ var fsm=farmMsg[C().id+":"+fsi]; toast(fsp.name+": "+(fsm?fsm.t:"no targets found")); lastView=""; refresh(); return; } }
+    fsp.auto=true; toastQ(fsp.name+" is auto-farming"+fsg); processAuto(); lastView=""; refresh(); return; }
   if (act==="preset-auto"){ var pa=S.presets[+a.dataset.p]; pa.auto=!pa.auto; toastQ(pa.name+(pa.auto?" is auto-farming":" stopped")); processAuto(); refresh(); return; }
   if (act==="mpop-farm"){ var mfs=document.getElementById("mpfarmsel"); if (mfs) MPOPFARM=+mfs.value; var mfp=S.presets[MPOPFARM], mft=a.dataset.tile; if (!mfp || !mft) return; var mfi=mfp.farm.indexOf(mft);
     if (mfi>=0){ mfp.farm.splice(mfi,1); if (mfp.idx>=mfp.farm.length) mfp.idx=0; toastQ("Removed from "+mfp.name); } else { mfp.farm.push(mft); toastQ("Added to "+mfp.name+"\u2019s farm list ("+mfp.farm.length+")"); }
