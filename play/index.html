@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.137";
+window.IBORY_V="0.2.138";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1934,7 +1934,7 @@ table.simtab td.simherotd{text-align:left;overflow-wrap:normal;word-break:normal
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.137";
+var APP_VERSION = "0.2.138";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -5096,6 +5096,11 @@ function myRallySheet(){ var L=myRallies(), h='<div class="head"><span class="ic
       '<div class="btnrow" style="margin-top:8px"><button class="btn ghost small" data-act="goto-tile" data-tile="'+r.tile+'">Show on map</button>'+(r.live.length?'<button class="btn ghost danger small" data-act="myry-cancel" data-r="'+r.id+'">'+(arm?'Tap again: call off '+r.live.length+' wave'+(r.live.length>1?'s':''):'Call off the rally')+'</button>':'')+'</div></div>'; });
   return h+'<p class="hint">Calling off cancels waves that have not left (troops and rations come back at once) and turns round the ones on the road or waiting at the target. Waves that already hit are not undone.</p><button class="closebtn" data-act="close">Close</button>'; }
 function wvKey(cid, pi){ return cid+":"+pi; }
+/* 0.2.138 (Cody): waves hit in the order you pick them, not city by city. waveDraft.seq keeps every wave key in picking order: new waves go
+   to the end, removed ones leave it, and the up/down arrows still rearrange it. */
+function wvSeqSet(k, was, now){ var d=waveDraft; if (!d.seq){ d.seq=[]; for (var wk in d.w) if (wk!==k) for (var j=0;j<(d.w[wk]||0);j++) d.seq.push(wk+"#"+j); for (var j0=0;j0<was;j0++) d.seq.push(k+"#"+j0); }
+  if (now<was) d.seq=d.seq.filter(function(x){ var p=x.lastIndexOf("#"); return x.slice(0,p)!==k || +x.slice(p+1)<now; });
+  else for (var j2=was;j2<now;j2++) if (d.seq.indexOf(k+"#"+j2)<0) d.seq.push(k+"#"+j2); }
 function wvFromCi(d){ var fi=cityIndex(d.from); return fi<0?S.cur:fi; } // 0.2.109 (Cody): a solo rally sets out from one city, like an alliance rally
 function wvNorm(d){ if (d.from==null) d.from=C().id; if (!d.ens) d.ens={}; if (!d.w){ d.w={}; if (d.n){ d.n.forEach(function(n,pi){ if (n) d.w[wvKey(C().id,pi)]=n; }); delete d.n; } } return d; } // a draft in the old one-city form (counts per preset of the city you are in)
 function wavesSheet(){ if (!waveDraft.times) waveDraft.times=[]; wvNorm(waveDraft);
@@ -17863,7 +17868,7 @@ document.addEventListener("input",function(e){ markDirty();
   if (e.target.dataset.unit!=null && e.target.tagName==="INPUT"){ var iu=+e.target.dataset.unit; trainAmt[iu]=Math.max(0,Math.floor(+e.target.value||0)); updateTrainRow(iu); }
   if (e.target.dataset.ptroop!=null){ sheetPreset().t[+e.target.dataset.ptroop]=Math.max(0,Math.floor(+e.target.value||0)); save(); }
   if (e.target.dataset.pfield==="name"){ sheetPreset().name=e.target.value.trim()||((sheetFor.m?"March ":"Preset ")+(sheetFor.p+1)); save(); }
-  if (e.target.dataset.wave!=null){ waveDraft.w=waveDraft.w||{}; var wvCi=cityIndex(+String(e.target.dataset.wave).split(":")[0]), wvMx=Math.max(10, wvCi<0?0:withCity(wvCi,rallyLv)); waveDraft.w[e.target.dataset.wave]=Math.max(0,Math.min(wvMx,Math.floor(+e.target.value||0))); var wvEb=document.querySelector('.wvens[data-wensk="'+e.target.dataset.wave+'"]'); if (wvEb) wvEb.hidden=!waveDraft.w[e.target.dataset.wave]; /* 0.2.112 (Cody, kuku): one preset could only be sent 10 times, so a level 14 historic city fell short of its 14 marches; now up to that city's Rally Spot level */ // patched in place, so typing never closes the keyboard
+  if (e.target.dataset.wave!=null){ waveDraft.w=waveDraft.w||{}; var wvCi=cityIndex(+String(e.target.dataset.wave).split(":")[0]), wvMx=Math.max(10, wvCi<0?0:withCity(wvCi,rallyLv)), wvOld=waveDraft.w[e.target.dataset.wave]||0; waveDraft.w[e.target.dataset.wave]=Math.max(0,Math.min(wvMx,Math.floor(+e.target.value||0))); wvSeqSet(e.target.dataset.wave, wvOld, waveDraft.w[e.target.dataset.wave]); var wvEb=document.querySelector('.wvens[data-wensk="'+e.target.dataset.wave+'"]'); if (wvEb) wvEb.hidden=!waveDraft.w[e.target.dataset.wave]; /* 0.2.112 (Cody, kuku): one preset could only be sent 10 times, so a level 14 historic city fell short of its 14 marches; now up to that city's Rally Spot level */ // patched in place, so typing never closes the keyboard
     if (waveDraft.mode==="clock"){ var wvt=document.getElementById("wvtimes"); if (wvt){ wvt.innerHTML=wavesTimesHtml(wavePlan(true)); lastSheet=wavesSheet(); } }
     else { var wvo=document.getElementById("wvorder"); if (wvo){ wvo.innerHTML=wavesOrderHtml(wavePlan(true)); lastSheet=wavesSheet(); } }
     updateWaveInfo(); }
