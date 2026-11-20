@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.135";
+window.IBORY_V="0.2.136";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -767,11 +767,12 @@ select,input[type=number],input[type=text],input[type=search],input[type=time]{f
 .btnrow{display:flex;gap:8px;flex-wrap:wrap}
 
 /* Wheel */
-.wheelbox{display:grid;justify-items:center;gap:14px;padding:6px 0 4px}
+.wheelbox{display:grid;justify-items:center;gap:14px;padding:6px 0 4px;overflow:hidden}
 .wheelwrap{position:relative;width:min(100%,360px);aspect-ratio:1}
 .wheelwrap svg.wheel{width:100%;height:100%;transform-origin:50% 50%;will-change:transform}
 .pointer{position:absolute;left:50%;top:-6px;transform:translateX(-50%);width:28px;height:34px;z-index:2;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3))}
-.spinrow{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.spinrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:340px;margin:0 auto}.spinrow .btn{width:100%;margin:0}
+.wwonh{margin:4px 0 2px}.wwhero{margin:2px 0}.wprize .prize{width:100%}.wprize .rwgrid,.wprize .ctiles{margin-top:6px;text-align:left;width:100%;box-sizing:border-box}
 .spinrow .btn{min-width:130px;font-family:var(--display);letter-spacing:.04em;font-size:1.05rem;padding:11px 18px}
 .prize{min-height:2.8em;text-align:center;font-size:1.05rem}
 .prize b{font-family:var(--display)}
@@ -1932,7 +1933,7 @@ table.simtab td.simherotd{text-align:left;overflow-wrap:normal;word-break:normal
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.135";
+var APP_VERSION = "0.2.136";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -10544,21 +10545,23 @@ function awardPrize(i, forced){
     S.pendingLegend++;
     txt = "A legend answers your call. Choose their strength.";
     S.wheelLog.unshift("Guaranteed Legendary hero"); S.wheelLog = S.wheelLog.slice(0,8);
-    return {txt:txt, big:true, tier:"legendary", forced:true};
+    return {txt:txt, big:true, tier:"legendary", forced:true, pz:{hero:"Guaranteed Legendary hero: choose them", tier:"legendary"}};
   }
-  if (RES.indexOf(s.k)>=0){ var amt = (s.k==="gold"?WHEEL_RES.gold:WHEEL_RES.other)*S.th; S.res[s.k]+=amt; txt = fmt(amt)+" "+RNAME[s.k].toLowerCase(); }
-  else if (ITEMS[s.k]){ S.items[s.k]=(S.items[s.k]||0)+1; txt = ITEMS[s.k].name; }
-  else if (s.k==="stones"){ var gk=Math.random()<WHEEL_GEMS.pF?"gemF":"gemD", gn=qtyRoll(WHEEL_GEMS[gk]); S.items[gk]=(S.items[gk]||0)+gn; txt=lootTxt(gk,gn); }
-  else if (s.k==="gear"){ var wm=MAT[gearTierFor(Math.min(12,2+S.th))]; S.items[wm]=(S.items[wm]||0)+1; txt="a "+ITEMS[wm].name; }
-  else if (s.k==="medal"){ var mi=rollMedal(); S.medals[MEDALS[mi][0]]++; achMedal(MEDALS[mi][0]); txt = "a "+MEDALS[mi][1]+" medal"; }
+  var pz={}; // 0.2.136: what was won, for the picture tiles under the Spin buttons
+  if (RES.indexOf(s.k)>=0){ var amt = (s.k==="gold"?WHEEL_RES.gold:WHEEL_RES.other)*S.th; S.res[s.k]+=amt; txt = fmt(amt)+" "+RNAME[s.k].toLowerCase(); pz.res={}; pz.res[s.k]=amt; }
+  else if (ITEMS[s.k]){ S.items[s.k]=(S.items[s.k]||0)+1; txt = ITEMS[s.k].name; pz.it=s.k; pz.n=1; }
+  else if (s.k==="stones"){ var gk=Math.random()<WHEEL_GEMS.pF?"gemF":"gemD", gn=qtyRoll(WHEEL_GEMS[gk]); S.items[gk]=(S.items[gk]||0)+gn; txt=lootTxt(gk,gn); pz.it=gk; pz.n=gn; }
+  else if (s.k==="gear"){ var wm=MAT[gearTierFor(Math.min(12,2+S.th))]; S.items[wm]=(S.items[wm]||0)+1; txt="a "+ITEMS[wm].name; pz.it=wm; pz.n=1; }
+  else if (s.k==="medal"){ var mi=rollMedal(); S.medals[MEDALS[mi][0]]++; achMedal(MEDALS[mi][0]); txt = "a "+MEDALS[mi][1]+" medal"; pz.medal=mi; }
   else {
     var h=genHero(s.tier);
     if (S.heroes.length < hallCap()){ S.heroes.push(h); txt = TIERS[s.tier].name+" hero "+h.name+" joined your hall"; }
     else if (s.tier==="legendary"){ S.waiting.push(h); txt = "Legendary hero "+h.name+" waits at the gate: free a place in your Feasting Hall"; }
     else { S.nextHeroId--; txt = TIERS[s.tier].name+" hero "+h.name+" found no room in your Feasting Hall and moved on"; }
   }
+  if (s.tier){ pz.hero=txt; pz.tier=s.tier; }
   S.wheelLog.unshift(txt); S.wheelLog = S.wheelLog.slice(0,8);
-  return {txt:txt, big: !!s.tier, tier:s.tier};
+  return {txt:txt, big: !!s.tier, tier:s.tier, pz:pz};
 }
 
 /* ---------- state ---------- */
@@ -15903,20 +15906,29 @@ function viewWheel(){
     '<div class="wheelwrap"><svg class="pointer" viewBox="0 0 28 34" aria-hidden="true"><path d="M14 33L2 6a12 12 0 0 1 24 0z" style="fill:var(--red);stroke:var(--bg)" stroke-width="2"/><circle cx="14" cy="10" r="4" style="fill:var(--bg)"/></svg>'+wheelSvg()+'<div class="whub" id="whub" aria-hidden="true"></div></div>'+
     '<div class="amu"><span class="amuct">'+ICON.amulet+'<b id="amulets"></b> amulets</span><span class="dur" id="amurate"></span></div>'+
     '<div class="pity"><div class="pitybar"><i id="pitybar"></i></div><span class="dur" id="pitytxt"></span></div>'+
-    '<div class="wprize"><div class="prize" id="prize" aria-live="polite"></div><span class="dur" id="spincount"></span></div>'+
+    '<div class="spinrow"><button class="btn" data-act="spin" id="spin1">Spin</button><button class="btn ghost" data-act="spin10" id="spin10">Spin 10×</button></div>'+ /* 0.2.136 (Cody): the buttons sit still; what you won shows under them, as pictures */
     '<button class="btn" data-act="legend-open" id="legendbtn" hidden></button>'+
-    '<div class="spinrow"><button class="btn" data-act="spin" id="spin1">Spin</button><button class="btn ghost" data-act="spin10" id="spin10">Spin 10×</button></div>'+
+    '<div class="wprize"><div class="prize" id="prize" aria-live="polite"></div><span class="dur" id="spincount"></span></div>'+
     '<button class="link" data-act="tab" data-tab="items">Prizes go to your Items ›</button></div>'+
     '<details><summary>Odds</summary><div class="odds">'+odds+'</div><p class="hint" style="margin-top:6px">Resource prizes scale with your Town Hall level. Amulets: 1 for every finished research and every building that takes 5 minutes or more (10 for each Town Hall level).</p></details></div>'+
     '<div class="section"><h3>Recent prizes</h3><ul class="log" id="wlog"></ul></div>';
 }
+function wheelWonHtml(pzs){ var res={}, items={}, med={}, heroes=[]; // 0.2.136: a spin's prizes as the same picture tiles reports use
+  pzs.forEach(function(z){ if (!z) return; if (z.res) for (var k in z.res) res[k]=(res[k]||0)+z.res[k]; if (z.it) items[z.it]=(items[z.it]||0)+(z.n||1); if (z.medal!=null) med[z.medal]=(med[z.medal]||0)+1; if (z.hero) heroes.push(z); });
+  var h='<div class="dur wwonh">You won</div>';
+  heroes.forEach(function(z){ h+='<div class="wwhero"><b style="color:'+TIERS[z.tier].color+'">'+TIERS[z.tier].name+' hero!</b> '+esc(z.hero)+'</div>'; });
+  h+=repResTiles(res);
+  var tiles=Object.keys(items).map(function(k){ return '<span class="rwit" title="'+esc(ITEMS[k].name)+'">'+itemImg(k)+'<b>\u00d7'+fmt(items[k])+'</b><i>'+esc(ITEMS[k].name)+'</i></span>'; });
+  Object.keys(med).forEach(function(mi){ var m=MEDALS[mi]; tiles.push('<span class="rwit">'+alArt("mem-"+m[0],30)+'<b>\u00d7'+med[mi]+'</b><i>'+m[1]+' medal</i></span>'); });
+  if (tiles.length) h+='<div class="rwgrid rploot">'+tiles.join("")+'</div>';
+  return h; }
 function updateWheelSide(){
   if (!document.getElementById("wlog")) return;
   var lg = S.wheelLog.length ? S.wheelLog.map(function(t){ return '<li>'+esc(t)+'</li>'; }).join("") : '<li>Nothing yet. Give it a spin.</li>';
   var wl=document.getElementById("wlog"); if (wl.innerHTML!==lg) wl.innerHTML=lg;
   document.getElementById("spincount").textContent = S.spins ? fmt(S.spins)+" spins so far" : "No spins yet";
   var pz=document.getElementById("prize");
-  var ph = lastPrize ? (lastPrize.big ? '<span class="big" style="color:'+TIERS[lastPrize.tier].color+'">'+TIERS[lastPrize.tier].name+' hero!</span>'+esc(lastPrize.txt) : 'You won <b>'+esc(lastPrize.txt)+'</b>') : '';
+  var ph = lastPrize ? (lastPrize.pzs ? wheelWonHtml(lastPrize.pzs) : lastPrize.big ? '<span class="big" style="color:'+TIERS[lastPrize.tier].color+'">'+TIERS[lastPrize.tier].name+' hero!</span>'+esc(lastPrize.txt) : 'You won <b>'+esc(lastPrize.txt)+'</b>') : '';
   if (pz.innerHTML!==ph) pz.innerHTML=ph;
   document.getElementById("spincount").hidden=!!ph; /* 0.2.50: the spin count fills the prize line until there's a prize */
   var hub=document.getElementById("whub"), hh=lastPrize ? (lastPrize.n ? '<b>'+lastPrize.n+'×</b>' : lastPrize.i!=null ? wheelPrizeIcon(WHEEL[lastPrize.i]) : '') : '';
@@ -15948,7 +15960,7 @@ function doSpin(){
   requestAnimationFrame(function(){ w.style.transform = "rotate("+wheelRot+"deg)"; });
   setTimeout(function(){
     spinning=false; w.style.transition="none";
-    lastPrize = awardPrize(i, roll.forced); lastPrize.i=i; S.spins++; /* 0.2.50: i = the wedge, for the hub */
+    lastPrize = awardPrize(i, roll.forced); lastPrize.i=i; lastPrize.pzs=[lastPrize.pz]; S.spins++; /* 0.2.50: i = the wedge, for the hub */
     save(); refresh();
     if (roll.forced) openSheet({kind:"legend"});
     else if (lastPrize.big) toastQ(lastPrize.txt);
@@ -15957,16 +15969,16 @@ function doSpin(){
 function doSpin10(){
   if (spinning || S.amulets < 10) return;
   S.amulets -= 10;
-  var got={}, heroes=[], forcedAny=false;
+  var got={}, heroes=[], forcedAny=false, pzs=[];
   for (var n=0;n<10;n++){
-    var roll=spinIndex(), i=roll.i, r=awardPrize(i, roll.forced);
+    var roll=spinIndex(), i=roll.i, r=awardPrize(i, roll.forced); pzs.push(r.pz);
     if (roll.forced) forcedAny=true;
     if (r.big) heroes.push(r); else got[WHEEL[i].label]=(got[WHEEL[i].label]||0)+1;
   }
   S.spins+=10;
   var parts = Object.keys(got).map(function(k){ return got[k]+"× "+k; });
   lastPrize = heroes.length ? {big:true,tier:heroes[heroes.length-1].tier,txt:heroes.map(function(h){return h.txt;}).join(". ")+(parts.length?". Also: "+parts.join(", "):"")} : {big:false,txt:parts.join(", ")};
-  lastPrize.n=10; /* 0.2.50: the hub says 10× */
+  lastPrize.n=10; lastPrize.pzs=pzs; /* 0.2.50: the hub says 10× */
   save(); refresh();
   if (forcedAny) openSheet({kind:"legend"});
 }
