@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.139";
+window.IBORY_V="0.2.140";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -442,6 +442,9 @@ details.rep summary{list-style-position:outside;line-height:1.35}
 .kgrep{margin:4px 0 0}.kgtile.lock{opacity:.62}.kgtile .n small{font-size:.72rem;color:var(--muted);font-weight:500}
 .fmstats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:4px 0 2px;text-align:center}.fmstats div{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 2px}.fmstats b{display:block;font:700 1.05rem var(--display)}.fmstats span{font-size:.74rem;color:var(--muted)}
 .fmtile{cursor:default;gap:8px}.fmth{display:flex;gap:8px;align-items:center;min-width:0}.fmtn{display:flex;flex-direction:column;min-width:0}.fmtn .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fmtn .dur{font-size:.8rem;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow-wrap:anywhere}
+.hmiss{position:relative;display:inline-flex;flex:none}.hmiss .hport{filter:grayscale(1);opacity:.55}
+.hmisst{position:absolute;left:50%;bottom:-3px;transform:translateX(-50%);background:var(--red);color:#fff;font-size:9px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:1px 4px;border-radius:4px;line-height:1.3;white-space:nowrap}
+.fmtn .fmtin{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--red);-webkit-line-clamp:unset}
 .fmnoh{width:44px;height:44px;border-radius:12px;border:1px dashed var(--line);flex:none}.fmts{display:flex;justify-content:space-between;gap:6px;font-size:.85rem;min-width:0}.fmts .n{color:var(--brass);font-weight:700}
 .fmtb{display:grid;grid-template-columns:1fr 1fr;gap:6px}.fmtb .btn{width:100%;min-height:36px;margin:0}
 .fmtile.run{border-color:var(--grass);box-shadow:inset 0 0 0 1px var(--grass)}.fmtile.idle .fmts>span:first-child{color:var(--muted)}.fmtile .ln b{font-weight:700}
@@ -1934,7 +1937,7 @@ table.simtab td.simherotd{text-align:left;overflow-wrap:normal;word-break:normal
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.139";
+var APP_VERSION = "0.2.140";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -4875,10 +4878,14 @@ function farmSort(pr, how){ var key=function(id){ var q=TILE_BY[id]; return q?{d
   var ks={}; pr.farm.forEach(function(id){ ks[id]=key(id); });
   var cmp={near:function(a,b){ return ks[a].d-ks[b].d; }, far:function(a,b){ return ks[b].d-ks[a].d; }, lvhi:function(a,b){ return ks[b].L-ks[a].L || ks[a].d-ks[b].d; }, lvlo:function(a,b){ return ks[a].L-ks[b].L || ks[a].d-ks[b].d; }, kind:function(a,b){ return ks[a].k<ks[b].k?-1:ks[a].k>ks[b].k?1:ks[a].d-ks[b].d; }}[how];
   if (!cmp) return; pr.farm=pr.farm.slice().sort(cmp); pr.idx=0; }
+function heroWhere(id){ for (var c=0;c<S.cities.length;c++){ var hs=S.cities[c].heroes||[]; for (var i=0;i<hs.length;i++) if (hs[i].id===id) return {h:hs[i], ci:c}; } return null; }
+function heroMissingPic(h, px){ return '<span class="hmiss">'+heroPortrait(h,px)+'<span class="hmisst">Missing</span></span>'; } // 0.2.140: the hero picture with a Missing tag (the hero is in another city)
 function presetHeroCard(pr){ // 0.2.130: full-width card for the preset's hero (for Best / Fastest / Any, the one it would pick right now)
   var auto=presetAutoHero(pr.hero), h=presetHero(pr);
   if (!pr.hero) return '<div class="phcard none"><span class="dur">No hero rides with this preset.</span></div>';
-  if (!h) return '<div class="phcard none"><span class="dur">'+(auto?'No free hero to pick right now.':'That hero is not in this city.')+'</span></div>';
+  if (!h){ var hx=!auto?heroWhere(pr.hero):null;
+    if (hx) return '<div class="phcard">'+heroMissingPic(hx.h,64)+'<div class="phc1"><b>'+esc(hx.h.name)+'</b><span class="dur"><b class="badc">Missing</b> \u00b7 in <span translate="no">'+esc(S.cities[hx.ci].name)+'</span>. Bring them back, or pick another hero for this preset.</span></div></div>';
+    return '<div class="phcard none"><span class="dur">'+(auto?'No free hero to pick right now.':'That hero is no longer in your hall.')+'</span></div>'; }
   var set=starSet(h), tr=TIERS[h.tier];
   return '<div class="phcard" style="border-color:'+tr.color+'">'+heroPortrait(h,64)+'<div class="phc1"><b>'+esc(h.name)+'</b>'+
     '<span class="dur">Lv '+h.level+(set>=0?' · ★'+set:'')+' · <span style="color:'+tr.color+';font-weight:700">'+tr.name+'</span>'+(h.away?' · Marching':'')+'</span>'+
@@ -5017,9 +5024,9 @@ function farmTileHtml(pr,pi){ var tot=presetTotal(pr), st, cls=''; // 0.2.135 (C
   if (!tot){ st='No troops set'; cls=' idle'; }
   else if (pr.auto){ var fw=farmWhy(pr,pi); st=fw&&!fw.out&&!fw.soft?'<b class="badc">Waiting</b> <span class="dur">\u00b7 '+esc(farmWhyShort(fw.t))+'</span>':'<b class="okc">Auto-farming</b>'; cls=' run'; }
   else st='Not running';
-  var h=pr.hero?presetHero(pr):null, auto=pr.hero?presetAutoHero(pr.hero):false;
-  var hn=!pr.hero?'No hero':h?(auto?(pr.hero===HERO_BEST?'Best':pr.hero===HERO_FAST?'Fastest':'Any')+': ':'')+h.name:(auto?'No free hero':'Hero away');
-  return '<div class="reptile fmtile'+cls+'"><span class="fmth">'+(h?heroPortrait(h,44):'<span class="fmnoh" aria-hidden="true"></span>')+'<span class="fmtn"><span class="nm">'+esc(pr.name)+'</span><span class="dur" translate="no">'+esc(hn)+'</span></span></span>'+
+  var h=pr.hero?presetHero(pr):null, auto=pr.hero?presetAutoHero(pr.hero):false, hx=(!h && pr.hero>0)?heroWhere(pr.hero):null; // 0.2.140 (Cody, kuku): a preset's hero who is in another city shows with a Missing tag and where they are
+  var hn=!pr.hero?'No hero':h?(auto?(pr.hero===HERO_BEST?'Best':pr.hero===HERO_FAST?'Fastest':'Any')+': ':'')+h.name:hx?hx.h.name:(auto?'No free hero':'Hero gone');
+  return '<div class="reptile fmtile'+cls+'"><span class="fmth">'+(h?heroPortrait(h,44):hx?heroMissingPic(hx.h,44):'<span class="fmnoh" aria-hidden="true"></span>')+'<span class="fmtn"><span class="nm">'+esc(pr.name)+'</span><span class="dur" translate="no">'+esc(hn)+'</span>'+(hx?'<span class="dur fmtin">in <span translate="no">'+esc(S.cities[hx.ci].name)+'</span></span>':'')+'</span></span>'+
     '<span class="fmts"><span>'+st+'</span><span class="n">'+(pr.farm.length||'')+'</span></span>'+
     '<span class="fmtb"><button class="btn small'+(pr.auto?' ghost danger':'')+'" data-act="farm-start" data-p="'+pi+'">'+(pr.auto?'Stop':'Start')+'</button><button class="btn ghost small" data-act="farm-page" data-p="'+pi+'">Edit</button></span></div>'; }
 var FMHELP=false; // 0.2.50: the farm planner's how-to, behind its ?
