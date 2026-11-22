@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.140";
+window.IBORY_V="0.2.141";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1937,7 +1937,7 @@ table.simtab td.simherotd{text-align:left;overflow-wrap:normal;word-break:normal
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.140";
+var APP_VERSION = "0.2.141";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -14768,10 +14768,20 @@ function gameClock(t){ t+=(S.dayOff||0); var d=Math.floor(t/DAY)+1, m=Math.floor
    so a monster, PvP or hand-sent report isn't pushed out by an hour of auto-farming; when a list is still over its cap, farm hits leave before anything else. */
 var FARM_FULL=50;
 function isFarmRep(x){ return x && (x.pre!=null || x.p!=null) && !x.fav; }
-function trimKeepFav(arr,cap){ var i, over;
-  if (arr===S.reports){ var nf=0; for (i=0;i<arr.length;i++) if (isFarmRep(arr[i]) && ++nf>FARM_FULL){ arr.splice(i,1); i--; } }
+/* 0.2.141 (Cody: farm reports sometimes vanished the moment they came in): once the other reports filled the cap, every new farm hit was the first
+   thing trimmed. Now the newest farm hits always keep their own share: full reports keep the newest FARM_FULL farm hits on top of the cap for
+   everything else, and the report list keeps at least the newest FARM_LOG_MIN farm lines, with older farm lines still leaving first. */
+var FARM_LOG_MIN=1500;
+function trimKeepFav(arr,cap){ var i, over, nf=0;
+  if (arr===S.reports){ var fk=Math.min(FARM_FULL, Math.max(5, Math.ceil(cap/6))), no=0;
+    for (i=0;i<arr.length;i++){ var x=arr[i]; if (x.fav) continue; if (isFarmRep(x)){ if (++nf>fk){ arr.splice(i,1); i--; } } else if (++no>cap){ arr.splice(i,1); i--; } }
+    return; }
   over=arr.length-cap; if (over<=0) return;
-  if (arr===S.reports || arr===S.log) for (i=arr.length-1;i>=0 && over>0;i--) if (isFarmRep(arr[i])){ arr.splice(i,1); over--; }
+  if (arr===S.log){ var fm=Math.min(FARM_LOG_MIN, Math.ceil(cap*0.3)), keep={}; for (i=0;i<arr.length && nf<fm;i++) if (isFarmRep(arr[i])){ keep[i]=1; nf++; }
+    var drop={}; for (i=arr.length-1;i>=0 && over>0;i--) if (isFarmRep(arr[i]) && !keep[i]){ drop[i]=1; over--; } // older farm lines first
+    for (i=arr.length-1;i>=0 && over>0;i--) if (!drop[i] && !keep[i] && !arr[i].fav){ drop[i]=1; over--; }        // then the oldest of the rest
+    for (i=arr.length-1;i>=0 && over>0;i--) if (!drop[i] && !arr[i].fav){ drop[i]=1; over--; }                     // then, only if it must, the oldest kept farm lines
+    var wi=0; for (i=0;i<arr.length;i++) if (!drop[i]) arr[wi++]=arr[i]; arr.length=wi; return; }
   for (i=arr.length-1;i>=0 && over>0;i--) if (!arr[i].fav){ arr.splice(i,1); over--; } }
 var KEEP_MISSIONS={attack:1, conquer:1, occupy:1, scout:1, arena:1, rally:1};
 function keepRep(id){ S.log.forEach(function(c){ if (c.id===id) c.fav=1; }); S.reports.forEach(function(r){ if (r.id===id) r.fav=1; }); var rl=document.getElementById("replist"); if (rl) rl._sig=""; }
