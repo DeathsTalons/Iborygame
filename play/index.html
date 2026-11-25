@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.141";
+window.IBORY_V="0.2.142";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1937,7 +1937,7 @@ table.simtab td.simherotd{text-align:left;overflow-wrap:normal;word-break:normal
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.141";
+var APP_VERSION = "0.2.142";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -8078,8 +8078,10 @@ function ryReport(r, m, o, rw, xpOk){
    the other waves are fetched when the report is open and kept in memory (RYREP). */
 var RYREP={};
 function ryRepFetch(rep){ if (!rep || !rep.rid || !rep.aid || rep.aid!==ALS.aid || !(S.cloud&&S.cloud.token)) return; var k=rep.aid+"/"+rep.rid, o=RYREP[k];
-  if (o && (o.busy || o.waves || (o.err && Date.now()-o.at<30000))) return; RYREP[k]={busy:1, at:Date.now()};
-  alPost("/al/rally/rep",{rid:rep.rid}).then(function(d){ var q=RYREP[k]; q.busy=0; q.at=Date.now();
+  var hasMine=o && o.waves && o.waves.some(function(w){ return w.wave===rep.wave; });
+  if (o && (o.busy || (o.waves && (hasMine || Date.now()-o.at<8000)) || (o.err && Date.now()-o.at<30000))) return; // 0.2.142: a later wave isn't in an earlier copy, so fetch again (kuku: every report after the first stuck on Loading)
+  RYREP[k]={busy:1, at:Date.now(), waves:o&&o.waves, tries:(o&&o.tries||0)+1};
+  alPost("/al/rally/rep",{rid:rep.rid}).then(function(d){ var q=RYREP[k]; q.busy=0; q.at=Date.now(); q.err=null;
     if (d && d.ok){ q.waves=d.waves||[]; var mine=q.waves.filter(function(w){ return w.wave===rep.wave; })[0]; if (mine && !rep.full){ rep.full=mine; save(); } }
     else q.err=(d&&d.error)||"Couldn’t load the full report";
     if (sheetFor) { lastSheet=""; renderSheet(); } }).catch(function(){ var q=RYREP[k]; q.busy=0; q.at=Date.now(); q.err="Couldn’t reach the server"; if (sheetFor){ lastSheet=""; renderSheet(); } }); }
@@ -8088,7 +8090,8 @@ function ryWaveBody(w, mine){ var o={sent:w.sent||Z12(), left:w.left||Z12(), had
     (mine ? reportTable(o)+(w.kb?killsHtml(o):'') : (reportTable(o)+(w.kb?killsHtml(o):'')).replace('<th colspan="2">You</th>','<th colspan="2">'+esc(w.name||"Wave")+'</th>').split('Your kills').join(esc(w.name||"Their")+'\u2019s kills')); }
 function rallyRepHtml(r){ var row=function(l,v){ return '<div class="merow"><span>'+l+'</span><b>'+v+'</b></div>'; };
   var k=r.aid&&r.rid?r.aid+"/"+r.rid:"", RR=k?RYREP[k]:null, old=r.rid && realMs(S.gt-r.at)>7*864e5;
-  if (k && r.wave && !r.wiz && !old && (!r.full || (r.fights&&r.fights.length>1&&!(RR&&RR.waves)))) ryRepFetch(r);
+  if (k && r.wave && !r.wiz && !old && (!r.full || (r.fights&&r.fights.length>1&&!(RR&&RR.waves)))){ ryRepFetch(r); RR=RYREP[k]; if (RR && !RR.busy && !r.full && !RR.err && (RR.tries||0)<16) setTimeout(function(){ if (sheetFor){ lastSheet=""; renderSheet(); } }, 8500); }
+  var notYet=RR && RR.waves && !RR.busy && !r.full && !RR.waves.some(function(w){ return w.wave===r.wave; });
   var h='<div class="mestats">'+row("Target",esc(r.host)+'’s '+esc(r.target))+row("Your wave",r.cancelled?'called off':r.late?'arrived too late':r.idle?'not needed (already wiped out)':(r.wave+' of '+r.waves))+
     (r.wave?row("Result",r.result===1?'<span class="okc">Won</span>':'<span class="badc">Thrown back</span>'):'')+row("Who fought",esc((r.players||[]).join(", ")||"nobody"))+'</div>';
   if (r.wave){ var ryS=sum12(r.sent), ryL=Math.max(0,ryS-sum12(r.left)), ryK=sum12(r.killed); h=repTiles([[fmt(ryS),"Sent",""],[fmt(ryL),r.wiz||r.vamp?"Wounded":"Lost",ryL&&!(r.wiz||r.vamp)?"bad":""],[fmt(ryK),"Killed",ryK?"good":""],[fmt(r.rounds||0),r.rounds===1?"Round":"Rounds",""]])+h; }
@@ -8100,7 +8103,7 @@ function rallyRepHtml(r){ var row=function(l,v){ return '<div class="merow"><spa
     h+='<div class="h3" style="margin-top:8px">Your march <span class="dur">from '+esc(r.city)+(r.hero?', led by '+esc(r.hero):'')+'</span></div><div class="tscroll"><table class="gt" style="min-width:0"><thead><tr><th>Troop</th><th>Sent</th><th>Left</th><th>'+(r.wiz||r.vamp?'Wounded':'Fallen')+'</th></tr></thead><tbody>'+rows.join("")+'</tbody></table></div>';
     var kr=[]; for (var kk=0;kk<12;kk++) if (r.killed[kk]) kr.push(fmt(r.killed[kk])+' '+uname(kk,r.killed[kk]));
     if (kr.length) h+='<p class="dur">You killed: '+kr.join(", ")+'.</p>';
-    if (r.wave && !r.wiz) h+='<p class="hint">'+(old?'The full report is only kept for 7 days.':RR&&RR.busy?'Loading the full report…':RR&&RR.err?esc(RR.err)+'. <button class="link" data-act="ry-rep-retry" data-id="'+r.id+'">Try again</button>':r.aid&&r.aid!==ALS.aid?'The full report is with the alliance you were in then.':'Loading the full report…')+'</p>';
+    if (r.wave && !r.wiz) h+='<p class="hint">'+(old?'The full report is only kept for 7 days.':RR&&RR.busy?'Loading the full report…':notYet?'The full report for this wave isn’t ready yet. Checking again shortly… <button class="link" data-act="ry-rep-retry" data-id="'+r.id+'">Try now</button>':RR&&RR.err?esc(RR.err)+'. <button class="link" data-act="ry-rep-retry" data-id="'+r.id+'">Try again</button>':r.aid&&r.aid!==ALS.aid?'The full report is with the alliance you were in then.':'Loading the full report…')+'</p>';
   }
   var ryLoot=''; if (r.drops){ var got=(r.medal>=0?[MEDALS[r.medal][1]+" medal"]:[]).concat(r.drops); ryLoot = got.length && !r.nofull ? repLootHtml(r) : '<div class="h3" style="margin-top:10px">Loot</div><p class="dur" style="margin:6px 0">'+(r.nofull?'The garrison wasn’t full when the rally hit, so nothing dropped.':'Nothing this time.')+'</p>'; }
   if (r.fights && r.fights.length){ var byW={}; if (RR && RR.waves) RR.waves.forEach(function(w){ byW[w.wave]=w; });
@@ -14921,7 +14924,9 @@ function shareModel(c, r){
   try { var kd=document.createElement("div"); kd.innerHTML=killsHtml(r); kd.querySelectorAll(".killrow").forEach(function(x){ m.kills.push(x.textContent.replace(/\s+/g," ").trim()); }); } catch(e){}
   return m;
 }
-function shareCopy(url){ try { navigator.clipboard.writeText(url).then(function(){ toast("Link copied"); },function(){ toast("Copy the link from the box"); }); } catch(e){ toast("Copy the link from the box"); } }
+function shareCopyOld(url){ try { var ta=document.createElement("textarea"); ta.value=url; ta.setAttribute("readonly",""); ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0,url.length); var ok=document.execCommand("copy"); document.body.removeChild(ta); return ok; } catch(e){ return false; } }
+function shareCopy(url){ var fb=function(){ toast(shareCopyOld(url)?"Link copied":"Copy the link from the box"); }; // 0.2.142: some phones refuse the clipboard after a wait (kuku)
+  try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(function(){ toast("Link copied"); }, fb); else fb(); } catch(e){ fb(); } }
 function shareReport(){
   if (shareBusy || !LB_URL || !sheetFor || sheetFor.kind!=="report" || !sheetFor.rep) return;
   var rep=sheetFor.rep, c=sheetFor.c; shareBusy=true; lastSheet=""; renderSheet();
