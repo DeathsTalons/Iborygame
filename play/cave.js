@@ -693,7 +693,7 @@ function dmgOf(F, u, t, extra){ var m=1+u.buf.atk, o=extra||{};
   if (t.shred) arm*=1-t.shred;
   var red=arm/(arm+60), dmg=u.atk*m*(1-red)*(o.mult||1);
   return dmg; }
-function attack(F, u, t){ u.anim={k:"attack",t:F.t}; var multiT=[t];
+function attack(F, u, t){ u.anim={k:"attack",t:F.t}; if (t) u.foe=t.id; /* who they face (drawing only) */ var multiT=[t];
   if (u.side===0){
     var behind=function(){ var L=laneOf(F,1,t.lane), i=L.indexOf(t); return (i<0?[t]:L.slice(i)).filter(function(x){ return canHit(u,x); }); }; // the target and everyone behind it in its lane
     var pi=hasFx(u,"pierce"); if (pi && u.role==="spear"){ multiT=behind().slice(0,pi.n); }
@@ -927,10 +927,10 @@ function abilText(a, name){ if (!a) return ""; var fem=name && CAVE_H[name] && C
   if (a.revive) o.push((o.length?"; ":"")+"once a fight, brings back the first fallen ally at "+p(a.revive));
   var s=o.join(" ").replace(/ and \(/," (").replace(/ ; /g,"; ").replace(/^./,function(c){ return c.toUpperCase(); }); return s+"."; }
 // fire it: in place of an attack once charged
-function castAbil(F, u, t){ var a=u.abil, opp=1-u.side, D=[], A=[]; u.charge=0; u.anim={k:"attack",t:F.t}; u.casts=(u.casts||0)+1;
+function castAbil(F, u, t){ var a=u.abil, opp=1-u.side, D=[], A=[]; u.charge=0; u.anim={k:"attack",t:F.t}; if (t) u.foe=t.id; u.casts=(u.casts||0)+1;
   if (a.leap && canWalk(u)){ var E=foes(F,u); if (E.length){ var tg=a.leap==="back"?E.sort(function(p,q){ return depthOf(q)-depthOf(p) || q.id-p.id; })[0]:E.sort(function(p,q){ return p.hp/p.max-q.hp/q.max || p.id-q.id; })[0];
       var best=null; for (var dx=-1;dx<=1;dx++) for (var dy=-1;dy<=1;dy++){ var g=tg.gx+dx, l=tg.lane+dy; if (g<0||g>2*ND-1||l<0||l>=NL||occ(F,g,l,u)) continue; var d=Math.abs(dx)+Math.abs(dy)+(g===tg.gx-fwd(u.side)?-.5:0); if (!best||d<best.d) best={g:g,l:l,d:d}; }
-      if (best){ var fg=u.gx, fl=u.lane; u.gx=best.g; u.lane=best.l; u.lanes=[best.l]; u.move={t:.25, T:.25, fg:fg, fl:fl}; relane(F); t=tg; } } }
+      if (best){ var fg=u.gx, fl=u.lane; u.gx=best.g; u.lane=best.l; u.lanes=[best.l]; u.move={t:.25, T:.25, fg:fg, fl:fl}; relane(F); t=tg; u.foe=tg.id; } } }
   if (a.m){ var hitL=function(l){ return laneOf(F,opp,l).filter(function(x){ return canHit(u,x); }); };
     if (a.all) D=foes(F,u);
     else if (a.lanes3) [t.lane-1,t.lane,t.lane+1].forEach(function(l){ if (l>=0 && l<NL) D=D.concat(hitL(l)); });
@@ -1412,7 +1412,8 @@ function colX(g, z){ return PV.cx+(g-4.5)*PV.cw*rowS(z); }
 function cellGx(side, depth){ return side===0?ND-1-depth:ND+depth; }
 function tilePath(g, l, g2){ var z0=l-.62, z1=l+.38, a=g-.5, b=(g2==null?g:g2)+.5; cx.beginPath(); cx.moveTo(colX(a,z0),rowY(z0)); cx.lineTo(colX(b,z0),rowY(z0)); cx.lineTo(colX(b,z1),rowY(z1)); cx.lineTo(colX(a,z1),rowY(z1)); cx.closePath(); }
 function slotBox(l, s){ var g=cellGx(0,s), sc=rowS(l), y=rowY(l); return {x:colX(g-.5,l), w:PV.cw*sc, y:y-74*sc, h:92*sc, s:sc}; }
-function drawHeroAt(name, look, row, k, fx, fy, sc, flip, shadow, alpha, hero){ cx.save(); cx.translate(fx, fy); cx.scale(sc, sc); drawHero(name, look, row, k, -48, -92, flip, shadow, alpha, hero); cx.restore(); }
+function unitById(F,id){ for (var i=0;i<F.units.length;i++) if (F.units[i].id===id) return F.units[i]; return null; }
+function drawHeroAt(name, look, row, k, fx, fy, sc, flip, shadow, alpha, hero, lean){ cx.save(); cx.translate(fx, fy); cx.scale(sc, sc); if (lean){ cx.translate(0,-40); cx.rotate(lean); cx.translate(0,40); } drawHero(name, look, row, k, -48, -92, flip, shadow, alpha, hero); cx.restore(); }
 /* the cave behind: the old backdrop's ceiling as the far wall, its floor strip laid down in perspective, and the tiles on top. Made once per biome. */
 // a stone floor in the biome's own colours: mottled, speckled and cracked, made once per biome
 function floorTex(im, key){ var c=document.createElement("canvas"); c.width=1024; c.height=256; var g=c.getContext("2d"), base=[44,52,70], rock=[60,70,92];
@@ -1802,8 +1803,13 @@ function drawUnits(F, o){ var t=o.preview?0:F.t, now=performance.now()/1000;
     var look=u.side===1?1:(u.hero&&A.setCount(A.heroById(run(),u.hero.id)||u.hero)>=3?1:0), al2=u.alive?1:Math.max(0,1-(t-u.diedAt-1)/1.2);
     var hop=(!o.preview && F.over && F.over.win && u.side===0 && u.alive)?Math.round(Math.abs(Math.sin(now*7+u.id))*6):0;
     // walking left means facing left: your heroes face right unless they're heading back, theirs the other way
-    var flip=u.side===1; if (u.move && u.move.fg!=null && u.gx!==u.move.fg) flip=u.gx<u.move.fg;
-    drawHeroAt(u.name, look, row, k, u.dx, u.dy-hop, sc, flip, !!u.shadow, al2, u.side===0&&u.hero?(A.heroById(run(),u.hero.id)||u.hero):null);
+    var flip=u.side===1, walking=u.move && u.move.fg!=null && u.gx!==u.move.fg; if (walking) flip=u.gx<u.move.fg;
+    // 25 Nov (Cody): face whoever they're fighting (Alexander leaping behind the line turns round), and lean into blows aimed up or down the board
+    var lean=0, fo=!o.preview && !walking && u.alive && u.foe!=null?unitById(F,u.foe):null;
+    if (fo && fo.dx!=null && (fo.alive || t-(fo.diedAt||0)<.6)){ var ddx=fo.dx-u.dx, ddy=fo.dy-u.dy; if (Math.abs(ddx)>4) flip=ddx<0;
+      if (row==="attack"){ var adur=d.n[2]*MS.attack/1000, ael=(ui.cast[u.id]!=null && t-ui.cast[u.id]<adur)?t-ui.cast[u.id]:el;
+        lean=Math.sin(Math.PI*Math.min(1,Math.max(0,ael/adur)))*Math.max(-.35,Math.min(.35,Math.atan2(ddy,Math.max(24,Math.abs(ddx)))*.6))*(flip?-1:1); } }
+    drawHeroAt(u.name, look, row, k, u.dx, u.dy-hop, sc, flip, !!u.shadow, al2, u.side===0&&u.hero?(A.heroById(run(),u.hero.id)||u.hero):null, lean);
     if (u.alive && !o.preview){ var bx=u.dx-24*sc, by=u.dy-88*sc, bw=48*sc; bar(bx, by, bw, u.hp/u.max, u.side===0?"#5bd16b":"#e05a4a"); var nb=4; if (u.abil){ var cf=Math.min(1,u.charge/u.abil.n); bar(bx, by+nb, bw, cf, cf>=1?"#ffd65a":"#7fb6ff"); nb+=4; } if (u.shield>0){ bar(bx, by+nb, bw, u.shield/u.shieldMax, "#8fc0ea"); nb+=4; } if (u.ward>0) bar(bx, by+nb, bw, Math.min(1,u.ward/(u.max*.12)), "#f2e3a0"); } }); }
 /* ---------- top bar and controls ---------- */
 /* ---------- always on screen: the synergy rail and the bench bar ---------- */
