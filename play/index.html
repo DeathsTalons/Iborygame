@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.146";
+window.IBORY_V="0.2.147";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -1424,7 +1424,7 @@ body.bfmode #chatdock{display:none!important}
 .evleaf.b1{width:12px;height:12px;color:#d9a23a}.evleaf.b2{width:10px;height:10px;color:#9a3a1c}
 @keyframes evspin{to{transform:rotate(360deg)}}
 .vcards.ev-thanks .vcard{border-color:#5a3a1c;background:linear-gradient(#20160d,#33200f)}
-.evchip.ev-thanks{color:#d9822b}
+.evchip.ev-thanks{color:#d9822b}.evban.ev-frost{background:radial-gradient(120% 90% at 50% 120%,#2f6a9a 0%,#16304e 45%,#0b1424 100%);border-color:#2c4d72}.evban.ev-frost .evmoon{background:radial-gradient(circle at 40% 40%,#ffffff 0%,#cfe8ff 50%,#7fb4e6 100%);box-shadow:0 0 30px 8px rgba(160,210,255,.35)}.evban.ev-frost .evtitle{color:#e6f4ff;text-shadow:0 2px 0 #12304e,0 0 18px rgba(160,210,255,.55)}.evsnow{color:#dff0ff}.evflake{width:14px;height:14px;animation:evspin 6s linear infinite, evfly 13s linear infinite}.evflake.b1{width:10px;height:10px}.evflake.b2{width:8px;height:8px;color:#a9d4ff}.evflake.b3{width:12px;height:12px;animation-delay:-4s,-6s}.evflake.b4{width:9px;height:9px;animation-delay:-7s,-9s}.vcards.ev-frost .vcard{border-color:#2c4d72;background:linear-gradient(#0f1a2c,#16263e)}.evchip.ev-frost{color:#9fd4ff}.chp{display:inline-block;width:80px;height:140px;background-repeat:no-repeat;image-rendering:auto;transform-origin:50% 100%}.chp.sil{filter:brightness(0) opacity(.18)}.chentry{display:flex;align-items:center;gap:10px;width:100%;margin:8px 0;padding:8px 10px;border:1px solid #2c4d72;border-radius:10px;background:linear-gradient(#0f1a2c,#16263e);color:#e6f4ff;text-align:left;cursor:pointer}.chei{display:flex;align-items:flex-end;height:38px}.chei .chp{zoom:.27;margin-right:-8px}.chet{display:flex;flex-direction:column;flex:1;min-width:0}.chet span{font-size:.8rem;color:#a9c6e6}.chego{font-size:1.4rem;color:#9fd4ff}.chhint{margin:0 0 8px}.chsets{display:grid;gap:8px}.chset{border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--panel2)}.chset.done{border-color:var(--brass);box-shadow:0 0 0 1px var(--brass) inset}.chst{display:flex;align-items:baseline;gap:8px;margin-bottom:4px}.chst b{flex:1}.chn{font-weight:700;color:var(--brass);font-size:.85rem}.chboard{display:grid;gap:1px;border-radius:6px;overflow:hidden;background:#6b5338;padding:3px}.chrow{display:grid;grid-template-columns:repeat(8,1fr)}.chc{display:flex;justify-content:center;align-items:flex-end;height:46px;overflow:hidden}.chrow:nth-child(1) .chc:nth-child(odd),.chrow:nth-child(2) .chc:nth-child(even){background:#e9d6b0}.chrow:nth-child(1) .chc:nth-child(even),.chrow:nth-child(2) .chc:nth-child(odd){background:#b48a5e}.chc .chp{zoom:.31}.chrw{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px}.chrw.got{opacity:.6}.chset.locked{opacity:.75}.chlock{display:flex;gap:4px;align-items:flex-end;height:44px}.chlock .chp{zoom:.3}@media (prefers-reduced-motion:reduce){.evflake{animation:none}}
 @media (prefers-reduced-motion:reduce){.evleaf{animation:none}}
 .alm[data-act="rx-sel"]{cursor:pointer}
 .tgline{background:var(--panel2);border-radius:10px;padding:8px 12px;margin-top:6px;border-left:4px solid transparent}
@@ -2039,7 +2039,7 @@ table.simtab td.simherotd{text-align:left;overflow-wrap:normal;word-break:normal
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.146";
+var APP_VERSION = "0.2.147";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -3480,10 +3480,10 @@ function fieldNoise(x,y){ // smooth value noise: low values are wide open fields
   var v=function(i,j){ return hash3(i,j,sd); }, sx=fx*fx*(3-2*fx), sy=fy*fy*(3-2*fy);
   var a=v(gx,gy)+(v(gx+1,gy)-v(gx,gy))*sx, b=v(gx,gy+1)+(v(gx+1,gy+1)-v(gx,gy+1))*sx; return a+(b-a)*sy;
 }
-var MONSTERS={wyvern:"Wyvern",troll:"Troll",hydra:"Hydra",behemoth:"Behemoth", jack:"Vampire Fledgling",horseman:"Vampire Stalker",pking:"Vampire Lord", csquire:"Colonizer Squire",cknight:"Colonizer Knight",ccaptain:"Colonizer Captain"}; // 0.2.36: Giving True Thanks, the colonizers (CraftPix free Knight pack) // 0.1.200: the Hallow\u2019s Eve monsters are vampires (CraftPix free pack); the kind keys stay as they were
-var VAMP={"1":{"src":"art/vamp-1.png","w":49,"h":55,"n":4,"idle":[0,4],"atk":[4,12],"die":[16,11],"feet":13,"ih":30},"2":{"src":"art/vamp-2.png","w":49,"h":57,"n":4,"idle":[0,4],"atk":[4,12],"die":[16,11],"feet":13,"ih":32},"3":{"src":"art/vamp-3.png","w":49,"h":57,"n":4,"idle":[0,4],"atk":[4,12],"die":[16,11],"feet":13,"ih":31}}, VAMP_IMG={}, VAMP_FX=[], VAMP_LIST=[], EVM_VIS=false, VAMP_K={jack:1,horseman:2,pking:3,csquire:1,cknight:2,ccaptain:3};
+var MONSTERS={wyvern:"Wyvern",troll:"Troll",hydra:"Hydra",behemoth:"Behemoth", jack:"Vampire Fledgling",horseman:"Vampire Stalker",pking:"Vampire Lord", csquire:"Colonizer Squire",cknight:"Colonizer Knight",ccaptain:"Colonizer Captain", fthrall:"Frost Thrall",frider:"Frost Rider",flich:"Frost Lich"}; // 0.2.147: Midwinter, the Frost Lich host (Out Of Tokens Fantasy Chess, set 052) // 0.2.36: Giving True Thanks, the colonizers (CraftPix free Knight pack) // 0.1.200: the Hallow\u2019s Eve monsters are vampires (CraftPix free pack); the kind keys stay as they were
+var VAMP={"1":{"src":"art/vamp-1.png","w":49,"h":55,"n":4,"idle":[0,4],"atk":[4,12],"die":[16,11],"feet":13,"ih":30},"2":{"src":"art/vamp-2.png","w":49,"h":57,"n":4,"idle":[0,4],"atk":[4,12],"die":[16,11],"feet":13,"ih":32},"3":{"src":"art/vamp-3.png","w":49,"h":57,"n":4,"idle":[0,4],"atk":[4,12],"die":[16,11],"feet":13,"ih":31}}, VAMP_IMG={}, VAMP_FX=[], VAMP_LIST=[], EVM_VIS=false, VAMP_K={jack:1,horseman:2,pking:3,csquire:1,cknight:2,ccaptain:3,fthrall:1,frider:2,flich:3};
 // 0.2.36: each event brings its own three monsters; the strips share one layout (4 idle, 12 attack, then the fall), so everything that draws a vampire draws them
-var KNIGHT={"1":{"src":"art/knight-1.png","w":177,"h":75,"n":4,"idle":[0,4],"atk":[4,12],"die":[16,6],"feet":0,"ih":64},"2":{"src":"art/knight-2.png","w":169,"h":75,"n":4,"idle":[0,4],"atk":[4,12],"die":[16,6],"feet":0,"ih":64},"3":{"src":"art/knight-3.png","w":155,"h":75,"n":4,"idle":[0,4],"atk":[4,12],"die":[16,6],"feet":0,"ih":64}}, EV_ART={halloween:VAMP, thanks:KNIGHT};
+var KNIGHT={"1":{"src":"art/knight-1.png","w":177,"h":75,"n":4,"idle":[0,4],"atk":[4,12],"die":[16,6],"feet":0,"ih":64},"2":{"src":"art/knight-2.png","w":169,"h":75,"n":4,"idle":[0,4],"atk":[4,12],"die":[16,6],"feet":0,"ih":64},"3":{"src":"art/knight-3.png","w":155,"h":75,"n":4,"idle":[0,4],"atk":[4,12],"die":[16,6],"feet":0,"ih":64}}, FROST={"1":{"src":"art/frost-1.png","w":57,"h":70,"n":4,"idle":[0,4],"atk":[4,12],"die":[16,8],"feet":2,"ih":64},"2":{"src":"art/frost-2.png","w":79,"h":80,"n":4,"idle":[0,4],"atk":[4,12],"die":[16,8],"feet":2,"ih":74},"3":{"src":"art/frost-3.png","w":81,"h":90,"n":4,"idle":[0,4],"atk":[4,12],"die":[16,8],"feet":2,"ih":84}}, EV_ART={halloween:VAMP, thanks:KNIGHT, frost:FROST}; // FROST: built by art/tools/frost.py (still pictures made into strips: a bob, a lunge, a fall)
 function evDef(id){ for (var i=0;i<EVENTS.length;i++) if (EVENTS[i].id===id) return EVENTS[i]; return null; }
 function evId(){ var e=evNow(); return e?e.id:EVENTS[EVENTS.length-1].id; } // the running event, else the latest one
 function evArt(ev, L){ return (EV_ART[ev]||EV_ART[evId()]||VAMP)[L]; }
@@ -3501,7 +3501,7 @@ function vampFxDraw(g, x0, y0, x1, y1, z){ var now=Date.now(); VAMP_FX=VAMP_FX.f
 // also unlocks that vampire as a one-tile decoration, for good (place it as often as you like)
 var VAMP_SPOILS={1:{s15:1}, 2:{s15:1, gemF:4}, 3:{s15:1, gemF:4, ore:1}}; // every slain vampire, for everyone who brought it down
 // 0.2.36 (Cody): the colonizers drop the same, and level 2 has a 1% chance of a Fine Ingot, level 3 a 1% Fine Ingot and a 0.5% Mithril (each its own roll)
-var EV_SPOILS={halloween:VAMP_SPOILS, thanks:VAMP_SPOILS}, EV_CHANCE={thanks:{2:{ingot:0.01}, 3:{ingot:0.01, mithril:0.005}}}, EV_DECO={halloween:"dv_vamp", thanks:"dv_knight"};
+var EV_SPOILS={halloween:VAMP_SPOILS, thanks:VAMP_SPOILS, frost:VAMP_SPOILS}, EV_CHANCE={thanks:{2:{ingot:0.01}, 3:{ingot:0.01, mithril:0.005}}, frost:{2:{ingot:0.01}, 3:{ingot:0.01, mithril:0.005}}}, EV_DECO={halloween:"dv_vamp", thanks:"dv_knight", frost:"dv_frost"};
 function vampSpoilsGive(L, drops, ev){ ev=ev||evId(); var V=(EV_SPOILS[ev]||VAMP_SPOILS)[L]||{}, C=(EV_CHANCE[ev]||{})[L]||{}; for (var k in V){ var n=qtyRoll(V[k]); S.items[k]=(S.items[k]||0)+n; drops.push(lootTxt(k,n)); }
   for (var c in C) if (Math.random()<C[c]){ S.items[c]=(S.items[c]||0)+1; drops.push(lootTxt(c,1)); }
   var D=decoS(), dk=(EV_DECO[ev]||"dv_vamp")+L; D.unl=D.unl||{}; if (!D.unl[dk]){ D.unl[dk]=1; drops.push("the "+DECOS[dk].n+" decoration (yours for good)"); } }
@@ -3518,7 +3518,10 @@ function vampImg(L, ev){ var a=evArt(ev, L), ck=a.src; if (VAMP_IMG[ck]) return 
 var EVENTS=[{id:"halloween", name:"Hallow\u2019s Eve", from:Date.UTC(2026,9,20,4), to:Date.UTC(2026,10,3,5), kinds:["jack","horseman","pking"], emo:"\ud83e\udddb", tile:"#2a1636"},
   // 0.2.36 (Cody): Giving True Thanks, Nov 3 to the end of Sun Nov 29 (Eastern). Drive out the colonizers who have moved into your lands.
   // When the map is full (30), new colonizers of a higher level take the place of lower ones (replace), so a map left alone grows harder.
-  {id:"thanks", name:"Giving True Thanks", from:Date.UTC(2026,10,3,5), to:Date.UTC(2026,10,30,5), kinds:["csquire","cknight","ccaptain"], replace:true, emo:"\ud83e\udeb6", tile:"#3a2a1a"}]; // 0.1.205: on, Oct 20 to the end of Nov 2, Eastern time (set off:true to switch it off)
+  {id:"thanks", name:"Giving True Thanks", from:Date.UTC(2026,10,3,5), to:Date.UTC(2026,10,30,5), kinds:["csquire","cknight","ccaptain"], replace:true, emo:"\ud83e\udeb6", tile:"#3a2a1a"},
+  // 0.2.147 (Cody): Midwinter, from the moment Giving True Thanks ends (Mon Nov 30, midnight Eastern) to the end of Sun Jan 4. The Frost Lich's host
+  // marches on your lands; the chess collection (CHESS) runs alongside it. Same rules as Giving True Thanks, stronger ones push the weaker out.
+  {id:"frost", name:"Midwinter", from:Date.UTC(2026,10,30,5), to:Date.UTC(2027,0,5,5), kinds:["fthrall","frider","flich"], replace:true, emo:"\u2744\ufe0f", tile:"#16243a"}]; // 0.1.205: on, Oct 20 to the end of Nov 2, Eastern time (set off:true to switch it off)
 function evNow(){ var t=Date.now(); for (var i=0;i<EVENTS.length;i++) if (!EVENTS[i].off && t>=EVENTS[i].from && t<EVENTS[i].to) return EVENTS[i]; return null; }
 var DECOS={pumpkin:{n:"Jack-o\u2019-Lantern",e:"\ud83c\udf83",r:1}, bats:{n:"Bats",e:"\ud83e\udd87",r:1}, web:{n:"Spider Web",e:"\ud83d\udd78\ufe0f",r:1}, candle:{n:"Candle",e:"\ud83d\udd6f\ufe0f",r:1}, candy:{n:"Candy Pile",e:"\ud83c\udf6c",r:1},
   ghost:{n:"Ghost",e:"\ud83d\udc7b",r:2}, grave:{n:"Gravestone",e:"\ud83e\udea6",r:2}, cat:{n:"Black Cat",e:"\ud83d\udc08\u200d\u2b1b",r:2}, spider:{n:"Giant Spider",e:"\ud83d\udd77\ufe0f",r:2},
@@ -3573,7 +3576,7 @@ var DSHOP=[{id:"ai", name:"AI Pack", ai:1, groups:AI_GROUPS}].concat(DPACKS.filt
 
 var DECO_RAR=["","Common","Uncommon","Rare"];
 // 0.1.203: the Hallow's Eve vampires as one-tile decorations (idle loop), unlocked for good by slaying one of that level (S.deco.unl)
-var XIMG={}; [["vamp",VAMP,["jack","horseman","pking"]],["knight",KNIGHT,["csquire","cknight","ccaptain"]]].forEach(function(e){ [1,2,3].forEach(function(L){ var v=e[1][L], k="dv_"+e[0]+L; XIMG[e[0]+L]={src:v.src};
+var XIMG={}; [["vamp",VAMP,["jack","horseman","pking"]],["knight",KNIGHT,["csquire","cknight","ccaptain"]],["frost",FROST,["fthrall","frider","flich"]]].forEach(function(e){ [1,2,3].forEach(function(L){ var v=e[1][L], k="dv_"+e[0]+L; XIMG[e[0]+L]={src:v.src};
   SPRITES[k]={ppt:v.ih, ax:v.w/2, ay:v.h-v.feet, img:e[0]+L, r:[0,0,v.w,v.h], nf:v.n, ms:200}; DECOS[k]={n:MONSTERS[e[2][L-1]], spr:k, unl:1}; }); }); // 0.2.36: the colonizers too
 // 0.1.202: icons are cached (each one is a PNG encode); cleared whenever a pack picture finishes loading
 var ICON_CACHE={};
@@ -4010,11 +4013,13 @@ function vampSpawn(){ if (!TILES || !S.cities.length) return; var V=vampS(), ev=
 /* the event track: monsters brought down this event. Hallow's Eve: 25 brings the historic hero Dracula; 50, 75 and 100 bring 1, 2 and 3 Rough Ore.
    Giving True Thanks (0.2.36, Cody): 25 brings Sequoyah; 50, 75 and 100 bring 1, 2 and 3 Mithril */
 var EV_TRACK={halloween:{max:100, miles:[{n:25, hero:"Dracula", label:"Dracula, a historic hero"},{n:50, item:"ore", q:1, label:"1 Rough Ore"},{n:75, item:"ore", q:2, label:"2 Rough Ore"},{n:100, item:"ore", q:3, label:"3 Rough Ore"}]},
-  thanks:{max:100, miles:[{n:25, hero:"Sequoyah", label:"Sequoyah, a historic hero"},{n:50, item:"mithril", q:1, label:"1 Mithril"},{n:75, item:"mithril", q:2, label:"2 Mithril"},{n:100, item:"mithril", q:3, label:"3 Mithril"}]}};
+  thanks:{max:100, miles:[{n:25, hero:"Sequoyah", label:"Sequoyah, a historic hero"},{n:50, item:"mithril", q:1, label:"1 Mithril"},{n:75, item:"mithril", q:2, label:"2 Mithril"},{n:100, item:"mithril", q:3, label:"3 Mithril"}]},
+  frost:{max:100, miles:[{n:25, hero:"Wenceslaus I", label:"Wenceslaus I, a historic hero"},{n:50, item:"mithril", q:3, label:"3 Mithril"},{n:75, item:"starmetal", q:1, label:"1 Star Metal"},{n:100, item:"starmetal", q:2, label:"2 Star Metal"}]}}; // 0.2.147 (Cody): Wenceslaus I at 25
 function evk(id){ S.evk=S.evk||{}; var e=S.evk[id]; if (!e) e=S.evk[id]={n:0, got:{}}; return e; }
 // event heroes: historic heroes like the rest (every stat 160-170, the specialty 200-250). Dracula: Attack (Vlad III was a warlord first).
 // Sequoyah (0.2.36): Intelligence (he made the Cherokee syllabary on his own, and a whole nation could read within a few years)
-var EV_HEROES={Dracula:{pol:164, atk:238, int:169}, Sequoyah:{pol:168, atk:161, int:242}};
+// Wenceslaus I (0.2.147, Cody): the first Politics event hero, as strong as the level 16 founders (Politics 330). The duke of Bohemia remembered for his charity ("Good King Wenceslas")
+var EV_HEROES={Dracula:{pol:164, atk:238, int:169}, Sequoyah:{pol:168, atk:161, int:242}, "Wenceslaus I":{pol:330, atk:208, int:252}};
 function evHero(nm){ var d=EV_HEROES[nm]; return {id:S.nextHeroId++, name:nm, tier:"historic", level:1, xp:0, pol:d.pol, atk:d.atk, int:d.int, pts:0, base:{pol:d.pol, atk:d.atk, int:d.int}}; }
 // 0.2.36: each event's words, as whole sentences (word-swapping can't be translated well). Hallow's Eve keeps its old wording.
 var EV_TXT={
@@ -4035,7 +4040,16 @@ var EV_TXT={
     lore:function(r){ return "Strangers in armor have crossed into "+r+". They stake fences on the valleys and flats around your cities and call the land their own. It was never theirs to take."; }, who:"Who has come", hunt:"Take back the land",
     rules:function(end){ return "New colonizers arrive near your cities every hour, up to 30 at a time. When there’s no room left, stronger ones push the weaker ones out, so the longer they’re left alone the harder they get. They stay until they’re driven out or the event ends after "+end+". Every colonizer you drive out drops spoils, and the first of each kind joins your decorations for good. Call your alliance onto one and everyone who gets a march there takes the spoils and the kill."; },
     track:function(h){ return "Drive out 100 colonizers to finish it. At 25, a historic hero answers your call: "+h+"."; }, follow:"Follow it from the feather at the top of the screen.", go:"Ride out",
-    onMap:function(n,end){ return n+" on your map right now. More arrive every hour (up to 30 at once; when it’s full, stronger ones push the weaker ones out). Rally your alliance onto them: everyone who gets there takes the spoils and the kill. The event ends after "+end+"; any colonizers left then are gone, but everything you earned stays."; } } };
+    onMap:function(n,end){ return n+" on your map right now. More arrive every hour (up to 30 at once; when it’s full, stronger ones push the weaker ones out). Rally your alliance onto them: everyone who gets there takes the spoils and the kill. The event ends after "+end+"; any colonizers left then are gone, but everything you earned stays."; } },
+  frost:{ // 0.2.147: Midwinter, the Frost Lich's host
+    done:function(n){ return n+" of the frost host broken"; }, heroFor:function(h,n){ return h+", a historic hero, for breaking "+n+" of the frost host"; }, itemFor:function(l,n){ return l+" for breaking "+n+" of the frost host"; },
+    heroNote:function(h,n,c){ return "❄️ "+n+" of the frost host broken: "+h+" answers your call and joins "+c; }, itemNote:function(l,n){ return "❄️ "+n+" of the frost host broken: "+l+"."; },
+    top:"Top wardens", none:"Nobody has broken the frost host yet. Be the first.", join:"Break one of the frost host to join the board.", you:function(r,n){ return "You: #"+r+" with "+n+" broken."; },
+    many:function(n){ return n===1?"1 warden so far":fmt(n)+" wardens so far"; }, count:function(m){ return "of "+m+" of the frost host broken"; }, head:"The frost host", fight:"Nobody dies fighting the frost host: every loss is wounded", table:"The frost host (Midwinter)",
+    lore:function(r){ return "The Frost Lich has woken in the far north. His host of frozen dead marches through the snow and gathers on the valleys and flats around "+r+", and the cold follows them wherever they stand."; }, who:"Who marches", hunt:"Hold back the cold",
+    rules:function(end){ return "New thralls, riders and liches arrive near your cities every hour, up to 30 at a time. When there’s no room left, stronger ones push the weaker ones out, so the longer they’re left alone the harder they get. They stay until they’re broken or the event ends after "+end+". Every one you break drops spoils, and the first of each kind joins your decorations for good. Any monster you bring down this winter may also give you a chess piece for your collection."; },
+    track:function(h){ return "Break 100 of the frost host to finish it. At 25, a historic hero answers your call: "+h+". Mithril and Star Metal follow."; }, follow:"Follow it from the snowflake at the top of the screen.", go:"March out",
+    onMap:function(n,end){ return n+" on your map right now. More arrive every hour (up to 30 at once; when it’s full, stronger ones push the weaker ones out). Rally your alliance onto them: everyone who gets there takes the spoils and the kill. The event ends after "+end+"; any of the host left then are gone, but everything you earned stays."; } } };
 function evT(id){ return EV_TXT[id]||EV_TXT[evId()]||EV_TXT.halloween; }
 function evDone(id, n){ return evT(id).done(n); } // "25 colonizers driven out"
 function evKill(id, drops){ var T=EV_TRACK[id]; if (!T) return; var e=evk(id); e.n++;
@@ -4045,6 +4059,63 @@ function evKill(id, drops){ var T=EV_TRACK[id]; if (!T) return; var e=evk(id); e
       note("heroes",evT(id).heroNote(m.hero, m.n, C().name)+(full?" (he waits at the gate until there’s room in the Feasting Hall)":"")+"."); }
     if (m.item){ S.items[m.item]=(S.items[m.item]||0)+m.q; drops.push(evT(id).itemFor(m.label, m.n)); note("march",evT(id).itemNote(m.label, m.n)); } });
   lastSheet=""; }
+
+/* ---------- 0.2.147 (Cody): the chess collection, Midwinter's "+1" event ----------
+   Built as its own module so it can come back with other holidays (CHESS_RUNS: one entry per holiday, tied to an event id).
+   Fill a whole side of the board (8 pawns, 2 rooks, 2 knights, 2 bishops, the queen and the king) for each of 12 sets. A new set opens every
+   3 days. Any monster you bring down has a 10% chance to give a piece you don't have yet (never a duplicate). In multiplayer, loose pieces and
+   rare Frost Fairies on the server map give pieces too (send one scout). A finished set: Star Metal, Mithril, speed-ups, and its six pieces as decorations.
+   Art: Out Of Tokens Studio "Christmas Chess Set Pack" (art/tools/chess.py makes art/chess/<set>.png: 6 white then 6 black pieces, 80x140 each). */
+var CHESS_KINDS=["king","queen","bishop","knight","rook","pawn"], CHESS_W=80, CHESS_H=140;
+var CHESS_SLOTS=[4,3,2,1,0,2,3,4,5,5,5,5,5,5,5,5]; // a board side: back rank rook knight bishop queen king bishop knight rook, then the 8 pawns (kind index per slot)
+var CHESS_RUNS=[{id:"xmas26", ev:"frost", every:3*86400000, rate:0.10, sets:[["classic-red-green","Classic Red & Green"],["candy-cane","Candy Cane"],["gingerbread","Gingerbread"],["snowman","Snowman"],
+  ["santa","Santa"],["elf","Elf"],["nutcracker","Nutcracker"],["reindeer","Reindeer"],["polar-bear","Polar Bear"],["penguin","Penguin"],["krampus","Krampus"],["new-years-eve","New Year’s Eve"]]}];
+function chessRun(){ var ev=evNow(); if (!ev) return null; for (var i=0;i<CHESS_RUNS.length;i++) if (CHESS_RUNS[i].ev===ev.id) return CHESS_RUNS[i]; return null; }
+function chessRunLatest(){ var r=chessRun(); if (r) return r; for (var i=CHESS_RUNS.length-1;i>=0;i--){ var e=evDef(CHESS_RUNS[i].ev); if (e && Date.now()>=e.from) return CHESS_RUNS[i]; } return null; }
+function chessS(run){ S.chess=S.chess||{}; var c=S.chess[run.id]; if (!c) c=S.chess[run.id]={got:{}, done:{}, n:0}; return c; }
+function chessOpenN(run){ var e=evDef(run.ev); if (!e) return 0; return Math.max(1, Math.min(run.sets.length, 1+Math.floor((Math.min(Date.now(), e.to-1)-e.from)/run.every))); }
+function chessOpensAt(run, i){ var e=evDef(run.ev); return e ? e.from+i*run.every : 0; }
+function chessHas(run, si, slot){ return !!((chessS(run).got[si]||0) & (1<<slot)); }
+function chessCount(run, si){ var g=chessS(run).got[si]||0, n=0; for (var k=0;k<16;k++) if (g & (1<<k)) n++; return n; }
+function chessTotal(run){ var n=0; for (var i=0;i<run.sets.length;i++) n+=chessCount(run, i); return n; }
+function chessMissing(run){ var out=[], open=chessOpenN(run); for (var i=0;i<open;i++) for (var k=0;k<16;k++) if (!chessHas(run, i, k)) out.push([i,k]); return out; }
+function chessPieceName(run, si, slot){ return run.sets[si][1]+" "+CHESS_KINDS[CHESS_SLOTS[slot]]; }
+function chessReward(i){ var g=Math.floor(i/4); return {starmetal:1+g, mithril:[4,6,8][g], script:1+g, s480:[3,5,8][g], s60:[10,15,20][g], gemF:[20,30,40][g], gemD:[50,75,100][g]}; } // Cody: Star Metal, Michelangelo’s Scripts, Mithril and lots of speed-ups and gems; more for the later sets (no buffs)
+function chessDeco(run, si, kind){ return "ch_"+run.sets[si][0]+"_"+kind; }
+// give one piece; returns the line for reports and notes. A finished set pays out and unlocks its decorations on the spot.
+function chessGive(run, si, slot){ var c=chessS(run), was=c.got[si]||0; if (was & (1<<slot)) return "";
+  c.got[si]=was|(1<<slot); c.n=(c.n||0)+1; var cnt=chessCount(run, si), txt="a chess piece: the "+chessPieceName(run, si, slot)+" ("+cnt+" of 16)";
+  if (cnt===16 && !c.done[si]){ c.done[si]=S.gt; var rw=chessReward(si), got=[]; for (var k in rw){ S.items[k]=(S.items[k]||0)+rw[k]; got.push(rw[k]+" "+((ITEMS[k]&&ITEMS[k].name)||k)); }
+    var D=decoS(); D.unl=D.unl||{}; CHESS_KINDS.forEach(function(kd){ D.unl[chessDeco(run, si, kd)]=1; });
+    txt+=". The "+run.sets[si][1]+" set is complete: "+got.join(", ")+", and its pieces as decorations";
+    note("march", "♞ The "+run.sets[si][1]+" chess set is complete! "+got.join(", ")+", and its six pieces join your decorations."); }
+  lastSheet=""; return txt; }
+// every monster brought down: a 10% chance of a piece you don't have yet (from the sets open so far)
+function chessRoll(){ var run=chessRun(); if (!run || Math.random()>=run.rate) return ""; var miss=chessMissing(run); if (!miss.length) return "";
+  var p=miss[Math.floor(Math.random()*miss.length)]; return chessGive(run, p[0], p[1]); }
+// a missing piece on purpose (Frost Fairies, loose pieces on the server map): the given slot if you lack it, else any you're missing
+function chessGift(si, slot){ var run=chessRun(); if (!run) return ""; if (si!=null && si<chessOpenN(run) && !chessHas(run, si, slot)) return chessGive(run, si, slot);
+  var miss=chessMissing(run); if (!miss.length) return ""; var p=miss[Math.floor(Math.random()*miss.length)]; return chessGive(run, p[0], p[1]); }
+// the pieces as one-tile decorations (white), unlocked for good by finishing the set
+CHESS_RUNS.forEach(function(run){ run.sets.forEach(function(st, si){ XIMG["ch_"+st[0]]={src:"art/chess/"+st[0]+".png"};
+  CHESS_KINDS.forEach(function(kd, ki){ var k="ch_"+st[0]+"_"+kd; SPRITES[k]={ppt:118, ax:CHESS_W/2, ay:CHESS_H, img:"ch_"+st[0], r:[ki*CHESS_W,0,CHESS_W,CHESS_H], nf:1, ms:1e9}; DECOS[k]={n:st[1]+" "+kd, spr:k, unl:1}; }); }); });
+function chessPieceImg(run, si, ki, black, cls){ var st=run.sets[si], x=(ki+(black?6:0))*CHESS_W;
+  return '<span class="chp'+(cls?' '+cls:'')+'" style="background-image:url(art/chess/'+st[0]+'.png);background-position:-'+x+'px 0" aria-hidden="true"></span>'; }
+// the collection book: one card per set, each a little board (back rank over the pawns)
+function chessEntry(){ var run=chessRun(), tot=chessTotal(run), open=chessOpenN(run), ic=[0,3,5].map(function(ki){ return chessPieceImg(run, open-1, ki, false, "mini"); }).join("");
+  return '<button class="chentry" data-act="chess-open"><span class="chei">'+ic+'</span><span class="chet"><b>Chess collection</b><span>'+tot+' of '+(run.sets.length*16)+' pieces \u00b7 '+open+' of '+run.sets.length+' sets open</span></span><span class="chego">\u203a</span></button>'; }
+function chessSheet(){ var run=chessRunLatest(); if (!run) return '<div class="head"><div style="flex:1"><h2>Chess collection</h2></div><button class="btn ghost small" data-act="close" aria-label="Close">✕</button></div><p class="hint">No collection is running right now.</p>';
+  var open=chessOpenN(run), tot=chessTotal(run), all=run.sets.length*16, c=chessS(run), live=!!chessRun();
+  var h='<div class="head"><div style="flex:1"><h2>Chess collection</h2><span class="dur">'+tot+' of '+all+' pieces · '+Object.keys(c.done).length+' of '+run.sets.length+' sets</span></div><button class="btn ghost small" data-act="close" aria-label="Close">✕</button></div>';
+  h+='<p class="hint chhint">Fill a whole side of the board for each set. Any monster you bring down has a 10% chance to give you a piece you don’t have yet'+(lbMp()?'; loose pieces and Frost Fairies on the server map give them too (send one scout)':'')+'. A new set opens every 3 days.'+(live?'':' This collection has ended; what you finished stays yours.')+'</p>';
+  h+='<div class="chsets">'+run.sets.map(function(st, si){ var n=chessCount(run, si), done=!!c.done[si], locked=si>=open, rw=chessReward(si);
+    if (locked) return '<div class="chset locked"><div class="chst"><b>'+esc(st[1])+'</b><span class="dur">opens '+evDay(chessOpensAt(run, si))+'</span></div><div class="chlock">'+chessPieceImg(run, si, 0, false, "sil")+chessPieceImg(run, si, 3, false, "sil")+'</div></div>';
+    var cell=function(slot){ var ki=CHESS_SLOTS[slot], has=chessHas(run, si, slot); return '<span class="chc'+(has?' got':'')+'" title="'+esc(st[1]+" "+CHESS_KINDS[ki])+(has?'':' (missing)')+'">'+chessPieceImg(run, si, ki, false, has?"":"sil")+'</span>'; };
+    var row=function(a,b){ var o=''; for (var k=a;k<b;k++) o+=cell(k); return o; };
+    return '<div class="chset'+(done?' done':'')+'"><div class="chst"><b>'+esc(st[1])+'</b><span class="chn">'+(done?'✓ Complete':n+' / 16')+'</span></div>'+
+      '<div class="chboard"><div class="chrow">'+row(0,8)+'</div><div class="chrow">'+row(8,16)+'</div></div>'+
+      '<div class="chrw'+(done?' got':'')+'">'+Object.keys(rw).map(function(k){ return '<span class="evsc">'+(ITEM_IMG[k]?'<img src="'+ITEM_IMG[k]+'" alt="'+esc(ITEMS[k].name)+'">':'')+rw[k]+'</span>'; }).join("")+'<span class="dur">+ 6 decorations</span></div></div>'; }).join("")+'</div>';
+  return h; }
 
 /* the event board (0.1.224): who has slain the most vampires this event, everyone together (single player and multiplayer).
    Your count goes up with your high scores; the board loads when the event page opens and again every minute while it's open. */
@@ -4073,7 +4144,8 @@ function evBoardHtml(ev){ var e=evk(ev.id), E=evDef(ev.id)||EVENTS[0], d=EVB.d &
 var EV_BATS='<span class="evbats" aria-hidden="true">'+[0,1,2].map(function(i){ return '<svg class="evbat b'+i+'" viewBox="0 0 24 12"><path fill="currentColor" d="M12 4.2c.5-.9 1.1-1.4 1.6-1.6l.3 1.6c1.6-.2 3.5-1.6 4.6-3.6 1 1.1 2.9 1.9 5 1.7-1 1.3-1.6 3.1-1.4 4.9-1.3-.6-2.9-.6-4 .1-.5-1.1-1.6-1.8-2.7-1.8-.6 1-1.5 2.3-3.4 3.9-1.9-1.6-2.8-2.9-3.4-3.9-1.1 0-2.2.7-2.7 1.8-1.1-.7-2.7-.7-4-.1.2-1.8-.4-3.6-1.4-4.9 2.1.2 4-.6 5-1.7 1.1 2 3 3.4 4.6 3.6l.3-1.6c.5.2 1.1.7 1.6 1.6z"/></svg>'; }).join("")+'</span>';
 function evDay(t){ return new Date(t).toLocaleDateString(undefined,{month:"short",day:"numeric",timeZone:"America/New_York"}); }
 var EV_LEAVES='<span class="evbats evleaves" aria-hidden="true">'+[0,1,2].map(function(i){ return '<svg class="evbat evleaf b'+i+'" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2c1 2 2.2 3.1 3.6 3.4-.4 1.2-.3 2.3.4 3.3 1.3-.6 2.6-.6 3.9.1-.8 1.2-1 2.5-.6 3.9-1.2.1-2.2.6-3 1.6 1 .7 1.6 1.7 1.6 3-1.6-.3-3-.1-4.3.7l-.3 3.9h-1.2l-.3-3.9c-1.3-.8-2.7-1-4.3-.7 0-1.3.6-2.3 1.6-3-.8-1-1.8-1.5-3-1.6.4-1.4.2-2.7-.6-3.9 1.3-.7 2.6-.7 3.9-.1.7-1 .8-2.1.4-3.3C9.8 5.1 11 4 12 2z"/></svg>'; }).join("")+'</span>'; // 0.2.36: autumn leaves for Giving True Thanks
-function evBanner(ev, small){ return '<div class="evban ev-'+ev.id+(small?' sm':'')+'"><span class="evmoon" aria-hidden="true"></span>'+(ev.id==="thanks"?EV_LEAVES:EV_BATS)+'<div class="evtitle">'+esc(ev.name)+'</div><div class="evsub">'+evDay(ev.from)+' – '+evDay(ev.to-1)+'</div></div>'; }
+var EV_SNOW='<span class="evbats evsnow" aria-hidden="true">'+[0,1,2,3,4].map(function(i){ return '<svg class="evbat evflake b'+i+'" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 2v20M3.3 7l17.4 10M3.3 17L20.7 7M12 2l-2 2m2-2l2 2M12 22l-2-2m2 2l2-2"/></svg>'; }).join("")+'</span>'; // 0.2.147: Midwinter snow
+function evBanner(ev, small){ return '<div class="evban ev-'+ev.id+(small?' sm':'')+'"><span class="evmoon" aria-hidden="true"></span>'+(ev.id==="thanks"?EV_LEAVES:ev.id==="frost"?EV_SNOW:EV_BATS)+'<div class="evtitle">'+esc(ev.name)+'</div><div class="evsub">'+evDay(ev.from)+' – '+evDay(ev.to-1)+'</div></div>'; }
 function vampSpoils(L){ var ev=evId(), V=(EV_SPOILS[ev]||VAMP_SPOILS)[L]||{}, C=(EV_CHANCE[ev]||{})[L]||{}, a=Object.keys(V).map(function(k){ return lootTxt(k, typeof V[k]==="number"?V[k]:qtyTxt(V[k])); }).concat(Object.keys(C).map(function(k){ return "a "+(C[k]*100)+"% chance of a "+((ITEMS[k]&&ITEMS[k].name)||k); })); /* 0.2.47: "1% Fine Ingot" read like an amount */ var t=a.length>1?a.slice(0,-1).join(", ")+" and "+a[a.length-1]:(a[0]||""); return t.charAt(0).toUpperCase()+t.slice(1); }
 function vampCards(withSpoils){ var ev=evId(); return '<div class="vcards ev-'+ev+'">'+[1,2,3].map(function(L){ var nm=MONSTERS[evKind(L, ev)]; return '<button class="vcard" type="button" aria-label="'+nm+'"><span class="vsp vsp-'+ev+'-'+L+'"></span><b>'+nm+'</b><span class="dur">Level '+L+'</span>'+(withSpoils?vampSpoilChips(L):'')+'</button>'; }).join("")+'</div>'; }
 // 0.2.50: a monster's spoils as icon chips ("1%" for a chance); the full sentence stays in the title
@@ -4102,6 +4174,7 @@ function evSheet(){ var ev=evNow(); if (!ev || !EV_TRACK[ev.id]) return '<div cl
     '<div class="evbar" role="progressbar" aria-valuemin="0" aria-valuemax="'+T.max+'" aria-valuenow="'+Math.min(e.n,T.max)+'"><div class="evfill" style="width:'+pct.toFixed(1)+'%"></div>'+
       T.miles.map(function(m){ return '<span class="evtick'+(e.got[m.n]?' got':'')+'" style="left:'+(m.n/T.max*100)+'%"></span>'; }).join("")+'</div>'+
     evMilesHtml(ev.id)+
+    (chessRun()?chessEntry():'')+
     evBoardHtml(ev)+
     '<div class="h3">'+evT(ev.id).head+'</div>'+vampCards(true)+
     '<p class="dur evfoot">'+onMap+' on your map \u00b7 more every hour \u00b7 ends after '+evDay(ev.to-1)+' \u00b7 <button class="link" data-act="ev-intro">How it works</button></p>'; } // 0.2.50: the long footer as one line; the rules are in the intro
@@ -4109,8 +4182,8 @@ function evSheet(){ var ev=evNow(); if (!ev || !EV_TRACK[ev.id]) return '<div cl
 setInterval(function(){ try { var ev=evNow(); if (!ev || !EV_TRACK[ev.id] || saveLocked || sheetFor || !S || !S.cities || !S.cities.length) return; S.evIntro=S.evIntro||{}; if (S.evIntro[ev.id]) return;
   S.evIntro[ev.id]=Date.now(); save(); openSheet({kind:"evintro"}); } catch(e){} }, 2000);
 // the vampire sprites as CSS backgrounds (idle loop; tap or hover plays the attack)
-(function(){ var css=''; Object.keys(EV_ART).forEach(function(ev){ var SC=ev==="thanks"?1.4:2; [1,2,3].forEach(function(L){ var v=EV_ART[ev][L], fr=v.die[0]+v.die[1]; // 0.2.36: per event (the knights' frames are wide for their sword swings; the card crops the sides)
-  css+='.vsp-'+ev+'-'+L+'{--fw:'+(v.w*SC)+'px;width:'+(v.w*SC)+'px;height:'+(v.h*SC)+'px;background-image:url('+v.src+');background-size:'+(fr*v.w*SC)+'px '+(v.h*SC)+'px'+(ev==="thanks"?';max-width:none;flex:none;margin:-4px 0 -2px':'')+'}'; }); });
+(function(){ var css=''; Object.keys(EV_ART).forEach(function(ev){ var SC=ev==="thanks"?1.4:ev==="frost"?1.1:2; [1,2,3].forEach(function(L){ var v=EV_ART[ev][L], fr=v.die[0]+v.die[1]; // 0.2.36: per event (the knights' frames are wide for their sword swings; the card crops the sides)
+  css+='.vsp-'+ev+'-'+L+'{--fw:'+(v.w*SC)+'px;width:'+(v.w*SC)+'px;height:'+(v.h*SC)+'px;background-image:url('+v.src+');background-size:'+(fr*v.w*SC)+'px '+(v.h*SC)+'px'+(ev==="thanks"||ev==="frost"?';max-width:none;flex:none;margin:-4px 0 -2px':'')+'}'; }); });
   var st=document.createElement("style"); st.textContent=css; document.head.appendChild(st); })();
 
 var WIZ_LOOT={1:{items:{gemF:[2,12], s15:[1,4]}, res:1e6}, 2:{items:{gemF:[10,20], s60:[1,2]}, res:5e6}}; // a slain wizard, for every player who brought it down
@@ -4129,7 +4202,7 @@ function wizBattle(m){
   if (hero) heroRec(hero, {won:f.win, killed:[], lost:wd, label:"a "+WIZ[L].n});
   var wxp=0; if (hero){ wxp=f.win ? (WIZ_XP[L]||0) : 0; if (wxp){ var wups=giveXp(hero, wxp); wxp=Math.round(wxp*xpMul()); if (wups) note("heroes", hero.name+" reached level "+hero.level); } }
   var city=ci>=0?S.cities[ci].name:C().name, id=S.nextMarchId++, name="Level "+L+" "+WIZ[L].n, g=[];
-  if (rw){ for (var k2 in rw.items) g.push(fmt(rw.items[k2])+" "+((ITEMS[k2]&&ITEMS[k2].name)||k2)); g.push(fmt(rw.res.food)+" of each resource"); }
+  if (rw){ for (var k2 in rw.items) g.push(fmt(rw.items[k2])+" "+((ITEMS[k2]&&ITEMS[k2].name)||k2)); g.push(fmt(rw.res.food)+" of each resource"); var wcp2=chessRoll(); if (wcp2) g.push(wcp2); }
   S.reports.unshift({id:id, at:S.gt, arena:1, wiz:1, mname:WIZ[L].n, name:name, tile:q.id, result:f.win?1:2, type:"wiz"+L, lv:L, rounds:f.rounds, hpLeft:f.hpLeft, hp0:f.hp0, reward:rw, players:[myName()||"You"], marches:1,
     mine:[{city:city, hero:hero?hero.name:"", sent:m.t.slice(), back:back.slice(), wounded:wd.slice()}], solo:true, xp:wxp, hero:hero?hero.name:"", def:0, aww:v?{v:v}:null}); trimKeepFav(S.reports, FULL_CAP);
   S.log.unshift({id:id, at:S.gt, sc:0, n:name, tile:q.id, r:f.win?1:2, d:0, l:0, k:0, lo:0, m:-1, g:g, h:null, f:null, o:0, c:city, ar:1, wd:wn, sent:sumT(m.t)}); trimKeepFav(S.log, LOG_CAP);
@@ -4366,7 +4439,8 @@ var HIST_SPEC={
   // Politics: rulers, builders and lawgivers
   "Charlemagne":"pol","Cleopatra":"pol","Xerxes":"pol","Cyrus the Great":"pol","Ramesses II":"pol","Pericles":"pol","Constantine":"pol","Justinian":"pol","Octavian":"pol","Hadrian":"pol","Zenobia":"pol","Otto the Great":"pol","Theodoric":"pol",
   "Dracula":"atk", // 0.1.205: the Hallow's Eve reward (not in HISTORIC, so no historic city holds him)
-  "Sequoyah":"int" // 0.2.36: the Giving True Thanks reward (Cody). He made the Cherokee syllabary on his own: an Intelligence hero
+  "Sequoyah":"int", // 0.2.36: the Giving True Thanks reward (Cody). He made the Cherokee syllabary on his own: an Intelligence hero
+  "Wenceslaus I":"pol" // 0.2.147: the Midwinter reward (Cody): Politics
 };
 // a historic hero's starting stats, the same for every player. 0.1.169: 160-170 in every stat and the specialty 200-250
 // (before: 120-130, specialty 160-199; old=true gives those, so heroes already captured can be moved up by the difference)
@@ -4464,7 +4538,7 @@ function hallLoad(){ if (window.IB_HIST || HALL.loading) return; HALL.loading=tr
 function hallHeroList(){ var out=[];
   HISTORIC.forEach(function(n){ out.push({n:n, g:"The forty", how:""}); });
   Object.keys(HC_CITY_HERO).forEach(function(c){ var f=HC_CITY_HERO[c], L=HC_NAMES_16.indexOf(c)>=0?16:c==="Atlantis"?18:14; out.push({n:f.name, g:L===18?"Atlantis":L===16?"The founders (level 16 cities)":"Heroes of the level 14 cities", how:"From "+c, city:c}); });
-  out.push({n:"Dracula", g:"Event heroes", how:"The Hallow\u2019s Eve reward"}); out.push({n:"Sequoyah", g:"Event heroes", how:"The Giving True Thanks reward"});
+  out.push({n:"Dracula", g:"Event heroes", how:"The Hallow\u2019s Eve reward"}); out.push({n:"Sequoyah", g:"Event heroes", how:"The Giving True Thanks reward"}); out.push({n:"Wenceslaus I", g:"Event heroes", how:"The Midwinter reward"});
   return out; }
 function hallCityList(){ var out=[]; Object.keys(HC_AT).forEach(function(id){ var hc=HC_AT[id]; if (!hc.name) return; var xy=id.split(",");
     out.push({n:hc.name, L:hc.L, id:id, x:+xy[0], y:+xy[1], g:hc.L===18?"Atlantis":hc.L===16?"Level 16":hc.L===14?"Level 14":HALL_REGION[hcQuarter(+xy[0],+xy[1])]}); });
@@ -4643,7 +4717,8 @@ function boxRules(q){ if (q.k==="hc") return [["medalbox3",BOX_DROP.hcSenior]]; 
 function boxRates(q){ var none=1, out=[]; boxRules(q).forEach(function(r){ out.push({k:r[0], p:none*r[1]}); none*=1-r[1]; }); return {list:out, none:none}; }
 function medalRates(q){ var w=medalWeights(q), sum=w.reduce(function(a,c){ return a+c; },0), bx=boxRates(q); if (!sum) return [];
   return w.map(function(x,i){ return {i:i, p:bx.none*MEDAL_RATE*x/sum}; }).filter(function(m){ return m.p>0; }); }
-function winDrops(q){
+function winDrops(q){ var o=winDrops0(q); if (q.k==="monster"){ var cp=chessRoll(); if (cp) o.drops.push(cp); } return o; } // 0.2.147: every monster brought down may give a chess piece
+function winDrops0(q){
   if (q.k==="monster" && q.ev && VAMP_K[q.mon]) return vampDrops(q);
   var boxKey = rollMedalBox(q), drops=[], medal=-1;
   if (boxKey){ S.items[boxKey]=(S.items[boxKey]||0)+1; drops.push("a "+ITEMS[boxKey].name); }
@@ -7738,7 +7813,7 @@ function arReward(r, m, myM){
   var rw=r.reward||{items:{},res:{}}; for (var k in rw.items) S.items[k]=(S.items[k]||0)+rw.items[k];
   var ci=m?cityIndex(m.city):S.cur, rs=0; if (ci<0) ci=S.cur; withCity(ci,function(){ for (var k2 in rw.res){ S.res[k2]+=rw.res[k2]; rs+=rw.res[k2]; } });
   if (rs){ S.stats=S.stats||{}; S.stats.loot=(S.stats.loot||0)+rs; }
-  note("alliance","The "+nm+" fell at the Arena! Your share: "+arRewardList(rw)+".");
+  var acp=chessRoll(); note("alliance","The "+nm+" fell at the Arena! Your share: "+arRewardList(rw)+(acp?", and "+acp:"")+".");
 }
 function wdRepHtml(r){ var pct0=r.hp0?Math.max(r.result===1?0:1, Math.round(r.hpLeft/r.hp0*100)):0, row=function(l,v){ return '<div class="merow"><span>'+l+'</span><b>'+v+'</b></div>'; }, x=(r.mine||[])[0];
   var h=(WD_MART[r.lv]?'<div style="text-align:center"><img src="'+WD_MART[r.lv]+'" alt="" style="width:96px;height:96px;object-fit:contain;image-rendering:pixelated"></div>':'')+monMarchTiles(r,"Health")+'<div class="mestats">'+row("Monster","Level "+r.lv+" "+esc(r.mname))+
@@ -8132,8 +8207,8 @@ function ryResults(Y){
     if (fresh.length && r.win && !r.cancelled && !S.alRallyRoll[rk]){ S.alRallyRoll[rk]=Date.now();
       if (r.k==="wiz"){ var wr=wizRoll(r.L), wm=L.filter(function(x){ return x.ref===fresh[0]; })[0], wci=wm?cityIndex(wm.city):S.cur; if (wci<0) wci=S.cur; // a wizard: everyone who made it rolls the rewards
         for (var wk in wr.items) S.items[wk]=(S.items[wk]||0)+wr.items[wk]; RES.forEach(function(rk2){ S.cities[wci].res[rk2]+=wr.res[rk2]||0; });
-        roll={drops:Object.keys(wr.items).map(function(k3){ return fmt(wr.items[k3])+" "+((ITEMS[k3]&&ITEMS[k3].name)||k3); }).concat([fmt(wr.res.food)+" of each resource (sent to "+S.cities[wci].name+")"]), medal:-1}; }
-      else if (r.k==="vamp"){ var vd=[]; vampSpoilsGive(r.L, vd, evId()); evKill(evId(), vd); roll={drops:vd, medal:-1}; } // 0.1.209: a vampire: the spoils and a kill on the event track for each player
+        roll={drops:Object.keys(wr.items).map(function(k3){ return fmt(wr.items[k3])+" "+((ITEMS[k3]&&ITEMS[k3].name)||k3); }).concat([fmt(wr.res.food)+" of each resource (sent to "+S.cities[wci].name+")"]), medal:-1}; var wcp=chessRoll(); if (wcp) roll.drops.push(wcp); }
+      else if (r.k==="vamp"){ var vd=[]; vampSpoilsGive(r.L, vd, evId()); evKill(evId(), vd); var vcp=chessRoll(); if (vcp) vd.push(vcp); roll={drops:vd, medal:-1}; } // 0.1.209: a vampire: the spoils and a kill on the event track for each player
       else roll = r.full ? winDrops({id:"rally:"+r.id, k:r.k, L:r.L}) : {drops:[], medal:-1, nofull:true}; }
     var xpRef=xpFirstRef(Object.keys(r.mine||{}).map(function(ref){ return L.filter(function(x){ return x.ref===ref; })[0]; }));
     Object.keys(r.mine||{}).forEach(function(ref){ var m=L.filter(function(x){ return x.ref===ref; })[0]; if (!m || m.st!=="out") return; var o=r.mine[ref];
@@ -8609,6 +8684,10 @@ function wdSvg(){ var d=WDS.d, V0=wdWin(), V={x:V0.x-V0.w*WD_OV, y:V0.y-V0.h*WD_
     if (close) h+='<image href="'+WD_MART[m.L]+'" x="'+(m.x-0.3)+'" y="'+(m.y-0.6)+'" width="1.6" height="1.6" preserveAspectRatio="xMidYMax meet" style="image-rendering:pixelated"/>'+(zt>=12?'<text x="'+(m.x+0.5)+'" y="'+(m.y+1.3)+'" text-anchor="middle" font-size=".34" class="wdsm" fill="#fff" stroke="#1f2421" stroke-width=".07" paint-order="stroke">Lv '+m.L+'</text>':'');
     else { var mr=Math.max(0.5, 1.5/z)*(0.8+m.L*0.2); h+='<circle cx="'+(m.x+0.5)+'" cy="'+(m.y+0.5)+'" r="'+mr.toFixed(2)+'" fill="'+WD_MCOL[m.L]+'" stroke="#1f2421" stroke-width="'+fs(0.6)+'"/>'; }
     if (ryOn[m.id]) h+='<circle cx="'+(m.x+0.5)+'" cy="'+(m.y+0.5)+'" r="'+(close?0.75:Math.max(1.1,3/z)).toFixed(2)+'" fill="none" stroke="#f3dc9a" stroke-width="'+fs(1.6)+'" stroke-dasharray="'+fs(3)+' '+fs(2)+'"/>'; });
+  (d.gifts||[]).forEach(function(g){ if (g.until<=Date.now() || g.born>Date.now() || !inV(g.x,g.y,1)) return; var gone=wgGot(g)||wgOwned(g); // 0.2.147: chess pieces close up only; fairies show from further out (a sparkle) so they can be found
+    if (close){ var gu=g.k==="fy"?WG_FART[g.L]:wgPieceUrl(g.si,g.slot); if (gu) h+='<image href="'+gu+'" x="'+(g.x-0.25)+'" y="'+(g.y-0.75)+'" width="1.5" height="1.75" preserveAspectRatio="xMidYMax meet"'+(gone?' opacity=".45"':'')+'/>'; else h+='<text x="'+(g.x+0.5)+'" y="'+(g.y+0.8)+'" text-anchor="middle" font-size=".9">\u265f</text>';
+      if (g.k==="fy" && !gone) h+='<circle cx="'+(g.x+0.5)+'" cy="'+(g.y+0.3)+'" r=".8" fill="none" stroke="#cfe8ff" stroke-width="'+fs(1.2)+'" stroke-dasharray="'+fs(2)+' '+fs(3)+'" opacity=".8"/>'; }
+    else if (g.k==="fy" && !gone){ var fr=Math.max(0.6, 2/z); h+='<circle cx="'+(g.x+0.5)+'" cy="'+(g.y+0.5)+'" r="'+fr.toFixed(2)+'" fill="#dff0ff" stroke="#3a7bc8" stroke-width="'+fs(1)+'"/>'; } });
   var nowM=Date.now(), mk=Math.max(0.9, 3.2/z), caps={}; d.lords.forEach(function(l){ caps[l.x+","+l.y]=1; });
   (d.marches||[]).forEach(function(mv){ if (mv.s!=="wait" && mv.b && nowM>mv.b+1500) return; /* 0.2.86: it has arrived: the line goes now, not at the next refresh */ var a=wdPt(mv.f[0],mv.f[1],caps), b2=wdPt(mv.to[0],mv.to[1],caps), pr=mv.s==="wait"?1:Math.max(0,Math.min(1,(nowM-mv.a)/Math.max(1,mv.b-mv.a))), px=a[0]+(b2[0]-a[0])*pr, py=a[1]+(b2[1]-a[1])*pr, col=mv.me?"#f3dc9a":"rgba(235,227,208,.75)";
     if (mv.s!=="wait") h+='<line x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b2[0]+'" y2="'+b2[1]+'" stroke="'+col+'" stroke-width="'+fs(mv.me?1.4:1)+'" stroke-dasharray="'+fs(4)+' '+fs(3)+'" opacity=".8"/>';
@@ -8638,6 +8717,7 @@ function wdIco(k, x, y, sc, col){ return '<g transform="matrix('+sc+' 0 0 '+sc+'
 function wdAt(x, y){ var d=WDS.d, z=wdWin().z, best=null, bd=Math.pow(Math.max(0.6, 3/z),2);
   if (z>=WD_CLOSE){ var L=wdLordAt(x, y); if (L) return {k:"lord", x:L.x, y:L.y, l:L};
     var Mn=(d.mons||[]).filter(function(m){ return m.x===x && m.y===y; })[0]; if (Mn) return {k:"mon", x:x, y:y, m:Mn};
+    var Gf=(d.gifts||[]).filter(function(g){ return g.x===x && g.y===y && g.until>Date.now() && !(g.born>Date.now()); })[0]; if (Gf) return {k:"gift", x:x, y:y, g:Gf}; // 0.2.147
     for (var si=0; si<d.slots.length; si++){ var s0=d.slots[si]; if (s0.ring>=d.open || x<s0.x || y<s0.y || x>=s0.x+d.sz || y>=s0.y+d.sz) continue;
       var bs=d.bs||3, bb=(s0.b||[]).filter(function(q){ return x>=q.x && y>=q.y && x<q.x+bs && y<q.y+bs; })[0];
       var ct=s0.city && x>=s0.city[0] && y>=s0.city[1] && x<s0.city[0]+s0.city[2] && y<s0.city[1]+s0.city[2];
@@ -8792,6 +8872,7 @@ function wdPopHtml(){ var inf=wdInfo(), more=WDS.more===WDS.sel, tn=wdTele();
 function wdInfo(){ var d=WDS.d, v=WDS.sel, me=d.me, mine=me.aid, tn=wdTele(), myS=me.slot!=null?d.slots[me.slot]:null;
   if (!v) return '';
   if (v.k==="mon"){ var mStill=(d.mons||[]).filter(function(m){ return m.id===v.m.id; })[0]; if (!mStill) return '<p class="hint">That monster is gone.</p>'; v.m=mStill; return wdMonInfo(v); }
+  if (v.k==="gift"){ var gStill=(d.gifts||[]).filter(function(g){ return g.id===v.g.id && g.until>Date.now(); })[0]; if (!gStill) return '<p class="hint">It\u2019s gone.</p>'; v.g=gStill; return wgInfo(v); } // 0.2.147
   var tele=function(what){ return ' <span class="dur">(1 City Teleport, you have '+tn+')</span>'; };
   var trip='<p class="dur wdx">To the Throne: about '+(v.x!=null?wdTrip(v.x,v.y):'')+' for Cavalry with no speed bonuses.</p>';
   if ((v.k==="throne"||v.k==="bld") && d.bk){ var wbi=wbBldInfo(v.k==="throne"?8:v.i); if (wbi!=null) return wbi; }
@@ -8951,6 +9032,7 @@ function wdAct(act, a, e){
   if (act==="wd-open"){ WDS.sel=null; if (sheetFor) closeSheet(); wdGoTab(); lastView=""; renderView(true); window.scrollTo({top:0}); if (!WDS.busy) wdFetch(); return true; }
   if (act==="wd-tap"){ if (!WDS.dragAt && !wdGhost(e)) wdTapAt(e); return true; }
   if (act==="wd-popx"){ WDS.sel=null; WDS.armed=""; wdPaint(); return true; }
+  if (act==="wd-gvisit"){ wgVisit(+a.dataset.g); return true; } // 0.2.147
   if (act==="wd-more"){ WDS.more=WDS.more===WDS.sel?null:WDS.sel; wdPaint(); return true; }
   if (act==="wd-mltog"){ WDS.mlOpen=WDS.mlOpen===false; wdPaint(); return true; }
   if (act==="wd-mrecall"){ wdMarchAct("/wd/recall", +a.dataset.id, "March recalled: it\u2019s heading home"); return true; }
@@ -9096,6 +9178,11 @@ function wbHome(m){ var ci=cityIndex(m.city); if (ci<0) ci=S.cur; var c=S.cities
   withCity(ci, function(){ for (var i=0;i<12;i++){ var k=back[i]||0; S.troops[i]+=k; n+=k; } if (r.loot) RES.forEach(function(k){ S.res[k]+=r.loot[k]||0; }); });
   var wd=woundFrom(c.id, m.t, back, false), lost=Math.max(0, sumT(m.t)-n), hh=m.hero?heroById(m.hero):null; if (hh) hh.away=false;
   var tail=" Back in "+c.name+": "+fmt(n)+" troops"+(lost?", "+fmt(lost)+" fell"+(wd?" ("+fmt(wd)+" only wounded, in the Medic Camp)":""):"")+".", lt=r.loot?RES.reduce(function(a,k){ return a+(r.loot[k]||0); },0):0;
+  if (r.gift){ var G=r.gift, gl=[]; // 0.2.147: a piece or a Frost Fairy on the server map
+    if (G.gone || G.again){ note("alliance", "Your scout reached "+(r.of||nm)+(G.gone?", but it was gone.":", but you\u2019d already been there.")+tail); return; }
+    if (G.k==="fy"){ var gi=G.items||{}; for (var gk in gi){ S.items[gk]=(S.items[gk]||0)+gi[gk]; gl.push(gi[gk]+" "+((ITEMS[gk]&&ITEMS[gk].name)||gk)); } var fp=chessGift(); if (fp) gl.unshift(fp);
+      note("alliance", "\u2744\ufe0f "+(r.of||"A Frost Fairy").replace(/^./,function(c){ return c.toUpperCase(); })+" gave your scout "+(gl.length?gl.join(", "):"her blessing")+"."+tail); return; }
+    var pp=chessGift(G.si, G.slot); note("alliance", pp?"\u265e Your scout picked up "+pp+"."+tail:"Your scout reached the chess piece, but you already have it."+tail); return; }
   if (r.scout){ var I=r.intel; note("alliance", r.ok&&I ? "Scouting "+(r.of||nm)+": "+(I.npc?"its guard holds ":I.marches!=null?I.marches+" garrison march"+(I.marches===1?"":"es")+" ("+(I.names||[]).join(", ")+") with ":"")+wbTroopTxt(I.t)+(I.f?", fortifications "+fmt(I.f.reduce(function(a,b){ return a+b; },0)):"")+(I.wall?", wall level "+I.wall:"")+(I.gate==="closed"?", gate shut":"")+(I.res?", about "+fmt(RES.reduce(function(a,k){ return a+(I.res[k]||0); },0))+" resources to take":"")+"."
       : "Your scouts were caught at "+(r.of||nm)+": none came back."); return; }
   if (r.gar!=null && !r.why) note("alliance", (r.lost?"Your garrison at "+nm+" fell.":r.left?"Your garrison left "+nm+".":"Your garrison came home from "+nm+".")+tail);
@@ -9226,6 +9313,33 @@ document.addEventListener("keydown", function(e){ if (e.key==="Enter" && e.targe
    until you join one, without an alliance), Flawless Gems, speed-ups, chances at Rough Ore, Mithril and Star Metal, and hero experience for the
    first hero you sent. No weakness hints, as with every monster: players find out what works. */
 var WD_MART={1:"art/mon-skeleton.png",2:"art/mon-eye.png",3:"art/mon-mushroom.png"}, WD_MCOL={1:"#d9534f",2:"#a66bd8",3:"#e3a33a"}, WD_MXP={1:20000,2:50000,3:100000};
+/* 0.2.147: Midwinter's chess collection on the server map: loose pieces (the black piece of a set) and Frost Fairies (art/fairy-1..3.png, Out Of Tokens
+   Fantasy Chess, set 043). Send one scout; each player once. A piece gives that piece (if you're missing it); a fairy gives a piece you're missing and a gift. */
+var WG_FART={1:"art/fairy-1.png",2:"art/fairy-2.png",3:"art/fairy-3.png"}, WG_FN={1:"Frost Fairy",2:"Frost Fairy on her owl",3:"Frost Fairy Queen"}, WG_GIFT={1:{s60:1, gemF:4}, 2:{s60:2, gemF:8, ore:1}, 3:{s480:1, ingot:1, mithril:1}};
+var WG_PCIMG={}; // the black piece of a set, cut from its sheet once (an SVG image can't crop a sheet)
+function wgPieceUrl(si, slot){ var run=CHESS_RUNS[0], st=run&&run.sets[si]; if (!st) return ""; var ki=CHESS_SLOTS[slot], k=st[0]+"|"+ki; if (WG_PCIMG[k]) return WG_PCIMG[k].url||"";
+  var im=new Image(); WG_PCIMG[k]={url:""}; im.onload=function(){ try { var cv=document.createElement("canvas"); cv.width=CHESS_W; cv.height=CHESS_H; cv.getContext("2d").drawImage(im, (ki+6)*CHESS_W, 0, CHESS_W, CHESS_H, 0, 0, CHESS_W, CHESS_H); WG_PCIMG[k].url=cv.toDataURL(); if (wdVisible()) wdPaint(); } catch(e){} }; im.src="art/chess/"+st[0]+".png"; return ""; }
+function wgName(g){ var run=CHESS_RUNS[0]; return g.k==="fy" ? WG_FN[g.L]||"Frost Fairy" : (run&&run.sets[g.si] ? "a "+run.sets[g.si][1]+" "+CHESS_KINDS[CHESS_SLOTS[g.slot]] : "a chess piece"); }
+function wgGot(g){ var d=WDS.d; return !!(d && (d.gotG||[]).indexOf(g.id)>=0); }
+function wgOwned(g){ var run=chessRun(); return g.k==="pc" && run && g.si<chessOpenN(run) && chessHas(run, g.si, g.slot); }
+function wgInfo(v){ var d=WDS.d, me=d.me, g=v.g, now=Date.now(), pic=g.k==="fy"?WG_FART[g.L]:wgPieceUrl(g.si,g.slot), got=wgGot(g), own=wgOwned(g), run=chessRun();
+  var h='<div class="wdmon">'+(pic?'<img src="'+pic+'" alt="" class="wdmimg" style="object-fit:contain">':'')+'<div style="min-width:0"><h4>'+esc(g.k==="fy"?wgName(g):wgName(g).replace(/^a /,"").replace(/^./,function(c){ return c.toUpperCase(); }))+'</h4><div class="dur">('+g.x+', '+g.y+') · leaves in <b class="arleft" data-ends="'+g.until+'">'+fmtT(Math.max(0,g.until-now))+'</b></div></div></div>';
+  h+='<p class="hint">'+(g.k==="fy" ? 'She brings a chess piece you don’t have yet and a gift: '+Object.keys(WG_GIFT[g.L]||{}).map(function(k){ return WG_GIFT[g.L][k]+" "+((ITEMS[k]&&ITEMS[k].name)||k); }).join(", ")+'. Send one scout; everyone can visit her once.'
+    : 'A piece for your Midwinter chess collection. Send one scout to pick it up; everyone can collect it once.')+'</p>';
+  if (got) return h+'<p class="dur">✓ You’ve been here.</p>';
+  if (own) return h+'<p class="dur">✓ You already have this piece.</p>';
+  if (!run) return h+'<p class="dur">The chess collection isn’t running.</p>';
+  if (!me.on || me.x==null) return h+'<p class="dur">Join the server map to send a scout.</p>';
+  var t=[0,0,1,0,0,0,0,0,0,0,0,0], ms=wdTripMs([me.x,me.y],[g.x,g.y],wdMult(t,0)), late=now+ms>g.until;
+  return h+'<p class="dur wdx">Your scout: about '+fmtT(ms)+' from your capital'+(late?', too slow to get there before '+(g.k==="fy"?"she leaves":"it’s gone"):'')+'.</p><div class="btnrow" style="margin-top:6px"><button class="btn small" data-act="wd-gvisit" data-g="'+g.id+'"'+(late?' disabled':'')+'>Send a scout</button></div>'; }
+function wgVisit(gid){ var d=WDS.d, g=d&&(d.gifts||[]).filter(function(x){ return x.id===gid; })[0]; if (!g || WDS.sending) return;
+  var ci=wdCapIdx(), c=S.cities[ci], t=[0,0,1,0,0,0,0,0,0,0,0,0]; if (!c || (c.troops[2]||0)<1){ toast("You need a Scout in "+(c?c.name:"your capital")); return; }
+  if (wbSlotsUsed()>=wbSlotsCap()){ toast("Your server-map march slots are full ("+wbSlotsCap()+", Arena marches included)"); return; }
+  var ref="w"+c.id+"-"+Date.now().toString(36)+Math.floor(Math.random()*1e6).toString(36), mult=wdMult(t,0);
+  var undo=optSend("wdM", {ref:ref, city:c.id, hero:0, t:t, dep:Date.now(), st:"out", L:0, tk:"gift", name:wgName(g)}, c.id, t, null, null); WDS.sending=true; if (wdVisible()) wdPaint();
+  alPost("/wd/b/visit", {g:gid, ref:ref, t:t, side:mySide(null), mult:mult, slots:wbSlotsBase()}).then(function(r){ WDS.sending=false;
+    if (r.error){ undo(r.error); if (wdVisible()) wdPaint(); return; } optDone("wdM", ref, function(m){ m.rid=r.rid; }); toastQ("Your scout is on its way"); WDS.at=0; wdFetch(); })
+    .catch(function(){ WDS.sending=false; undo("Couldn’t reach the server. Your scout is back home."); if (wdVisible()) wdPaint(); }); }
 var AR_ART={goblin:"art/mon-goblin.png",ent:"art/mon-ent.png",golem:"art/mon-golem.png",titan:"art/mon-titan.png",dragon:"art/mon-dragon.png"}; // the Arena's monsters on their rally cards
 function wdMonName(L){ var D=WDS.d&&WDS.d.monDef&&WDS.d.monDef[L]; return D?D.n:["","Skeleton","Flying Eye","Mushroom"][L]||"Monster"; }
 function wdCapIdx(){ var i=S.cities.indexOf(wdCapCity()); return i>=0?i:S.cur; } // 0.2.85: cityIndex answers 0 for "not found", so city 0's troops were uploaded as the capital's before the first sync
@@ -9311,7 +9425,7 @@ function wdHome(m){ if (m.res && m.res.pvp) return wbHome(m); var ci=cityIndex(m
 function wdReport(m, c, hh, xp){ var r=m.res||{}, R=m.result||{}, L=m.L||1, win=!!(R.win!=null?R.win:r.win), id=S.nextMarchId++, mn=wdMonName(L), name="Server map: level "+L+" "+mn;
   var mine=[{city:c.name, hero:hh?hh.name:"", sent:(m.t||Z12()).slice(), back:(r.back||m.t||Z12()).slice(), wounded:(r.wounded||Z12()).slice(), xp:xp, xpNo:0, b:m.sb||null}];
   if (hh) heroRec(hh, {won:win, killed:[], lost:mine[0].wounded, label:"a "+mn+" on the server map"});
-  var rw=win&&m.reward?{items:Object.assign({},m.reward.items||{}), res:{}}:null, g=[]; if (rw){ g.push("a Shield Orb"); for (var k in rw.items) g.push(fmt(rw.items[k])+" "+((ITEMS[k]&&ITEMS[k].name)||k)); }
+  var rw=win&&m.reward?{items:Object.assign({},m.reward.items||{}), res:{}}:null, g=[]; if (rw){ g.push("a Shield Orb"); for (var k in rw.items) g.push(fmt(rw.items[k])+" "+((ITEMS[k]&&ITEMS[k].name)||k)); var dcp=chessRoll(); if (dcp) g.push(dcp); }
   var solo=!!m.solo, n=R.n||1;
   S.reports.unshift({id:id, at:S.gt, arena:1, wd:1, mname:mn, name:name, result:win?1:2, type:"wd"+L, lv:L, rounds:R.rounds||0, hpLeft:R.hpLeft||0, hp0:R.hp0||0, dealt:r.dealt||0, reward:rw, orb:rw?1:0,
     players:[], marches:n, host:m.host||"", mine:mine, solo:solo, xp:xp, hero:hh?hh.name:"", def:0, aww:null}); trimKeepFav(S.reports, FULL_CAP);
@@ -11493,7 +11607,7 @@ function tickText(){
   if (document.getElementById("m-have")) updateMarket();
   var hcp=document.getElementById("helpchip"); if (hcp){ var hn=(alMine()&&ALS.d.help)?ALS.d.help.canHelp:0, hd=hn?"":"none"; if (hcp.style.display!==hd) hcp.style.display=hd; setText(document.getElementById("helpn"), hn?String(hn):""); }
   var evc=document.getElementById("evchip"); if (evc){ var evo=evNow(), evd=evo&&EV_TRACK[evo.id]?"":"none"; if (evc.style.display!==evd) evc.style.display=evd;
-    if (evo && evc.dataset.ev!==evo.id){ evc.dataset.ev=evo.id; evc.setAttribute("aria-label", evo.name); if (evo.id==="thanks"){ var esv=evc.querySelector("svg"); if (esv) esv.outerHTML='<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M20.7 3.3c-5.8-.6-10.6 2.1-13.2 7.2-1.2 2.4-1.9 5-2.1 7.6L3.3 20.2l1.1 1.1 2.1-2.1c2.6-.2 5.2-.9 7.6-2.1 5.1-2.6 7.8-7.4 7.2-13.2-.1-.3-.3-.5-.6-.6zM8.1 17.1l7.5-7.5-1.1-1.1-7.5 7.5c.3-2.2 1-4.3 2-6.2 2.1-4.1 5.7-6.4 10.2-6.6-.2 4.5-2.5 8.1-6.6 10.2-1.9 1-4 1.7-6.2 2l1.7 1.7z"/></svg>'; evc.classList.add("ev-thanks"); } } if (evo&&EV_TRACK[evo.id]){ var evkn=evk(evo.id).n; setText(document.getElementById("evn"), evkn<EV_TRACK[evo.id].max?String(evkn):"\u2713"); } }
+    if (evo && evc.dataset.ev!==evo.id){ evc.dataset.ev=evo.id; evc.setAttribute("aria-label", evo.name); if (evo.id==="thanks"){ var esv=evc.querySelector("svg"); if (esv) esv.outerHTML='<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M20.7 3.3c-5.8-.6-10.6 2.1-13.2 7.2-1.2 2.4-1.9 5-2.1 7.6L3.3 20.2l1.1 1.1 2.1-2.1c2.6-.2 5.2-.9 7.6-2.1 5.1-2.6 7.8-7.4 7.2-13.2-.1-.3-.3-.5-.6-.6zM8.1 17.1l7.5-7.5-1.1-1.1-7.5 7.5c.3-2.2 1-4.3 2-6.2 2.1-4.1 5.7-6.4 10.2-6.6-.2 4.5-2.5 8.1-6.6 10.2-1.9 1-4 1.7-6.2 2l1.7 1.7z"/></svg>'; evc.classList.add("ev-thanks"); } else if (evo.id==="frost"){ var esv2=evc.querySelector("svg"); if (esv2) esv2.outerHTML='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 2v20M3.3 7l17.4 10M3.3 17L20.7 7M12 2l-2 2m2-2l2 2M12 22l-2-2m2 2l2-2M3.3 7l.7 2.7M3.3 7l2.7-.7M20.7 17l-.7-2.7M20.7 17l-2.7.7M3.3 17l2.7.7M3.3 17l.7-2.7M20.7 7l-2.7-.7M20.7 7l-.7 2.7"/></svg>'; evc.classList.add("ev-frost"); } } if (evo&&EV_TRACK[evo.id]){ var evkn=evk(evo.id).n; setText(document.getElementById("evn"), evkn<EV_TRACK[evo.id].max?String(evkn):"\u2713"); } }
   var myc=document.getElementById("myrychip"); if (myc){ var myl=myRallies().length, myd=myl?"":"none"; if (myc.style.display!==myd) myc.style.display=myd; setText(document.getElementById("myryn"), myl?String(myl):""); if (sheetFor && sheetFor.kind==="myrally") renderSheet(); }
   var ryc=document.getElementById("rychip"); if (ryc){ var ryl=ryOn()?ryOpen().length:0, ryd=ryl?"":"none"; if (ryc.style.display!==ryd) ryc.style.display=ryd; setText(document.getElementById("ryn"), ryl?String(ryl):""); if (sheetFor && sheetFor.kind==="rylist") renderSheet(); }
   var wtc=document.getElementById("wtchip"); if (wtc){ var wtl=alMine()?wtList().length:0, wtd=wtl?"":"none"; if (wtc.style.display!==wtd) wtc.style.display=wtd; setText(document.getElementById("wtn"), wtl?String(wtl):""); if (sheetFor && sheetFor.kind==="watch") renderSheet(); }
@@ -11624,7 +11738,7 @@ function heroDrawn(h, px){
   return o+'</svg>';
 }
 // 0.1.207: built-in portraits for special heroes (a player's own picture still wins). Dracula: the Ambras Castle portrait of Vlad III (16th century, public domain)
-var HPORT_BUILTIN={"Julius Caesar": "art/hero-julius-caesar.jpg", "Alexander the Great": "art/hero-alexander-the-great.jpg", "Hannibal Barca": "art/hero-hannibal-barca.jpg", "Leonidas": "art/hero-leonidas.jpg", "Charlemagne": "art/hero-charlemagne.jpg", "Joan of Arc": "art/hero-joan-of-arc.jpg", "Richard the Lionheart": "art/hero-richard-the-lionheart.jpg", "Saladin": "art/hero-saladin.jpg", "Genghis Khan": "art/hero-genghis-khan.jpg", "Attila": "art/hero-attila.jpg", "El Cid": "art/hero-el-cid.jpg", "William Wallace": "art/hero-william-wallace.jpg", "Boudica": "art/hero-boudica.jpg", "Cleopatra": "art/hero-cleopatra-2.jpg", "Sun Tzu": "art/hero-sun-tzu.jpg", "Scipio Africanus": "art/hero-scipio-africanus.jpg", "Xerxes": "art/hero-xerxes.jpg", "Cyrus the Great": "art/hero-cyrus-the-great.jpg", "Ramesses II": "art/hero-ramesses-ii.jpg", "Pericles": "art/hero-pericles.jpg", "Themistocles": "art/hero-themistocles.jpg", "Constantine": "art/hero-constantine.jpg", "Justinian": "art/hero-justinian.jpg", "Belisarius": "art/hero-belisarius.jpg", "Charles Martel": "art/hero-charles-martel.jpg", "Frederick Barbarossa": "art/hero-frederick-barbarossa.jpg", "Robert the Bruce": "art/hero-robert-the-bruce.jpg", "Vercingetorix": "art/hero-vercingetorix.jpg", "Spartacus": "art/hero-spartacus.jpg", "Octavian": "art/hero-octavian.jpg", "Marcus Aurelius": "art/hero-marcus-aurelius.jpg", "Trajan": "art/hero-trajan.jpg", "Hadrian": "art/hero-hadrian.jpg", "Tomyris": "art/hero-tomyris.jpg", "Zenobia": "art/hero-zenobia.jpg", "Harald Hardrada": "art/hero-harald-hardrada.jpg", "William the Conqueror": "art/hero-william-the-conqueror.jpg", "Otto the Great": "art/hero-otto-the-great.jpg", "Alaric": "art/hero-alaric.jpg", "Theodoric": "art/hero-theodoric.jpg", "Dracula": "art/hero-dracula.jpg", "Sequoyah": "art/hero-sequoyah.jpg", "Hammurabi": "art/hero-hammurabi.jpg", "Hector": "art/hero-hector.jpg", "Lysander": "art/hero-lysander.jpg", "Ptolemy I Soter": "art/hero-ptolemy-i-soter.jpg", "Baldwin IV": "art/hero-baldwin-iv.jpg", "Darius the Great": "art/hero-darius-the-great.jpg", "Imhotep": "art/hero-imhotep.jpg", "Thutmose III": "art/hero-thutmose-iii.jpg", "Ashurbanipal": "art/hero-ashurbanipal.jpg", "Ur-Nammu": "art/hero-ur-nammu.jpg", "Seleucus I Nicator": "art/hero-seleucus-i-nicator.jpg", "Nur ad-Din": "art/hero-nur-ad-din.jpg", "Archimedes": "art/hero-archimedes.jpg", "Periander": "art/hero-periander.jpg", "Croesus": "art/hero-croesus.jpg", "Minos": "art/hero-minos.jpg", "Aretas IV": "art/hero-aretas-iv.jpg", "Odaenathus": "art/hero-odaenathus.jpg", "Hiram I": "art/hero-hiram-i.jpg", "Abdalonymus": "art/hero-abdalonymus.jpg", "Shutruk-Nakhunte": "art/hero-shutruk-nakhunte.jpg", "Shapur I": "art/hero-shapur-i.jpg", "Pliny the Elder": "art/hero-pliny-the-elder.jpg", "Stilicho": "art/hero-stilicho.jpg", "Francesco Sforza": "art/hero-francesco-sforza.jpg", "Roland": "art/hero-roland.jpg", "Alfonso X the Wise": "art/hero-alfonso-x-the-wise.jpg", "Abd al-Rahman III": "art/hero-abd-al-rahman-iii.jpg", "Olga of Kyiv": "art/hero-olga-of-kyiv.jpg", "Alexander Nevsky": "art/hero-alexander-nevsky.jpg", "Timur": "art/hero-timur.jpg", "Agamemnon": "art/hero-agamemnon.jpg", "Romulus": "art/hero-romulus.jpg", "Theseus": "art/hero-theseus.jpg", "Dido": "art/hero-dido.jpg", "Theodora": "art/hero-theodora.jpg", "Atlas": "art/hero-atlas.jpg"};
+var HPORT_BUILTIN={"Wenceslaus I": "art/hero-wenceslaus-i.jpg", "Julius Caesar": "art/hero-julius-caesar.jpg", "Alexander the Great": "art/hero-alexander-the-great.jpg", "Hannibal Barca": "art/hero-hannibal-barca.jpg", "Leonidas": "art/hero-leonidas.jpg", "Charlemagne": "art/hero-charlemagne.jpg", "Joan of Arc": "art/hero-joan-of-arc.jpg", "Richard the Lionheart": "art/hero-richard-the-lionheart.jpg", "Saladin": "art/hero-saladin.jpg", "Genghis Khan": "art/hero-genghis-khan.jpg", "Attila": "art/hero-attila.jpg", "El Cid": "art/hero-el-cid.jpg", "William Wallace": "art/hero-william-wallace.jpg", "Boudica": "art/hero-boudica.jpg", "Cleopatra": "art/hero-cleopatra-2.jpg", "Sun Tzu": "art/hero-sun-tzu.jpg", "Scipio Africanus": "art/hero-scipio-africanus.jpg", "Xerxes": "art/hero-xerxes.jpg", "Cyrus the Great": "art/hero-cyrus-the-great.jpg", "Ramesses II": "art/hero-ramesses-ii.jpg", "Pericles": "art/hero-pericles.jpg", "Themistocles": "art/hero-themistocles.jpg", "Constantine": "art/hero-constantine.jpg", "Justinian": "art/hero-justinian.jpg", "Belisarius": "art/hero-belisarius.jpg", "Charles Martel": "art/hero-charles-martel.jpg", "Frederick Barbarossa": "art/hero-frederick-barbarossa.jpg", "Robert the Bruce": "art/hero-robert-the-bruce.jpg", "Vercingetorix": "art/hero-vercingetorix.jpg", "Spartacus": "art/hero-spartacus.jpg", "Octavian": "art/hero-octavian.jpg", "Marcus Aurelius": "art/hero-marcus-aurelius.jpg", "Trajan": "art/hero-trajan.jpg", "Hadrian": "art/hero-hadrian.jpg", "Tomyris": "art/hero-tomyris.jpg", "Zenobia": "art/hero-zenobia.jpg", "Harald Hardrada": "art/hero-harald-hardrada.jpg", "William the Conqueror": "art/hero-william-the-conqueror.jpg", "Otto the Great": "art/hero-otto-the-great.jpg", "Alaric": "art/hero-alaric.jpg", "Theodoric": "art/hero-theodoric.jpg", "Dracula": "art/hero-dracula.jpg", "Sequoyah": "art/hero-sequoyah.jpg", "Hammurabi": "art/hero-hammurabi.jpg", "Hector": "art/hero-hector.jpg", "Lysander": "art/hero-lysander.jpg", "Ptolemy I Soter": "art/hero-ptolemy-i-soter.jpg", "Baldwin IV": "art/hero-baldwin-iv.jpg", "Darius the Great": "art/hero-darius-the-great.jpg", "Imhotep": "art/hero-imhotep.jpg", "Thutmose III": "art/hero-thutmose-iii.jpg", "Ashurbanipal": "art/hero-ashurbanipal.jpg", "Ur-Nammu": "art/hero-ur-nammu.jpg", "Seleucus I Nicator": "art/hero-seleucus-i-nicator.jpg", "Nur ad-Din": "art/hero-nur-ad-din.jpg", "Archimedes": "art/hero-archimedes.jpg", "Periander": "art/hero-periander.jpg", "Croesus": "art/hero-croesus.jpg", "Minos": "art/hero-minos.jpg", "Aretas IV": "art/hero-aretas-iv.jpg", "Odaenathus": "art/hero-odaenathus.jpg", "Hiram I": "art/hero-hiram-i.jpg", "Abdalonymus": "art/hero-abdalonymus.jpg", "Shutruk-Nakhunte": "art/hero-shutruk-nakhunte.jpg", "Shapur I": "art/hero-shapur-i.jpg", "Pliny the Elder": "art/hero-pliny-the-elder.jpg", "Stilicho": "art/hero-stilicho.jpg", "Francesco Sforza": "art/hero-francesco-sforza.jpg", "Roland": "art/hero-roland.jpg", "Alfonso X the Wise": "art/hero-alfonso-x-the-wise.jpg", "Abd al-Rahman III": "art/hero-abd-al-rahman-iii.jpg", "Olga of Kyiv": "art/hero-olga-of-kyiv.jpg", "Alexander Nevsky": "art/hero-alexander-nevsky.jpg", "Timur": "art/hero-timur.jpg", "Agamemnon": "art/hero-agamemnon.jpg", "Romulus": "art/hero-romulus.jpg", "Theseus": "art/hero-theseus.jpg", "Dido": "art/hero-dido.jpg", "Theodora": "art/hero-theodora.jpg", "Atlas": "art/hero-atlas.jpg"};
 function heroPortrait(h, px, ext){ // ext: {k: account key, hu: picture version} for another player's hero
   var src = ext ? (ext.hu ? LB_URL+"/me/heroimg?k="+encodeURIComponent(ext.k)+"&h="+h.id+"&v="+ext.hu : "") : himgGet(h);
   if (!src && h && (h.tier==="historic"||h.tier==="mythic") && HPORT_BUILTIN[h.name]) src=HPORT_BUILTIN[h.name]; // 0.2.80: Atlas (mythic) has one too
@@ -16468,6 +16582,8 @@ function renderSheetCore0(){
     h=hallSheet();
   } else if (sheetFor.kind==="event"){
     evBoardFetch("nosend"); h=evSheet();
+  } else if (sheetFor.kind==="chess"){
+    h=chessSheet();
   } else if (sheetFor.kind==="watch"){
     h=wtSheet();
   } else if (sheetFor.kind==="player"){
@@ -17178,6 +17294,7 @@ document.addEventListener("click",function(e){
   if (act==="kg-findlord"){ var kfl=pkNearLord(); if (!kfl){ toast("No AI lords left nearby: try further out on the map"); closeSheet(); tab="map"; lastView=""; renderView(true); setTabs(); return; }
     if (tab!=="map"){ closeSheet(); tab="map"; lastView=""; renderView(true); setTabs(); } selectTile(kfl.id,true); window.scrollTo({top:0,behavior:"smooth"}); return; }
   if (act==="ev-open"){ evBoardFetch(); openSheet({kind:"event"}); return; }
+  if (act==="chess-open"){ openSheet({kind:"chess"}); return; } // 0.2.147
   if (act==="hall-open"){ openSheet({kind:"hall"}); return; } // 0.2.36: the Hall of History
   if (act==="hall-tab"){ HALL.tab=a.dataset.v==="cities"?"cities":"heroes"; lastSheet=""; renderSheet(); if (sheetBody) sheetBody.scrollTop=0; return; }
   if (act==="ev-board"){ evBoardFetch(true); lastSheet=""; renderSheet(); return; }
