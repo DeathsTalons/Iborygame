@@ -1222,8 +1222,11 @@ function removeHero(run, h){ for (var l=0;l<NL;l++) for (var s=0;s<ND;s++) if (r
 function placeAnywhere(run, h){ var order=roleOf(h.name)==="melee"?[0,1,2,3,4]:roleOf(h.name)==="spear"?[1,0,2,3,4]:[2,3,1,4,0];
   if (boardCount(run)<maxB()) for (var oi=0;oi<ND;oi++) for (var li=0;li<NL;li++){ var l=[2,1,3,0,4][li], s=order[oi]; if (!run.board[l][s]){ run.board[l][s]=h.id; return "board"; } }
   if (run.bench.length<benchCap()){ run.bench.push(h.id); return "bench"; } return null; }
+var TOK_FLOOR=30; // 26 Nov (Cody): once you have reached layer 30, a run has to reach 30 again to pay any tokens (no farming quick 10-layer runs)
+function tokFloor(){ return (CS().best||0)>=TOK_FLOOR?TOK_FLOOR:0; }
 function finishRun(run){ var c=CS(), depth=run.L-1, tok=Math.floor(Math.max(0,depth)/10); // 1 token per 10 layers reached: a slow grind on purpose
-  run.tok=tok; c.tok=(c.tok||0)+tok; c.best=Math.max(c.best||0, depth); c.last={depth:depth, tok:tok, at:Date.now(), bosses:run.bosses};
+  var fl=tokFloor(), short=fl && depth<fl; if (short) tok=0;
+  run.tok=tok; c.tok=(c.tok||0)+tok; c.best=Math.max(c.best||0, depth); c.last={depth:depth, tok:tok, at:Date.now(), bosses:run.bosses, short:short?fl:0};
   try { if (typeof lbSync==="function") lbSync(true); } catch(e){} }
 
 /* ---------- shop actions ---------- */
@@ -1350,7 +1353,7 @@ CV.api={kLevel:kLevel, isHeavy:isHeavy, maxB:maxB, toggleLock:toggleLock, synerg
   heroStats:heroStats, effList:effList, setCount:setCount, tiersOn:tiersOn, onBoard:onBoard, heroById:heroById, bossPair:bossPair, prepNext:prepNext, finishRun:finishRun, cvFight:cvFight, cvRun:cvRun, step:step,
   pieceName:pieceName, pieceStats:pieceStats, roleOf:roleOf, biome:biome, benchCap:benchCap, interestOf:interestOf, CS:CS, U:U, ownedPool:ownedPool, levelUp:levelUp};
 CV.data={SYN:SYN, HT_N:HT_N, HT_ODDS:HT_ODDS, SUPK:SUPK, BOSS:BOSS, RELIC:RELIC, BANNER:BANNER, SQUAD:SQUAD, SQ_SIZE:SQ_SIZE, UNL:UNL, MAIN:MAIN, TIERS:TIERS, SLOTS:SLOTS, SLOT_N:SLOT_N, ROLE_N:ROLE_N, BIOMES:BIOMES};
-CV.k={W:W,H:H,TOP:TOP,LANES:LANES,NL:NL,ND:ND,MAXB:MAXB,FW:FW,FH:FH,DW:DW,DOX:DOX,TICK:TICK};
+CV.tokFloor=tokFloor; CV.k={W:W,H:H,TOP:TOP,LANES:LANES,NL:NL,ND:ND,MAXB:MAXB,FW:FW,FH:FH,DW:DW,DOX:DOX,TICK:TICK};
 CV.rng=RNG; CV.eScale=eScale; CV.waveS=waveS; CV.bossP=bossP; CV.shadowLine=shadowLine;
 })();
 /* ---------- The Caves: screen, sprites and playback ---------- */
@@ -2090,11 +2093,11 @@ function showModal(){ var r=run(), k=ui.modal; renderScr(); if (ui.scr){ modal(n
   else if (k==="relic"){ h='<h2>Choose a relic</h2><p class="cvdim">It lasts the rest of this run.</p><div class="cvpick">'+r.relicOpts.map(function(rk){ var R=D.RELIC[rk]; return '<button class="cvpc r'+R.r+'" data-cv="relic" data-k="'+rk+'"><b>'+esc2(R.n)+'</b><span>'+esc2(R.d)+'</span><i>'+["Common","Uncommon","Rare","Legendary"][R.r]+'</i></button>'; }).join("")+'</div>'+(A.canRelicReroll(r)?'<div class="cvrow"><button class="cvb" data-cv="relicrr">Library of Nineveh: new choices (free)</button></div>':''); }
   else if (k==="camp"){ h='<h2>A quiet cave</h2><p class="cvdim">A moment to prepare before going deeper.</p><div class="cvpick"><button class="cvpc" data-cv="camp" data-k="forage"><b>Forage</b><span>+4 material and '+GI+'3.</span></button><button class="cvpc" data-cv="camp" data-k="train"><b>Train</b><span>Your lowest-level hero on the board gains 2 levels.</span></button><button class="cvpc" data-cv="camp" data-k="drill"><b>Drill</b><span>Every hero on the board gets +4% attack for the rest of the run.</span></button></div>'; }
   else if (k==="boss"){ var bp=r.bossPick; h='<h2>Layer '+r.L+': choose your foe</h2><div class="cvpick">'+bp.opts.map(function(bk){ var B=D.BOSS[bk]; return '<button class="cvpc" data-cv="bosspick" data-k="'+bk+'"><b>'+esc2(B.n)+'</b><span>'+esc2(B.d)+'</span><i>'+(B.trophy?'Drops '+esc2(B.tro)+' ('+(B.trophy==="any"?'any slot':D.SLOT_N[B.trophy].toLowerCase())+')':'Drops lots of common material')+'</i></button>'; }).join("")+'</div>'+(r.L%100===0?'<p class="cvwarn">A deep boss: tougher, double trophies.</p>':''); }
-  else if (k==="over"){ var la=c.last||{}; h='<h2>The run is over</h2><p>You reached layer <b>'+(la.depth||0)+'</b>'+(la.bosses?' and beat '+la.bosses+' boss'+(la.bosses>1?'es':''):'')+'.</p><p>Prestige tokens earned: <b>'+(la.tok||0)+'</b> (you have '+(c.tok||0)+')</p><p class="cvdim">One token for every 10 layers you reach'+((la.depth||0)%10?': the next one was at layer '+(Math.floor((la.depth||0)/10)+1)*10:'')+'.</p><p class="cvdim">Deepest ever: '+(c.best||0)+'</p><div class="cvrow"><button class="cvb go" data-cv="newyes">New run</button><button class="cvb" data-cv="prest">Prestige</button><button class="cvb" data-cv="land">Cave entrance</button></div>'; }
+  else if (k==="over"){ var la=c.last||{}; h='<h2>The run is over</h2><p>You reached layer <b>'+(la.depth||0)+'</b>'+(la.bosses?' and beat '+la.bosses+' boss'+(la.bosses>1?'es':''):'')+'.</p><p>Prestige tokens earned: <b>'+(la.tok||0)+'</b> (you have '+(c.tok||0)+')</p><p class="cvdim">'+(la.short?'Since you have reached layer '+la.short+', a run has to reach layer '+la.short+' to earn tokens.':'One token for every 10 layers you reach'+((la.depth||0)%10?': the next one was at layer '+(Math.floor((la.depth||0)/10)+1)*10:'')+'.')+'</p><p class="cvdim">Deepest ever: '+(c.best||0)+'</p><div class="cvrow"><button class="cvb go" data-cv="newyes">New run</button><button class="cvb" data-cv="prest">Prestige</button><button class="cvb" data-cv="land">Cave entrance</button></div>'; }
   else if (k==="prest"){ var offer=function(N,lv,btn){ var mx=lv>=N.max, cost=mx?0:N.cost[lv];
         return '<div class="cvoff'+(btn?'':' dim')+'"><div class="cvot"><b>'+esc2(N.n)+' '+lv+'/'+N.max+'</b><span>'+esc2(N.d)+'</span></div>'+(mx?'<span class="cvdim">Done</span>':btn?'<button class="cvb sm go" data-cv="unl" data-k="'+btn+'"'+((c.tok||0)<cost?' disabled':'')+'>'+cost+'</button>':'<span class="cvdim">'+cost+'</span>')+'</div>'; },
       grp=function(g){ return Object.keys(D.MAIN).filter(function(u){ return D.MAIN[u].g===g; }).map(function(u){ return offer(D.MAIN[u],(c.main||{})[u]||0,CV.MAIN_ON?null:null); }).join(""); };
-    h='<h2>Prestige</h2><p>Tokens: <b>'+(c.tok||0)+'</b> <span class="cvdim">(1 for every 10 layers you reach)</span></p><div class="cvlist tall">'+
+    h='<h2>Prestige</h2><p>Tokens: <b>'+(c.tok||0)+'</b> <span class="cvdim">(1 for every 10 layers you reach'+(CV.tokFloor()?'; a run must reach layer '+CV.tokFloor()+' to earn any':'')+')</span></p><div class="cvlist tall">'+
       '<div class="cvph"><b>For the Caves</b></div>'+Object.keys(D.UNL).map(function(u){ return offer(D.UNL[u], c.unl[u]||0, u); }).join("")+
       '<div class="cvph"><b>For your kingdom</b><span class="cvwarn">Draft: not switched on yet</span></div>'+grp("eco")+
       '<div class="cvph"><b>For your troops</b><span class="cvwarn">Draft: not switched on yet</span></div>'+grp("troop")+
