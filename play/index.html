@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.147";
+window.IBORY_V="0.2.148";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -2039,7 +2039,7 @@ table.simtab td.simherotd{text-align:left;overflow-wrap:normal;word-break:normal
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.147";
+var APP_VERSION = "0.2.148";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -4494,6 +4494,8 @@ var HC_CITY_HERO={
   "Constantinople":{name:"Theodora", spec:"int", pol:258, atk:212, int:325},
   "Atlantis":{name:"Atlas", spec:"all", pol:350, atk:350, int:350, tier:"mythic"}};
 function hhGot(){ if (!S.map.hhGot) S.map.hhGot={}; return S.map.hhGot; } // names of the level 12 pool heroes already handed out (dismissing one doesn't make it come back)
+// 0.2.148 (Cody): a historic hero's main-game level, for the Caves (a third of it goes to each of Politics, Attack and Intelligence there)
+function hhLevel(name){ var all=S.heroes.concat(S.waiting||[]), best=0; S.cities.forEach(function(c){ all=all.concat(c.heroes||[], c.waiting||[]); }); all.forEach(function(h){ if (h && h.name===name && (h.level||0)>best) best=h.level||0; }); return best; }
 function hhOwned(name){ var all=S.heroes.concat(S.waiting||[]); S.cities.forEach(function(c){ all=all.concat(c.heroes||[], c.waiting||[]); }); return hhGot()[name] || all.some(function(h){ return h && h.name===name; }); }
 function hcHeroDue(q){ if (!S.map.hhTaken) S.map.hhTaken={}; if (S.map.hhTaken[q.id]) return null;
   if (q.L===12){ if (S.map.heroTaken && S.map.heroTaken[q.id]) return null; // gave its hero under the old random drop
@@ -4528,7 +4530,7 @@ var CAVE_LOADING=false;
 function caveOpen(){ var mp=document.getElementById("morepanel"); if (mp && !mp.hidden && typeof moreClose==="function") moreClose();
   if (window.CV && window.CV.open){ window.CV.open(); return; } if (CAVE_LOADING) return; CAVE_LOADING=true;
   window.CV=window.CV||{}; if (/[?&]cavepreview/.test(location.search) && !/iborygame\.com$/.test(location.hostname)) window.CV.preview=1; // never on the live site
-  window.CV_G={S:function(){ return S; }, save:save, HISTORIC:HISTORIC, histStats:histStats, EV_HEROES:EV_HEROES, HC_CITY_HERO:HC_CITY_HERO, hhOwned:hhOwned,
+  window.CV_G={S:function(){ return S; }, save:save, HISTORIC:HISTORIC, histStats:histStats, EV_HEROES:EV_HEROES, HC_CITY_HERO:HC_CITY_HERO, hhOwned:hhOwned, hhLevel:hhLevel,
     VAMP:VAMP, KNIGHT:KNIGHT, WIZ_SPR:WIZ_SPR, DMON_ART:DMON_ART, HPORT_BUILTIN:HPORT_BUILTIN, LB_URL:LB_URL, fmt:fmt, lbSync:lbSync};
   var sc=document.createElement("script"); sc.src="cave.js?v="+(window.IBORY_V||"");
   sc.onload=function(){ CAVE_LOADING=false; if (window.CV && window.CV.open) window.CV.open(); }; sc.onerror=function(){ CAVE_LOADING=false; toast("Couldn\u2019t load the Caves. Check your connection and try again."); };
