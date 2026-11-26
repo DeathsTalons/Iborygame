@@ -1066,7 +1066,7 @@ function squadOf(h, L){ if (!h.sq) return null; var sz=SQ_SIZE[h.sq.s], k=eScale
 
 /* ---------- prestige and the drafted main-game buffs ---------- */
 var UNL={ // the Caves' own unlocks. Tokens are scarce (1 per 10 layers), so these are many small steps (Cody, 22 Nov)
-  gold:{n:"Deeper pockets", d:"Start each run with +1 gold per level.", max:6, cost:[2,3,5,7,10,14]},
+  gold:{n:"Deeper pockets", d:"+1 gold after every layer for each level." /* 26 Nov (Cody): was +1 starting gold per level */, max:6, cost:[2,3,5,7,10,14]},
   hold:{n:"Quartermaster", d:"Your first reroll in each shop is free.", max:1, cost:[12]},
   reroll:{n:"Haggler", d:"The first reroll each visit costs 1.", max:1, cost:[10]},
   rare:{n:"Keen eye", d:"Rare shop offers 10% more likely per level (finished set pieces still not before layer 150).", max:5, cost:[3,5,8,12,18]},
@@ -1102,7 +1102,7 @@ function to5x5(r){ var b=emptyBoard(); for (var l=0;l<3;l++) for (var s=0;s<3;s+
   if (r.next && r.next.line) r.next.line.forEach(function(e){ if (e.lane<3 && !e.moved){ e.lane+=1; e.moved=1; } }); }
 function U(k){ return (CS().unl[k]||0); }
 function newRun(){ var c=CS(), seed=(Date.now()^Math.floor(Math.random()*1e9))>>>0, pool=ownedPool();
-  var run={seed:seed, L:1, gold:8+U("gold"), heroes:[], nid:1, board:emptyBoard(), bench:[], bag:[], mats:{c:0,t:{}}, relics:[], banners:[],
+  var run={seed:seed, L:1, gold:8, heroes:[], nid:1, board:emptyBoard(), bench:[], bag:[], mats:{c:0,t:{}}, relics:[], banners:[],
     shop:null, held:[], phase:"shop", lives:1+U("life"), kills:0, bosses:0, stack:{}, perRun:{}, cheat:{}, stats:{fights:0}, started:Date.now(), sold:0};
   c.run=run; c.runs=(c.runs||0)+1;
   // a free starter: the strongest-looking melee hero you own (or any), at level 1
@@ -1177,7 +1177,7 @@ function endFight(run, F){ var win=F.over.win, L=run.L, res={win:win, L:L, gold:
   run.whet=null; run.drums=null;
   if (!win){ run.lives--; if (run.lives>0){ res.saved=1; run.phase="result"; run.res=res; run.retry=(run.retry||0)+1; save(); return res; } run.phase="over"; run.res=res; finishRun(run); save(); return res; }
   // rewards
-  var g=5+Math.min(10,Math.floor(L/20)); if (res.boss) g=10+Math.floor(L/50); var sgf=synFx(run, onBoard(run)), sgd={}; Object.keys(sgf).forEach(function(id){ sgf[id].forEach(function(e){ if (e.t==="gold") sgd[e.v]=1; }); }); Object.keys(sgd).forEach(function(v){ g+=+v; }); boardFx(run,"gold").forEach(function(x){ g+=x.e.v; });
+  var g=5+Math.min(10,Math.floor(L/20)); if (res.boss) g=10+Math.floor(L/50); var sgf=synFx(run, onBoard(run)), sgd={}; Object.keys(sgf).forEach(function(id){ sgf[id].forEach(function(e){ if (e.t==="gold") sgd[e.v]=1; }); }); Object.keys(sgd).forEach(function(v){ g+=+v; }); boardFx(run,"gold").forEach(function(x){ g+=x.e.v; }); g+=U("gold"); /* Deeper pockets */
   var interest=interestOf(run); res.gold=g; res.interest=interest; run.gold+=g+interest;
 
   run.kills+=F.kills||0;
