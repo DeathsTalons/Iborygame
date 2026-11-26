@@ -1369,7 +1369,16 @@ function shadowOf(f){ if (SHADOW[f]) return SHADOW[f]; var s=sheet(f); if (!s.co
   g.putImageData(d,0,0); SHADOW[f]=c; return c; }
 /* ---------- music: the orchestral score, a cue for each place and moment ---------- */
 var TRK={title:"02-title-theme", battle:"08-battle", boss:"10-boss-battle", deep:"11-final-confrontation", forest:"12-ancient-forest", cavern:"13-crystal-cavern", frozen:"14-frozen-highlands", desert:"15-desert-ruins", sorrow:"17-theme-of-sorrow", temple:"19-ancient-temple"};
-var MUS={key:undefined, a:null, old:[], blocked:false};
+var MUS={key:undefined, a:null, old:[], blocked:false, pool:{}};
+/* 26 Nov (Sax, iPhone): iPhones ignore audio.volume (it always reads 1), so old tracks never faded to 0 and were never stopped: two more looping tracks every layer until the phone crawled.
+   Now the volume goes through a Web Audio gain where there is one, the level is kept in a._v (never read back from the element), a fading track is stopped outright once its fade time is up, and each track reuses one player. */
+var MCTX=null;
+function musCtx(){ if (MCTX!==null) return MCTX; try { var C=window.AudioContext||window.webkitAudioContext; MCTX=C?new C():false; } catch(e){ MCTX=false; } return MCTX; }
+function musVol(a,v){ a._v=v; if (a._g){ try { a._g.gain.value=v; } catch(e){} } else { try { a.volume=v; } catch(e){} } }
+function musGet(key){ var a=MUS.pool[key]; if (a) return a; a=new Audio("audio/cave/"+TRK[key]+".mp3?v="+(window.IBORY_V||"")); a.loop=true; a.preload="auto";
+  var c=musCtx(); if (c){ try { var src=c.createMediaElementSource(a), g=c.createGain(); src.connect(g); g.connect(c.destination); a._g=g; } catch(e){} }
+  musVol(a,0); MUS.pool[key]=a; return a; }
+function musHalt(o){ try { o.pause(); } catch(e){} }
 function musPrefs(){ var c=A.CS(); if (!c.mus) c.mus={on:1, vol:.5}; return c.mus; }
 function musPlace(L){ var b=A.biome(L)[1]; return /frost_gate|glacier_hall/.test(b)?"cavern":/frozen_lake|heart_of_winter/.test(b)?"frozen":/mycelium|spore/.test(b)?"forest":/sunken|drowned/.test(b)?"cavern":/forge/.test(b)?"temple":"desert"; }
 function musWant(){ if (!root || root.hidden || document.hidden) return null; var r=run();
@@ -1377,16 +1386,16 @@ function musWant(){ if (!root || root.hidden || document.hidden) return null; va
   if (fightShown(r) && ui.F && !ui.F.over){ var bk=ui.F.boss; return bk?(bk.deep?"deep":"boss"):"battle"; }
   return musPlace(r.L); }
 function musTick(dt){ var p=musPrefs(), want=p.on?musWant():null;
-  if (want!==MUS.key){ MUS.key=want; if (MUS.a){ MUS.old.push(MUS.a); MUS.a=null; }
-    if (want){ var a=new Audio("audio/cave/"+TRK[want]+".mp3?v="+(window.IBORY_V||"")); a.loop=true; a.volume=0; a.preload="auto"; MUS.a=a; musPlay(a); } }
+  if (want!==MUS.key){ MUS.key=want; if (MUS.a){ MUS.a._end=performance.now()+2000; MUS.old.push(MUS.a); MUS.a=null; }
+    if (want){ var a=musGet(want); MUS.old=MUS.old.filter(function(o){ return o!==a; }); a._end=0; if (a.paused && !a._v) musVol(a,0); MUS.a=a; musPlay(a); } }
   var tv=p.vol*.7, sp=dt/1.2; // 1.2 s fades
-  if (MUS.a){ if (MUS.a.paused && !MUS.blocked) musPlay(MUS.a); MUS.a.volume=Math.max(0,Math.min(tv, MUS.a.volume+sp*Math.max(tv,.05))); }
-  MUS.old=MUS.old.filter(function(o){ o.volume=Math.max(0, o.volume-sp*.6); if (o.volume<=0.001){ try { o.pause(); o.src=""; } catch(e){} return false; } return true; }); }
-CV._mus=function(){ return {key:MUS.key, src:MUS.a&&MUS.a.src, vol:MUS.a&&MUS.a.volume, ready:MUS.a&&MUS.a.readyState, err:MUS.a&&MUS.a.error&&MUS.a.error.code, old:MUS.old.length, prefs:musPrefs()}; }; // for tests
+  if (MUS.a){ if (MUS.a.paused && !MUS.blocked) musPlay(MUS.a); var v0=MUS.a._v||0; musVol(MUS.a, v0>tv?tv:Math.min(tv, v0+sp*Math.max(tv,.05))); }
+  var now=performance.now(); MUS.old=MUS.old.filter(function(o){ musVol(o, Math.max(0, (o._v||0)-sp*.6)); if (o._v<=0.001 || now>o._end){ musVol(o,0); musHalt(o); return false; } return true; }); }
+CV._mus=function(){ return {key:MUS.key, src:MUS.a&&MUS.a.src, vol:MUS.a&&MUS.a._v, gain:!!(MUS.a&&MUS.a._g), pool:Object.keys(MUS.pool).length, ready:MUS.a&&MUS.a.readyState, err:MUS.a&&MUS.a.error&&MUS.a.error.code, old:MUS.old.length, prefs:musPrefs()}; }; // for tests
 function musPlay(a){ try { var pr=a.play(); if (pr && pr.catch) pr.catch(function(){ MUS.blocked=true; }); } catch(e){ MUS.blocked=true; } }
 // phones only allow sound after a tap: the first tap in the Caves starts it
-function musUnblock(){ if (MUS.blocked && MUS.a){ MUS.blocked=false; musPlay(MUS.a); } }
-function musStop(){ MUS.key=undefined; [MUS.a].concat(MUS.old).forEach(function(o){ if (o){ try { o.pause(); o.src=""; } catch(e){} } }); MUS.a=null; MUS.old=[]; }
+function musUnblock(){ var c=MCTX; if (c && c.state==="suspended"){ try { c.resume(); } catch(e){} } if (MUS.blocked && MUS.a){ MUS.blocked=false; musPlay(MUS.a); } }
+function musStop(){ MUS.key=undefined; Object.keys(MUS.pool).forEach(function(k){ var o=MUS.pool[k]; musVol(o,0); musHalt(o); }); MUS.a=null; MUS.old=[]; } // players are kept (paused) for next time
 function musHtml(){ var p=musPrefs(); return '<div class="cvmus"><button class="cvb sm'+(p.on?' on':'')+'" data-cv="mus">♪ Music '+(p.on?'on':'off')+'</button><input type="range" min="0" max="100" step="5" value="'+Math.round(p.vol*100)+'" data-cv="musvol" aria-label="Music volume"'+(p.on?'':' disabled')+'></div>'; }
 function bgImg(L){ var b=A.biome(L); return img("art/cave/bg/"+b[1]+".png?v="+(window.IBORY_V||"")); }
 function esc2(s){ return String(s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
@@ -1394,7 +1403,7 @@ function run(){ return A.CS().run; }
 function fm(n){ return typeof fmt==="function"?fmt(n):String(Math.floor(n)); }
 
 /* ---------- open / close / layout ---------- */
-CV.open=function(){
+CV.open=function(){ try { var mc=musCtx(); if (mc && mc.state==="suspended") mc.resume(); } catch(e){} /* opened by a tap: wake the audio while we may */
   if (!root){ build(); }
   root.hidden=false; document.body.classList.add("cvopen"); layout(); window.addEventListener("resize", layout);
   applyTheme(); var r=run(); if (r && r.phase==="fight") resumeFight(); ui.modal=null; ui.scr="land";
