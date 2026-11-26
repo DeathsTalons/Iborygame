@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.142";
+window.IBORY_V="0.2.143";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -280,6 +280,107 @@ html[data-look="bughunter"] .walls::before{background:repeating-linear-gradient(
 html[data-look="bughunter"] .walls{background:linear-gradient(180deg,#6b8a58,#557546)}
 html[data-look="bughunter"] .plot{border-radius:12px}
 html[data-look="bughunter"] .plot.th{background:radial-gradient(circle at 50% 40%,rgba(232,195,74,.18),var(--panel2) 70%)}
+/* 0.2.143 (Cody): four more city looks that theme the whole app: Forged, Royal, Paper, Neon. Each is a full palette plus its own panels,
+   buttons and type. Fonts are bundled (OFL, art/skin/fonts) and only used in Latin-script languages. */
+@font-face{font-family:"Tiny5";src:url("art/skin/fonts/Tiny5-Regular.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"Nunito";src:url("art/skin/fonts/Nunito-Regular.woff2") format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Nunito";src:url("art/skin/fonts/Nunito-Bold.woff2") format("woff2");font-weight:700;font-display:swap}
+@font-face{font-family:"Patrick Hand";src:url("art/skin/fonts/PatrickHand-Regular.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"Chakra Petch";src:url("art/skin/fonts/ChakraPetch-500.woff2") format("woff2");font-weight:400 500;font-display:swap}
+@font-face{font-family:"Chakra Petch";src:url("art/skin/fonts/ChakraPetch-700.woff2") format("woff2");font-weight:600 800;font-display:swap}
+@font-face{font-family:"Orbitron";src:url("art/skin/fonts/Orbitron-700.woff2") format("woff2");font-weight:700;font-display:swap}
+
+/* ---- Forged: dark iron, riveted plates, hammered gold (the Caves look) ---- */
+html:root[data-look="forged"]{--bg:#121016;--panel:#1d1a22;--panel2:#27232d;--ink:#ece4d4;--muted:#a59c8c;--brass:#e6c25a;--brass-soft:rgba(230,194,90,.13);--red:#e0565e;--green:#7fb06a;--grass:#8fb36a;--grass-soft:rgba(143,179,106,.14);--line:#3d3846;--stone:#5b5563;
+  --t-common:#7d7684;--t-rare:#5a8fd0;--t-epic:#9c6ccb;--t-legendary:#e6c25a;--t-historic:#d4505a;--t-mythic:#3cc6d6}
+html[data-look="forged"] body{background:radial-gradient(ellipse at 50% -12%,rgba(230,194,90,.09),transparent 55%),repeating-linear-gradient(0deg,rgba(255,255,255,.014) 0 2px,transparent 2px 4px),var(--bg)}
+html[data-look="forged"] :is(.section,.queue,.tech,.dtcard,.offer,.sheet){border:1px solid #4a4352;border-radius:6px;
+  background:radial-gradient(circle at 7px 7px,#6f6777 1.5px,#0000 2.2px),radial-gradient(circle at calc(100% - 7px) 7px,#6f6777 1.5px,#0000 2.2px),radial-gradient(circle at 7px calc(100% - 7px),#6f6777 1.5px,#0000 2.2px),radial-gradient(circle at calc(100% - 7px) calc(100% - 7px),#6f6777 1.5px,#0000 2.2px),linear-gradient(180deg,#26222c,#1b1820);
+  border-top-color:#6a5a36;box-shadow:inset 0 1px 0 rgba(230,194,90,.16),inset 0 -2px 0 rgba(0,0,0,.35),0 2px 0 #08070a}
+html[data-look="forged"] :is(.hero,.unit,.medal,.effect,.dtitem,.choice,.sgrp,.bnow){background:linear-gradient(180deg,#2b2731,#232029);border-color:#3d3846;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+html[data-look="forged"] .plot{background:linear-gradient(170deg,#2a2630,#1c1921);border-color:#4a4352;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 2px 0 #08070a}
+html[data-look="forged"] .btn:not(.ghost):not(.danger){background:linear-gradient(180deg,#f2d684,#c8972f);color:#1c1406;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 0 0 1px #8a6620,0 2px 0 #4a360e;border-radius:5px}
+html[data-look="forged"] .btn.ghost{background:linear-gradient(180deg,#2e2a34,#222027);box-shadow:inset 0 0 0 1px #4f4858,0 2px 0 #08070a}
+html[data-look="forged"] .btn.danger:not(.ghost){background:linear-gradient(180deg,#e2666d,#a8343c);color:#fff3ee;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 2px 0 #4a1418}
+html[data-look="forged"] :is(.chipbtn,.speedchip){background:linear-gradient(180deg,#2e2a34,#222027);border-color:#4f4858}
+html[data-look="forged"] :is(h1,.sheet h2,#pagehost h2,.section h3){color:#f0d995;text-shadow:0 1px 0 #000,0 0 10px rgba(230,194,90,.25)}
+html[data-look="forged"] nav.tabs button[aria-selected="true"]{color:var(--brass);text-shadow:0 0 8px rgba(230,194,90,.4)}
+
+/* ---- Royal: gilt frames on midnight velvet, pixel lettering (Runewire) ---- */
+html:root[data-look="royal"]{--bg:#0b0d24;--panel:#181829;--panel2:#222244;--ink:#f4ecd2;--muted:#aaa7cc;--brass:#f7c64a;--brass-soft:rgba(247,198,74,.14);--red:#ff5d5d;--green:#6fcf6a;--grass:#7ad36a;--grass-soft:rgba(122,211,106,.14);--line:#3a3a6e;--stone:#4c4c80;
+  --t-common:#8a88a8;--t-rare:#4f8bff;--t-epic:#b36cff;--t-legendary:#f7c64a;--t-historic:#ff4f5e;--t-mythic:#3fe0f0}
+html:root[data-look="royal"]:is(:lang(en),:lang(es),:lang(fr),:lang(de),:lang(pt),:lang(it)){--display:"Tiny5","Cinzel",monospace}
+html[data-look="royal"] body{background:linear-gradient(180deg,#18205a 0,#0e1236 260px,#0b0d24 600px) fixed,var(--bg)}
+html[data-look="royal"] :is(.section,.queue,.tech,.dtcard,.offer,.sheet){border:6px solid transparent;border-image:url("art/skin/royal/panel.png") 18 / 6px stretch;border-radius:0;
+  background:#181829 url("art/skin/royal/tile_diaper.png") 0 0/8px 8px;background-clip:padding-box;box-shadow:0 3px 0 rgba(0,0,0,.45)}
+html[data-look="royal"] :is(.section,.tech,.dtcard,.offer){padding:8px 10px}
+html[data-look="royal"] :is(.hero,.unit,.medal,.effect,.dtitem,.choice,.sgrp,.bnow){background:#222244;border:2px solid #3a3a6e;border-radius:0;box-shadow:inset 0 2px 0 rgba(255,255,255,.07)}
+html[data-look="royal"] .hero:hover{border-color:var(--brass)}
+html[data-look="royal"] .plot{background:#222244;border:2px solid #3a3a6e;border-radius:0;box-shadow:inset 0 2px 0 rgba(255,255,255,.08),0 2px 0 rgba(0,0,0,.5)}
+html[data-look="royal"] .plot.th{border:6px solid transparent;border-image:url("art/skin/royal/panel_blue.png") 18 / 6px stretch;background:#24308a;background-clip:padding-box}
+html[data-look="royal"] .btn{border-radius:0;font-family:var(--display);letter-spacing:.02em}
+html[data-look="royal"] .btn:not(.ghost):not(.danger){border:4px solid transparent;border-image:url("art/skin/royal/button_primary_idle.png") 12 fill / 4px stretch;background:none;color:#24140a;padding:5px 12px}
+html[data-look="royal"] .btn:not(.ghost):not(.danger):active{border-image-source:url("art/skin/royal/button_primary_active.png")}
+html[data-look="royal"] .btn.ghost{border:4px solid transparent;border-image:url("art/skin/royal/button_ghost_idle.png") 12 fill / 4px stretch;background:none;box-shadow:none;padding:5px 12px}
+html[data-look="royal"] .btn.danger:not(.ghost){border:4px solid transparent;border-image:url("art/skin/royal/button_danger_idle.png") 12 fill / 4px stretch;background:none;color:#fff;padding:5px 12px}
+html[data-look="royal"] .btn.small{padding:2px 9px}
+html[data-look="royal"] :is(.chipbtn,.speedchip,.sseg){border-radius:0;border:2px solid #3a3a6e;background:#222244}
+html[data-look="royal"] .chipbtn.on{border-color:var(--brass)}
+html[data-look="royal"] :is(h1,.sheet h2,#pagehost h2,.section h3){color:#ffe9a8;text-shadow:2px 2px 0 #05061a;letter-spacing:.02em}
+html[data-look="royal"] nav.tabs button[aria-selected="true"]{color:#ffe9a8;text-shadow:2px 2px 0 #05061a}
+
+/* ---- Paper: folded cream card stock, ink and hand lettering (Origami) ---- */
+html:root[data-look="paper"]{--bg:#e6ddc4;--panel:#fbf7ec;--panel2:#f2ecda;--ink:#2a2827;--muted:#5d5852;--brass:#285480;--brass-soft:rgba(40,84,128,.11);--red:#9c3020;--green:#2c6636;--grass:#2c6636;--grass-soft:rgba(44,102,54,.12);--line:#d3c8ac;--stone:#b4a88c;
+  --t-common:#857d6e;--t-rare:#285480;--t-epic:#6a3f8c;--t-legendary:#a2770e;--t-historic:#9c3020;--t-mythic:#1d7a80}
+html:root[data-look="paper"]:is(:lang(en),:lang(es),:lang(fr),:lang(de),:lang(pt),:lang(it)){--display:"Patrick Hand","Cinzel",cursive;--body:"Nunito","Alegreya Sans",sans-serif}
+html[data-look="paper"] body{background:url("art/skin/paper/sheet.png") 0 0/128px 128px,#e6ddc4;background-blend-mode:multiply}
+html[data-look="paper"] :is(.section,.queue,.tech,.dtcard,.offer){border:0;border-radius:2px;background:linear-gradient(225deg,#e6ddc4 50%,#d8cdae 50%) top right/14px 14px no-repeat,var(--panel);box-shadow:0 0 0 1px rgba(60,50,30,.08),3px 4px 0 rgba(60,50,30,.15)}
+html[data-look="paper"] .sheet{border:0;border-radius:3px;background:linear-gradient(90deg,#0000 11px,rgba(226,169,156,.55) 11px 12px,#0000 12px),repeating-linear-gradient(180deg,#0000 0 27px,rgba(40,84,128,.07) 27px 28px),var(--panel);box-shadow:0 0 0 1px rgba(60,50,30,.1),4px 5px 0 rgba(60,50,30,.18)}
+html[data-look="paper"] :is(.hero,.unit,.medal,.effect,.dtitem,.choice,.sgrp,.bnow){background:var(--panel2);border:1px solid #ddd3b8;border-radius:3px}
+html[data-look="paper"] .plot{background:var(--panel);border:1px solid #d3c8ac;border-radius:3px;box-shadow:2px 3px 0 rgba(60,50,30,.13)}
+html[data-look="paper"] .plot.empty{background:transparent;box-shadow:none;border:1.5px dashed #b4a88c}
+html[data-look="paper"] .btn{border-radius:4px;letter-spacing:.01em}
+html[data-look="paper"] .btn:not(.ghost):not(.danger){background:#285480;color:#fbf7ec;box-shadow:0 3px 0 #17334e}
+html[data-look="paper"] .btn.ghost{background:#fbf7ec;box-shadow:inset 0 0 0 1.5px #2a2827,0 3px 0 rgba(42,40,39,.22)}
+html[data-look="paper"] .btn.danger:not(.ghost){background:#9c3020;color:#fbf7ec;box-shadow:0 3px 0 #5e1c13}
+html[data-look="paper"] .btn:active{transform:translateY(2px)}
+html[data-look="paper"] :is(.chipbtn,.speedchip){background:#fbf7ec;border:1.5px solid #2a2827;border-radius:5px}
+html[data-look="paper"] .speedchip.helpchip{background:#285480;color:#fbf7ec;border-color:#285480}
+html[data-look="paper"] :is(h1,.sheet h2,#pagehost h2,.section h3,.plot.th .nm,.hero .hn){letter-spacing:.01em}
+html[data-look="paper"] h1{font-size:1.75rem}
+html[data-look="paper"] nav.tabs button{font-size:1.1rem}
+html[data-look="paper"] nav.tabs button[aria-selected="true"]{color:#9c3020;border-bottom-color:#9c3020}
+
+/* ---- Neon: night city glass, cyan and magenta light (Nightwire) ---- */
+html:root[data-look="neon"]{--bg:#05070d;--panel:#0b111c;--panel2:#101a29;--ink:#dcf7ff;--muted:#8099ad;--brass:#19e3ff;--brass-soft:rgba(25,227,255,.12);--red:#ff3d7f;--green:#3dffa8;--grass:#3dffa8;--grass-soft:rgba(61,255,168,.12);--line:#1c3447;--stone:#2a465c;
+  --t-common:#6f8494;--t-rare:#3d8bff;--t-epic:#b14dff;--t-legendary:#ffd23d;--t-historic:#ff3d5a;--t-mythic:#19e3ff}
+html:root[data-look="neon"]:is(:lang(en),:lang(es),:lang(fr),:lang(de),:lang(pt),:lang(it)){--display:"Chakra Petch","Cinzel",sans-serif;--body:"Chakra Petch","Alegreya Sans",sans-serif}
+html[data-look="neon"] body{background:repeating-linear-gradient(0deg,rgba(25,227,255,.035) 0 1px,#0000 1px 3px),radial-gradient(circle at 85% -8%,rgba(255,61,127,.16),#0000 42%),radial-gradient(circle at 0% 105%,rgba(25,227,255,.13),#0000 45%),var(--bg);background-attachment:fixed}
+html[data-look="neon"] :is(.section,.queue,.tech,.dtcard,.offer,.sheet){border:1px solid #1c3447;border-radius:0;
+  background:linear-gradient(225deg,var(--brass) 0 7px,#0000 7px) top right/16px 16px no-repeat,linear-gradient(135deg,rgba(25,227,255,.06),#0000 45%),var(--panel);
+  box-shadow:inset 3px 0 0 var(--brass),0 0 22px rgba(25,227,255,.05)}
+html[data-look="neon"] :is(.hero,.unit,.medal,.effect,.dtitem,.choice,.sgrp,.bnow){background:var(--panel2);border:1px solid #1c3447;border-radius:0}
+html[data-look="neon"] .hero:hover,html[data-look="neon"] .plot:hover{border-color:var(--brass);box-shadow:0 0 10px rgba(25,227,255,.3)}
+html[data-look="neon"] .plot{background:linear-gradient(160deg,#122033,#0a1018);border:1px solid #1f3a50;border-radius:0;clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,9px 100%,0 calc(100% - 9px))}
+html[data-look="neon"] .plot.th{box-shadow:inset 0 0 24px rgba(25,227,255,.18)}
+html[data-look="neon"] .btn{border-radius:0;letter-spacing:.04em;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+html[data-look="neon"] .btn:not(.ghost):not(.danger){background:#19e3ff;color:#021219}
+html[data-look="neon"] .btn.ghost{background:rgba(25,227,255,.07);color:var(--ink);box-shadow:inset 0 0 0 1px #2b6680}
+html[data-look="neon"] .btn.danger:not(.ghost){background:#ff3d7f;color:#1a0210}
+html[data-look="neon"] :is(.chipbtn,.speedchip,.sseg){border-radius:0;border-color:#24506a;background:rgba(25,227,255,.05)}
+html[data-look="neon"] .chipbtn.on{box-shadow:0 0 8px rgba(25,227,255,.4)}
+html[data-look="neon"] h1{font-family:"Orbitron",var(--display);letter-spacing:.06em;color:#eafcff;text-shadow:0 0 8px rgba(25,227,255,.7),0 0 18px rgba(25,227,255,.35)}
+html[data-look="neon"] :is(.sheet h2,#pagehost h2,.section h3){color:#eafcff;text-shadow:0 0 8px rgba(25,227,255,.45)}
+html[data-look="neon"] nav.tabs button[aria-selected="true"]{color:var(--brass);text-shadow:0 0 8px rgba(25,227,255,.7)}
+html[data-look="neon"] nav.tabs .tabrow{border-bottom-color:#1c3447}
+html[data-look="forged"] .walls{background:linear-gradient(180deg,#4f4858,#2e2a34);box-shadow:inset 0 0 0 1px #6a5a36}
+html[data-look="forged"] .walls::before{background:#4f4858}
+html[data-look="royal"] .walls{background:linear-gradient(180deg,#3a54c8,#24308a);box-shadow:inset 0 0 0 2px #f7c64a}
+html[data-look="royal"] .walls::before{background:#24308a}
+html[data-look="paper"] .walls{background:#d8cdae;box-shadow:2px 3px 0 rgba(60,50,30,.15)}
+html[data-look="paper"] .walls::before{background:#cfc3a2}
+html[data-look="neon"] .walls{background:#0f1a2a;box-shadow:inset 0 0 0 1px #19e3ff,0 0 14px rgba(25,227,255,.25)}
+html[data-look="neon"] .walls::before{background:repeating-linear-gradient(90deg,#19e3ff 0 14px,#0000 14px 24px);opacity:.7}
 *,*::before,*::after{box-sizing:inherit}
 details > *{box-sizing:border-box} /* newer Chrome puts details content in a ::details-content box that * does not reach, so it fell back to content-box */
 details::details-content{box-sizing:border-box}
@@ -1899,6 +2000,7 @@ table.simtab td.simherotd{text-align:left;overflow-wrap:normal;word-break:normal
       <button class="mptile mpkg" data-act="tab" data-tab="alliance"><i data-ico="crest"></i><span>Pact</span></button>
       <button class="mptile" data-act="tab" data-tab="war"><i data-ico="helm"></i><span>War Room</span></button>
       <button class="mptile" data-act="tab" data-tab="college"><i data-ico="academy"></i><span>War College</span></button>
+      <button class="mptile" data-act="cave-open"><i data-ico="helm"></i><span>The Caves</span></button>
       </div>
       <div class="mph">You</div><div class="mpgrid">
       <button class="mptile evchip" data-act="ev-open" id="evchip" style="display:none" aria-label="Event"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 9.2c.5-.9 1.1-1.4 1.6-1.6l.3 1.6c1.6-.2 3.5-1.6 4.6-3.6 1 1.1 2.9 1.9 5 1.7-1 1.3-1.6 3.1-1.4 4.9-1.3-.6-2.9-.6-4 .1-.5-1.1-1.6-1.8-2.7-1.8-.6 1-1.5 2.3-3.4 3.9-1.9-1.6-2.8-2.9-3.4-3.9-1.1 0-2.2.7-2.7 1.8-1.1-.7-2.7-.7-4-.1.2-1.8-.4-3.6-1.4-4.9 2.1.2 4-.6 5-1.7 1.1 2 3 3.4 4.6 3.6l.3-1.6c.5.2 1.1.7 1.6 1.6z"/></svg><span>Event</span><b class="mpb" id="evn"></b></button>
@@ -1937,7 +2039,7 @@ table.simtab td.simherotd{text-align:left;overflow-wrap:normal;word-break:normal
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.142";
+var APP_VERSION = "0.2.143";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -4347,6 +4449,16 @@ function hallSync(){ if (!S || !S.cities || !S.map) return; var H=hallS(), ch=fa
 setInterval(function(){ try { hallSync(); } catch(e){} }, 20000);
 function hallBtnHtml(){ try { hallSync(); } catch(e){} var HH=hallS(); return '<button class="hallbtn" data-act="hall-open"><span class="ico">'+ICON.crest+'</span><span><b>Hall of History</b><span class="dur">'+(function(){ var nh=Object.keys(HH.h).filter(function(n){ return hallHero(n); }).length, nc=Object.keys(HH.c).length; return nh+(nh===1?' hero':' heroes')+' \u00b7 '+nc+(nc===1?' city':' cities'); })()+', and their stories</span></span></button>'; }
 function hallHero(n){ return HISTORIC.indexOf(n)>=0 || EV_HEROES[n] || Object.keys(HC_CITY_HERO).some(function(c){ return HC_CITY_HERO[c].name===n; }); }
+// the Caves (Cody, Nov 2026): cave.js holds the whole minigame and its art list; loaded the first time it opens. ?cavepreview lends every hero (test builds only)
+var CAVE_LOADING=false;
+function caveOpen(){ var mp=document.getElementById("morepanel"); if (mp && !mp.hidden && typeof moreClose==="function") moreClose();
+  if (window.CV && window.CV.open){ window.CV.open(); return; } if (CAVE_LOADING) return; CAVE_LOADING=true;
+  window.CV=window.CV||{}; if (/[?&]cavepreview/.test(location.search) && !/iborygame\.com$/.test(location.hostname)) window.CV.preview=1; // never on the live site
+  window.CV_G={S:function(){ return S; }, save:save, HISTORIC:HISTORIC, histStats:histStats, EV_HEROES:EV_HEROES, HC_CITY_HERO:HC_CITY_HERO, hhOwned:hhOwned,
+    VAMP:VAMP, KNIGHT:KNIGHT, WIZ_SPR:WIZ_SPR, DMON_ART:DMON_ART, HPORT_BUILTIN:HPORT_BUILTIN, LB_URL:LB_URL, fmt:fmt, lbSync:lbSync};
+  var sc=document.createElement("script"); sc.src="cave.js?v="+(window.IBORY_V||"");
+  sc.onload=function(){ CAVE_LOADING=false; if (window.CV && window.CV.open) window.CV.open(); }; sc.onerror=function(){ CAVE_LOADING=false; toast("Couldn\u2019t load the Caves. Check your connection and try again."); };
+  document.head.appendChild(sc); }
 function hallLoad(){ if (window.IB_HIST || HALL.loading) return; HALL.loading=true; var sc=document.createElement("script"); sc.src="history.js?v="+(window.IBORY_V||"");
   sc.onload=function(){ HALL.loading=false; lastSheet=""; renderSheet(); }; sc.onerror=function(){ HALL.loading=false; HALL.err=true; lastSheet=""; renderSheet(); }; document.head.appendChild(sc); }
 function hallHeroList(){ var out=[];
@@ -6660,7 +6772,7 @@ function grantBeta(){
 /* ---------- high scores (Cloudflare Worker) ---------- */
 var LB_URL = "https://ibory-scores.ibory-reports.workers.dev"; // the Worker address, e.g. "https://ibory-scores.yourname.workers.dev" (empty hides syncing)
 var LB_HC=[12,14,16,18], lbData={}, lbCat="prestige", lbBusy=false, lbErr="", lbLastSync=0;
-var LB_CATS=[["prestige","Prestige"],["power","Power"],["kills","Troops killed"],["deaths","Troops lost"],["hero","Top heroes"],["stars","Star set"],["cities","Cities"],["rep","Pact rep"],["college","War College"]]
+var LB_CATS=[["prestige","Prestige"],["power","Power"],["kills","Troops killed"],["deaths","Troops lost"],["hero","Top heroes"],["stars","Star set"],["cities","Cities"],["rep","Pact rep"],["college","War College"],["cave","The Caves"]]
   .concat(LB_HC.map(function(L){ return ["hc"+L,"First L"+L+" historic"]; }));
 var lbMpSel=null; // which boards are open: null follows this save (single until it does something multiplayer)
 function lbMp(){ return lbMpSel==null ? (S.mp?1:0) : lbMpSel; }
@@ -6684,7 +6796,7 @@ function lbStats(){
   var hc={}; LB_HC.forEach(function(L){ if (S.hcSeen[L]) hc[L]=true; });
   var gev=(S.starLog||[]).filter(function(e){ return e.at>Date.now()-3500000; }).map(function(e){ return {at:e.at, st:e.st, nm:e.nm}; }); // every 11+ star hit of the last hour, for the world chat
   return {prestige:Math.floor(S.prestige||0), deaths:Math.floor((S.stats&&S.stats.lostT)||0), killsBy:achStore().kills.map(function(x){ return Math.floor(x||0); }),
-    hero:hero, heroName:heroName, heroId:heroId, heroStats:heroStats, heroes:lbHeroes(), stars:bestGearSet(), gearEv:gev, college:wcStars(), cities:S.cities.length, rep:Math.floor((S.alliance&&S.alliance.rep)||0), hc:hc, power:powerOf(true).total, ev:evLbStat()};
+    hero:hero, heroName:heroName, heroId:heroId, heroStats:heroStats, heroes:lbHeroes(), stars:bestGearSet(), gearEv:gev, college:wcStars(), cities:S.cities.length, rep:Math.floor((S.alliance&&S.alliance.rep)||0), hc:hc, power:powerOf(true).total, ev:evLbStat(), cave:(S.cave&&S.cave.best)||0};
 }
 // 0.2.30: the hero board lists heroes: every player's heroes (0.2.31: all of them, it was the 10 best; 500 is a safety cap), gear included
 var LB_HPER=500, lbHSort="lv", LB_HSORTS=[["lv","Level"],["atk","Attack"],["int","Intelligence"],["pol","Politics"]];
@@ -10871,7 +10983,7 @@ function applyTheme(){ try { mapDirty(); } catch(e){}
   var lk=""; try { lk = S && S.me && S.me.ui!==false ? myLook("city") : ""; } catch(e){}
   if (lk) root.setAttribute("data-look",lk); else root.removeAttribute("data-look");
   var dark = lk || t==="dark" || (t==="auto" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
-  var mt=document.querySelector('meta[name="theme-color"]'); if (mt) mt.setAttribute("content", lk?{halloween:"#1b1226",automaton:"#1a2229",bughunter:"#1d2a18",harvest:"#22170f"}[lk]:dark?"#252a27":"#d8dbd2");
+  var mt=document.querySelector('meta[name="theme-color"]'); if (mt) mt.setAttribute("content", lk?{halloween:"#1b1226",automaton:"#1a2229",bughunter:"#1d2a18",harvest:"#22170f",forged:"#121016",royal:"#0b0d24",paper:"#e6ddc4",neon:"#05070d"}[lk]:dark?"#252a27":"#d8dbd2");
 }
 // 0.2.85: a save code or save file never carries the account's sign-in tokens (sharing one gave the account away). Restoring one keeps this device's sign-in.
 function exportJson(){ return JSON.stringify(S, function(k,v){ return (k==="token" && this && (this===S.cloud || this===S.lb)) ? undefined : (k==="pvpId" && this===S) ? undefined : v; }); }
@@ -14365,12 +14477,12 @@ function profSync(){ // sends your image and frame to the server so alliance mat
 }
 var COSM={ // cosmetics: look only, never changes how the game plays. Prices and what you own come from the server (/cos/state)
   frame:{bughunter:{name:"Bug Hunter", desc:"For the beta testers who hunted bugs", icon:"bug"}, fire:{name:"Fire", desc:"Flames round your picture", icon:"cfire"}, water:{name:"Water", desc:"A cool blue ring", icon:"cwater"}, rock:{name:"Rock", desc:"Solid grey stone", icon:"crock"}, leaf:{name:"Leaf", desc:"Fresh leaf green", icon:"cleaf"}, halloween:{name:"Halloween", desc:"Pumpkin orange and witch purple", icon:"cpump"}, automaton:{name:"Automaton", desc:"Steel with a cyan glow", icon:"cbot"}},
-  city:{bughunter:{name:"Bug Hunter", desc:"A mossy castle with a ladybug on the gate"}, halloween:{name:"Halloween", desc:"Witch-hat towers and a pumpkin at the gate"}, automaton:{name:"Automaton", desc:"A clockwork castle with a glowing visor"}, harvest:{name:"Harvest", desc:"Autumn banners on the towers and a harvest wreath over the gate"}},
+  city:{bughunter:{name:"Bug Hunter", desc:"A mossy castle with a ladybug on the gate"}, halloween:{name:"Halloween", desc:"Witch-hat towers and a pumpkin at the gate"}, automaton:{name:"Automaton", desc:"A clockwork castle with a glowing visor"}, harvest:{name:"Harvest", desc:"Autumn banners on the towers and a harvest wreath over the gate"}, forged:{name:"Forged", desc:"A dark iron keep with riveted walls and a glowing forge gate"}, royal:{name:"Royal", desc:"A gilded palace with crowned towers and blue banners"}, paper:{name:"Paper", desc:"A folded paper castle with a red ink seal"}, neon:{name:"Neon", desc:"A night-city fortress outlined in cyan and pink light"}},
   march:{bughunter:{name:"Bug Hunter", desc:"A little bug marches for you"}, halloween:{name:"Halloween", desc:"A bat flutters ahead of your army"}, automaton:{name:"Automaton", desc:"A tin robot marches for you"}}};
 COSM.frame.ruler={name:"Ruler", desc:"Held the Throne and ruled the server for a week", icon:"crest"}; // 0.2.37
 COSM.frame.warbringer={name:"Warbringer", desc:"Earned with 2,000 alliance-war points", icon:"rally"}; COSM.frame.warlord={name:"Warlord", desc:"Earned with 20,000 alliance-war points", icon:"crest"};
 var FRAMES=COSM.frame;
-var CPAL={bughunter:{bg:"#2f5a2a",w:"#a8d98a",d:"#6fa653",a:"#e8c34a"}, halloween:{bg:"#2b1a3a",w:"#8a68a8",d:"#5d4278",a:"#ff8a1f"}, automaton:{bg:"#26343d",w:"#b4c4d0",d:"#7d909e",a:"#3fe0e8"}, harvest:{bg:"#3a2412",w:"#d6a066",d:"#8a4f24",a:"#e8a33a"}};
+var CPAL={bughunter:{bg:"#2f5a2a",w:"#a8d98a",d:"#6fa653",a:"#e8c34a"}, halloween:{bg:"#2b1a3a",w:"#8a68a8",d:"#5d4278",a:"#ff8a1f"}, automaton:{bg:"#26343d",w:"#b4c4d0",d:"#7d909e",a:"#3fe0e8"}, harvest:{bg:"#3a2412",w:"#d6a066",d:"#8a4f24",a:"#e8a33a"}, forged:{bg:"#1a1416",w:"#5b5563",d:"#3a3540",a:"#e6c25a"}, royal:{bg:"#0b0d24",w:"#3a54c8",d:"#24308a",a:"#f7c64a"}, paper:{bg:"#8a7f66",w:"#fbf7ec",d:"#ddd2b4",a:"#9c3020"}, neon:{bg:"#05070d",w:"#0f1a2a",d:"#0a1220",a:"#19e3ff"}};
 function cosCastleSvg(st, px){ // one castle drawing used on the alliance map, in the Me sheet and (as a picture) on the world map; original art
   var p=CPAL[st]; if (!p) return "";
   var o='<svg '+(px?'xmlns="http://www.w3.org/2000/svg" width="'+px+'" height="'+px+'" ':'')+'viewBox="0 0 24 24" aria-hidden="true">';
@@ -14387,6 +14499,17 @@ function cosCastleSvg(st, px){ // one castle drawing used on the alliance map, i
     o+='<path d="M11.300 16.700l.7-.6.7.6-.7.5z" fill="#8a2a1a"/>';
     o+='<ellipse cx="4.200" cy="20.300" rx="1.500" ry="1.050" fill="#e07a2a"/><path d="M3.500 19.500v1.600M4.900 19.500v1.600" stroke="#c0601e" stroke-width=".35"/><rect x="4" y="18.700" width=".4" height=".7" fill="#4a6a2a"/>';
     o+='<ellipse cx="20" cy="20.300" rx=".85" ry="1" fill="#e8c36a"/><rect x="19.800" y="18.900" width=".4" height=".6" fill="#4a6a2a"/><ellipse cx="7.600" cy="21.300" rx=".7" ry=".35" transform="rotate(20 7.600 21.300)" fill="#c8442a"/><ellipse cx="16.600" cy="21.400" rx=".7" ry=".35" transform="rotate(-25 16.600 21.400)" fill="#e8a33a"/>'; }
+  else if (st==="forged"){ // 0.2.143: riveted iron, a gold band and an ember glow in the gate
+    o+='<rect x="6" y="15" width="12" height=".8" fill="'+p.a+'"/><path d="M10.700 21v-3a1.300 1.300 0 0 1 2.600 0V21z" fill="#ff8a2a"/>';
+    [[3.7,10],[6.3,10],[17.7,10],[20.3,10],[3.7,18],[6.3,18],[17.7,18],[20.3,18],[8,13],[16,13]].forEach(function(c){ o+='<circle cx="'+c[0]+'" cy="'+c[1]+'" r=".45" fill="'+p.a+'"/>'; }); }
+  else if (st==="royal"){ // gold crowns on the towers, blue pennants, gold trim
+    [5,19].forEach(function(x){ o+='<path d="M'+(x-1.600)+' 6.300L'+(x-1.600)+' 4.300L'+(x-.8)+' 5.300L'+x+' 3.800L'+(x+.8)+' 5.300L'+(x+1.600)+' 4.300L'+(x+1.600)+' 6.300z" fill="'+p.a+'"/>'; });
+    o+='<path d="M12 11V6.500" stroke="'+p.a+'" stroke-width=".5"/><path d="M12 6.600L15.200 7.500L12 8.400z" fill="#e8f0ff"/><rect x="6" y="11" width="12" height=".8" fill="'+p.a+'"/><rect x="2.500" y="8" width="5" height=".7" fill="'+p.a+'"/><rect x="16.500" y="8" width="5" height=".7" fill="'+p.a+'"/><circle cx="12" cy="14.300" r="1.100" fill="'+p.a+'"/>'; }
+  else if (st==="paper"){ // creases across the folded walls and a red ink seal
+    o+='<path d="M2.500 8L7.500 21M16.500 21L21.500 8M6 11L12 21M18 11L12 21" stroke="#cfc3a2" stroke-width=".35" fill="none"/><path d="M2.500 8h5v13h-5zM16.500 8h5v13h-5zM6 11h12v10H6z" stroke="#8a7f66" stroke-width=".35" fill="none"/>';
+    o+='<circle cx="12" cy="14.300" r="1.500" fill="'+p.a+'"/><path d="M11.300 14.300h1.400M12 13.600v1.400" stroke="#fbf7ec" stroke-width=".35"/>'; }
+  else if (st==="neon"){ // cyan light lines round the walls, a pink window strip, antennas
+    o+='<path d="M2.500 8h5v13h-5zM16.500 8h5v13h-5zM6 11h12v10H6z" stroke="'+p.a+'" stroke-width=".5" fill="none"/><rect x="8" y="13" width="8" height=".9" fill="#ff3d7f"/><path d="M5 8V3.800M19 8V3.800" stroke="'+p.a+'" stroke-width=".4"/><circle cx="5" cy="3.600" r=".55" fill="#ff3d7f"/><circle cx="19" cy="3.600" r=".55" fill="#ff3d7f"/><path d="M10 21v-3.500a2 2 0 0 1 4 0V21" stroke="'+p.a+'" stroke-width=".4" fill="none"/>'; }
   else if (st==="automaton"){ o+='<path d="M5 8V3.500M19 8V3.500" stroke="'+p.w+'" stroke-width=".8"/><circle cx="5" cy="3.200" r="1" fill="'+p.a+'"/><circle cx="19" cy="3.200" r="1" fill="'+p.a+'"/><rect x="8" y="12.500" width="8" height="2" rx="1" fill="'+p.a+'"/><circle cx="4" cy="11" r=".5" fill="'+p.bg+'"/><circle cx="6" cy="11" r=".5" fill="'+p.bg+'"/><circle cx="18" cy="11" r=".5" fill="'+p.bg+'"/><circle cx="20" cy="11" r=".5" fill="'+p.bg+'"/><rect x="11.200" y="19" width="1.600" height=".8" fill="'+p.a+'"/>'; }
   return o+'</svg>';
 }
@@ -17033,6 +17156,7 @@ document.addEventListener("click",function(e){
   if (act==="build-new"){ var bnw=sheetFor.w, bni=sheetFor.i, bnt=a.dataset.type; if (!startBuild(bnw,bni,bnt)) toastQ(DEF[bnt].name+" added to the build queue"); bqFill(bnw,bni,bnt,Math.max(1,+a.dataset.to||1)); closeSheet(); refresh(); return; } // 0.2.83: up to the picked level
   if (act==="tax"){ S.tax=Math.max(0,Math.min(80,S.tax+(+a.dataset.d))); save(); tickText(); lastView=""; renderView(true); return; }
   if (act==="quests"){ goPage("quests"); return; }
+  if (act==="cave-open"){ caveOpen(); return; } // the Caves: the historic-hero auto-battler, its own full screen (cave.js)
   if (act==="drops-open"){ goPage("drops"); return; } // 0.2.104 (Cody): a tab like the high scores, not a full-screen sheet
   if (act==="dt-mode"){ DT.mode=a.dataset.v; lastSheet=""; renderSheet(); return; }
   if (act==="dt-base"){ DT.base=a.dataset.v==="1"; lastSheet=""; renderSheet(); return; }
@@ -17174,7 +17298,7 @@ document.addEventListener("click",function(e){
     if (act==="al-start"){ alDo("/al/start",{kind:a.dataset.kind, key:a.dataset.key},"Started"); return; }
     if (act==="al-donate"){ var dg={}, any=false; for (var dk in ALD){ var dv=Math.max(0,Math.floor(+ALD[dk]||0)); if (dv>Math.floor(S.res[dk])){ toast("You don\u2019t have that much "+RNAME[dk].toLowerCase()); return; } dg[dk]=dv; if (dv) any=true; }
       if (!any){ toast("Type how much to donate"); return; } if (ALS.donating) return; ALS.donating=true;
-      alPost("/al/donate",{res:dg}).then(function(d){ ALS.donating=false; if (d.error){ toast(d.error); return; } for (var k in dg) S.res[k]-=dg[k]; ALD={food:"",lumber:"",stone:"",iron:"",gold:""}; save(); toastQ("Donated. Thank you!"); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); ALS.last=0; alSync(); refresh(); })
+      alPost("/al/donate",{res:dg}).then(function(d){ ALS.donating=false; if (d.error){ toast(d.error); return; } var gv=d.given||dg; for (var k in dg) S.res[k]-=Math.min(dg[k], +gv[k]||0); ALD={food:"",lumber:"",stone:"",iron:"",gold:""}; /* 0.2.142: only take what the bank actually received */ save(); toastQ("Donated. Thank you!"); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); ALS.last=0; alSync(); refresh(); })
         .catch(function(){ ALS.donating=false; toast("Couldn\u2019t reach the server"); }); return; }
     if (act==="al-lendacad"){ var lci=+a.dataset.ci; withCity(lci,function(){ if (!S.alAcad && S.research){ toast("Finish or cancel this city\u2019s research first"); return; } S.alAcad=!S.alAcad; toastQ(S.alAcad?S.name+"\u2019s Academy now works for the alliance":S.name+"\u2019s Academy is back to its own research"); }); save(); lastView=""; renderView(true); processAll(); renderQueue(); return; }
     if (act==="al-lendbld"){ var bci=+a.dataset.ci, bn=+a.dataset.n; withCity(bci,function(){ if (S.builds.length>BUILDERS-bn){ toast("Those builders are busy here"); return; } S.alBld=bn; toastQ(bn?bn+" builder"+(bn>1?"s":"")+" from "+S.name+" now work"+(bn>1?"":"s")+" for the alliance":S.name+"\u2019s builders are back home"); }); save(); lastView=""; renderView(true); processAll(); renderQueue(); return; }
