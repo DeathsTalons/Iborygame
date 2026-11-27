@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.154";
+window.IBORY_V="0.2.155";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -2039,7 +2039,7 @@ table.simtab td.simherotd{text-align:left;overflow-wrap:normal;word-break:normal
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.154";
+var APP_VERSION = "0.2.155";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -11048,6 +11048,8 @@ try { if (loadRaw && !loadFail){ var p = JSON.parse(loadRaw); if (p && p.v>=1 &&
 if (loadFail){ try { if (loadRaw) localStorage.setItem(BK_RESCUE, loadRaw); } catch(e){} saveLocked=true; } // a save that won't open is never written over
 else if (!loadRaw){ var bkb=bkMeta(BK_BEST); if (bkb && bkb.score>=1000) recoverOffer=true; }
 if (!S) S = newState();
+if (IDBL.state==="ok"){ try { sessionStorage.removeItem("ibory-idbwait"); } catch(e){} }
+var LOAD_SVAT=(S&&S.svAt)||0; // when the copy we opened was written (idbLate compares a late database against it)
 S.speed=1; // real time
 // 0.2.14: make-up time. A full browser storage stopped saves (see save()), and players lost a night: every existing game gets 8 hours once,
 // run by the normal catch-up below. Marked in the save and on the device, so restoring an older copy or a cloud save can't take it twice.
@@ -11133,6 +11135,22 @@ function idbFlush(){ if (IDB.busy || !IDB.pend || IDB.bad || !IDB.db) return; va
     tx.oncomplete=function(){ IDB.busy=false; IDB.ok=true; IDB.retried=false; IDB.size=p.json.length; IDB.at=p.at; try { localStorage.setItem("ibory-idbat", String(p.at)); } catch(e){} idbFlush(); };
     tx.onerror=function(){ fail(tx.error); }; tx.onabort=function(){ fail(tx.error||"aborted"); };
   } catch(e){ fail(e); } }
+/* 27 Nov: a database that answers after the game has started (or comes back after failing) is taken up again. If it holds a newer save
+   than the one we opened, nothing is written: the game reloads and waits longer for it, so that save is the one that opens. */
+function idbLate(db){ if (!db || (IDB.db && !IDB.bad)) return;
+  try { var g=db.transaction("kv","readonly").objectStore("kv").get("save");
+    g.onsuccess=function(){ var v=g.result, at=(v&&v.at)||0;
+      var newer=(loadFail && loadFail.why==="idb") || (!loadFail && loadFrom!=="idb" && at>LOAD_SVAT+1000); // the boot already locked saving if it knew the database held the newest copy
+      if (loadFail && !newer) return; // some other load problem: leave it to the recovery screen
+      if (newer){ saveLocked=true; var wn=0; try { wn=+sessionStorage.getItem("ibory-idbwait")||0; } catch(e){}
+        if (wn>=3){ try { toast("Your newest save is on this device but it\u2019s opening very slowly. Close the game fully and open it again."); } catch(e){} return; } // never loop
+        try { sessionStorage.setItem("ibory-idbwait", String(wn+1)); } catch(e){} try { toast("Found a newer save on this device, reopening it\u2026"); } catch(e){} setTimeout(function(){ location.reload(); }, 900); return; }
+      try { sessionStorage.removeItem("ibory-idbwait"); } catch(e){}
+      IDB.db=db; IDB.bad=false; IDB.err=""; IDB.retried=false; save(); };
+    g.onerror=function(){}; } catch(e){} }
+window.__iboryIdbLate=idbLate; if (window.__IBORY_IDB_LATE) setTimeout(function(){ idbLate(window.__IBORY_IDB_LATE); }, 0);
+setInterval(function(){ if (!IDB.bad || saveLocked || !window.indexedDB) return; // a database that failed is tried again every minute
+  try { var rq=indexedDB.open("ibory",1); rq.onupgradeneeded=function(){ try { rq.result.createObjectStore("kv"); } catch(e){} }; rq.onsuccess=function(){ idbLate(rq.result); }; } catch(e){} }, 60000);
 function idbSave(json, at){ if (IDB.bad || !IDB.db) return false; IDB.pend={json:json, at:at}; idbFlush(); return true; }
 function save(){ mapDirty(); if (saveLocked) return; var json, at=Date.now();
   S.svAt=at; // 0.2.94: when this copy was written; on the next open it is compared with the cloud's latest (cbCheck)
@@ -18374,16 +18392,20 @@ window.addEventListener("pagehide",function(){ advance(Date.now()); save(); });
 (function(){
   var started=false, R={state:"none"};
   function go(){ if (started) return; started=true; window.__IBORY_IDB=R; var m=document.getElementById("ibory-main"), sc=document.createElement("script"); sc.textContent=m.textContent; document.body.appendChild(sc); }
-  var t=setTimeout(function(){ R={state:"timeout"}; go(); }, 3000);
+  // 27 Nov (Sax, iPhone): a slow database used to be dropped for the whole session, so a big save fell back to the small store and overflowed it.
+  // Now a database that answers late is handed to the game (__iboryIdbLate), and a reload asked for by the game waits up to 20 s.
+  var wait=3000; try { var wn=+sessionStorage.getItem("ibory-idbwait")||0; if (wn) wait=wn>=2?60000:20000; } catch(e){}
+  function late(db){ window.__IBORY_IDB_LATE=db; try { if (window.__iboryIdbLate) window.__iboryIdbLate(db); } catch(e){} }
+  var t=setTimeout(function(){ R={state:"timeout"}; go(); }, wait);
   try {
     if (!window.indexedDB) { clearTimeout(t); go(); return; }
     var rq=indexedDB.open("ibory", 1);
     rq.onupgradeneeded=function(){ try { rq.result.createObjectStore("kv"); } catch(e){} };
     rq.onerror=function(){ clearTimeout(t); R={state:"error"}; go(); };
     rq.onblocked=function(){ clearTimeout(t); R={state:"error"}; go(); };
-    rq.onsuccess=function(){ var db=rq.result;
+    rq.onsuccess=function(){ var db=rq.result; if (started){ late(db); return; }
       try { var g=db.transaction("kv","readonly").objectStore("kv").get("save");
-        g.onsuccess=function(){ if (started) return; clearTimeout(t); var v=g.result; R={state:"ok", db:db, json:v&&v.json||null, at:v&&v.at||0}; go(); };
+        g.onsuccess=function(){ if (started){ late(db); return; } clearTimeout(t); var v=g.result; R={state:"ok", db:db, json:v&&v.json||null, at:v&&v.at||0}; go(); };
         g.onerror=function(){ clearTimeout(t); R={state:"error"}; go(); };
       } catch(e){ clearTimeout(t); R={state:"error"}; go(); } };
   } catch(e){ clearTimeout(t); R={state:"error"}; go(); }
