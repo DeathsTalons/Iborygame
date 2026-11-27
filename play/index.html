@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Ibory</title>
 <script id="i18n">
-window.IBORY_V="0.2.153";
+window.IBORY_V="0.2.154";
 /* ---------- translations (0.2.7) ----------
    The game is written in English. When another language is picked (Settings, Language), this runtime translates what is on
    screen as it appears: every text node and the title / placeholder / aria-label / alt attributes, through lang/<code>.js.
@@ -2039,7 +2039,7 @@ table.simtab td.simherotd{text-align:left;overflow-wrap:normal;word-break:normal
 <script type="text/x-ibory" id="ibory-main">
 (function(){
 "use strict";
-var APP_VERSION = "0.2.153";
+var APP_VERSION = "0.2.154";
 var SITE_URL = "https://iborygame.com"; // 0.1.258: the website (landing page, privacy policy, account page); the game lives at SITE_URL/play/
 var HERO_ATK_DIV = 200; // battle rules (0.1.249): a hero's Attack adds +0.5% troop attack per point (the classic rules were +1%: 100)
 var DISCORD_URL = "https://discord.gg/H8gErENmWe";
@@ -4122,6 +4122,7 @@ function chessSheet(){ var run=chessRunLatest(); if (!run) return '<div class="h
 var EVB={d:null, at:0, busy:false, err:""};
 function evLbStat(){ var ev=evNow(); if (!ev || !EV_TRACK[ev.id] || !S.evk || !S.evk[ev.id]) return undefined; return {id:ev.id, n:Math.floor(S.evk[ev.id].n||0)}; }
 function evBoardFetch(force){ var ev=evNow(); if (!LB_URL || !ev || !EV_TRACK[ev.id] || EVB.busy) return; if (force!==true && EVB.d && EVB.d.cat==="ev_"+ev.id && Date.now()-EVB.at<60000) return;
+  if (force!==true && EVB.err && Date.now()-EVB.at<30000) return; // 27 Nov (Cody: the event page froze): a failed load redraws the page, and the redraw asked again at once, forever. A failure now waits 30 s (↻ still forces it).
   EVB.busy=true; EVB.at=Date.now();
   var go=function(){ fetch(LB_URL+"/board?cat=ev_"+ev.id+(lbOn()&&S.lb.id?"&id="+S.lb.id:""),{cache:"no-store"}).then(function(r){ return r.json(); })
     .then(function(d){ EVB.busy=false; if (d && d.rows){ EVB.d=d; EVB.err=""; } else EVB.err="Couldn\u2019t load the event board"; if (sheetFor && sheetFor.kind==="event"){ lastSheet=""; renderSheet(); } })
