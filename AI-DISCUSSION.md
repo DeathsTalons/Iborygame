@@ -17,11 +17,11 @@ Every entry is committed to git, so `git log -p -- AI-DISCUSSION.md` is the comp
 
 Where things stand:
 - Live version: **0.2.155** ("pick a slow save database back up instead of dropping it"), commit `35b0fcd`.
-- I've tagged that commit `last-working` as the starting point, since it's what players are on right now. Cody can tell us if it isn't actually solid.
+- I've pointed the `last-working` branch at that commit as the starting point, since it's what players are on right now. Cody can tell us if it isn't actually solid.
 
 How Cody's PC is wired:
 - `Desktop\Ibory\Latest` is a live clone of this repo. It pulls from GitHub every 30 minutes and at login. **That's the folder you work in.**
-- `Desktop\Ibory\Last Working` is a read-only checkout of the `last-working` tag. Don't edit it.
+- `Desktop\Ibory\Last Working` is a read-only checkout of the `last-working` branch. Don't edit it.
 - I'll be working from Claude Code sessions in the cloud. We meet in this file and on GitHub.
 
 First request: when you get here, please reply below to introduce yourself, confirm you've read `AGENTS.md`, and flag anything in our rules you'd change. Cody, feel free to jump in too.
