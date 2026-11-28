@@ -10,8 +10,9 @@ Two AI agents work on this repo: **Claude** (Anthropic, via Claude Code) and **G
 ### Before you start any work
 1. `git pull --rebase` first. The other agent may have pushed since you last looked.
 2. Read the newest entries at the bottom of `AI-DISCUSSION.md`.
-3. Post a **CLAIM** entry saying what you're about to change, then commit and push it.
+3. Post a **CLAIM** entry saying what you're about to change, **naming the files or areas** (for example `play/index.html: settings menu`), then commit and push it.
    Don't start on something the other agent has claimed and not yet marked **DONE**. Ask in the discussion instead.
+4. Discussion entries (CLAIM, REVIEW, DONE and the rest) **always go to `main`**, even while your code is on a `claude/<topic>` or `gemini/<topic>` branch. That way the other agent sees them on the next pull, and merging a feature branch never conflicts in the log. Doc-only commits to `AGENTS.md` and `AI-DISCUSSION.md` are fine on `main`.
 
 ### While you work
 - Small, focused commits. Start every commit message with `[claude]` or `[gemini]`.
@@ -22,6 +23,8 @@ Two AI agents work on this repo: **Claude** (Anthropic, via Claude Code) and **G
 - If your work collides with the other agent's (merge conflict, overlapping files), stop and post a **QUESTION**. Never overwrite their work.
 - Disagree openly and politely in the discussion. Cody would rather read a real debate than have one of you silently undo the other.
 
+- **Keep a clean working tree between sessions.** Cody's `Latest` folder pulls from GitHub every 30 minutes. Before you stop, commit your work (on your branch if it isn't for `main`) and switch back to `main`, so a background pull never meets uncommitted edits.
+
 ### When you finish
 Post a **DONE** entry: what changed, the commit hashes or branch, how you tested it, and anything the other agent should review.
 
@@ -29,6 +32,38 @@ Post a **DONE** entry: what changed, the commit hashes or branch, how you tested
 `last-working` is a branch that points at the newest version **Cody has confirmed works**. Cody's PC mirrors it into a "Last Working" folder automatically.
 Never commit to it directly. Only move it when Cody confirms a version works, and log it in the discussion:
 `git push origin <commit>:last-working` (add `--force-with-lease` only if Cody wants to roll it *back* to an older commit).
+
+## What is NOT in this repo (read before touching game code)
+This repo is the **published output**. Some of Ibory's source lives only in Claude's private workspace for now:
+
+| Thing | Where it lives | What that means |
+|---|---|---|
+| The Caves (`play/cave.js`) | Built from separate source files by a build script | **Never edit `play/cave.js` by hand**: the next build replaces it. Describe Caves changes in a CLAIM or QUESTION and Claude makes them in the source. |
+| The game server (`worker.js`, a Cloudflare Worker) | Claude's workspace, deployed with a key that isn't in this repo | Server changes go through Claude. Deploy the server **before** a site release that needs it. |
+| Tests (about 250 browser tests plus server tests), `CHANGELOG.md`, the developer log | Claude's workspace | Claude runs the tests before a release. |
+| Website source for `build.py` (the `website/` and `ibory-phone/` folders it expects) | Not here | **Don't run `build.py` in this repo**; it's for the old bundle layout. Edit the root pages directly. |
+
+**Editing `play/` directly is fine.** Before every release, Claude pulls and folds any `play/` changes made since its last release into its workspace copy, so they aren't overwritten. Say what you changed in your DONE entry.
+
+## Release checklist (a new game version going live)
+A release is a push to `main` that changes `play/`. **Only when Cody has said to push.**
+1. **Pull first** (`git pull --rebase`) and read the bottom of `AI-DISCUSSION.md`, so nobody's work is overwritten.
+2. **One version number for everything.** Bump all of these together, to the same `0.2.x`:
+   - `play/index.html`: `window.IBORY_V` and `var APP_VERSION`
+   - `play/sw.js`: `CACHE` (`ibory-v0.2.x`)
+   - the server's `WORKER_VERSION` (Claude), even when the server code didn't change
+3. **Cache busting.** Changing `CACHE` in `play/sw.js` is what makes installed phones fetch the new files. `cave.js` and the translations are loaded with `?v=IBORY_V`, so they follow the version too.
+   **New art:** any new file under `play/art/` must also be added to `play/art/FILES.json` **and** to the `ART` list in `play/sw.js`, or offline play breaks.
+4. **Server first.** If the release needs server changes, deploy the server before pushing the site. If tables or columns were added, the server's `SCHEMA_VER` must change too.
+5. **Translations** (`play/lang/*.js`). New or changed English text shows in English until it's translated, so a release never waits on translations. Translation updates go out in later batches.
+6. **Test:**
+   - phone widths 390px and 360px;
+   - the Caves both in landscape and turned sideways on an upright phone;
+   - the browser console clean;
+   - Claude runs the test suite.
+7. **Commit message:** `[claude] 0.2.x: what changed` (or `[gemini] …`). Add a player-facing line to the changelog (Claude keeps `CHANGELOG.md`).
+8. **After pushing, verify it's live.** GitHub Pages takes about a minute. Check that `https://iborygame.com/play/sw.js` shows the new `CACHE` name and that the game opens without console errors. Then post **DONE** with the version and commit.
+9. **`last-working`** moves only when Cody confirms the new version works (see above).
 
 ### This repo is public
 Everything here, including `AI-DISCUSSION.md`, is readable by anyone. Never commit API keys, passwords, `.env` files, emails, or customer details.
