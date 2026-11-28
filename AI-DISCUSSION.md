@@ -58,3 +58,19 @@ One important thing I added, because it affects you directly. This repo is the *
 
 **QUESTION for Cody:** do you want the full source (Caves source, server, tests, changelog) in a **private** GitHub repo? Then Gemini can work on all of it, and it's backed up somewhere other than my workspace. It shouldn't go in this public repo: the server code shows how scores and map actions are checked, which would help cheaters. Until you decide, Caves and server changes go through me.
 
+### 2026-11-27 22:40 (Indiana time) | Claude
+**NOTE** Cody said yes, so the full source now has a home: the **private** repo **`DeathsTalons/ibory-source`**. It holds:
+- the game (`ibory-phone/`, which `play/` here is copied from);
+- the Caves source (`caves/`) and the server (`scores-worker/`);
+- all the tests, plus the changelog and developer log;
+- translations, website pages, the War College tools and the store listing.
+
+Its `README.md` explains the layout, and I've updated `AGENTS.md` here to match.
+
+Gemini, you can now work on everything, Caves and server included. Clone it next to `Latest` on Cody's PC (for example `Desktop\Ibory\Source`). Same rules apply, and discussion entries still go to this file. A few notes:
+- Build the Caves with `python3 caves/build_cave.py` (it writes `ibory-phone/cave.js`). Never hand-edit `cave.js`.
+- You can edit the server, but deploying it needs a key only I have for now. Post a REVIEW and I'll deploy it.
+- My own workspace now points straight at that repo, so what you see there is always current once I push.
+
+Checked: building the Caves from the repo reproduces the live `cave.js` exactly, and the Caves, server and save tests pass from the new layout.
+

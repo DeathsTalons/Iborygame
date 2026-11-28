@@ -33,17 +33,19 @@ Post a **DONE** entry: what changed, the commit hashes or branch, how you tested
 Never commit to it directly. Only move it when Cody confirms a version works, and log it in the discussion:
 `git push origin <commit>:last-working` (add `--force-with-lease` only if Cody wants to roll it *back* to an older commit).
 
-## What is NOT in this repo (read before touching game code)
-This repo is the **published output**. Some of Ibory's source lives only in Claude's private workspace for now:
+## The source lives in a second, private repo: `DeathsTalons/ibory-source`
+This repo is the **published output**. The full source is in the **private** repo `DeathsTalons/ibory-source` (same rules: pull first, CLAIM, `[claude]`/`[gemini]` commits, discussion entries go to **this** repo's `AI-DISCUSSION.md`). Its `README.md` explains the layout. In short:
 
-| Thing | Where it lives | What that means |
+| Thing | In `ibory-source` | What that means |
 |---|---|---|
-| The Caves (`play/cave.js`) | Built from separate source files by a build script | **Never edit `play/cave.js` by hand**: the next build replaces it. Describe Caves changes in a CLAIM or QUESTION and Claude makes them in the source. |
-| The game server (`worker.js`, a Cloudflare Worker) | Claude's workspace, deployed with a key that isn't in this repo | Server changes go through Claude. Deploy the server **before** a site release that needs it. |
-| Tests (about 250 browser tests plus server tests), `CHANGELOG.md`, the developer log | Claude's workspace | Claude runs the tests before a release. |
-| Website source for `build.py` (the `website/` and `ibory-phone/` folders it expects) | Not here | **Don't run `build.py` in this repo**; it's for the old bundle layout. Edit the root pages directly. |
+| The game | `ibory-phone/` | This repo's `play/` is a copy of it. Make game changes there; a release copies it to `play/` here. |
+| The Caves | `caves/` (`cave_data.js`, `cave_src.js`, `cave_ui.js`, `fighter.js`) | **Never edit `cave.js` by hand.** Run `python3 caves/build_cave.py`, which writes `ibory-phone/cave.js`. |
+| The game server | `scores-worker/worker.js` (Cloudflare Worker) | Anyone can edit it, but only Claude can deploy it for now (`tools/deploy-worker.py` needs a key that is never committed). Deploy the server **before** a site release that needs it. |
+| Tests | `t/` (browser) and `scores-worker/test-harness/` (server) | Run the ones that touch your change; Claude runs the wider suite before a release. |
+| Changelog and developer log | `CHANGELOG.md`, `BUNDLE.md` | Add a changelog line with every player-facing change. `BUNDLE.md` explains why things are the way they are. |
+| Translations, website pages, War College tools, store listing | `i18n/`, `website/`, `war-college-tools/`, `play-store/` | **Never copy `war-college-tools/` or the server code into this public repo.** |
 
-**Editing `play/` directly is fine.** Before every release, Claude pulls and folds any `play/` changes made since its last release into its workspace copy, so they aren't overwritten. Say what you changed in your DONE entry.
+**Editing `play/` here directly still works:** before every release Claude folds any `play/` changes since its last release back into `ibory-source`, so nothing gets overwritten. Making the change in `ibory-source/ibory-phone/` is better, though. Don't run `build.py` in this repo; it's for an old layout.
 
 ## Release checklist (a new game version going live)
 A release is a push to `main` that changes `play/`. **Only when Cody has said to push.**
@@ -61,7 +63,7 @@ A release is a push to `main` that changes `play/`. **Only when Cody has said to
    - the Caves both in landscape and turned sideways on an upright phone;
    - the browser console clean;
    - Claude runs the test suite.
-7. **Commit message:** `[claude] 0.2.x: what changed` (or `[gemini] …`). Add a player-facing line to the changelog (Claude keeps `CHANGELOG.md`).
+7. **Commit message:** `[claude] 0.2.x: what changed` (or `[gemini] …`), in both repos. Add a player-facing line to `CHANGELOG.md` in `ibory-source`, and push `ibory-source` too.
 8. **After pushing, verify it's live.** GitHub Pages takes about a minute. Check that `https://iborygame.com/play/sw.js` shows the new `CACHE` name and that the game opens without console errors. Then post **DONE** with the version and commit.
 9. **`last-working`** moves only when Cody confirms the new version works (see above).
 
