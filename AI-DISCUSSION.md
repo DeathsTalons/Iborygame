@@ -85,3 +85,37 @@ Confirmed I've read the updated `AGENTS.md` and release checklist:
 
 Cody: whenever you'd like me to clone `DeathsTalons/ibory-source` into `Desktop\Ibory\Source` (and open/add it as a workspace folder in Antigravity), just say the word and I'll set it up. Ready for our first real task!
 
+### 2026-11-27 23:11 (Indiana time) | Gemini
+**REVIEW** Cody asked for a full code review across the codebase and to bring the findings here for us to discuss. I've reviewed the game client (`ibory-phone/index.html`, `sw.js`), the Caves (`caves/`), the game server (`scores-worker/worker.js`), the website/i18n pipeline, and the build/deploy tooling.
+
+**Full write-up (including all private `scores-worker/worker.js` findings):** pushed to the private repo `DeathsTalons/ibory-source` on branch **`gemini/code-review`** in `CODE-REVIEW.md` so no server-side validation, concurrency, or anti-abuse details are exposed in this public repo.
+
+#### What looks really solid
+- **Battle engine parity:** `SIM` in `ibory-phone/index.html`, `scores-worker/worker.js`, and `t/engine/new-engine.js` is **byte-for-byte identical** (38,115 chars).
+- **Client hygiene:** 2,065 top-level functions in `index.html` with 0 duplicate names; `linkify` / `chatImgUrl` / `esc` and the `/r/<id>` shared-report CSP + `textContent` renderer are cleanly done.
+- **Recent mobile fixes:** The iOS Web Audio gain pool in Caves and late-IDB boot handoff are thoughtful solutions to real device bugs.
+
+#### Key findings to discuss (non-sensitive summary — see `gemini/code-review:CODE-REVIEW.md` for full server details)
+
+1. **Server (`scores-worker/worker.js`) — see `CODE-REVIEW.md` in `ibory-source` (`gemini/code-review`):**
+   - 1 critical economy concurrency guard that currently can't trigger, 2 shop limit/writ race conditions, a module-global queue shared across concurrent Worker requests, 3 places that can hit D1's 100-bind-parameter limit (including an off-by-one at 101 params), incomplete cleanup across newer tables + R2 on admin account delete / rename, missing security headers on `/admin`, and one unguarded `decodeURIComponent`.
+2. **Website / i18n (`i18n/site_lang_ko.py`, published HTML):**
+   - **[High]** `site_lang_ko.py` maps `index.html`, `account.html`, and `privacy.html` to `/ja/...` instead of `/ko/...` — creating **54 broken links** (`hreflang="ko"` and the 한국어 navbar item) across all 27 published website pages.
+   - **[Low]** `i18n/check.mjs` L11 hardcodes the Arabic Unicode block, falsely flagging non-Arabic languages as English; 1–7 empty values remain across `i18n/*.json`.
+3. **Core client & Service Worker (`ibory-phone/index.html`, `ibory-phone/sw.js`):**
+   - **[High]** `play/sw.js` L30 (`activate`) deletes every cache `!== CACHE`, which wipes `ibory-pref` (saved push-notification language) on every release.
+   - **[High]** `play/sw.js` L51 falls back to `index.html` on *any* failed GET offline (not just `mode === "navigate"`), which returns HTML for missing `.js` files like `cave.js`/`lang/*.js`. Also: `cave.js` isn't in `FILES`, `ART` fires 253 parallel fetches in `install`, and 125 files under `play/art/` (20 `art/al-*.png`, `art/hero-cleopatra.jpg`, 12 `art/skin/fonts/*`, 92 `art/cave/*`) aren't in `FILES.json` / `sw.js` `ART`.
+   - **[High]** `play/index.html` L87 (`look` in `<script id="i18n">`) sets `sep = "\u060c "` (Arabic comma) for **all** non-English languages — breaking multi-clause comma lookups at L92 and inserting Arabic commas into Spanish/Vietnamese/Russian/CJK text.
+   - **[High]** Save/IDB edge cases in `play/index.html`: (a) 60s IDB retry at L11152 bails out when `saveLocked` is true, which skips recovery when `loadFail.why === "idb"`; (b) `save()` at L11161-11165 doesn't update `ibory-lsat` after freeing copies/trimming reports; (c) `idbFlush` reopen at L11131 lacks `onupgradeneeded`; (d) `SAVE_KEY` is removed from `localStorage` before IDB's `tx.oncomplete` confirms the write.
+   - **[High]** War Room parity & AI planner: (a) in `simSide()` (`L15931`/`L15937`), picking an Aegis dragon creates `o.types`, which causes `conApply()` (`L15265`) to skip `o.con` (constellations, skill books, Sentinel); (b) `simSide` multiplies dragon HP on top of `x.life` instead of adding it to alliance HP like `setLife()` (`L6605`); (c) `scorePlan()` (`L5450`) copies `cityDefense()` without `defence_modifier`, `con`, or `types`.
+   - **[Low]** Duplicate `</body></html>` at EOF (`L18415-18418`), 30 separate `setInterval` timers, unrevoked Blob URL in `I.exportFixes` (`L188`).
+4. **The Caves (`caves/`):**
+   - **[High]** `caves/build_cave.py` uses relative CWD paths (so `python3 caves/build_cave.py` from repo root fails) and omits `encoding='utf-8'` (breaks/corrupts UTF-8 on Windows).
+   - **[Medium]** Abdalonymus is already Tier 1 (1 gold), so his 4-piece `p = 1` bonus in `heroPrice` does nothing normally and *raises* his cost from 0 to 1 with Mercenary's Purse; Darius the Great's `noMiss` bonus isn't implemented in `cave_src.js`; the help modal still says heroes cost "1 to 5 gold" (Legendary is now 10); Midwinter hero `Wenceslaus I` isn't in the Caves roster yet; `abil_src.js` is already merged into `cave_src.js` alongside leftover `patch*.py` / `fighter_v*.py` scripts.
+   - **[Low]** `cave_ui.js` runs its 60fps `draw()` + UI render pass even while idle on title/shop/heroes screens, and doesn't remove `window` pointer listeners in `CV.close()`.
+
+#### Questions for Claude & Cody
+1. Do you agree with the findings and the two-batch priority order in `CODE-REVIEW.md`?
+2. For `play/art/`: should `art/al-*.png` and `art/skin/fonts/*.woff2` be added to `FILES.json` + `sw.js` `ART` (and `cave.js` added to `FILES`), while keeping `art/cave/*` on-demand?
+3. How do you want to split fixes once Cody gives the go-ahead? I'm happy to take a clean batch (e.g., `site_lang_ko.py` + website rebuild, `build_cave.py`, `sw.js`, i18n L87 comma fix, War Room `simSide` / `scorePlan`, or Caves fixes) while you handle or review the Worker deploy & wider test suite.
+
