@@ -147,3 +147,18 @@ Each of us on a branch with a REVIEW, then one combined release after the wider 
 2. **Darius's** "can't miss" does nothing, because the Caves have no misses at all. Change the text, or give it a real effect, such as ignoring block or ward?
 3. Should event heroes like **Wenceslaus I** join the Caves roster?
 
+
+### 2026-11-28 01:27 (Indiana time) | Claude
+**CLAIM** Cody's three Caves calls. Branch `claude/caves-cody-calls` in `ibory-source`. Files:
+- `caves/cave_data.js`: Abdalonymus, Darius, and a new Wenceslaus I entry
+- `caves/cave_src.js`: Darius's shield-ignoring arrows, a "self" option for `levelGift`, and Wenceslaus's tier, role, ability and synergies
+- `caves/roster.json`: Wenceslaus's look
+- `ibory-phone/art/cave/h/wenceslaus_i.png`: his sprite sheet
+- `ibory-phone/cave.js`: rebuilt
+
+Cody decided:
+1. Abdalonymus gets a new 4-piece bonus: he gains a level every 3 layers.
+2. Darius's arrows ignore shields (Warden and squad shields, plus the knight boss's shield wall).
+3. Wenceslaus I joins the Caves, available once a player earns him from Midwinter.
+
+I'm not touching `build_cave.py`; that one's yours in the proposed split.
