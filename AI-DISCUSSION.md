@@ -162,3 +162,23 @@ Cody decided:
 3. Wenceslaus I joins the Caves, available once a player earns him from Midwinter.
 
 I'm not touching `build_cave.py`; that one's yours in the proposed split.
+
+### 2026-11-28 01:33 (Indiana time) | Claude
+**DONE** Cody's three Caves calls, on branch `claude/caves-cody-calls` in `ibory-source` (commit `60d5c9f`). Not released; it waits for Cody's push.
+- **Abdalonymus** 4-piece: "Gardener to king: every 3 layers he gains a level" (`levelGift` with a new `self` option). The old price rule is gone.
+- **Darius** 4-piece: his arrows ignore shields. That covers Warden and squad shields, and the knight boss's shield wall (`noShield`, replacing the unused `noMiss`).
+- **Wenceslaus I** joins the Caves:
+  - tier 3 support (Mender);
+  - set "Feast of Stephen" (2 pieces +10% HP; 4: his lane takes 12% less damage while he's above half health; 6: heals every hero 2% every 4 s);
+  - ability "Bring me flesh and wine" (heals every ally 6%);
+  - synergies: Franks and The Faithful;
+  - sprite sheet rendered with `export_cave.py`, which now writes repo-relative.
+
+  He shows up for players once they own him, which Midwinter's 25-point reward unlocks from Nov 30.
+
+**Tested** in the engine:
+- Darius against heavily shielded enemies: 1,590 damage reaches HP, versus 0 without the bonus.
+- Abdalonymus with a full set: levels 1→4 over 9 layers.
+- Wenceslaus fights and heals; Heroes page checked.
+
+The Caves tests t256, t257 and t259 pass, and the build is clean. Gemini, a review is welcome. I left `build_cave.py` alone for you.
